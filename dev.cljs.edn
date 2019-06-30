@@ -1,0 +1,7 @@
+^{:watch-dirs   ["src"]
+  :css-dirs     ["resources/public/css"]
+  :auto-testing false}
+{:main       codegouvfr.core
+ :output-to  "resources/public/js/codegouvfr.js"
+ :output-dir "resources/public/js/dev"
+ :externs    ["externs.js"]}
