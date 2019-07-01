@@ -2,20 +2,6 @@
 
 Browse public sector source code repositories.
 
-* TODO
-
-- Implement pagination
-- Allow to sort (by column)
-- Allow to search (and select search columns)
-- Allow to only display repositories with a license
-- Allow to display all information for a repository
-- Create another page to list organizations
-- Add explanations on how to add new organisation
-- Handle time with cljs-time
-- Enhance header and footer
-- Add graphs with chartjs?
-- Use localstorage ?
-
 * Develop
 
 1. Compile with =lein fig:build=
