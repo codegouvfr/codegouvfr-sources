@@ -19,12 +19,18 @@
     :orgas        nil
     :sort-by      :stars
     :view         :orgas
-    :reverse-sort :true}))
+    :reverse-sort :true
+    :filter       ""}))
 
 (re-frame/reg-event-db
  :update-repos!
  (fn [db [_ repos]]
    (if repos (assoc db :repos repos))))
+
+(re-frame/reg-event-db
+ :filter!
+ (fn [db [_ s]]
+   (assoc db :filter s)))
 
 (re-frame/reg-event-db
  :view!
@@ -39,6 +45,10 @@
 (re-frame/reg-sub
  :sort-by
  (fn [db _] (:sort-by db)))
+
+(re-frame/reg-sub
+ :filter
+ (fn [db _] (:filter db)))
 
 (re-frame/reg-sub
  :view
@@ -60,6 +70,15 @@
  (fn [db _]
    (assoc db :reverse-sort (not (:reverse-sort db)))))
 
+(defn apply-filter [m s ks]
+  (if (empty? s) m ;; Filter string is empty, return the map
+      (filter (fn [i]
+                (when (re-find (re-pattern (str "(?i)" s))
+                               (clojure.string/join
+                                " " (vals (select-keys i ks))))
+                  i))
+              m)))
+
 (re-frame/reg-sub
  :repos
  (fn [db _]
@@ -73,9 +92,12 @@
                                          (count (:description %2)))
                                (:repos db)) 
                  (:repos db))]
-     (if @(re-frame/subscribe [:reverse-sort])
-       (reverse repos)
-       repos))))
+     (apply-filter
+      (if @(re-frame/subscribe [:reverse-sort])
+        (reverse repos)
+        repos)
+      @(re-frame/subscribe [:filter])
+      [:description :nom])))) ;; FIXME: Other fields?
 
 (defn nom-or-login [m] (or (:nom m) (:login m)))
 
@@ -90,9 +112,12 @@
                                        (count (:description %2)))
                              (:orgas db)) 
                  (:orgas db))]
-     (if @(re-frame/subscribe [:reverse-sort])
-       (reverse orgas)
-       orgas))))
+     (apply-filter
+      (if @(re-frame/subscribe [:reverse-sort])
+        (reverse orgas)
+        orgas)
+      @(re-frame/subscribe [:filter])
+      [:description :nom])))) ;; FIXME: Other fields?
 
 (defn organizations-page []
   [:table {:class "table"}
@@ -130,7 +155,11 @@
   [:div
    [:nav {:class "level"}
     [:a {:class "button level-item" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]
-    [:a {:class "button level-item" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+    [:a {:class "button level-item" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]
+    [:input {:class        "input"
+             :on-key-press (fn [e]
+                             (when (= 13 (.-charCode e))
+                               (re-frame/dispatch [:filter! (.-value (.-target e))])))}]]
    (case @(re-frame/subscribe [:view])
      :repos [repositories-page]
      :orgas [organizations-page])])
