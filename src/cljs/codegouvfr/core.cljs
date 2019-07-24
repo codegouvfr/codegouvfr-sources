@@ -153,13 +153,19 @@
 
 (defn main-page []
   [:div
-   [:nav {:class "level"}
-    [:a {:class "button level-item" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]
-    [:a {:class "button level-item" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]
-    [:input {:class        "input"
-             :on-key-press (fn [e]
-                             (when (= 13 (.-charCode e))
-                               (re-frame/dispatch [:filter! (.-value (.-target e))])))}]]
+   [:div {:class "columns"}
+    [:div {:class "column"}
+     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
+    [:div {:class "column"}
+     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+    [:div {:class "column"}
+     [:a {:class "button"} "Chiffres"]]
+    [:div {:class "column"}
+     [:a {:class "button" :href "latest.xml"} "RSS"]]
+    [:div {:class "column is-two-thirds"}
+     [:input {:class        "input"
+              :on-key-press (fn [e]
+                              (re-frame/dispatch [:filter! (.-value (.-target e))]))}]]]
    (case @(re-frame/subscribe [:view])
      :repos [repositories-page]
      :orgas [organizations-page])])
