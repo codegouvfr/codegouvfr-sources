@@ -3,7 +3,8 @@
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
 (ns codegouvfr.core
-  (:require [re-frame.core :as re-frame]
+  (:require [cljs.core.async :as async]
+            [re-frame.core :as re-frame]
             [reagent.core :as reagent]
             [reagent.session :as session]
             [cljs-bean.core :refer [bean]]
@@ -119,6 +120,14 @@
       @(re-frame/subscribe [:filter])
       [:description :nom])))) ;; FIXME: Other fields?
 
+(def search-filter-chan (async/chan 10))
+
+(defn start-search-filter-loop []
+  (async/go
+    (loop [s (async/<! search-filter-chan)]
+      (re-frame/dispatch [:filter! s])
+      (recur (async/<! search-filter-chan)))))
+
 (defn organizations-page []
   [:table {:class "table"}
    [:thead
@@ -163,9 +172,10 @@
     [:div {:class "column"}
      [:a {:class "button" :href "latest.xml"} "RSS"]]
     [:div {:class "column is-two-thirds"}
-     [:input {:class        "input"
-              :on-key-press (fn [e]
-                              (re-frame/dispatch [:filter! (.-value (.-target e))]))}]]]
+     [:input {:class     "input"
+              :on-change (fn [e]                           
+                           (let [ev (.-value (.-target e))]
+                             (async/go (async/>! search-filter-chan ev))))}]]]
    (case @(re-frame/subscribe [:view])
      :repos [repositories-page]
      :orgas [organizations-page])])
@@ -183,6 +193,7 @@
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
+  (start-search-filter-loop)
   (reagent/render
    [main-class]
    (. js/document (getElementById "app"))))

@@ -35,6 +35,7 @@
                                   [com.bhauman/figwheel-main "0.2.3"]
                                   [com.bhauman/rebel-readline-cljs "0.1.4"]
                                   [org.clojure/clojurescript "1.10.520"]
+                                  [org.clojure/core.async "0.4.500"]
                                   [re-frame "0.10.8"]
                                   [reagent "0.8.1"]
                                   [reagent-utils "0.3.3"]]}})
