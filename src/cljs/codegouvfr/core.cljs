@@ -169,13 +169,15 @@
      [:a {:class "button" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
     [:div {:class "column"}
      [:a {:class "button"} "Chiffres"]]
-    [:div {:class "column"}
-     [:a {:class "button" :href "latest.xml"} "RSS"]]
     [:div {:class "column is-two-thirds"}
      [:input {:class     "input"
               :on-change (fn [e]                           
                            (let [ev (.-value (.-target e))]
-                             (async/go (async/>! search-filter-chan ev))))}]]]
+                             (async/go (async/>! search-filter-chan ev))))}]]
+    [:div {:class "column"}
+     [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
+      [:span {:class "icon has-text-info"}
+       [:i {:class "fas fa-rss"}]]]]]
    (case @(re-frame/subscribe [:view])
      :repos [repositories-page]
      :orgas [organizations-page])])
