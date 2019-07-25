@@ -177,16 +177,20 @@
  :repos
  (fn [db _]
    (let [lang  @(re-frame/subscribe [:lang-filter?])
+         reps  (:repos db)
          repos (case @(re-frame/subscribe [:sort-by])
-                 :name   (sort-by :nom (:repos db))
-                 :forks  (sort-by :nombre_forks (:repos db))
-                 :stars  (sort-by :nombre_stars (:repos db))
-                 :issues (sort-by :nombre_issues_ouvertes (:repos db))
+                 :name   (sort-by :nom reps)
+                 :forks  (sort-by :nombre_forks reps)
+                 :stars  (sort-by :nombre_stars reps)
+                 :issues (sort-by :nombre_issues_ouvertes reps)
+                 :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
+                                         (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
+                               reps)
                  ;; FIXME: intuitive enough to sort by length of desc?
                  :desc   (sort #(compare (count (:description %1))
                                          (count (:description %2)))
-                               (:repos db)) 
-                 (:repos db))]
+                               reps) 
+                 reps)]
      (apply-license-filter
       (apply-fork-filter
        (apply-lang-filter
@@ -201,15 +205,16 @@
 (re-frame/reg-sub
  :orgas
  (fn [db _]
-   (let [orgas (case @(re-frame/subscribe [:sort-by])
+   (let [orgs  (:orgas db)
+         orgas (case @(re-frame/subscribe [:sort-by])
                  :name (sort #(compare (or-kwds %1 [:nom :login])
                                        (or-kwds %2 [:nom :login]))
-                             (:orgas db))
+                             orgs)
                  ;; FIXME: intuitive enough to sort by length of desc?
                  :desc (sort #(compare (count (:description %1))
                                        (count (:description %2)))
-                             (:orgas db)) 
-                 (:orgas db))]
+                             orgs) 
+                 orgs)]
      (apply-search-filter
       orgas
       @(re-frame/subscribe [:filter?])
@@ -221,6 +226,7 @@
     [:tr
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :desc]))} "Description"]]
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :date]))} "MàJ"]]
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :forks]))} "Forks"]]
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :stars]))} "Stars"]]
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :issues]))} "Issues"]]]]
@@ -234,6 +240,7 @@
                  :target "new"
                  :title  (str  "Licence: " (:licence d))} (:nom d)]]
        [:td (:description d)]
+       [:td (to-locale-date (:derniere_mise_a_jour d))]
        [:td (:nombre_forks d)]
        [:td (:nombre_stars d)]
        [:td (:nombre_issues_ouvertes d)]])]])
