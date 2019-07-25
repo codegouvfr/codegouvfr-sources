@@ -73,11 +73,9 @@
 
 (defn apply-filter [m s ks]
   (if (empty? s) m ;; Filter string is empty, return the map
-      (filter (fn [i]
-                (when (re-find (re-pattern (str "(?i)" s))
-                               (clojure.string/join
-                                " " (vals (select-keys i ks))))
-                  i))
+      (filter #(re-find (re-pattern (str "(?i)" s))
+                        (clojure.string/join
+                         " " (vals (select-keys % ks))))
               m)))
 
 (re-frame/reg-sub
