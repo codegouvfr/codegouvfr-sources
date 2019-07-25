@@ -12,7 +12,6 @@
 
 (defonce repos-url "https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all")
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
-
 (def pages 200) ;; FIXME: customizable?
 
 (re-frame/reg-event-db
@@ -85,12 +84,31 @@
  (fn [db _]
    (assoc db :reverse-sort (not (:reverse-sort db)))))
 
+(defn or-kwds [m ks]
+  (first (remove nil? (map #(apply % [m]) ks))))
+
+(defn fa [s]
+  [:span {:class "icon has-text-info"}
+   [:i {:class (str "fas " s)}]])
+
+(defn to-locale-date [s]
+  (.toLocaleDateString
+   (js/Date. (.parse js/Date s))))
+
 (defn apply-filter [m s ks]
   (if (empty? s) m ;; Filter string is empty, return the map
       (filter #(re-find (re-pattern (str "(?i)" s))
                         (clojure.string/join
                          " " (vals (select-keys % ks))))
               m)))
+
+(def search-filter-chan (async/chan 10))
+
+(defn start-search-filter-loop []
+  (async/go
+    (loop [s (async/<! search-filter-chan)]
+      (re-frame/dispatch [:filter! s])
+      (recur (async/<! search-filter-chan)))))
 
 (re-frame/reg-sub
  :repos
@@ -112,9 +130,6 @@
       @(re-frame/subscribe [:filter])
       [:description :nom])))) ;; FIXME: Other fields?
 
-(defn or-kwds [m ks]
-  (first (remove nil? (map #(apply % [m]) ks))))
-
 (re-frame/reg-sub
  :orgas
  (fn [db _]
@@ -128,32 +143,44 @@
                              (:orgas db)) 
                  (:orgas db))]
      (apply-filter
-      (if @(re-frame/subscribe [:reverse-sort])
-        (reverse orgas)
-        orgas)
+      orgas
       @(re-frame/subscribe [:filter])
-      [:description :nom])))) ;; FIXME: Other fields?
-
-(def search-filter-chan (async/chan 10))
-
-(defn start-search-filter-loop []
-  (async/go
-    (loop [s (async/<! search-filter-chan)]
-      (re-frame/dispatch [:filter! s])
-      (recur (async/<! search-filter-chan)))))
+      [:description :nom :login]))))
 
 (defn organizations-page []
-  [:table {:class "table is-hoverable is-fullwidth"}
-   [:thead
-    [:tr
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :desc]))} "Description"]]]]
-   [:tbody
-    (for [d @(re-frame/subscribe [:orgas])]
-      ^{:key d}
-      [:tr
-       [:td [:a {:href (:organisation_url d)} (or (:nom d) (:login d))]]
-       [:td (:description d)]])]])
+  (into
+   [:div]
+   (for [d (partition-all 3 @(re-frame/subscribe [:orgas]))]
+     ^{:key d}
+     [:div {:class "columns"}
+      (for [{:keys [nom login organisation_url site_web
+                    date_creation description nombre_repertoires email]
+             :as   o} d]
+        ^{:key o}
+        [:div {:class "column is-4"}
+         [:div {:class "card"}
+          [:div {:class "card-header"}
+           [:a {:class  "card-header-title subtitle"
+                :target "new"
+                :title  "Visiter le compte d'organisation"
+                :href   organisation_url} (or nom login)]]
+          [:div {:class "card-content"}
+           [:div {:class "content"}
+            [:p description]
+            [:p "Créé le " (to-locale-date date_creation)]]]
+          [:div {:class "card-footer"}
+           (if nombre_repertoires
+             [:div {:class "card-footer-item"
+                    :title "Nombre de répertoires"}
+              nombre_repertoires])
+           (if email [:a {:class "card-footer-item"
+                          :title "Contacter par email"
+                          :href  (str "mailto:" email)}
+                      (fa "fa-envelope")])
+           (if site_web [:a {:class  "card-footer-item"
+                             :title  "Visiter le site web"
+                             :target "new"
+                             :href   site_web} (fa "fa-link")])]]])])))
 
 (defn repositories-page []
   [:table {:class "table is-hoverable is-fullwidth"}
@@ -175,10 +202,6 @@
        [:td (:nombre_forks d)]
        [:td (:nombre_stars d)]
        [:td (:nombre_issues_ouvertes d)]])]])
-
-(defn fa [s]
-  [:span {:class "icon has-text-info"}
-   [:i {:class (str "fas " s)}]])
 
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page])
