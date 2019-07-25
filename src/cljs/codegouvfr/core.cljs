@@ -23,6 +23,9 @@
     :sort-by      :stars
     :view         :repos
     :reverse-sort :true
+    :is-fork      false
+    :is-licensed  false
+    :lang-filter  ""
     :filter       ""}))
 
 (re-frame/reg-event-db
@@ -37,6 +40,12 @@
    (assoc db :filter s)))
 
 (re-frame/reg-event-db
+ :lang-filter!
+ (fn [db [_ s]]
+   (re-frame/dispatch [:repos-page! 0])
+   (assoc db :lang-filter s)))
+
+(re-frame/reg-event-db
  :repos-page!
  (fn [db [_ n]]
    (assoc db :repos-page n)))
@@ -44,7 +53,34 @@
 (re-frame/reg-event-db
  :view!
  (fn [db [_ view]]
+   (re-frame/dispatch [:lang-filter! ""])
+   (re-frame/dispatch [:filter! ""])
+   (re-frame/dispatch [:repos-page! 0])
    (assoc db :view view)))
+
+(re-frame/reg-event-db
+ :is-fork!
+ (fn [db [_ b]]
+   (re-frame/dispatch [:repos-page! 0])
+   (assoc db :is-fork b)))
+
+(re-frame/reg-event-db
+ :is-licensed!
+ (fn [db [_ b]]
+   (re-frame/dispatch [:repos-page! 0])
+   (assoc db :is-licensed b)))
+
+(re-frame/reg-sub
+ :lang-filter?
+ (fn [db _] (:lang-filter db)))
+
+(re-frame/reg-sub
+ :is-fork?
+ (fn [db _] (:is-fork db)))
+
+(re-frame/reg-sub
+ :is-licensed?
+ (fn [db _] (:is-licensed db)))
 
 (re-frame/reg-event-db
  :update-orgas!
@@ -60,7 +96,7 @@
  (fn [db _] (:repos-page db)))
 
 (re-frame/reg-sub
- :filter
+ :filter?
  (fn [db _] (:filter db)))
 
 (re-frame/reg-sub
@@ -95,12 +131,31 @@
   (.toLocaleDateString
    (js/Date. (.parse js/Date s))))
 
-(defn apply-filter [m s ks]
+(defn apply-search-filter [m s ks]
   (if (empty? s) m ;; Filter string is empty, return the map
       (filter #(re-find (re-pattern (str "(?i)" s))
                         (clojure.string/join
                          " " (vals (select-keys % ks))))
               m)))
+
+(defn apply-license-filter [m]
+  (if @(re-frame/subscribe [:is-licensed?])
+    (filter #(let [l (:licence %)]
+               (and l (not (= l "Other"))))
+            m)
+    m))
+
+(defn apply-fork-filter [m]
+  (if @(re-frame/subscribe [:is-fork?])
+    (filter #(:est_fork %) m)
+    m))
+
+(defn apply-lang-filter [m l]
+  (filter #(re-find (re-pattern (str "(?i)" l))
+                    (or (:langage %) ""))
+          m))
+
+(apply-lang-filter '({:langage "python"}) "")
 
 (def search-filter-chan (async/chan 10))
 
@@ -110,10 +165,19 @@
       (re-frame/dispatch [:filter! s])
       (recur (async/<! search-filter-chan)))))
 
+(def lang-filter-chan (async/chan 10))
+
+(defn start-lang-filter-loop []
+  (async/go
+    (loop [s (async/<! lang-filter-chan)]
+      (re-frame/dispatch [:lang-filter! s])
+      (recur (async/<! lang-filter-chan)))))
+
 (re-frame/reg-sub
  :repos
  (fn [db _]
-   (let [repos (case @(re-frame/subscribe [:sort-by])
+   (let [lang  @(re-frame/subscribe [:lang-filter?])
+         repos (case @(re-frame/subscribe [:sort-by])
                  :name   (sort-by :nom (:repos db))
                  :forks  (sort-by :nombre_forks (:repos db))
                  :stars  (sort-by :nombre_stars (:repos db))
@@ -123,12 +187,16 @@
                                          (count (:description %2)))
                                (:repos db)) 
                  (:repos db))]
-     (apply-filter
-      (if @(re-frame/subscribe [:reverse-sort])
-        (reverse repos)
-        repos)
-      @(re-frame/subscribe [:filter])
-      [:description :nom])))) ;; FIXME: Other fields?
+     (apply-license-filter
+      (apply-fork-filter
+       (apply-lang-filter
+        (apply-search-filter
+         (if @(re-frame/subscribe [:reverse-sort])
+           (reverse repos)
+           repos)
+         @(re-frame/subscribe [:filter?])
+         [:description :nom :topics]) ;; FIXME: Other fields?
+        lang))))))
 
 (re-frame/reg-sub
  :orgas
@@ -142,10 +210,33 @@
                                        (count (:description %2)))
                              (:orgas db)) 
                  (:orgas db))]
-     (apply-filter
+     (apply-search-filter
       orgas
-      @(re-frame/subscribe [:filter])
+      @(re-frame/subscribe [:filter?])
       [:description :nom :login]))))
+
+(defn repositories-page []
+  [:table {:class "table is-hoverable is-fullwidth"}
+   [:thead
+    [:tr
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :desc]))} "Description"]]
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :forks]))} "Forks"]]
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :stars]))} "Stars"]]
+     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :issues]))} "Issues"]]]]
+   [:tbody
+    (for [d (take pages
+                  (drop (* pages @(re-frame/subscribe [:repos-page]))
+                        @(re-frame/subscribe [:repos])))]
+      ^{:key d}
+      [:tr
+       [:td [:a {:href   (:repertoire_url d)
+                 :target "new"
+                 :title  (str  "Licence: " (:licence d))} (:nom d)]]
+       [:td (:description d)]
+       [:td (:nombre_forks d)]
+       [:td (:nombre_stars d)]
+       [:td (:nombre_issues_ouvertes d)]])]])
 
 (defn organizations-page []
   (into
@@ -182,27 +273,6 @@
                              :target "new"
                              :href   site_web} (fa "fa-link")])]]])])))
 
-(defn repositories-page []
-  [:table {:class "table is-hoverable is-fullwidth"}
-   [:thead
-    [:tr
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :desc]))} "Description"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :forks]))} "Forks"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :stars]))} "Stars"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :issues]))} "Issues"]]]]
-   [:tbody
-    (for [d (take pages
-                  (drop (* pages @(re-frame/subscribe [:repos-page]))
-                        @(re-frame/subscribe [:repos])))]
-      ^{:key d}
-      [:tr
-       [:td [:a {:href (:repertoire_url d)} (:nom d)]]
-       [:td (:description d)]
-       [:td (:nombre_forks d)]
-       [:td (:nombre_stars d)]
-       [:td (:nombre_issues_ouvertes d)]])]])
-
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page])
         count-pages (count (partition-all pages @(re-frame/subscribe [:repos])))]
@@ -218,28 +288,50 @@
 
 (defn main-page []
   [:div
-   [:div {:class "columns"}
-    [:div {:class "column"}
-     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
-    [:div {:class "column"}
-     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
-    [:div {:class "column"}
-     [:a {:class "button"} "Chiffres"]]
-    [:div {:class "column is-two-thirds"}
-     [:input {:class     "input"
-              :on-change (fn [e]                           
-                           (let [ev (.-value (.-target e))]
-                             (async/go (async/>! search-filter-chan ev))))}]]
-    [:div {:class "column"}
+   [:div {:class "level-left"}
+    [:div {:class "level-item"}
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
-      (fa "fa-rss")]]]
-   (if  (or (= @(re-frame/subscribe [:view]) :repos)
-            (not (empty? @(re-frame/subscribe [:filter]))))
+      (fa "fa-rss")]]
+    [:div {:class "level-item"}
+     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
+    [:div {:class "level-item"}
+     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+    [:div {:class "level-item"}
+     [:a {:class "button"} "Chiffres"]]]
+   [:br]
+   (if-not (= @(re-frame/subscribe [:view]) :repos)
+     [:div {:class "level-left"}
+      [:div {:class "level-item"}
+       [:input {:class       "input"
+                :placeholder "Recherche libre"
+                :on-change   (fn [e]                           
+                               (let [ev (.-value (.-target e))]
+                                 (async/go (async/>! search-filter-chan ev))))}]]]
      (let [repos-pages    @(re-frame/subscribe [:repos-page])
            count-pages    (count (partition-all pages @(re-frame/subscribe [:repos])))
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
-       [:div {:class "level-right"}
+       [:div {:class "level-left"}        
+        [:label {:class "checkbox level-item"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:is-fork! (.-checked (.-target %))])}]
+         "Forks seuls"]
+        [:label {:class "checkbox level-item"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:is-licensed! (.-checked (.-target %))])}]
+         "Seulement avec licence identifiable"]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :placeholder "Langage"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! lang-filter-chan ev))))}]]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :placeholder "Recherche libre"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! search-filter-chan ev))))}]]
         [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
          [:a {:class    "pagination-previous"
               :on-click #(change-page "first")
@@ -267,15 +359,18 @@
    {:component-will-mount
     (fn []
       (GET repos-url :handler
-           #(re-frame/dispatch [:update-repos! (map (comp bean clj->js) %)]))
+           #(re-frame/dispatch
+             [:update-repos! (map (comp bean clj->js) %)]))
       (GET orgas-url :handler
-           #(re-frame/dispatch [:update-orgas! (map (comp bean clj->js) %)])))
+           #(re-frame/dispatch
+             [:update-orgas! (map (comp bean clj->js) %)])))
     :reagent-render main-page}))
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
   (start-search-filter-loop)
+  (start-lang-filter-loop)
   (reagent/render
    [main-class]
    (. js/document (getElementById "app"))))
