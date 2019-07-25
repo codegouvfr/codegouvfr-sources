@@ -129,7 +129,7 @@
       (recur (async/<! search-filter-chan)))))
 
 (defn organizations-page []
-  [:table {:class "table"}
+  [:table {:class "table is-hoverable is-fullwidth"}
    [:thead
     [:tr
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
@@ -142,7 +142,7 @@
        [:td (:description d)]])]])
 
 (defn repositories-page []
-  [:table {:class "table"}
+  [:table {:class "table is-hoverable is-fullwidth"}
    [:thead
     [:tr
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
