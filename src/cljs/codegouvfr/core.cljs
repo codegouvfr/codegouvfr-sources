@@ -100,14 +100,16 @@
       @(re-frame/subscribe [:filter])
       [:description :nom])))) ;; FIXME: Other fields?
 
-(defn nom-or-login [m] (or (:nom m) (:login m)))
+(defn or-kwds [m ks]
+  (first (remove nil? (map #(apply % [m]) ks))))
 
 (re-frame/reg-sub
  :orgas
  (fn [db _]
    (let [orgas (case @(re-frame/subscribe [:sort-by])
-                 :name (sort #(compare (nom-or-login %1)
-                                       (nom-or-login %2)) (:orgas db))
+                 :name (sort #(compare (or-kwds %1 [:nom :login])
+                                       (or-kwds %2 [:nom :login]))
+                             (:orgas db))
                  ;; FIXME: intuitive enough to sort by length of desc?
                  :desc (sort #(compare (count (:description %1))
                                        (count (:description %2)))
