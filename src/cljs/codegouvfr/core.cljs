@@ -13,13 +13,16 @@
 (defonce repos-url "https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all")
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
 
+(def pages 200) ;; FIXME: customizable?
+
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]      
    {:repos        nil
+    :repos-page   0
     :orgas        nil
     :sort-by      :stars
-    :view         :orgas
+    :view         :repos
     :reverse-sort :true
     :filter       ""}))
 
@@ -31,7 +34,13 @@
 (re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
+   (re-frame/dispatch [:repos-page! 0])
    (assoc db :filter s)))
+
+(re-frame/reg-event-db
+ :repos-page!
+ (fn [db [_ n]]
+   (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
  :view!
@@ -48,6 +57,10 @@
  (fn [db _] (:sort-by db)))
 
 (re-frame/reg-sub
+ :repos-page
+ (fn [db _] (:repos-page db)))
+
+(re-frame/reg-sub
  :filter
  (fn [db _] (:filter db)))
 
@@ -62,6 +75,7 @@
 (re-frame/reg-event-db
  :sort-by!
  (fn [db [_ k]]
+   (re-frame/dispatch [:repos-page! 0])
    (when (= k (:sort-by db))
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-by k)))
@@ -151,7 +165,9 @@
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :stars]))} "Stars"]]
      [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :issues]))} "Issues"]]]]
    [:tbody
-    (for [d @(re-frame/subscribe [:repos])]
+    (for [d (take pages
+                  (drop (* pages @(re-frame/subscribe [:repos-page]))
+                        @(re-frame/subscribe [:repos])))]
       ^{:key d}
       [:tr
        [:td [:a {:href (:repertoire_url d)} (:nom d)]]
@@ -159,6 +175,23 @@
        [:td (:nombre_forks d)]
        [:td (:nombre_stars d)]
        [:td (:nombre_issues_ouvertes d)]])]])
+
+(defn fa [s]
+  [:span {:class "icon has-text-info"}
+   [:i {:class (str "fas " s)}]])
+
+(defn change-page [next]
+  (let [repos-page  @(re-frame/subscribe [:repos-page])
+        count-pages (count (partition-all pages @(re-frame/subscribe [:repos])))]
+    (cond
+      (= next "first")
+      (re-frame/dispatch [:repos-page! 0])
+      (= next "last")
+      (re-frame/dispatch [:repos-page! (dec count-pages)])
+      (and (< repos-page (dec count-pages)) next)
+      (re-frame/dispatch [:repos-page! (inc repos-page)])
+      (and (> repos-page 0) (not next))
+      (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
 (defn main-page []
   [:div
@@ -176,8 +209,32 @@
                              (async/go (async/>! search-filter-chan ev))))}]]
     [:div {:class "column"}
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
-      [:span {:class "icon has-text-info"}
-       [:i {:class "fas fa-rss"}]]]]]
+      (fa "fa-rss")]]]
+   (if  (or (= @(re-frame/subscribe [:view]) :repos)
+            (not (empty? @(re-frame/subscribe [:filter]))))
+     (let [repos-pages    @(re-frame/subscribe [:repos-page])
+           count-pages    (count (partition-all pages @(re-frame/subscribe [:repos])))
+           first-disabled (= repos-pages 0)
+           last-disabled  (= repos-pages (dec count-pages))]
+       [:div {:class "level-right"}
+        [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
+         [:a {:class    "pagination-previous"
+              :on-click #(change-page "first")
+              :disabled first-disabled}
+          (fa "fa-fast-backward")]
+         [:a {:class    "pagination-previous"
+              :on-click #(change-page nil)
+              :disabled first-disabled}
+          (fa "fa-step-backward")]
+         [:a {:class    "pagination-next"
+              :on-click #(change-page true)
+              :disabled last-disabled}
+          (fa "fa-step-forward")]
+         [:a {:class    "pagination-next"
+              :on-click #(change-page "last")
+              :disabled last-disabled}
+          (fa "fa-fast-forward")]]]))
+   [:br]
    (case @(re-frame/subscribe [:view])
      :repos [repositories-page]
      :orgas [organizations-page])])
@@ -199,3 +256,4 @@
   (reagent/render
    [main-class]
    (. js/document (getElementById "app"))))
+
