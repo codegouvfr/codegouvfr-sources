@@ -22,6 +22,8 @@
 
   :main codegouvfr.server
 
+  :auto-clean false
+
   :clean-targets ^{:protect false} ["target" "resources/public/js/dev/"
                                     "resources/public/js/codegouvfr.js"]
 
@@ -29,13 +31,14 @@
             "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:min"   ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]}
   
-  :profiles {:dev {:source-paths ["src/cljs"]
-                   :dependencies [[cljs-ajax "0.8.0"]
-                                  [cljs-bean "1.3.0"]
-                                  [com.bhauman/figwheel-main "0.2.3"]
-                                  [com.bhauman/rebel-readline-cljs "0.1.4"]
-                                  [org.clojure/clojurescript "1.10.520"]
-                                  [org.clojure/core.async "0.4.500"]
-                                  [re-frame "0.10.8"]
-                                  [reagent "0.8.1"]
-                                  [reagent-utils "0.3.3"]]}})
+  :profiles {:uberjar {:aot :all}
+             :dev     {:source-paths ["src/cljs"]
+                       :dependencies [[cljs-ajax "0.8.0"]
+                                      [cljs-bean "1.3.0"]
+                                      [com.bhauman/figwheel-main "0.2.3"]
+                                      [com.bhauman/rebel-readline-cljs "0.1.4"]
+                                      [org.clojure/clojurescript "1.10.520"]
+                                      [org.clojure/core.async "0.4.500"]
+                                      [re-frame "0.10.8"]
+                                      [reagent "0.8.1"]
+                                      [reagent-utils "0.3.3"]]}})
