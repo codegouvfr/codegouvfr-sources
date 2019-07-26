@@ -22,7 +22,7 @@
     :repos-page      0
     :orgas           nil
     :sort-by         :stars
-    :view            :about
+    :view            :repos
     :reverse-sort    true
     :has-description false
     :is-fork         false
