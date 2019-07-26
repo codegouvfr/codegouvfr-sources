@@ -300,11 +300,11 @@
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
       (fa "fa-rss")]]
     [:div {:class "level-item"}
-     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
+     [:a {:class "button is-link" :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
     [:div {:class "level-item"}
-     [:a {:class "button" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+     [:a {:class "button is-danger" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
     [:div {:class "level-item"}
-     [:a {:class "button"} "Chiffres"]]]
+     [:a {:class "button is-warning"} "Chiffres"]]]
    [:br]
    (if-not (= @(re-frame/subscribe [:view]) :repos)
      [:div {:class "level-left"}
