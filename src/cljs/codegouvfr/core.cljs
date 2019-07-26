@@ -235,15 +235,18 @@
                   (drop (* pages @(re-frame/subscribe [:repos-page]))
                         @(re-frame/subscribe [:repos])))]
       ^{:key d}
-      [:tr
-       [:td [:a {:href   (:repertoire_url d)
-                 :target "new"
-                 :title  (str  "Licence: " (:licence d))} (:nom d)]]
-       [:td (:description d)]
-       [:td (to-locale-date (:derniere_mise_a_jour d))]
-       [:td (:nombre_forks d)]
-       [:td (:nombre_stars d)]
-       [:td (:nombre_issues_ouvertes d)]])]])
+      (let [{:keys [licence]} d]
+        [:tr
+         [:td [:a {:href   (:repertoire_url d)
+                   :target "new"
+                   :title  (str (:organisation_nom d)
+                                (if licence (str " / Licence : " licence)))}
+               (:nom d)]]
+         [:td (:description d)]
+         [:td (to-locale-date (:derniere_mise_a_jour d))]
+         [:td (:nombre_forks d)]
+         [:td (:nombre_stars d)]
+         [:td (:nombre_issues_ouvertes d)]]))]])
 
 (defn organizations-page []
   (into
@@ -304,7 +307,9 @@
     [:div {:class "level-item"}
      [:a {:class "button is-danger" :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
     [:div {:class "level-item"}
-     [:a {:class "button is-warning"} "Chiffres"]]]
+     [:a {:class "button is-info"} "Chiffres"]]
+    [:div {:class "level-item"}
+     [:a {:class "button is-warning"} "À propos"]]]
    [:br]
    (if-not (= @(re-frame/subscribe [:view]) :repos)
      [:div {:class "level-left"}
