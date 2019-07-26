@@ -18,17 +18,18 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]      
-   {:repos        nil
-    :repos-page   0
-    :orgas        nil
-    :sort-by      :stars
-    :view         :repos
-    :reverse-sort :true
-    :is-fork      false
-    :is-licensed  false
-    :lang-filter  ""
-    :stats        nil
-    :filter       ""}))
+   {:repos           nil
+    :repos-page      0
+    :orgas           nil
+    :sort-by         :stars
+    :view            :repos
+    :reverse-sort    true
+    :has-description false
+    :is-fork         false
+    :is-licensed     false
+    :lang-filter     ""
+    :stats           nil
+    :filter          ""}))
 
 (re-frame/reg-event-db
  :update-repos!
@@ -58,6 +59,11 @@
    (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
+ :has-description!
+ (fn [db [_ n]]
+   (assoc db :has-description n)))
+
+(re-frame/reg-event-db
  :view!
  (fn [db [_ view]]
    (re-frame/dispatch [:lang-filter! ""])
@@ -80,6 +86,10 @@
 (re-frame/reg-sub
  :lang-filter?
  (fn [db _] (:lang-filter db)))
+
+(re-frame/reg-sub
+ :has-description?
+ (fn [db _] (:has-description db)))
 
 (re-frame/reg-sub
  :is-fork?
@@ -145,6 +155,11 @@
                          " " (vals (select-keys % ks))))
               m)))
 
+(defn apply-description-filter [m]
+  (if @(re-frame/subscribe [:has-description?])
+    (filter #(not (empty? (:description %))) m)
+    m))
+
 (defn apply-license-filter [m]
   (if @(re-frame/subscribe [:is-licensed?])
     (filter #(let [l (:licence %)]
@@ -203,16 +218,17 @@
                                          (count (:description %2)))
                                reps) 
                  reps)]
-     (apply-license-filter
-      (apply-fork-filter
-       (apply-lang-filter
-        (apply-search-filter
-         (if @(re-frame/subscribe [:reverse-sort])
-           (reverse repos)
-           repos)
-         @(re-frame/subscribe [:filter?])
-         [:description :nom :topics]) ;; FIXME: Other fields?
-        lang))))))
+     (apply-description-filter
+      (apply-license-filter
+       (apply-fork-filter
+        (apply-lang-filter
+         (apply-search-filter
+          (if @(re-frame/subscribe [:reverse-sort])
+            (reverse repos)
+            repos)
+          @(re-frame/subscribe [:filter?])
+          [:description :nom :topics]) ;; FIXME: Other fields?
+         lang)))))))
 
 (re-frame/reg-sub
  :orgas?
@@ -236,12 +252,24 @@
   [:table {:class "table is-hoverable is-fullwidth"}
    [:thead
     [:tr
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :name]))} "Nom"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :desc]))} "Description"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :date]))} "MàJ"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :forks]))} "Forks"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :stars]))} "Stars"]]
-     [:th [:button {:on-click (fn [] (re-frame/dispatch [:sort-by! :issues]))} "Issues"]]]]
+     [:th [:a {:class    "button"
+               :title    "Trier par ordre alphabétique des noms"
+               :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]
+     [:th [:a {:class    "button"
+               :title    "Trier par longueur de description"
+               :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]
+     [:th [:a {:class    "button"
+               :title    "Trier par date de mise à jour"
+               :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]
+     [:th [:a {:class    "button"
+               :title    "Trier par nombre de fourches"
+               :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]
+     [:th [:a {:class    "button"
+               :title    "Trier par nombre d'étoiles"
+               :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]
+     [:th [:a {:class    "button"
+               :title    "Trier par nombre de tickets"
+               :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]
    [:tbody
     (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
                               @(re-frame/subscribe [:repos?])))]
@@ -343,80 +371,84 @@
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
 (defn main-page []
-[:div
- [:div {:class "level-left"}
-  [:div {:class "level-item"}
-   [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
-    (fa "fa-rss")]]
-  [:div {:class "level-item"}
-   [:a {:class    "button is-link"
-        :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
-  [:div {:class "level-item"}
-   [:a {:class    "button is-danger"
-        :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
-  [:div {:class "level-item"}
-   [:a {:class    "button is-info"
-        :on-click #(re-frame/dispatch [:view! :stats])} "Chiffres"]]
-  [:div {:class "level-item"}
-   [:a {:class "button is-warning"} "À propos"]]]
- [:br]
- (cond
-   (= @(re-frame/subscribe [:view?]) :repos)
-   (let [repos-pages    @(re-frame/subscribe [:repos-page?])
-         count-pages    (count (partition-all pages @(re-frame/subscribe [:repos?])))
-         first-disabled (= repos-pages 0)
-         last-disabled  (= repos-pages (dec count-pages))]
-     [:div {:class "level-left"}        
-      [:label {:class "checkbox level-item"}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch [:is-fork! (.-checked (.-target %))])}]
-       " Forks seuls"]
-      [:label {:class "checkbox level-item"}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch [:is-licensed! (.-checked (.-target %))])}]
-       " Avec licence identifiée"]
-      [:div {:class "level-item"}
-       [:input {:class       "input"
-                :placeholder "Langage"
-                :on-change   (fn [e]                           
-                               (let [ev (.-value (.-target e))]
-                                 (async/go (async/>! lang-filter-chan ev))))}]]
+  [:div
+   [:div {:class "level-left"}
+    [:div {:class "level-item"}
+     [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
+      (fa "fa-rss")]]
+    [:div {:class "level-item"}
+     [:a {:class    "button is-link"
+          :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
+    [:div {:class "level-item"}
+     [:a {:class    "button is-danger"
+          :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+    [:div {:class "level-item"}
+     [:a {:class    "button is-info"
+          :on-click #(re-frame/dispatch [:view! :stats])} "Chiffres"]]
+    [:div {:class "level-item"}
+     [:a {:class "button is-warning"} "À propos"]]]
+   [:br]
+   (cond
+     (= @(re-frame/subscribe [:view?]) :repos)
+     (let [repos-pages    @(re-frame/subscribe [:repos-page?])
+           count-pages    (count (partition-all pages @(re-frame/subscribe [:repos?])))
+           first-disabled (= repos-pages 0)
+           last-disabled  (= repos-pages (dec count-pages))]
+       [:div {:class "level-left"}        
+        [:label {:class "checkbox level-item"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:is-fork! (.-checked (.-target %))])}]
+         " Fourches seules"]
+        [:label {:class "checkbox level-item"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:has-description! (.-checked (.-target %))])}]
+         " Avec description"]        
+        [:label {:class "checkbox level-item"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:is-licensed! (.-checked (.-target %))])}]
+         " Avec licence identifiée"]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :placeholder "Langage"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! lang-filter-chan ev))))}]]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :placeholder "Recherche libre"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! search-filter-chan ev))))}]]
+        [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
+         [:a {:class    "pagination-previous"
+              :on-click #(change-page "first")
+              :disabled first-disabled}
+          (fa "fa-fast-backward")]
+         [:a {:class    "pagination-previous"
+              :on-click #(change-page nil)
+              :disabled first-disabled}
+          (fa "fa-step-backward")]
+         [:a {:class    "pagination-next"
+              :on-click #(change-page true)
+              :disabled last-disabled}
+          (fa "fa-step-forward")]
+         [:a {:class    "pagination-next"
+              :on-click #(change-page "last")
+              :disabled last-disabled}
+          (fa "fa-fast-forward")]]])
+     (= @(re-frame/subscribe [:view?]) :orgas)
+     [:div {:class "level-left"}
       [:div {:class "level-item"}
        [:input {:class       "input"
                 :placeholder "Recherche libre"
                 :on-change   (fn [e]                           
                                (let [ev (.-value (.-target e))]
-                                 (async/go (async/>! search-filter-chan ev))))}]]
-      [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
-       [:a {:class    "pagination-previous"
-            :on-click #(change-page "first")
-            :disabled first-disabled}
-        (fa "fa-fast-backward")]
-       [:a {:class    "pagination-previous"
-            :on-click #(change-page nil)
-            :disabled first-disabled}
-        (fa "fa-step-backward")]
-       [:a {:class    "pagination-next"
-            :on-click #(change-page true)
-            :disabled last-disabled}
-        (fa "fa-step-forward")]
-       [:a {:class    "pagination-next"
-            :on-click #(change-page "last")
-            :disabled last-disabled}
-        (fa "fa-fast-forward")]]])
-   (= @(re-frame/subscribe [:view?]) :orgas)
-   [:div {:class "level-left"}
-    [:div {:class "level-item"}
-     [:input {:class       "input"
-              :placeholder "Recherche libre"
-              :on-change   (fn [e]                           
-                             (let [ev (.-value (.-target e))]
-                               (async/go (async/>! search-filter-chan ev))))}]]])
- [:br]
- (case @(re-frame/subscribe [:view?])
-   :repos [repositories-page]
-   :stats [stats-page]
-   :orgas [organizations-page])])
+                                 (async/go (async/>! search-filter-chan ev))))}]]])
+   [:br]
+   (case @(re-frame/subscribe [:view?])
+     :repos [repositories-page]
+     :stats [stats-page]
+     :orgas [organizations-page])])
 
 (defn main-class []
   (reagent/create-class
