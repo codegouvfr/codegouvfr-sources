@@ -372,20 +372,20 @@
 
 (defn main-page []
   [:div
-   [:div {:class "level-left"}
-    [:div {:class "level-item"}
+   [:div {:class "field is-grouped"}
+    [:p {:class "control"}
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
       (fa "fa-rss")]]
-    [:div {:class "level-item"}
+    [:p {:class "control"}
      [:a {:class    "button is-link"
           :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
-    [:div {:class "level-item"}
+    [:p {:class "control"}
      [:a {:class    "button is-danger"
           :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
-    [:div {:class "level-item"}
+    [:p {:class "control"}
      [:a {:class    "button is-info"
           :on-click #(re-frame/dispatch [:view! :stats])} "Chiffres"]]
-    [:div {:class "level-item"}
+    [:p {:class "control"}
      [:a {:class "button is-warning"} "À propos"]]]
    [:br]
    (cond
@@ -409,12 +409,14 @@
          " Avec licence identifiée"]
         [:div {:class "level-item"}
          [:input {:class       "input"
+                  :size        15
                   :placeholder "Langage"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! lang-filter-chan ev))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
+                  :size        40
                   :placeholder "Recherche libre"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
