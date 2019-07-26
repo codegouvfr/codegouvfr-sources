@@ -270,22 +270,22 @@
      [:th [:a {:class    "button"
                :title    "Trier par nombre de tickets"
                :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]
-   [:tbody
-    (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
-                              @(re-frame/subscribe [:repos?])))]
-      ^{:key d}
-      (let [{:keys [licence]} d]
-        [:tr
-         [:td [:a {:href   (:repertoire_url d)
-                   :target "new"
-                   :title  (str (:organisation_nom d)
-                                (if licence (str " / Licence : " licence)))}
-               (:nom d)]]
-         [:td (:description d)]
-         [:td (to-locale-date (:derniere_mise_a_jour d))]
-         [:td (:nombre_forks d)]
-         [:td (:nombre_stars d)]
-         [:td (:nombre_issues_ouvertes d)]]))]])
+   (into [:tbody]
+         (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
+                                   @(re-frame/subscribe [:repos?])))]
+           ^{:key d}
+           (let [{:keys [licence]} d]
+             [:tr
+              [:td [:a {:href   (:repertoire_url d)
+                        :target "new"
+                        :title  (str (:organisation_nom d)
+                                     (if licence (str " / Licence : " licence)))}
+                    (:nom d)]]
+              [:td (:description d)]
+              [:td (to-locale-date (:derniere_mise_a_jour d))]
+              [:td (:nombre_forks d)]
+              [:td (:nombre_stars d)]
+              [:td (:nombre_issues_ouvertes d)]])))])
 
 (defn organizations-page []
   (into
@@ -336,7 +336,7 @@
      [:table {:class "table is-fullwidth"}
       [:tbody
        (for [o (reverse (clojure.walk/stringify-keys (sort-by val data)))]
-         ^{:key o}
+         ^{:key (key o)}
          [:tr [:td (key o)] [:td (val o)]])]]]]])
 
 (defn stats-page []
