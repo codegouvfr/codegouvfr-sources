@@ -294,20 +294,27 @@
      ^{:key d}
      [:div {:class "columns"}
       (for [{:keys [nom login organisation_url site_web
-                    date_creation description nombre_repertoires email]
+                    date_creation description nombre_repertoires email
+                    avatar_url]
              :as   o} d]
         ^{:key o}
         [:div {:class "column is-4"}
          [:div {:class "card"}
-          [:div {:class "card-header"}
-           [:a {:class  "card-header-title subtitle"
-                :target "new"
-                :title  "Visiter le compte d'organisation"
-                :href   organisation_url} (or nom login)]]
           [:div {:class "card-content"}
+           [:div {:class "media"}
+            (if avatar_url
+              [:div {:class "media-left"}
+               [:figure {:class "image is-48x48"}
+                [:img {:src avatar_url}]]])
+            [:div {:class "media-content"}
+             [:p [:a {:class  "title is-4"
+                      :target "new"
+                      :title  "Visiter le compte d'organisation"
+                      :href   organisation_url} (or nom login)]]
+             [:p {:class "subtitle is-6"}
+              (str "Créé le " (to-locale-date date_creation))]]]
            [:div {:class "content"}
-            [:p description]
-            [:p "Créé le " (to-locale-date date_creation)]]]
+            [:p description]]]
           [:div {:class "card-footer"}
            (if nombre_repertoires
              [:div {:class "card-footer-item"
