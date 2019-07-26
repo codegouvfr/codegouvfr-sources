@@ -22,7 +22,7 @@
     :repos-page      0
     :orgas           nil
     :sort-by         :stars
-    :view            :repos
+    :view            :about
     :reverse-sort    true
     :has-description false
     :is-fork         false
@@ -366,11 +366,27 @@
 
 (defn about-page []
   [:div
-   [:h1 {:class "title"} "Que fait ce site web ?"]
-   [:p "Voilà. "]
-   [:br]
-   [:h1 {:class "title"} "Que fait ce site web ?"]
-   [:p "Voilà. "]])
+   [:div {:class "container"}
+    [:h1 {:class "title"} "Codes sources ?"]
+    [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes."]
+    [:p "Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
+    [:br]]
+   [:div {:class "container"}
+    [:h1 {:class "title"} "Secteur public ?"]
+    [:p "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions."]
+    [:p "Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public."]
+    [:p "Il a été développé par " [:a {:target "new" :href "la mission Etalab."} "la mission Etalab."]]
+    [:br]]
+   [:div {:class "container"}
+    [:h1 {:class "title"} "Que puis-je faire ?"]
+    [:p [:strong "Vous êtes un organisme public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas public ici. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
+    [:br]
+    [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
+    [:br]]
+   [:div {:class "container"}
+    [:h1 {:class "title"} "Une question ?"]
+    [:p "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la " [:a {:href "gazette #bluehats" :target "new"} "gazette #bluehats."]]
+    [:p "Pour toute autre question, n'hésitez pas à écrire à " [:a {:href "mailto:bastien.guerry@data.gouv.fr"} "Bastien Guerry."]]]])
 
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
