@@ -11,10 +11,6 @@
             [clj-http.client :as http])
   (:gen-class))
 
-(defn wrap-middleware [handler]
-  (-> handler
-      wrap-reload))
-
 (defn default-page []
   (assoc
    (response/response
@@ -23,7 +19,7 @@
       "public/index.html")))
    :headers {"Content-Type" "text/html; charset=utf-8"}))
 
-(defn codegouvfr-latest []
+(defn codegouvfr-latest-repositories []
   (json/parse-string
    (:body (http/get "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/last_repositories"))
    true))
@@ -38,7 +34,7 @@
                     :description (:description item)
                     :author      (:organisation_nom item)
                     :pubDate     (inst/read-instant-date (:derniere_mise_a_jour item))})
-        (codegouvfr-latest))))
+        (codegouvfr-latest-repositories))))
 
 (defn rss-page []
   (assoc
@@ -51,8 +47,8 @@
   (resources "/")
   (not-found "Not Found"))
 
-(def app (wrap-middleware #'routes))
+(def app (-> #'routes wrap-reload))
 
 (defn -main [& args]
-  (let [port 3000] ;; FIXME: make an environment variable
+  (let [port (read-string (or (System/getenv "CODEGOUVFR_PORT") "3000"))]
     (def server (server/run-server app {:port port}))))
