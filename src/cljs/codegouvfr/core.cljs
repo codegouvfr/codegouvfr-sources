@@ -149,7 +149,7 @@
    (js/Date. (.parse js/Date s))))
 
 (defn apply-search-filter [m s ks]
-  (if (empty? s) m ;; Filter string is empty, return the map
+  (if (empty? s) m
       (filter #(re-find (re-pattern (str "(?i)" s))
                         (clojure.string/join
                          " " (vals (select-keys % ks))))
@@ -157,7 +157,7 @@
 
 (defn apply-description-filter [m]
   (if @(re-frame/subscribe [:has-description?])
-    (filter #(not (empty? (:description %))) m)
+    (filter #(seq (:description %)) m)
     m))
 
 (defn apply-license-filter [m]
@@ -203,32 +203,31 @@
 (re-frame/reg-sub
  :repos?
  (fn [db _]
-   (let [lang  @(re-frame/subscribe [:lang-filter?])
-         reps  (:repos db)
-         repos (case @(re-frame/subscribe [:sort-by?])
-                 :name   (sort-by :nom reps)
-                 :forks  (sort-by :nombre_forks reps)
-                 :stars  (sort-by :nombre_stars reps)
-                 :issues (sort-by :nombre_issues_ouvertes reps)
-                 :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
-                                         (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
-                               reps)
-                 ;; FIXME: intuitive enough to sort by length of desc?
-                 :desc   (sort #(compare (count (:description %1))
-                                         (count (:description %2)))
-                               reps) 
-                 reps)]
-     (apply-description-filter
-      (apply-license-filter
-       (apply-fork-filter
-        (apply-lang-filter
+   (let [lang   @(re-frame/subscribe [:lang-filter?])
+         repos0 (:repos db)
+         repos  (case @(re-frame/subscribe [:sort-by?])
+                  :name   (sort-by :nom repos0)
+                  :forks  (sort-by :nombre_forks repos0)
+                  :stars  (sort-by :nombre_stars repos0)
+                  :issues (sort-by :nombre_issues_ouvertes repos0)
+                  :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
+                                          (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
+                                repos0)
+                  ;; FIXME: intuitive enough to sort by length of desc?
+                  :desc   (sort #(compare (count (:description %1))
+                                          (count (:description %2)))
+                                repos0) 
+                  repos0)]
+     (-> (if @(re-frame/subscribe [:reverse-sort])
+           (reverse repos)
+           repos)
          (apply-search-filter
-          (if @(re-frame/subscribe [:reverse-sort])
-            (reverse repos)
-            repos)
           @(re-frame/subscribe [:filter?])
-          [:description :nom :topics]) ;; FIXME: Other fields?
-         lang)))))))
+          [:description :nom :topics])
+         (apply-lang-filter lang)
+         apply-fork-filter
+         apply-license-filter
+         apply-description-filter))))
 
 (re-frame/reg-sub
  :orgas?
