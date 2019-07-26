@@ -385,7 +385,7 @@
     [:br]]
    [:div {:class "container"}
     [:h1 {:class "title"} "Une question ?"]
-    [:p "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la " [:a {:href "gazette #bluehats" :target "new"} "gazette #bluehats."]]
+    [:p "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la " [:a {:href "https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio" :target "new"} "gazette #bluehats."]]
     [:p "Pour toute autre question, n'hésitez pas à écrire à " [:a {:href "mailto:bastien.guerry@data.gouv.fr"} "Bastien Guerry."]]]])
 
 (defn change-page [next]
@@ -408,7 +408,7 @@
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
       (fa "fa-rss")]]
     [:p {:class "control"}
-     [:a {:class    "button is-link"
+     [:a {:class    "button is-success"
           :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
     [:p {:class "control"}
      [:a {:class    "button is-danger"
