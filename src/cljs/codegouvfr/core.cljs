@@ -357,6 +357,14 @@
      [:div {:class "columns"}
       (stats-card "Licences les plus utilisées" top_licenses)]]))
 
+(defn about-page []
+  [:div
+   [:h1 {:class "title"} "Que fait ce site web ?"]
+   [:p "Voilà. "]
+   [:br]
+   [:h1 {:class "title"} "Que fait ce site web ?"]
+   [:p "Voilà. "]])
+
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
         count-pages (count (partition-all pages @(re-frame/subscribe [:repos?])))]
@@ -386,7 +394,8 @@
      [:a {:class    "button is-info"
           :on-click #(re-frame/dispatch [:view! :stats])} "Chiffres"]]
     [:p {:class "control"}
-     [:a {:class "button is-warning"} "À propos"]]]
+     [:a {:class    "button is-warning"
+          :on-click #(re-frame/dispatch [:view! :about])} "À propos"]]]
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
@@ -409,14 +418,14 @@
          " Avec licence identifiée"]
         [:div {:class "level-item"}
          [:input {:class       "input"
-                  :size        15
+                  :size        10
                   :placeholder "Langage"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! lang-filter-chan ev))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
-                  :size        40
+                  :size        20
                   :placeholder "Recherche libre"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
@@ -450,6 +459,7 @@
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
      :stats [stats-page]
+     :about [about-page]
      :orgas [organizations-page])])
 
 (defn main-class []
