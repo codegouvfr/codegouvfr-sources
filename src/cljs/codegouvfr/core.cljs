@@ -269,7 +269,7 @@
           [:div {:class "card-footer"}
            (if nombre_repertoires
              [:div {:class "card-footer-item"
-                    :title "Nombre de répertoires"}
+                    :title "Nombre de dépôts"}
               nombre_repertoires])
            (if email [:a {:class "card-footer-item"
                           :title "Contacter par email"
@@ -322,11 +322,11 @@
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:is-fork! (.-checked (.-target %))])}]
-         "Forks seuls"]
+         " Forks seuls"]
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:is-licensed! (.-checked (.-target %))])}]
-         "Seulement avec licence identifiable"]
+         " Avec licence identifiée"]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :placeholder "Langage"
