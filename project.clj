@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
-(defproject codegouvfr "0.3.1"
+(defproject codegouvfr "0.3.2"
 
   :description "Frontend to display public sector source code repositories"
   :url "https://github.com/etalab/codegouvfr"

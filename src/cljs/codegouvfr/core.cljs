@@ -181,8 +181,6 @@
                     (or (:langage %) ""))
           m))
 
-(apply-lang-filter '({:langage "python"}) "")
-
 (def search-filter-chan (async/chan 10))
 
 (defn start-search-filter-loop []
