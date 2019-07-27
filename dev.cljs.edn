@@ -3,5 +3,4 @@
   :auto-testing false}
 {:main       codegouvfr.core
  :output-to  "resources/public/js/codegouvfr.js"
- :output-dir "resources/public/js/dev"
- :externs    ["externs.js"]}
+ :output-dir "resources/public/js/dev"}
