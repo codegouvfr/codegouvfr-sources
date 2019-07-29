@@ -455,7 +455,7 @@
   (rfe/start!
    (rf/router routes)
    on-navigate
-   {:use-fragment true})
+   {:use-fragment false})
   (start-filter-loop)
   (reagent/render
    [main-class]
