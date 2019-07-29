@@ -149,8 +149,9 @@
    [:i {:class (str "fas " s)}]])
 
 (defn to-locale-date [s]
-  (.toLocaleDateString
-   (js/Date. (.parse js/Date s))))
+  (if (string? s)
+    (.toLocaleDateString
+     (js/Date. (.parse js/Date s)))))
 
 (defn apply-search-filter [m s ks]
   (if (empty? s) m
@@ -283,7 +284,7 @@
                                      (if licence (str " / Licence : " licence)))}
                     (:nom d)]]
               [:td (:description d)]
-              [:td (to-locale-date (:derniere_mise_a_jour d))]
+              [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
               [:td (:nombre_forks d)]
               [:td (:nombre_stars d)]
               [:td (:nombre_issues_ouvertes d)]])))])
@@ -312,15 +313,19 @@
                       :target "new"
                       :title  "Visiter le compte d'organisation"
                       :href   organisation_url} (or nom login)]]
-             [:p {:class "subtitle is-6"}
-              (str "Créé le " (to-locale-date date_creation))]]]
+             (let [d (to-locale-date date_creation)]
+               (if d
+                 [:p {:class "subtitle is-6"}
+                  (str "Créé le " d)]))]]
            [:div {:class "content"}
             [:p description]]]
           [:div {:class "card-footer"}
            (if nombre_repertoires
              [:div {:class "card-footer-item"
                     :title "Nombre de dépôts"}
-              nombre_repertoires])
+              nombre_repertoires
+              (if (= nombre_repertoires 1)
+                " dépôt" " dépôts")])
            (if email [:a {:class "card-footer-item"
                           :title "Contacter par email"
                           :href  (str "mailto:" email)}
