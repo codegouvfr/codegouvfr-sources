@@ -78,7 +78,7 @@
  (fn [db _] (:view db)))
 
 (re-frame/reg-sub 
- :reverse-sort
+ :reverse-sort?
  (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-event-db
@@ -160,7 +160,7 @@
                                           (count (:description %2)))
                                 repos0) 
                   repos0)]
-     (apply-filters (if @(re-frame/subscribe [:reverse-sort])
+     (apply-filters (if @(re-frame/subscribe [:reverse-sort?])
                       (reverse repos)
                       repos)))))
 

@@ -42,9 +42,9 @@
    :headers {"Content-Type" "text/xml; charset=utf-8"}))
 
 (defroutes routes
+  (GET "/latest.xml" [] (rss-page))
   (GET "/" [] (default-page))
   (GET "/:page" [page] (default-page))
-  (GET "/latest.xml" [] (rss-page))
   (resources "/")
   (not-found "Not Found"))
 
