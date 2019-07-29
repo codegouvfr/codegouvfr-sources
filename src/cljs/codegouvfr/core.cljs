@@ -16,96 +16,50 @@
 (defonce repos-url "https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all")
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
 (defonce stats-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/general")
-(def pages 200) ;; FIXME: customizable?
+(def pages 200) ;; FIXME: Make customizable?
+(def init-filter {:lang "" :search ""})
 
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]      
-   {:repos           nil
-    :repos-page      0
-    :orgas           nil
-    :sort-by         :stars
-    :view            :repos
-    :reverse-sort    true
-    :has-description false
-    :is-fork         false
-    :is-licensed     false
-    :lang-filter     ""
-    :stats           nil
-    :filter          ""}))
+   {:repos        nil
+    :repos-page   0
+    :orgas        nil
+    :sort-by      :stars
+    :view         :repos
+    :reverse-sort true
+    :stats        nil
+    :filter       init-filter}))
 
 (re-frame/reg-event-db
  :update-repos!
- (fn [db [_ repos]]
-   (if repos (assoc db :repos repos))))
+ (fn [db [_ repos]] (if repos (assoc db :repos repos))))
 
 (re-frame/reg-event-db
  :update-stats!
- (fn [db [_ stats]]
-   (if stats (assoc db :stats stats))))
+ (fn [db [_ stats]] (if stats (assoc db :stats stats))))
 
 (re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
    (re-frame/dispatch [:repos-page! 0])
-   (assoc db :filter s)))
-
-(re-frame/reg-event-db
- :lang-filter!
- (fn [db [_ s]]
-   (re-frame/dispatch [:repos-page! 0])
-   (assoc db :lang-filter s)))
+   ;; FIXME: Find a more idiomatic way?
+   (assoc db :filter (merge (:filter db) s))))
 
 (re-frame/reg-event-db
  :repos-page!
- (fn [db [_ n]]
-   (assoc db :repos-page n)))
-
-(re-frame/reg-event-db
- :has-description!
- (fn [db [_ n]]
-   (assoc db :has-description n)))
+ (fn [db [_ n]] (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
-   (re-frame/dispatch [:lang-filter! ""])
-   (re-frame/dispatch [:filter! ""])
    (re-frame/dispatch [:repos-page! 0])
+   (re-frame/dispatch [:filter! init-filter])
    (assoc db :view view)))
 
 (re-frame/reg-event-db
- :is-fork!
- (fn [db [_ b]]
-   (re-frame/dispatch [:repos-page! 0])
-   (assoc db :is-fork b)))
-
-(re-frame/reg-event-db
- :is-licensed!
- (fn [db [_ b]]
-   (re-frame/dispatch [:repos-page! 0])
-   (assoc db :is-licensed b)))
-
-(re-frame/reg-sub
- :lang-filter?
- (fn [db _] (:lang-filter db)))
-
-(re-frame/reg-sub
- :has-description?
- (fn [db _] (:has-description db)))
-
-(re-frame/reg-sub
- :is-fork?
- (fn [db _] (:is-fork db)))
-
-(re-frame/reg-sub
- :is-licensed?
- (fn [db _] (:is-licensed db)))
-
-(re-frame/reg-event-db
  :update-orgas!
- (fn [db [_ orgas]]
-   (if orgas (assoc db :orgas orgas))))
+ (fn [db [_ orgas]] (if orgas (assoc db :orgas orgas))))
 
 (re-frame/reg-sub
  :sort-by?
@@ -137,8 +91,7 @@
 
 (re-frame/reg-event-db
  :reverse-sort!
- (fn [db _]
-   (assoc db :reverse-sort (not (:reverse-sort db)))))
+ (fn [db _] (assoc db :reverse-sort (not (:reverse-sort db)))))
 
 (defn md-to-string [s]
   (-> s (md/md->hiccup) (md/component)))
@@ -155,61 +108,41 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
-(defn apply-search-filter [m s ks]
-  (if (empty? s) m
-      (filter #(re-find (re-pattern (str "(?i)" s))
-                        (clojure.string/join
-                         " " (vals (select-keys % ks))))
-              m)))
+(defn apply-filters [m]
+  (let [f  @(re-frame/subscribe [:filter?])
+        se (:search f)
+        la (:lang f)
+        de (:has-description f)
+        fk (:is-fork f)
+        li (:is-licensed f)]
+    (filter
+     #(and (if fk (:est_fork %) true)
+           (if li (let [l (:licence %)]
+                    (and l (not (= l "Other")))) true)
+           (if de (seq (:description %)) true)
+           (if la (re-find (re-pattern (str "(?i)" la))
+                           (or (:langage %) "")) true)
+           (if se (re-find (re-pattern (str "(?i)" se))
+                           (clojure.string/join
+                            " " [(:nom %) (:description %) (:description %)]))))
+     m)))
 
-(defn apply-description-filter [m]
-  (if @(re-frame/subscribe [:has-description?])
-    (filter #(seq (:description %)) m)
-    m))
+(def filter-chan (async/chan 10))
 
-(defn apply-license-filter [m]
-  (if @(re-frame/subscribe [:is-licensed?])
-    (filter #(let [l (:licence %)]
-               (and l (not (= l "Other"))))
-            m)
-    m))
-
-(defn apply-fork-filter [m]
-  (if @(re-frame/subscribe [:is-fork?])
-    (filter #(:est_fork %) m)
-    m))
-
-(defn apply-lang-filter [m l]
-  (filter #(re-find (re-pattern (str "(?i)" l))
-                    (or (:langage %) ""))
-          m))
-
-(def search-filter-chan (async/chan 10))
-
-(defn start-search-filter-loop []
+(defn start-filter-loop []
   (async/go
-    (loop [s (async/<! search-filter-chan)]
-      (re-frame/dispatch [:filter! s])
-      (recur (async/<! search-filter-chan)))))
-
-(def lang-filter-chan (async/chan 10))
-
-(defn start-lang-filter-loop []
-  (async/go
-    (loop [s (async/<! lang-filter-chan)]
-      (re-frame/dispatch [:lang-filter! s])
-      (recur (async/<! lang-filter-chan)))))
+    (loop [f (async/<! filter-chan)]
+      (re-frame/dispatch [:filter! f])
+      (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
  :stats?
- (fn [db _]
-   (:stats db)))
+ (fn [db _] (:stats db)))
 
 (re-frame/reg-sub
  :repos?
  (fn [db _]
-   (let [lang   @(re-frame/subscribe [:lang-filter?])
-         repos0 (:repos db)
+   (let [repos0 (:repos db)
          repos  (case @(re-frame/subscribe [:sort-by?])
                   :name   (sort-by :nom repos0)
                   :forks  (sort-by :nombre_forks repos0)
@@ -218,21 +151,13 @@
                   :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
                                           (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
                                 repos0)
-                  ;; FIXME: intuitive enough to sort by length of desc?
                   :desc   (sort #(compare (count (:description %1))
                                           (count (:description %2)))
                                 repos0) 
                   repos0)]
-     (-> (if @(re-frame/subscribe [:reverse-sort])
-           (reverse repos)
-           repos)
-         (apply-search-filter
-          @(re-frame/subscribe [:filter?])
-          [:description :nom :topics])
-         (apply-lang-filter lang)
-         apply-fork-filter
-         apply-license-filter
-         apply-description-filter))))
+     (apply-filters (if @(re-frame/subscribe [:reverse-sort])
+                      (reverse repos)
+                      repos)))))
 
 (re-frame/reg-sub
  :orgas?
@@ -242,15 +167,11 @@
                  :name (sort #(compare (or-kwds %1 [:nom :login])
                                        (or-kwds %2 [:nom :login]))
                              orgs)
-                 ;; FIXME: intuitive enough to sort by length of desc?
                  :desc (sort #(compare (count (:description %1))
                                        (count (:description %2)))
                              orgs) 
                  orgs)]
-     (apply-search-filter
-      orgas
-      @(re-frame/subscribe [:filter?])
-      [:description :nom :login]))))
+     (apply-filters orgas))))
 
 (defn repositories-page []
   [:table {:class "table is-hoverable is-fullwidth"}
@@ -439,15 +360,15 @@
        [:div {:class "level-left"}        
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:is-fork! (.-checked (.-target %))])}]
+                  :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
          " Fourches seules"]
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:has-description! (.-checked (.-target %))])}]
+                  :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
          " Avec description"]        
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:is-licensed! (.-checked (.-target %))])}]
+                  :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
          " Avec licence identifiée"]
         [:div {:class "level-item"}
          [:input {:class       "input"
@@ -455,14 +376,14 @@
                   :placeholder "Langage"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! lang-filter-chan ev))))}]]
+                                   (async/go (async/>! filter-chan {:lang ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :size        20
                   :placeholder "Recherche libre"
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! search-filter-chan ev))))}]]
+                                   (async/go (async/>! filter-chan {:search ev}))))}]]
         [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
          [:a {:class    "pagination-previous"
               :on-click #(change-page "first")
@@ -487,7 +408,7 @@
                 :placeholder "Recherche libre"
                 :on-change   (fn [e]                           
                                (let [ev (.-value (.-target e))]
-                                 (async/go (async/>! search-filter-chan ev))))}]]])
+                                 (async/go (async/>! filter-chan {:search ev}))))}]]])
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
@@ -519,7 +440,6 @@
 (defn on-navigate [match]
   (let [target-page (:name (:data match))
         params      (:query-params match)]
-    (.log js/console (pr-str params))
     (re-frame/dispatch [:view! (keyword target-page) params])))
 
 (defn ^:export init []
@@ -529,8 +449,7 @@
    (rf/router routes)
    on-navigate
    {:use-fragment false})
-  (start-search-filter-loop)
-  (start-lang-filter-loop)
+  (start-filter-loop)
   (reagent/render
    [main-class]
    (. js/document (getElementById "app"))))
