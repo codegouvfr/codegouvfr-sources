@@ -17,7 +17,7 @@
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
 (defonce stats-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:lang "" :search ""})
+(def init-filter {:lang "" :search "" :search-orgas ""})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -54,7 +54,7 @@
  :view!
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:filter! init-filter])
+   (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
 (re-frame/reg-event-db
@@ -110,7 +110,8 @@
 
 (defn apply-filters [m]
   (let [f  @(re-frame/subscribe [:filter?])
-        se (:search f)
+        s  (:search f)
+        o  (:search-orgas f)
         la (:lang f)
         de (:has-description f)
         fk (:is-fork f)
@@ -120,13 +121,15 @@
            (if li (let [l (:licence %)]
                     (and l (not (= l "Other")))) true)
            (if de (seq (:description %)) true)
+           (if o (re-find (re-pattern (str "(?i)" o))
+                          (or (:organisation_nom %) "")) true)
            (if la (re-find (re-pattern (str "(?i)" la))
                            (or (:langage %) "")) true)
-           (if se (re-find (re-pattern (str "(?i)" se))
-                           (clojure.string/join
-                            " " [(:nom %) (:login %)
-                                 (:organisation_nom %)
-                                 (:description %)]))))
+           (if s (re-find (re-pattern (str "(?i)" s))
+                          (clojure.string/join
+                           " " [(:nom %) (:login %)
+                                (:organisation_nom %)
+                                (:description %)]))))
      m)))
 
 (def filter-chan (async/chan 10))
@@ -248,9 +251,11 @@
            (if nombre_repertoires
              [:div {:class "card-footer-item"
                     :title "Nombre de dépôts"}
-              nombre_repertoires
-              (if (= nombre_repertoires 1)
-                " dépôt" " dépôts")])
+              [:a {:title "Voir les dépôts"
+                   :href  (rfe/href :repos nil {:search-orgas login})}
+               nombre_repertoires
+               (if (= nombre_repertoires 1)
+                 " dépôt" " dépôts")]])
            (if email [:a {:class "card-footer-item"
                           :title "Contacter par email"
                           :href  (str "mailto:" email)}
@@ -450,7 +455,7 @@
   (rfe/start!
    (rf/router routes)
    on-navigate
-   {:use-fragment false})
+   {:use-fragment true})
   (start-filter-loop)
   (reagent/render
    [main-class]
