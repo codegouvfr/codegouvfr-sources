@@ -9,7 +9,9 @@
             [reagent.session :as session]
             [cljs-bean.core :refer [bean]]
             [ajax.core :refer [GET POST]]
-            [markdown-to-hiccup.core :as md]))
+            [markdown-to-hiccup.core :as md]
+            [reitit.frontend :as rf]
+            [reitit.frontend.easy :as rfe]))
 
 (defonce repos-url "https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all")
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
@@ -66,7 +68,7 @@
 
 (re-frame/reg-event-db
  :view!
- (fn [db [_ view]]
+ (fn [db [_ view query-params]]
    (re-frame/dispatch [:lang-filter! ""])
    (re-frame/dispatch [:filter! ""])
    (re-frame/dispatch [:repos-page! 0])
@@ -416,17 +418,17 @@
      [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
       (fa "fa-rss")]]
     [:p {:class "control"}
-     [:a {:class    "button is-success"
-          :on-click #(re-frame/dispatch [:view! :repos])} "Dépôts"]]
+     [:a {:class "button is-success"
+          :href  (rfe/href :repos)} "Dépôts"]]
     [:p {:class "control"}
-     [:a {:class    "button is-danger"
-          :on-click #(re-frame/dispatch [:view! :orgas])} "Organisations"]]
+     [:a {:class "button is-danger"
+          :href  (rfe/href :orgas)} "Organisations"]]
     [:p {:class "control"}
-     [:a {:class    "button is-info"
-          :on-click #(re-frame/dispatch [:view! :stats])} "Chiffres"]]
+     [:a {:class "button is-info"
+          :href  (rfe/href :stats)} "Chiffres"]]
     [:p {:class "control"}
-     [:a {:class    "button is-warning"
-          :on-click #(re-frame/dispatch [:view! :about])} "À propos"]]]
+     [:a {:class "button is-warning"
+          :href  (rfe/href :about)} "À propos"]]]
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
@@ -508,9 +510,25 @@
              [:update-stats! (clojure.walk/keywordize-keys %)])))
     :reagent-render main-page}))
 
+(def routes
+  [["/" :repos]
+   ["/chiffres" :stats]
+   ["/organisations" :orgas]
+   ["/apropos" :about]])
+
+(defn on-navigate [match]
+  (let [target-page (:name (:data match))
+        params      (:query-params match)]
+    (.log js/console (pr-str params))
+    (re-frame/dispatch [:view! (keyword target-page) params])))
+
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
+  (rfe/start!
+   (rf/router routes)
+   on-navigate
+   {:use-fragment false})
   (start-search-filter-loop)
   (start-lang-filter-loop)
   (reagent/render

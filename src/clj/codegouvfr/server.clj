@@ -43,6 +43,7 @@
 
 (defroutes routes
   (GET "/" [] (default-page))
+  (GET "/:page" [page] (default-page))
   (GET "/latest.xml" [] (rss-page))
   (resources "/")
   (not-found "Not Found"))
@@ -52,3 +53,6 @@
 (defn -main [& args]
   (let [port (read-string (or (System/getenv "CODEGOUVFR_PORT") "3000"))]
     (def server (server/run-server app {:port port}))))
+
+;; (-main)
+

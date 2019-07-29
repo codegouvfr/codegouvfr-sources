@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
-(defproject codegouvfr "0.3.2"
+(defproject codegouvfr "0.4.0-alpha"
 
   :description "Frontend to display public sector source code repositories"
   :url "https://github.com/etalab/codegouvfr"
@@ -36,4 +36,5 @@
                                       [org.clojure/core.async "0.4.500"]
                                       [re-frame "0.10.8"]
                                       [reagent "0.8.1"]
-                                      [reagent-utils "0.3.3"]]}})
+                                      [reagent-utils "0.3.3"]
+                                      [metosin/reitit-frontend "0.3.9"]]}})
