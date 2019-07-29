@@ -124,7 +124,9 @@
                            (or (:langage %) "")) true)
            (if se (re-find (re-pattern (str "(?i)" se))
                            (clojure.string/join
-                            " " [(:nom %) (:description %) (:description %)]))))
+                            " " [(:nom %) (:login %)
+                                 (:organisation_nom %)
+                                 (:description %)]))))
      m)))
 
 (def filter-chan (async/chan 10))
