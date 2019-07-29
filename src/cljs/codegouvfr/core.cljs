@@ -380,11 +380,11 @@
     [:br]]
    [:div {:class "container"}
     [:h1 {:class "title"} "Secteur public ?"]
-    [:p (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")]
+    (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
     [:br]]
    [:div {:class "container"}
     [:h1 {:class "title"} "D'où viennent les données ?"]
-    [:p (md-to-string "Nous construisons au fur et à mesure une <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation du secteur public</a>.  Vous pouvez **ajouter votre compte d'organisation** s'il n'y figure pas. À partir de cette liste, nous interrogeons les API des plateformes de partage de code et nous récupérons les <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a>, lesquelles sont ensuite exposées <a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">via cette API</a>.")]
+    (md-to-string "Nous construisons au fur et à mesure une <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation du secteur public</a>.  Vous pouvez **ajouter votre compte d'organisation** s'il n'y figure pas. À partir de cette liste, nous interrogeons les API des plateformes de partage de code et nous récupérons les <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a>, lesquelles sont ensuite exposées <a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">via cette API</a>.")
     [:br]]
    [:div {:class "container"}
     [:h1 {:class "title"} "Que puis-je faire ?"]
@@ -394,9 +394,9 @@
     [:br]]
    [:div {:class "container"}
     [:h1 {:class "title"} "Une question ?"]
-    [:p (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")]
+    (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
     [:br]
-    [:p (md-to-string "Pour toute autre question, n'hésitez pas à écrire à [Bastien Guerry](mailto:bastien.guerry@data.gouv.fr).")]]])
+    (md-to-string "Pour toute autre question, n'hésitez pas à écrire à [Bastien Guerry](mailto:bastien.guerry@data.gouv.fr).")]])
 
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
