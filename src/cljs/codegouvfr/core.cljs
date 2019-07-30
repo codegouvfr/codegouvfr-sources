@@ -179,43 +179,44 @@
      (apply-filters orgas))))
 
 (defn repositories-page []
-  [:table {:class "table is-hoverable is-fullwidth"}
-   [:thead
-    [:tr
-     [:th [:a {:class    "button"
-               :title    "Trier par ordre alphabétique des noms"
-               :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]
-     [:th [:a {:class    "button"
-               :title    "Trier par longueur de description"
-               :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]
-     [:th [:a {:class    "button"
-               :title    "Trier par date de mise à jour"
-               :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]
-     [:th [:a {:class    "button"
-               :title    "Trier par nombre de fourches"
-               :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]
-     [:th [:a {:class    "button"
-               :title    "Trier par nombre d'étoiles"
-               :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]
-     [:th [:a {:class    "button"
-               :title    "Trier par nombre de tickets"
-               :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]
-   (into [:tbody]
-         (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
-                                   @(re-frame/subscribe [:repos?])))]
-           ^{:key d}
-           (let [{:keys [licence]} d]
-             [:tr
-              [:td [:a {:href   (:repertoire_url d)
-                        :target "new"
-                        :title  (str (:organisation_nom d)
-                                     (if licence (str " / Licence : " licence)))}
-                    (:nom d)]]
-              [:td (:description d)]
-              [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
-              [:td (:nombre_forks d)]
-              [:td (:nombre_stars d)]
-              [:td (:nombre_issues_ouvertes d)]])))])
+  [:div {:class "table-container"}
+   [:table {:class "table is-hoverable is-fullwidth"}
+    [:thead
+     [:tr
+      [:th [:a {:class    "button"
+                :title    "Trier par ordre alphabétique des noms"
+                :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]
+      [:th [:a {:class    "button"
+                :title    "Trier par longueur de description"
+                :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]
+      [:th [:a {:class    "button"
+                :title    "Trier par date de mise à jour"
+                :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]
+      [:th [:a {:class    "button"
+                :title    "Trier par nombre de fourches"
+                :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]
+      [:th [:a {:class    "button"
+                :title    "Trier par nombre d'étoiles"
+                :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]
+      [:th [:a {:class    "button"
+                :title    "Trier par nombre de tickets"
+                :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]
+    (into [:tbody]
+          (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
+                                    @(re-frame/subscribe [:repos?])))]
+            ^{:key d}
+            (let [{:keys [licence]} d]
+              [:tr
+               [:td [:a {:href   (:repertoire_url d)
+                         :target "new"
+                         :title  (str (:organisation_nom d)
+                                      (if licence (str " / Licence : " licence)))}
+                     (:nom d)]]
+               [:td (:description d)]
+               [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
+               [:td (:nombre_forks d)]
+               [:td (:nombre_stars d)]
+               [:td (:nombre_issues_ouvertes d)]])))]])
 
 (defn organizations-page []
   (into
