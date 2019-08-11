@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
-(defproject codegouvfr "0.5.0"
+(defproject codegouvfr "0.5.1"
   :description "Frontend to display public sector source code repositories"
   :url "https://github.com/etalab/codegouvfr"
   :license {:name "Eclipse Public License - v 2.0"
@@ -14,7 +14,7 @@
                  [clj-rss "0.2.5"]
                  [ring "1.7.1"]
                  [ring-middleware-format "0.7.4"]
-                 [cheshire "5.8.1"]]
+                 [cheshire "5.9.0"]]
   :source-paths ["src/clj" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
