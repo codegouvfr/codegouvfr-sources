@@ -27,7 +27,7 @@
   :profiles {:uberjar {:aot :all}
              :dev     {:source-paths ["src/cljs"]
                        :dependencies [[cljs-ajax "0.8.0"]
-                                      [cljs-bean "1.3.0"]
+                                      [cljs-bean "1.4.0"]
                                       [com.bhauman/figwheel-main "0.2.3"]
                                       [com.bhauman/rebel-readline-cljs "0.1.4"]
                                       [markdown-to-hiccup "0.6.2"]
