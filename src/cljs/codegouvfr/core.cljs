@@ -351,10 +351,7 @@
           :href  (rfe/href :orgas)} "Organisations"]]
     [:p {:class "control"}
      [:a {:class "button is-info"
-          :href  (rfe/href :stats)} "Chiffres"]]
-    [:p {:class "control"}
-     [:a {:class "button is-warning"
-          :href  (rfe/href :about)} "À propos"]]]
+          :href  (rfe/href :stats)} "Chiffres"]]]
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
