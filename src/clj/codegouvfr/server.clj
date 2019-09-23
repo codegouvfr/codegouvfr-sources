@@ -11,7 +11,7 @@
             [clj-http.client :as http])
   (:gen-class))
 
-(def last-repositories-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/last_repositories")
+(defonce last-repositories-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/last_repositories")
 
 (defn default-page []
   (assoc
