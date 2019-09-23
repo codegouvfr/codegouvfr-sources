@@ -183,24 +183,30 @@
    [:table {:class "table is-hoverable is-fullwidth"}
     [:thead
      [:tr
-      [:th [:a {:class    "button"
-                :title    "Trier par ordre alphabétique des noms"
-                :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]
-      [:th [:a {:class    "button"
-                :title    "Trier par longueur de description"
-                :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]
-      [:th [:a {:class    "button"
-                :title    "Trier par date de mise à jour"
-                :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]
-      [:th [:a {:class    "button"
-                :title    "Trier par nombre de fourches"
-                :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]
-      [:th [:a {:class    "button"
-                :title    "Trier par nombre d'étoiles"
-                :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]
-      [:th [:a {:class    "button"
-                :title    "Trier par nombre de tickets"
-                :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]
+      [:th [:abbr {:title "Noms"}
+            [:a {:class    "button"
+                 :title    "Trier par ordre alphabétique des noms"
+                 :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]]
+      [:th [:abbr {:title "Description"}
+            [:a {:class    "button"
+                 :title    "Trier par longueur de description"
+                 :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]]
+      [:th [:abbr {:title "Mise à jour"}
+            [:a {:class    "button"
+                 :title    "Trier par date de mise à jour"
+                 :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]]
+      [:th [:abbr {:title "Fourches"}
+            [:a {:class    "button"
+                 :title    "Trier par nombre de fourches"
+                 :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]]
+      [:th [:abbr {:title "Étoiles"}
+            [:a {:class    "button"
+                 :title    "Trier par nombre d'étoiles"
+                 :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]]
+      [:th [:abbr {:title "Tickets"}
+            [:a {:class    "button"
+                 :title    "Trier par nombre de tickets"
+                 :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]]
     (into [:tbody]
           (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
                                     @(re-frame/subscribe [:repos?])))]
