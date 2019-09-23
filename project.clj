@@ -13,8 +13,10 @@
                  [clj-http "3.10.0"]
                  [clj-rss "0.2.5"]
                  [ring "1.7.1"]
-                 [ring-middleware-format "0.7.4"]
-                 [cheshire "5.9.0"]]
+                 [ring/ring-defaults "0.3.2"]
+                 [cheshire "5.9.0"]
+                 [com.draines/postal "2.0.3"]
+                 [com.taoensso/timbre "4.10.0"]]
   :source-paths ["src/clj" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
