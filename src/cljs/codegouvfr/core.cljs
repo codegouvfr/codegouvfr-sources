@@ -22,14 +22,15 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]      
-   {:repos        nil
-    :repos-page   0
-    :orgas        nil
-    :sort-by      :date
-    :view         :repos
-    :reverse-sort true
-    :stats        nil
-    :filter       init-filter}))
+   {:repos         nil
+    :repos-page    0
+    :orgas         nil
+    :sort-repos-by :date
+    :sort-orgas-by :repos
+    :view          :repos
+    :reverse-sort  true
+    :stats         nil
+    :filter        init-filter}))
 
 (re-frame/reg-event-db
  :update-repos!
@@ -62,8 +63,12 @@
  (fn [db [_ orgas]] (if orgas (assoc db :orgas orgas))))
 
 (re-frame/reg-sub
- :sort-by?
- (fn [db _] (:sort-by db)))
+ :sort-repos-by?
+ (fn [db _] (:sort-repos-by db)))
+
+(re-frame/reg-sub
+ :sort-orgas-by?
+ (fn [db _] (:sort-orgas-by db)))
 
 (re-frame/reg-sub
  :repos-page?
@@ -82,12 +87,19 @@
  (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-event-db
- :sort-by!
+ :sort-repos-by!
  (fn [db [_ k]]
    (re-frame/dispatch [:repos-page! 0])
-   (when (= k (:sort-by db))
+   (when (= k (:sort-repos-by db))
      (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-by k)))
+   (assoc db :sort-repos-by k)))
+
+(re-frame/reg-event-db
+ :sort-orgas-by!
+ (fn [db [_ k]]
+   (when (= k (:sort-orgas-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-orgas-by k)))
 
 (re-frame/reg-event-db
  :reverse-sort!
@@ -147,7 +159,7 @@
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
-         repos  (case @(re-frame/subscribe [:sort-by?])
+         repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (sort-by :nom repos0)
                   :forks  (sort-by :nombre_forks repos0)
                   :stars  (sort-by :nombre_stars repos0)
@@ -167,15 +179,18 @@
  :orgas?
  (fn [db _]
    (let [orgs  (:orgas db)
-         orgas (case @(re-frame/subscribe [:sort-by?])
-                 :name (sort #(compare (or-kwds %1 [:nom :login])
-                                       (or-kwds %2 [:nom :login]))
-                             orgs)
-                 :desc (sort #(compare (count (:description %1))
-                                       (count (:description %2)))
-                             orgs) 
+         orgas (case @(re-frame/subscribe [:sort-orgas-by?])
+                 :repos (sort-by :nombre_repertoires orgs)
+                 :date  (sort #(compare (js/Date. (.parse js/Date (:date_creation %1)))
+                                        (js/Date. (.parse js/Date (:date_creation %2))))
+                              orgs)
+                 :name  (sort #(compare (or-kwds %1 [:nom :login])
+                                        (or-kwds %2 [:nom :login]))
+                              orgs)
                  orgs)]
-     (apply-filters orgas))))
+     (apply-filters (if @(re-frame/subscribe [:reverse-sort?])
+                      (reverse orgas)
+                      orgas)))))
 
 (defn repositories-page []
   [:div {:class "table-container"}
@@ -185,30 +200,30 @@
       [:th [:abbr {:title "Organisation / dépôt"}
             [:a {:class    "button"
                  :title    "Trier par ordre alphabétique des noms de dépôts"
-                 :on-click #(re-frame/dispatch [:sort-by! :name])} "Organisation / dépôt"]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
       [:th [:abbr {:title "SWH"}
             [:a {:class "button"
                  :title "Lien vers l'archive de Software Heritage"} "SWH"]]]
       [:th [:abbr {:title "Description"}
             [:a {:class    "button"
                  :title    "Trier par longueur de description"
-                 :on-click #(re-frame/dispatch [:sort-by! :desc])} "Description"]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :desc])} "Description"]]]
       [:th [:abbr {:title "Mise à jour"}
             [:a {:class    "button"
                  :title    "Trier par date de mise à jour"
-                 :on-click #(re-frame/dispatch [:sort-by! :date])} "MàJ"]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :date])} "MàJ"]]]
       [:th [:abbr {:title "Fourches"}
             [:a {:class    "button"
                  :title    "Trier par nombre de fourches"
-                 :on-click #(re-frame/dispatch [:sort-by! :forks])} "Fourches"]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :forks])} "Fourches"]]]
       [:th [:abbr {:title "Étoiles"}
             [:a {:class    "button"
                  :title    "Trier par nombre d'étoiles"
-                 :on-click #(re-frame/dispatch [:sort-by! :stars])} "Étoiles"]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :stars])} "Étoiles"]]]
       [:th [:abbr {:title "Tickets"}
             [:a {:class    "button"
                  :title    "Trier par nombre de tickets"
-                 :on-click #(re-frame/dispatch [:sort-by! :issues])} "Tickets"]]]]]
+                 :on-click #(re-frame/dispatch [:sort-repos-by! :issues])} "Tickets"]]]]]
     (into [:tbody]
           (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
                                     @(re-frame/subscribe [:repos?])))]
@@ -419,13 +434,23 @@
               :disabled last-disabled}
           (fa "fa-fast-forward")]]])
      (= @(re-frame/subscribe [:view?]) :orgas)
-     [:div {:class "level-left"}
-      [:div {:class "level-item"}
-       [:input {:class       "input"
-                :placeholder "Recherche libre"
-                :on-change   (fn [e]                           
-                               (let [ev (.-value (.-target e))]
-                                 (async/go (async/>! filter-chan {:search ev}))))}]]])
+     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])]
+       [:div {:class "level-left"}
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :placeholder "Recherche libre"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! filter-chan {:search ev}))))}]]
+        [:a {:class    (str "button level-item is-" (if (= org-f :name) "black" "light"))
+             :title    "Trier par ordre alphabétique des noms d'organisations"
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Ordre alphabétique"]
+        [:a {:class    (str "button level-item is-" (if (= org-f :repos) "black" "light"))
+             :title    "Trier par nombre de dépôts"
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
+        [:a {:class    (str "button level-item is-" (if (= org-f :date) "black" "light"))
+             :title    "Trier par date de création de l'organisation"
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
