@@ -86,7 +86,7 @@
     [:nav {:class "navbar" :role "navigation" :aria-label "main navigation"}
      [:div {:class "navbar-brand"}
       [:a {:class "navbar-item" :href "/"}
-       [:img {:src    "https://template.data.gouv.fr/images/logo-marianne.svg"
+       [:img {:src    "/images/logo-marianne.svg"
               :alt    "Logo Marianne"
               :width  "120"
               :height "100"}
@@ -114,7 +114,7 @@
      [:div {:class "content"}
       [:div {:class "columns"}
        [:div {:class "column is-offset-2 is-4"}
-        [:img {:src "https://template.data.gouv.fr/images/etalab.svg" :width "240px"}]]
+        [:img {:src "/images/etalab.svg" :width "240px"}]]
        [:div {:class "column is-offset-1 is-4"}
         [:h1 "code.etalab.gouv.fr"]
         [:p "Site développé par la mission Etalab"]]]]]]))
