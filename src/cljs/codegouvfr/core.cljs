@@ -220,9 +220,9 @@
                      (:nom d)]]
                [:td (:description d)]
                [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
-               [:td (:nombre_forks d)]
-               [:td (:nombre_stars d)]
-               [:td (:nombre_issues_ouvertes d)]])))]])
+               [:td {:class "has-text-right"} (:nombre_forks d)]
+               [:td {:class "has-text-right"} (:nombre_stars d)]
+               [:td {:class "has-text-right"} (:nombre_issues_ouvertes d)]])))]])
 
 (defn organizations-page []
   (into
