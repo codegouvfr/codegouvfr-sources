@@ -301,10 +301,10 @@
         @(re-frame/subscribe [:stats?])]
     [:div
      [:div {:class "level"}
-      (figure "Dépôts" nb_repos)
+      (figure "Dépôts de code source" nb_repos)
       (figure "Organisations" nb_orgs)
-      (figure "Moyenne des dépôts par organisation" avg_nb_repos)
-      (figure "Médiane des dépôts par organisation" median_nb_repos)]
+      (figure "Nombre moyen de dépôts par organisation" avg_nb_repos)
+      (figure "Nombre médian de dépôts par organisation" median_nb_repos)]
      [:br]
      [:div {:class "columns"}
       (stats-card "Organisations avec le plus de dépôts" top_orgs_by_repos)
@@ -363,7 +363,7 @@
    [:div {:class "field is-grouped"}
     [:p {:class "control"}
      [:a {:class "button is-success"
-          :href  (rfe/href :repos)} "Dépôts"]]
+          :href  (rfe/href :repos)} "Dépôts de code source"]]
     [:p {:class "control"}
      [:a {:class "button is-danger"
           :href  (rfe/href :orgas)} "Organisations"]]
