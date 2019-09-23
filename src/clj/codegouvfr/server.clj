@@ -191,7 +191,7 @@
      [:h1 {:class "title"} "Une question ?"]
      (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
      [:br]
-     (md-to-string "Pour toute autre question, n'hésitez pas à écrire à [Bastien Guerry](mailto:bastien.guerry@data.gouv.fr).")]]))
+     (md-to-string "Pour toute autre question, n'hésitez pas à [nous écrire](/contact).")]]))
 
 (defn codegouvfr-latest-repositories []
   (let [reps (try (http/get last-repositories-url)
