@@ -100,7 +100,7 @@
   (first (remove nil? (map #(apply % [m]) ks))))
 
 (defn fa [s]
-  [:span {:class "icon has-text-info"}
+  [:span {:class "icon"}
    [:i {:class (str "fas " s)}]])
 
 (defn to-locale-date [s]
@@ -183,10 +183,10 @@
    [:table {:class "table is-hoverable is-fullwidth"}
     [:thead
      [:tr
-      [:th [:abbr {:title "Noms"}
+      [:th [:abbr {:title "Organisation / dépôt"}
             [:a {:class    "button"
-                 :title    "Trier par ordre alphabétique des noms"
-                 :on-click #(re-frame/dispatch [:sort-by! :name])} "Nom"]]]
+                 :title    "Trier par ordre alphabétique des noms de dépôts"
+                 :on-click #(re-frame/dispatch [:sort-by! :name])} "Organisation / dépôt"]]]
       [:th [:abbr {:title "Description"}
             [:a {:class    "button"
                  :title    "Trier par longueur de description"
@@ -213,11 +213,15 @@
             ^{:key d}
             (let [{:keys [licence]} d]
               [:tr
-               [:td [:a {:href   (:repertoire_url d)
-                         :target "new"
-                         :title  (str (:organisation_nom d)
-                                      (if licence (str " / Licence : " licence)))}
-                     (:nom d)]]
+               [:td [:div
+                     [:a {:href  (rfe/href :repos nil {:search-orgas (:organisation_nom d)})
+                          :title  "Voir la liste des dépôts de cette organisation"}
+                      (:organisation_nom d)]
+                     " / "
+                     [:a {:href   (:repertoire_url d)
+                          :target "new"
+                          :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
+                      (:nom d)]]]
                [:td (:description d)]
                [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
                [:td {:class "has-text-right"} (:nombre_forks d)]
@@ -425,6 +429,17 @@
                 :on-change   (fn [e]                           
                                (let [ev (.-value (.-target e))]
                                  (async/go (async/>! filter-chan {:search ev}))))}]]])
+   (let [flt @(re-frame/subscribe [:filter?])]
+     (if (seq (:search-orgas flt))
+       [:div
+        [:br]
+        [:div {:class "level-left"}
+         [:div {:class "level-item"}
+          [:a {:class "button is-outlined is-warning"
+               :title "Supprimer le filtre"
+               :href (rfe/href :repos)}
+           [:span (:search-orgas flt)]
+           (fa "fa-times")]]]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
