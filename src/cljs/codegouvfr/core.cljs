@@ -25,7 +25,7 @@
    {:repos        nil
     :repos-page   0
     :orgas        nil
-    :sort-by      :stars
+    :sort-by      :date
     :view         :repos
     :reverse-sort true
     :stats        nil
