@@ -184,6 +184,9 @@
             [:a {:class    "button"
                  :title    "Trier par ordre alphabétique des noms de dépôts"
                  :on-click #(re-frame/dispatch [:sort-by! :name])} "Organisation / dépôt"]]]
+      [:th [:abbr {:title "SWH"}
+            [:a {:class "button"
+                 :title "Lien vers l'archive de Software Heritage"} "SWH"]]]
       [:th [:abbr {:title "Description"}
             [:a {:class    "button"
                  :title    "Trier par longueur de description"
@@ -212,13 +215,18 @@
               [:tr
                [:td [:div
                      [:a {:href  (rfe/href :repos nil {:search-orgas (:organisation_nom d)})
-                          :title  "Voir la liste des dépôts de cette organisation"}
+                          :title "Voir la liste des dépôts de cette organisation"}
                       (:organisation_nom d)]
                      " / "
                      [:a {:href   (:repertoire_url d)
                           :target "new"
                           :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
                       (:nom d)]]]
+               [:td {:class "has-text-centered"}
+                [:a {:href   (:software_heritage_url d)
+                     :title  "Lien vers l'archive de Software Heritage"
+                     :target "new"}
+                 [:img {:width "18px" :src "/images/swh-logo.png"}]]]
                [:td (:description d)]
                [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
                [:td {:class "has-text-right"} (:nombre_forks d)]
@@ -340,7 +348,15 @@
           :href  (rfe/href :orgas)} "Organisations"]]
     [:p {:class "control"}
      [:a {:class "button is-info"
-          :href  (rfe/href :stats)} "Chiffres"]]]
+          :href  (rfe/href :stats)} "Chiffres"]]
+    (let [flt @(re-frame/subscribe [:filter?])]
+      (if (seq (:search-orgas flt))
+        [:p {:class "control"}
+         [:a {:class "button is-outlined is-warning"
+              :title "Supprimer le filtre"
+              :href  (rfe/href :repos)}
+          [:span (:search-orgas flt)]
+          (fa "fa-times")]]))]
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
@@ -404,17 +420,6 @@
                 :on-change   (fn [e]                           
                                (let [ev (.-value (.-target e))]
                                  (async/go (async/>! filter-chan {:search ev}))))}]]])
-   (let [flt @(re-frame/subscribe [:filter?])]
-     (if (seq (:search-orgas flt))
-       [:div
-        [:br]
-        [:div {:class "level-left"}
-         [:div {:class "level-item"}
-          [:a {:class "button is-outlined is-warning"
-               :title "Supprimer le filtre"
-               :href  (rfe/href :repos)}
-           [:span (:search-orgas flt)]
-           (fa "fa-times")]]]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
