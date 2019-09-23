@@ -11,6 +11,8 @@
             [clj-http.client :as http])
   (:gen-class))
 
+(def last-repositories-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/last_repositories")
+
 (defn default-page []
   (assoc
    (response/response
@@ -20,9 +22,9 @@
    :headers {"Content-Type" "text/html; charset=utf-8"}))
 
 (defn codegouvfr-latest-repositories []
-  (json/parse-string
-   (:body (http/get "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/last_repositories"))
-   true))
+  (let [reps (try (http/get last-repositories-url)
+                  (catch Exception e nil))]
+    (json/parse-string (:body reps) true)))
 
 (defn rss-feed []
   (rss/channel-xml
