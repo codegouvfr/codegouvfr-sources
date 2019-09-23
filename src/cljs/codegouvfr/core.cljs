@@ -373,8 +373,9 @@
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
-     (let [repos-pages    @(re-frame/subscribe [:repos-page?])
-           count-pages    (count (partition-all pages @(re-frame/subscribe [:repos?])))
+     (let [repos @(re-frame/subscribe [:repos?])
+           repos-pages    @(re-frame/subscribe [:repos-page?])
+           count-pages    (count (partition-all pages repos))
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
        [:div {:class "level-left"}
@@ -404,6 +405,9 @@
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
          " Avec licence identifiée"]
+        [:span {:class "button is-static level-item"}
+         (let [rps (count repos)]
+           (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
         [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
          [:a {:class    "pagination-previous"
               :on-click #(change-page "first")
