@@ -271,7 +271,7 @@
            (if site_web [:a {:class  "card-footer-item"
                              :title  "Visiter le site web"
                              :target "new"
-                             :href   site_web} (fa "fa-link")])]]])])))
+                             :href   site_web} (fa "fa-globe")])]]])])))
 
 (defn figure [heading title]
   [:div {:class "level-item has-text-centered"}
