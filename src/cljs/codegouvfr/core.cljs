@@ -344,9 +344,6 @@
   [:div
    [:div {:class "field is-grouped"}
     [:p {:class "control"}
-     [:a {:class "button" :href "latest.xml" :title "Flux RSS des derniers dépôts"}
-      (fa "fa-rss")]]
-    [:p {:class "control"}
      [:a {:class "button is-success"
           :href  (rfe/href :repos)} "Dépôts"]]
     [:p {:class "control"}
