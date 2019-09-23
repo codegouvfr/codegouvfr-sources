@@ -291,7 +291,8 @@
 
 (defn stats-page []
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
-                top_orgs_by_repos top_orgs_by_stars top_licenses]
+                top_orgs_by_repos top_orgs_by_stars top_licenses
+                platforms software_heritage]
          :as   stats}
         @(re-frame/subscribe [:stats?])]
     [:div
@@ -305,7 +306,14 @@
       (stats-card "Organisations avec le plus de dépôts" top_orgs_by_repos)
       (stats-card "Organisations les plus étoilées" top_orgs_by_stars)]
      [:div {:class "columns"}
-      (stats-card "Licences les plus utilisées" top_licenses)]]))
+      (stats-card "Licences les plus utilisées" top_licenses)]
+     [:div {:class "columns"}
+      (stats-card "Répartition par plateforme" platforms)
+      (stats-card "Sauvegarde sur Software Heritage"
+                  {"Dépôts dans Software Heritage"
+                   (:repos_in_archive software_heritage)
+                   "Proportion de dépôts archivés"
+                   (:ratio_in_archive software_heritage)})]]))
 
 (defn about-page []
   [:div
