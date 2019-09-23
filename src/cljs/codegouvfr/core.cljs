@@ -112,9 +112,11 @@
         la (:lang f)
         de (:has-description f)
         fk (:is-fork f)
+        ar (:is-archive f)
         li (:is-licensed f)]
     (filter
      #(and (if fk (:est_fork %) true)
+           (if ar (not (:est_archive %)) true)
            (if li (let [l (:licence %)]
                     (and l (not (= l "Other")))) true)
            (if de (seq (:description %)) true)
@@ -380,15 +382,19 @@
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! filter-chan {:lang ev}))))}]]
-        [:label {:class "checkbox level-item"}
+        [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
          " Fourches seules"]
-        [:label {:class "checkbox level-item"}
+        [:label {:class "checkbox level-item" :title "Ne pas inclure les dépôts archivés"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:filter! {:is-archive (.-checked (.-target %))}])}]
+         " Sauf archives"]
+        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une description"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
          " Avec description"]        
-        [:label {:class "checkbox level-item"}
+        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
          " Avec licence identifiée"]
