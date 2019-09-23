@@ -365,7 +365,21 @@
            count-pages    (count (partition-all pages @(re-frame/subscribe [:repos?])))
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
-       [:div {:class "level-left"}        
+       [:div {:class "level-left"}
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :size        20
+                  :placeholder "Recherche libre"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! filter-chan {:search ev}))))}]]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :size        10
+                  :placeholder "Langage"
+                  :on-change   (fn [e]                           
+                                 (let [ev (.-value (.-target e))]
+                                   (async/go (async/>! filter-chan {:lang ev}))))}]]
         [:label {:class "checkbox level-item"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
@@ -378,20 +392,6 @@
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
          " Avec licence identifiée"]
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :size        10
-                  :placeholder "Langage"
-                  :on-change   (fn [e]                           
-                                 (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! filter-chan {:lang ev}))))}]]
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :size        20
-                  :placeholder "Recherche libre"
-                  :on-change   (fn [e]                           
-                                 (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! filter-chan {:search ev}))))}]]
         [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
          [:a {:class    "pagination-previous"
               :on-click #(change-page "first")
