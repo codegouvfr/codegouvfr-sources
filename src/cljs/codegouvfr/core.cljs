@@ -93,9 +93,6 @@
  :reverse-sort!
  (fn [db _] (assoc db :reverse-sort (not (:reverse-sort db)))))
 
-(defn md-to-string [s]
-  (-> s (md/md->hiccup) (md/component)))
-
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
 
@@ -312,38 +309,12 @@
      [:div {:class "columns"}
       (stats-card "Licences les plus utilisées" top_licenses)]
      [:div {:class "columns"}
-      (stats-card "Répartition par plateforme" platforms)
+      (stats-card "Répartition par plateformes" platforms)
       (stats-card "Sauvegarde sur Software Heritage"
                   {"Dépôts dans Software Heritage"
                    (:repos_in_archive software_heritage)
                    "Proportion de dépôts archivés"
                    (:ratio_in_archive software_heritage)})]]))
-
-(defn about-page []
-  [:div
-   [:div {:class "container"}
-    [:h1 {:class "title"} "Codes sources ?"]
-    [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
-    [:br]]
-   [:div {:class "container"}
-    [:h1 {:class "title"} "Secteur public ?"]
-    (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
-    [:br]]
-   [:div {:class "container"}
-    [:h1 {:class "title"} "D'où viennent les données ?"]
-    (md-to-string "Nous construisons au fur et à mesure une <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation du secteur public</a>.  Vous pouvez **ajouter votre compte d'organisation** s'il n'y figure pas. À partir de cette liste, nous interrogeons les API des plateformes de partage de code et nous récupérons les <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a>, lesquelles sont ensuite exposées <a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">via cette API</a>.")
-    [:br]]
-   [:div {:class "container"}
-    [:h1 {:class "title"} "Que puis-je faire ?"]
-    [:p [:strong "Vous êtes un organisme public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas public ici. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
-    [:br]
-    [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
-    [:br]]
-   [:div {:class "container"}
-    [:h1 {:class "title"} "Une question ?"]
-    (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
-    [:br]
-    (md-to-string "Pour toute autre question, n'hésitez pas à écrire à [Bastien Guerry](mailto:bastien.guerry@data.gouv.fr).")]])
 
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
@@ -373,7 +344,7 @@
    [:br]
    (cond
      (= @(re-frame/subscribe [:view?]) :repos)
-     (let [repos @(re-frame/subscribe [:repos?])
+     (let [repos          @(re-frame/subscribe [:repos?])
            repos-pages    @(re-frame/subscribe [:repos-page?])
            count-pages    (count (partition-all pages repos))
            first-disabled (= repos-pages 0)
@@ -441,14 +412,13 @@
          [:div {:class "level-item"}
           [:a {:class "button is-outlined is-warning"
                :title "Supprimer le filtre"
-               :href (rfe/href :repos)}
+               :href  (rfe/href :repos)}
            [:span (:search-orgas flt)]
            (fa "fa-times")]]]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
      :stats [stats-page]
-     :about [about-page]
      :orgas [organizations-page])])
 
 (defn main-class []
@@ -469,8 +439,7 @@
 (def routes
   [["/" :repos]
    ["/chiffres" :stats]
-   ["/organisations" :orgas]
-   ["/apropos" :about]])
+   ["/organisations" :orgas]])
 
 (defn on-navigate [match]
   (let [target-page (:name (:data match))
