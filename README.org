@@ -47,6 +47,11 @@ and you want to expose the 3000 port:
 
 Then go to http://localhost:3000.
 
+* Roadmap
+
+There is no real roadmap but you can check [[https://github.com/etalab/codegouvfr/issues][our issues]] to see if you
+can help or suggest a feature.
+
 * Contribute
 
 Your help is welcome.  You can contribute with bug reports, pull
