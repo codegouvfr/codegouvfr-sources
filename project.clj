@@ -35,7 +35,7 @@
                                       [markdown-to-hiccup "0.6.2"]
                                       [org.clojure/clojurescript "1.10.520"]
                                       [org.clojure/core.async "0.4.500"]
-                                      [re-frame "0.10.8"]
+                                      [re-frame "0.10.9"]
                                       [reagent "0.8.1"]
                                       [reagent-utils "0.3.3"]
                                       [metosin/reitit-frontend "0.3.9"]]}})
