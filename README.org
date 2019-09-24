@@ -20,14 +20,30 @@ You will need to configure these environment variables:
 : CODEGOUVFR_ADMIN_EMAIL: the email where to receive messages
 : CODEGOUVFR_FROM: the From header for sent emails
 
-** With lein uberjar
+** Deploy with lein uberjar
 
-: ~$ cd codegouvfr
+: ~$ git clone https://github.com/etalab/codegouvfr
+: ~$ cd codegouvfr/
 : ~$ lein clean
 : ~$ lein test
 : ~$ lein fig:min
 : ~$ lein uberjar
 : ~$ java -jar target/codegouvfr-standalone.jar
+
+Then go to https://localhost:3000 or to your custom base URL.
+
+** Deploy with Docker
+
+Assuming your environments variables are stored in ~~/.codegouvfr_envs~
+and you want to expose the 3000 port:
+
+: ~$ git clone https://github.com/etalab/codegouvfr
+: ~$ cd codegouvfr/
+: ~$ lein fig:min
+: ~$ docker build -t codegouvfr .
+: ~$ docker run -it -p 3000:3000 --env-file=~/.codegouvfr_envs codegouvfr
+
+Then go to http://localhost:3000.
 
 * Contribute
 
