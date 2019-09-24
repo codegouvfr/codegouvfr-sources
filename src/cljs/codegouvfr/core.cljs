@@ -371,7 +371,7 @@
       (if (seq (:search-orgas flt))
         [:p {:class "control"}
          [:a {:class "button is-outlined is-warning"
-              :title "Supprimer le filtre"
+              :title "Supprimer le filtre : voir toutes les organisations"
               :href  (rfe/href :repos)}
           [:span (:search-orgas flt)]
           (fa "fa-times")]]))]
