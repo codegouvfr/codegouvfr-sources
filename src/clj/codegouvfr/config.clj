@@ -23,7 +23,7 @@
       smtp-login))
 
 (def codegouvfr_port
-  (or (System/getenv "CODEGOUVFR_PORT")
+  (or (read-string (System/getenv "CODEGOUVFR_PORT"))
       3000))
 
 (def log-file "log.txt")
