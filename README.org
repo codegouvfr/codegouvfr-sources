@@ -2,6 +2,8 @@
 
 Browse public sector source code repositories.
 
+[[file:codegouvfr.png]]
+
 * Develop
 
 1. Compile with =lein fig:build=
