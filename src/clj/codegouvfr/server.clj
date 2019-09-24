@@ -240,9 +240,8 @@
              wrap-reload))
 
 (defn -main [& args]
-  (let [port (read-string (or (System/getenv "CODEGOUVFR_PORT") "3000"))]
-    (def server (server/run-server app {:port port}))
-    (println (str "Server started on locahost:" port))))
+  (def server (server/run-server app {:port config/codegouvfr_port}))
+  (println (str "Server started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
 

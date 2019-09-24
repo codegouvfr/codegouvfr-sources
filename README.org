@@ -19,6 +19,7 @@ You will need to configure these environment variables:
 : SMTP_PASSWORD: the smtp password to use to send emails
 : CODEGOUVFR_ADMIN_EMAIL: the email where to receive messages
 : CODEGOUVFR_FROM: the From header for sent emails
+: CODEGOUVFR_PORT: the port to run the application
 
 ** Deploy with lein uberjar
 

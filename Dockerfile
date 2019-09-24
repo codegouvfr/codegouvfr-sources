@@ -8,5 +8,6 @@ ENV SMTP_LOGIN ${SMTP_LOGIN}
 ENV SMTP_PASSWORD ${SMTP_PASSWORD}
 ENV CODEGOUVFR_ADMIN_EMAIL ${CODEGOUVFR_ADMIN_EMAIL}
 ENV CODEGOUVFR_FROM ${CODEGOUVFR_FROM}
+ENV CODEGOUVFR_PORT ${CODEGOUVFR_PORT}
 ADD target/codegouvfr-standalone.jar /codegouvfr/codegouvfr-standalone.jar
 CMD ["java", "-jar", "/codegouvfr/codegouvfr-standalone.jar"]

@@ -18,8 +18,12 @@
   (or (System/getenv "CODEGOUVFR_ADMIN_EMAIL")
       "bastien.guerry@data.gouv.fr"))
 
-(def from "opensource"
+(def from
   (or (System/getenv "CODEGOUVFR_FROM")
       smtp-login))
+
+(def codegouvfr_port
+  (or (System/getenv "CODEGOUVFR_PORT")
+      3000))
 
 (def log-file "log.txt")
