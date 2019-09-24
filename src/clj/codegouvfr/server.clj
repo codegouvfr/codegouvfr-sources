@@ -51,18 +51,18 @@
   "Send a templated email."
   [{:keys [email name organization message log]}]
   (try
-    (do
-      (postal/send-message
-       {:host config/smtp-host
-        :port 587
-        :user config/smtp-login
-        :pass config/smtp-password}
-       {:from       config/from
-        :message-id #(postal.support/message-id "mail.etalab.studio")
-        :to         config/admin-email
-        :subject    (str name " / " organization)
-        :body       message})
-      (timbre/info log))
+    (if-let
+        [res (postal/send-message
+              {:host config/smtp-host
+               :port 587
+               :user config/smtp-login
+               :pass config/smtp-password}
+              {:from       config/from
+               :message-id #(postal.support/message-id "mail.etalab.studio")
+               :to         config/admin-email
+               :subject    (str name " / " organization)
+               :body       message})]
+      (when (= (:error res) :SUCCESS) (timbre/info log)))
     (catch Exception e
       (timbre/error (str "Can't send email: " (:cause (Throwable->map e)))))))
 
@@ -226,7 +226,7 @@
   (POST "/contact" req
         (let [params (clojure.walk/keywordize-keys (:form-params req))]
           (send-email (conj params {:log (str "Sent message from " (:name params)
-                                              "of " (:organization params))}))
+                                              " (" (:organization params) ")")}))
           (response/redirect "/merci")))
   (GET "/apropos" [] (about-page))
   (GET "/:page" [page] (default-page))
