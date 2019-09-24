@@ -170,31 +170,42 @@
 
 (defn about-page []
   (template-page
-   "À propos de code.etalab.gouv.fr" ""
+   "À propos de code.etalab.gouv.fr" "D'où viennent les données, à quoi peuvent-elles servir ?"
    [:div
     [:div {:class "container"}
-     [:h1 {:class "title"} "Codes sources ?"]
-     [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
-     [:br]]
-    [:div {:class "container"}
-     [:h1 {:class "title"} "Secteur public ?"]
-     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
-     [:br]]
-    [:div {:class "container"}
      [:h1 {:class "title"} "D'où viennent les données ?"]
-     (md-to-string "Nous construisons au fur et à mesure une <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation du secteur public</a>.  Vous pouvez **ajouter votre compte d'organisation** s'il n'y figure pas. À partir de cette liste, nous interrogeons les API des plateformes de partage de code et nous récupérons les <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a>, lesquelles sont ensuite exposées <a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">via cette API</a>.")
+     (md-to-string "Dans le cadre de la <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Polique de contribution de l'État aux logiciels libres</a>, la DINSIC collecte la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation</a> où des organismes publics partagent leurs codes sources. Nous nous servons de cette liste pour collecter des métadonnées sur tous les dépôts de code source.  Ces métadonnées sont publiées <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">sur data.gouv.fr</a> ou interrogeables depuis <a href=\"https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all\">cette API</a>.")
+     [:br]
+     (md-to-string "Le partage des codes sources est imposé par la <strong>Loi pour une République numérique</strong> : tout code source obtenu ou développé par un organisme public est considéré comme un « document administratif » devant par défaut être publié en open data.  Pour connaître les conditions d'ouverture d'un logiciel du secteur public, vous pouvez consulter ce <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guide interactif</a>.")
+     [:br]
+     [:h2 {:class "subtitle"} "« Je ne vois pas mes codes sources ! »"]
+     (md-to-string "C'est sûrement que votre forge ou votre compte d'organisation n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.  <a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
      [:br]]
     [:div {:class "container"}
-     [:h1 {:class "title"} "Que puis-je faire ?"]
-     [:p [:strong "Vous êtes un organisme public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas public ici. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
+     [:h1 {:class "title"} "En quoi cette liste peut m'être utile ?"]
+     [:p [:strong "Vous êtes un organisme public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas disponible. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
      [:br]
      [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
+     [:br]]
+    [:div {:class "container"}
+     [:h1 {:class "title"} "Mini-glossaire"]
+     [:p "<strong>Codes sources</strong> : le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
+     [:br]
+     (md-to-string "<strong>Secteur public</strong> : les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
+     [:br]
+     (md-to-string "<strong>Fourche</strong> : un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
+     [:br]
+     (md-to-string "<strong>Software Heritage (SWH)</strong> : <a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
+     [:br]]
+    [:div {:class "container"}
+     [:h1 {:class "title"} "Puis aider à faire évoluer ce site ?"]
+     (md-to-string "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Une question ?"]
      (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
      [:br]
-     (md-to-string "Pour toute autre question, n'hésitez pas à [nous écrire](/contact).")]]))
+     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/contact).")]]))
 
 (defn codegouvfr-latest-repositories []
   (let [reps (try (http/get last-repositories-url)
