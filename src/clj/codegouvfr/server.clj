@@ -20,7 +20,6 @@
             [hiccup.page :as h]
             [hiccup.element :as he]
             [ring.util.anti-forgery :as afu]
-            [clojure.core.async :as async]
             [postal.core :as postal]
             [taoensso.timbre :as timbre]
             [taoensso.timbre.appenders.core :as appenders]

@@ -41,6 +41,7 @@ and you want to expose the 3000 port:
 : ~$ git clone https://github.com/etalab/codegouvfr
 : ~$ cd codegouvfr/
 : ~$ lein fig:min
+: ~$ lein uberjar
 : ~$ docker build -t codegouvfr .
 : ~$ docker run -it -p 3000:3000 --env-file=~/.codegouvfr_envs codegouvfr
 
