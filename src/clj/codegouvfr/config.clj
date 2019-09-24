@@ -1,14 +1,14 @@
 (ns codegouvfr.config)
 
 (def smtp-host
-  (or (System/getenv "MAILGUN_HOST")
-      "smtp.mailgun.org"))
+  (or (System/getenv "SMTP_HOST")
+      "localhost"))
 
 (def smtp-login
-  (System/getenv "MAILGUN_LOGIN"))
+  (System/getenv "SMTP_LOGIN"))
 
 (def smtp-password
-  (System/getenv "MAILGUN_PASSWORD"))
+  (System/getenv "SMTP_PASSWORD"))
 
 (def admin-email
   (or (System/getenv "CODEGOUVFR_ADMIN_EMAIL")
@@ -16,6 +16,6 @@
 
 (def from "opensource"
   (or (System/getenv "CODEGOUVFR_FROM")
-      "postmaster@mail.etalab.studio"))
+      smtp-login))
 
 (def log-file "log.txt")
