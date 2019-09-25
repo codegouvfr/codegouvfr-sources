@@ -17,7 +17,7 @@
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
 (defonce stats-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:lang "" :search "" :search-orgas ""})
+(def init-filter {:lang "" :search "" :search-orgas "" :has-at-least-one-repo true})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -117,7 +117,7 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
-(defn apply-filters [m]
+(defn apply-repos-filters [m]
   (let [f  @(re-frame/subscribe [:filter?])
         s  (:search f)
         o  (:search-orgas f)
@@ -136,6 +136,24 @@
                           (or (:organisation_nom %) "")) true)
            (if la (re-find (re-pattern (str "(?i)" la))
                            (or (:langage %) "")) true)
+           (if s (re-find (re-pattern (str "(?i)" s))
+                          (clojure.string/join
+                           " " [(:nom %) (:login %)
+                                (:organisation_nom %)
+                                (:description %)]))))
+     m)))
+
+(defn apply-orgas-filters [m]
+  (let [f  @(re-frame/subscribe [:filter?])
+        s  (:search f)
+        o  (:search-orgas f)
+        de (:has-description f)
+        re (:has-at-least-one-repo f)]
+    (filter
+     #(and (if de (seq (:description %)) true)
+           (if re (> (:nombre_repertoires %) 0) true)
+           (if o (re-find (re-pattern (str "(?i)" o))
+                          (or (:organisation_nom %) "")) true)
            (if s (re-find (re-pattern (str "(?i)" s))
                           (clojure.string/join
                            " " [(:nom %) (:login %)
@@ -171,9 +189,9 @@
                                           (count (:description %2)))
                                 repos0) 
                   repos0)]
-     (apply-filters (if @(re-frame/subscribe [:reverse-sort?])
-                      (reverse repos)
-                      repos)))))
+     (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
+                            (reverse repos)
+                            repos)))))
 
 (re-frame/reg-sub
  :orgas?
@@ -188,9 +206,9 @@
                                         (or-kwds %2 [:nom :login]))
                               orgs)
                  orgs)]
-     (apply-filters (if @(re-frame/subscribe [:reverse-sort?])
-                      (reverse orgas)
-                      orgas)))))
+     (apply-orgas-filters (if @(re-frame/subscribe [:reverse-sort?])
+                            (reverse orgas)
+                            orgas)))))
 
 (defn repositories-page []
   (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
@@ -443,6 +461,12 @@
                   :on-change   (fn [e]                           
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! filter-chan {:search ev}))))}]]
+        [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
+         [:input {:type      "checkbox"
+                  :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
+                  :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
+                                                            (.-checked (.-target %))}])}]
+         " Avec du code publié"]
         [:a {:class    (str "button level-item is-" (if (= org-f :name) "black" "light"))
              :title    "Trier par ordre alphabétique des noms d'organisations"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Par ordre alphabétique"]
