@@ -22,6 +22,7 @@ You will need to configure these environment variables:
 : CODEGOUVFR_ADMIN_EMAIL: the email where to receive messages
 : CODEGOUVFR_FROM: the From header for sent emails
 : CODEGOUVFR_PORT: the port to run the application
+: CODEGOUVFR_MSGID_DOMAIN: what fqdn to use to build the message-id
 
 ** Deploy with lein uberjar
 

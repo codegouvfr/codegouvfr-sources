@@ -45,7 +45,7 @@
                :user config/smtp-login
                :pass config/smtp-password}
               {:from       config/from
-               :message-id #(postal.support/message-id "mail.etalab.studio")
+               :message-id #(postal.support/message-id config/msgid-domain)
                :to         config/admin-email
                :subject    (str name " / " organization)
                :body       message})]

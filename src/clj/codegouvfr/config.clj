@@ -14,6 +14,9 @@
 (def smtp-password
   (System/getenv "SMTP_PASSWORD"))
 
+(def msgid-domain
+  (System/getenv "CODEGOUVFR_MSGID_DOMAIN"))
+
 (def admin-email
   (or (System/getenv "CODEGOUVFR_ADMIN_EMAIL")
       "bastien.guerry@data.gouv.fr"))
