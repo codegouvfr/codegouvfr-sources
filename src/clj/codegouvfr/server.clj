@@ -75,7 +75,7 @@
 
 (defn -main [& args]
   (def server (server/run-server app {:port config/codegouvfr_port}))
-  (println (str "Server started on locahost:" config/codegouvfr_port)))
+  (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
 
