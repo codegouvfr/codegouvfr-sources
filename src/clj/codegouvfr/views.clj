@@ -169,7 +169,7 @@
      (md-to-string "<strong>Software Heritage (SWH)</strong> : <a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
      [:br]]
     [:div {:class "container"}
-     [:h1 {:class "title"} "Puis aider à faire évoluer ce site ?"]
+     [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
      (md-to-string "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
      [:br]]
     [:div {:class "container"}
