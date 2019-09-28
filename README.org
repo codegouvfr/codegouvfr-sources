@@ -4,11 +4,18 @@ Browse public sector source code repositories.
 
 [[file:codegouvfr.png]]
 
+This frontend retrives information source code [[https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all][repositories]] and
+[[https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all][organizations]] from the french public sector.  The source code for
+creating these endpoints can be found [[https://github.com/etalab/data-codes-sources-fr][here]].
+
 * Develop
 
-1. Compile with =lein fig:build=
-2. Check http://locahost:9500
-3. Hack
+: ~$ git clone https://github.com/etalab/codegouvfr
+: ~$ cd codegouvfr/
+: ~$ lein test
+: ~$ lein fig:build
+
+Then check http://locahost:9500 then hack and see changes going live.
    
 * Deploy
 
@@ -29,7 +36,6 @@ You will need to configure these environment variables:
 : ~$ git clone https://github.com/etalab/codegouvfr
 : ~$ cd codegouvfr/
 : ~$ lein clean
-: ~$ lein test
 : ~$ lein fig:min
 : ~$ lein uberjar
 : ~$ java -jar target/codegouvfr-standalone.jar
