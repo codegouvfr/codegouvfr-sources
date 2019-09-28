@@ -5,7 +5,6 @@
             [clj-rss.core :as rss]
             [clj-http.client :as http]
             [hiccup.page :as h]
-            [hiccup.element :as he]
             [ring.util.anti-forgery :as afu]
             [ring.util.response :as response]
             [markdown-to-hiccup.core :as md]))
