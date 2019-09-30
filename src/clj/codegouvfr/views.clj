@@ -165,6 +165,8 @@
      [:br]
      (md-to-string "<strong>Fourche</strong> : un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
      [:br]
+     (md-to-string "<strong>Étoiles</strong> : les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
+     [:br]
      (md-to-string "<strong>Software Heritage (SWH)</strong> : <a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
      [:br]]
     [:div {:class "container"}
