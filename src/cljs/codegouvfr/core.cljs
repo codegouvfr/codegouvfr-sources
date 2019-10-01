@@ -146,19 +146,17 @@
 (defn apply-orgas-filters [m]
   (let [f  @(re-frame/subscribe [:filter?])
         s  (:search f)
-        o  (:search-orgas f)
         de (:has-description f)
         re (:has-at-least-one-repo f)]
     (filter
      #(and (if de (seq (:description %)) true)
            (if re (> (:nombre_repertoires %) 0) true)
-           (if o (re-find (re-pattern (str "(?i)" o))
-                          (or (:organisation_nom %) "")) true)
            (if s (re-find (re-pattern (str "(?i)" s))
                           (clojure.string/join
                            " " [(:nom %) (:login %)
-                                (:organisation_nom %)
-                                (:description %)]))))
+                                (:description %)
+                                (:site_web %)
+                                (:organisation_url %)]))))
      m)))
 
 (def filter-chan (async/chan 10))
