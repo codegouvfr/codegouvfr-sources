@@ -341,13 +341,13 @@
     [:div
      [:div {:class "level"}
       (figure "Dépôts de code source" nb_repos)
-      (figure "Organisations" nb_orgs)
-      (figure "Nombre moyen de dépôts par organisation" avg_nb_repos)
-      (figure "Nombre médian de dépôts par organisation" median_nb_repos)]
+      (figure "Organisations ou groupes" nb_orgs)
+      (figure "Nombre moyen de dépôts par organisation/groupe" avg_nb_repos)
+      (figure "Nombre médian de dépôts par organisation/groupe" median_nb_repos)]
      [:br]
      [:div {:class "columns"}
-      (stats-card "Organisations avec le plus de dépôts" top_orgs_by_repos)
-      (stats-card "Organisations les plus étoilées" top_orgs_by_stars)]
+      (stats-card "Organisations/groupes avec le plus de dépôts" top_orgs_by_repos)
+      (stats-card "Organisations/groupes les plus étoilées" top_orgs_by_stars)]
      [:div {:class "columns"}
       (stats-card "Licences les plus utilisées" top_licenses)]
      [:div {:class "columns"}
@@ -379,7 +379,8 @@
           :href  (rfe/href :repos)} "Dépôts de code source"]]
     [:p {:class "control"}
      [:a {:class "button is-danger"
-          :href  (rfe/href :orgas)} "Organisations"]]
+          :title "Les comptes d'organisation GitHub ou groupes GitLab"
+          :href  (rfe/href :orgas)} "Organisations ou groupes"]]
     [:p {:class "control"}
      [:a {:class "button is-info"
           :href  (rfe/href :stats)} "Chiffres"]]
@@ -387,7 +388,7 @@
       (if (seq (:search-orgas flt))
         [:p {:class "control"}
          [:a {:class "button is-outlined is-warning"
-              :title "Supprimer le filtre : voir toutes les organisations"
+              :title "Supprimer le filtre : voir toutes les organisations ou groupes"
               :href  (rfe/href :repos)}
           [:span (:search-orgas flt)]
           (fa "fa-times")]]))]
@@ -466,13 +467,13 @@
                                                             (.-checked (.-target %))}])}]
          " Avec du code publié"]
         [:a {:class    (str "button level-item is-" (if (= org-f :name) "black" "light"))
-             :title    "Trier par ordre alphabétique des noms d'organisations"
+             :title    "Trier par ordre alphabétique des noms d'organisations ou de groupes"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Par ordre alphabétique"]
         [:a {:class    (str "button level-item is-" (if (= org-f :repos) "black" "light"))
              :title    "Trier par nombre de dépôts"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
         [:a {:class    (str "button level-item is-" (if (= org-f :date) "black" "light"))
-             :title    "Trier par date de création de l'organisation"
+             :title    "Trier par date de création de l'organisation ou du groupe"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
