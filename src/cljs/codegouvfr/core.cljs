@@ -220,7 +220,7 @@
                    :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
         [:th [:abbr {:title "SWH"}
               [:a {:class "button is-static"
-                   :title "Lien vers l'archive de Software Heritage"} "SWH"]]]
+                   :title "Lien vers l'archive faite par Software Heritage"} "SWH"]]]
         [:th [:abbr {:title "Description"}
               [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
                    :title    "Trier par longueur de description"
@@ -258,7 +258,7 @@
                         (:nom d)]]]
                  [:td {:class "has-text-centered"}
                   [:a {:href   (:software_heritage_url d)
-                       :title  "Lien vers l'archive de Software Heritage"
+                       :title  "Lien vers l'archive faite par Software Heritage"
                        :target "new"}
                    [:img {:width "18px" :src "/images/swh-logo.png"}]]]
                  [:td (:description d)]
