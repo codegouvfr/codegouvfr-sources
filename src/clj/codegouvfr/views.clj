@@ -91,7 +91,8 @@
         [:img {:src "/images/etalab.svg" :width "240px"}]]
        [:div {:class "column is-offset-1 is-4"}
         [:h1 "code.etalab.gouv.fr"]
-        [:p "Site développé par la mission Etalab"]]]]]]))
+        [:p "Site développé par la mission " [:a {:href "https://www.etalab.gouv.fr"} "Etalab"]
+         ", code source disponible " [:a {:href "https://github.com/etalab/codegouvfr"} "ici"]]]]]]]))
 
 (defn contact []
   (template
