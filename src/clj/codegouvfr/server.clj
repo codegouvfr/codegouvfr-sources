@@ -64,6 +64,7 @@
                                               " (" (:organization params) ")")}))
           (response/redirect "/merci")))
   (GET "/apropos" [] (views/about))
+  (GET "/glossaire" [] (views/glossary))
   (GET "/:page" [page] (views/default))
   (resources "/")
   (not-found "Not Found"))

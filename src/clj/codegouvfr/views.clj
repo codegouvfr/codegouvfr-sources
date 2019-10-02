@@ -66,8 +66,9 @@
         "code.etalab.gouv.fr (alpha)"]]]
      [:div {:class "navbar-menu"}
       [:div {:class "navbar-end"}
-       [:a {:href "/apropos" :title "Pourquoi ce site ?" :class "navbar-item"} "À propos"]
        [:a {:href "/contact" :title "Signalez-nous vos ouvertures de codes sources" :class "navbar-item"} "Contact"]
+       [:a {:href "/glossaire" :title "Comprendre les termes techniques de ce site" :class "navbar-item"} "Glossaire"]
+       [:a {:href "/apropos" :title "Pourquoi ce site ?" :class "navbar-item"} "À propos"]
        [:a {:href  "https://www.etalab.gouv.fr"
             :title "Site principal d'Etalab"
             :class "navbar-item"} "Etalab"]
@@ -148,35 +149,52 @@
      [:br]
      (md-to-string "Le partage des codes sources est imposé par la <strong>Loi pour une République numérique</strong> : tout code source obtenu ou développé par un organisme public est considéré comme un « document administratif » devant par défaut être publié en open data.  Pour connaître les conditions d'ouverture d'un logiciel du secteur public, vous pouvez consulter ce <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guide interactif</a>.")
      [:br]
-     [:h2 {:class "subtitle"} "« Je ne vois pas mes codes sources ! »"]
-     (md-to-string "C'est sûrement que votre forge, votre compte d'organisation ou votre groupe n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.  <a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
+     [:h1 {:class "title"} "Je ne vois pas mes codes sources !"]
+     (md-to-string "C'est sûrement que votre forge, votre compte d'organisation ou votre groupe n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.")
+     [:br]
+     (md-to-string "<a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "En quoi cette liste peut m'être utile ?"]
      [:p [:strong "Vous êtes un organisme public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas disponible. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
      [:br]
      [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
-     [:br]]
-    [:div {:class "container"}
-     [:h1 {:class "title"} "Mini-glossaire"]
-     [:p "<strong>Codes sources</strong> : le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
      [:br]
-     (md-to-string "<strong>Secteur public</strong> : les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
-     [:br]
-     (md-to-string "<strong>Fourche</strong> : un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
-     [:br]
-     (md-to-string "<strong>Étoiles</strong> : les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
-     [:br]
-     (md-to-string "<strong>Software Heritage (SWH)</strong> : <a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
+     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/glossaire\">glossaire</a> pour vous aider à tout comprendre."]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
      (md-to-string "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/AntoineAugusti/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
-     [:br]]
-    [:div {:class "container"}
-     [:h1 {:class "title"} "Une question ?"]
+     [:br]
      (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
      [:br]
-     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/contact).")]]))
+     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/contact).")
+     [:br]]]))
+
+(defn glossary []
+  (template
+   "Glossaire pour code.etalab.gouv.fr" "Qu'est-ce qu'un dépôt ? Une « organisation » ? Une licence ?"
+   [:div
+    [:div {:class "container"}
+     [:a {:name "code-source"} [:h2 {:class "subtitle"} "Codes sources"]]
+     [:br]
+     [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
+     [:br]
+     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Secteur public"]]
+     [:br]
+     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
+     [:br]
+     [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
+     [:br]
+     (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
+     [:br]
+     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
+     [:br]
+     (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
+     [:br]
+     [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
+     [:br]
+     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
+     [:br]]]))
 
 
