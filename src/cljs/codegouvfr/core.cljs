@@ -355,19 +355,34 @@
         @(re-frame/subscribe [:stats?])]
     [:div
      [:div {:class "level"}
-      (figure "Dépôts de code source" nb_repos)
-      (figure "Organisations ou groupes" nb_orgs)
+      (figure [:span [:a {:href  "/glossaire#depot"
+                          :title "Voir le glossaire"} "Dépôts de "]
+               [:a {:href  "/glossaire#code-source"
+                    :title "Voir le glossaire"}
+                "code source"]] nb_repos)
+      (figure [:span [:a {:href  "/glossaire#organisation-groupe"
+                          :title "Voir le glossaire"}
+                      "Organisations ou groupes"]] nb_orgs)
       (figure "Nombre moyen de dépôts par organisation/groupe" avg_nb_repos)
       (figure "Nombre médian de dépôts par organisation/groupe" median_nb_repos)]
      [:br]
      [:div {:class "columns"}
-      (stats-card "Organisations/groupes avec le plus de dépôts" top_orgs_by_repos)
+      (stats-card [:span [:a {:href  "/glossaire#organisation-groupe"
+                              :title "Voir le glossaire"} "Organisations/groupes"]
+                   " avec le plus de "
+                   [:a {:href  "/glossaire#depot"
+                        :title "Voir le glossaire"} "dépôts"]] top_orgs_by_repos)
       (stats-card "Organisations/groupes les plus étoilées" top_orgs_by_stars)]
      [:div {:class "columns"}
-      (stats-card "Licences les plus utilisées" top_licenses)]
+      (stats-card [:span [:a {:href  "/glossaire#licence"
+                              :title "Voir le glossaire"} "Licences"]
+                   " les plus utilisées"] top_licenses)]
      [:div {:class "columns"}
       (stats-card "Répartition par plateformes" platforms)
-      (stats-card "Sauvegarde sur Software Heritage"
+      (stats-card [:span "Sauvegarde sur "
+                   [:a {:href  "/glossaire#software-heritage"
+                        :title "Voir le glossaire"}
+                    "Software Heritage"]]
                   {"Dépôts dans Software Heritage"
                    (:repos_in_archive software_heritage)
                    "Proportion de dépôts archivés"

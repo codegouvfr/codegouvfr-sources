@@ -184,6 +184,14 @@
      [:br]
      (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
      [:br]
+     [:a {:name "depot"} [:h2 {:class "subtitle"} "Dépôt"]]
+     [:br]
+     (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
+     [:br]
+     [:a {:name "organisation-groupe"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
+     [:br]
+     (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
+     [:br]
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
      [:br]
      (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
@@ -191,6 +199,10 @@
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
      [:br]
      (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
+     [:br]
+     [:a {:name "licence"} [:h2 {:class "subtitle"} "Licence"]]
+     [:br]
+     (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
      [:br]
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
      [:br]
