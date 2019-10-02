@@ -218,7 +218,7 @@
               [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
                    :title    "Trier par ordre alphabétique des noms de dépôts"
                    :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
-        [:th [:abbr {:title "SWH"}
+        [:th [:abbr {:title "Archive"}
               [:a {:class "button is-static"
                    :title "Lien vers l'archive faite par Software Heritage"} "SWH"]]]
         [:th [:abbr {:title "Description"}
