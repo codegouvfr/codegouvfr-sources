@@ -220,7 +220,7 @@
                    :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
         [:th [:abbr {:title "Archive"}
               [:a {:class "button is-static"
-                   :title "Lien vers l'archive faite par Software Heritage"} "SWH"]]]
+                   :title "Lien vers l'archive faite par Software Heritage"} "Archive"]]]
         [:th [:abbr {:title "Description"}
               [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
                    :title    "Trier par longueur de description"
