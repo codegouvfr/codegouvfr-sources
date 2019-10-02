@@ -21,7 +21,7 @@
 
 (re-frame/reg-event-db
  :initialize-db!
- (fn [_ _]      
+ (fn [_ _]
    {:repos         nil
     :repos-page    0
     :orgas         nil
@@ -82,7 +82,7 @@
  :view?
  (fn [db _] (:view db)))
 
-(re-frame/reg-sub 
+(re-frame/reg-sub
  :reverse-sort?
  (fn [db _] (:reverse-sort db)))
 
@@ -189,7 +189,7 @@
                                 repos0)
                   :desc   (sort #(compare (count (:description %1))
                                           (count (:description %2)))
-                                repos0) 
+                                repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             (reverse repos)
@@ -249,27 +249,31 @@
             (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
                                       @(re-frame/subscribe [:repos?])))]
               ^{:key d}
-              (let [{:keys [licence]} d]
+              (let [{:keys [licence repertoire_url nom organisation_nom software_heritage_url
+                            description derniere_mise_a_jour nombre_forks nombre_stars
+                            nombre_issues_ouvertes]} d]
                 [:tr
                  [:td [:div
-                       [:a {:href  (rfe/href :repos nil {:search-orgas (:organisation_url d)})
+                       [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
+                                                                             (- (count repertoire_url)
+                                                                                (+ 1 (count nom))))})
                             :title "Voir la liste des dépôts de cette organisation"}
-                        (:organisation_nom d)]
+                        organisation_nom]
                        " / "
-                       [:a {:href   (:repertoire_url d)
+                       [:a {:href   repertoire_url
                             :target "new"
                             :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
                         (:nom d)]]]
                  [:td {:class "has-text-centered"}
-                  [:a {:href   (:software_heritage_url d)
+                  [:a {:href   software_heritage_url
                        :title  "Lien vers l'archive faite par Software Heritage"
                        :target "new"}
                    [:img {:width "18px" :src "/images/swh-logo.png"}]]]
-                 [:td (:description d)]
-                 [:td (or (to-locale-date (:derniere_mise_a_jour d)) "N/A")]
-                 [:td {:class "has-text-right"} (:nombre_forks d)]
-                 [:td {:class "has-text-right"} (:nombre_stars d)]
-                 [:td {:class "has-text-right"} (:nombre_issues_ouvertes d)]])))]]))
+                 [:td description]
+                 [:td (or (to-locale-date derniere_mise_a_jour) "N/A")]
+                 [:td {:class "has-text-right"} nombre_forks]
+                 [:td {:class "has-text-right"} nombre_stars]
+                 [:td {:class "has-text-right"} nombre_issues_ouvertes]])))]]))
 
 (defn organizations-page []
   (into
@@ -435,14 +439,14 @@
          [:input {:class       "input"
                   :size        20
                   :placeholder "Recherche libre"
-                  :on-change   (fn [e]                           
+                  :on-change   (fn [e]
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! filter-chan {:search ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :size        10
                   :placeholder "Langage"
-                  :on-change   (fn [e]                           
+                  :on-change   (fn [e]
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! filter-chan {:lang ev}))))}]]
         [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
@@ -456,7 +460,7 @@
         [:label {:class "checkbox level-item" :title "Que les dépôts ayant une description"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
-         " Avec description"]        
+         " Avec description"]
         [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
@@ -487,7 +491,7 @@
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :placeholder "Recherche libre"
-                  :on-change   (fn [e]                           
+                  :on-change   (fn [e]
                                  (let [ev (.-value (.-target e))]
                                    (async/go (async/>! filter-chan {:search ev}))))}]]
         [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
