@@ -112,6 +112,10 @@
   [:span {:class "icon"}
    [:i {:class (str "fas " s)}]])
 
+(defn fab [s]
+  [:span {:class "icon"}
+   [:i {:class (str "fab " s)}]])
+
 (defn to-locale-date [s]
   (if (string? s)
     (.toLocaleDateString
@@ -133,7 +137,7 @@
                     (and l (not (= l "Other")))) true)
            (if de (seq (:description %)) true)
            (if o (re-find (re-pattern (str "(?i)" o))
-                          (or (:organisation_nom %) "")) true)
+                          (or (:repertoire_url %) "")) true)
            (if la (re-find (re-pattern (str "(?i)" la))
                            (or (:langage %) "")) true)
            (if s (re-find (re-pattern (str "(?i)" s))
@@ -248,7 +252,7 @@
               (let [{:keys [licence]} d]
                 [:tr
                  [:td [:div
-                       [:a {:href  (rfe/href :repos nil {:search-orgas (:organisation_nom d)})
+                       [:a {:href  (rfe/href :repos nil {:search-orgas (:organisation_url d)})
                             :title "Voir la liste des dépôts de cette organisation"}
                         (:organisation_nom d)]
                        " / "
@@ -275,7 +279,7 @@
      [:div {:class "columns"}
       (for [{:keys [nom login organisation_url site_web
                     date_creation description nombre_repertoires email
-                    avatar_url]
+                    avatar_url plateforme]
              :as   o} d]
         ^{:key o}
         [:div {:class "column is-4"}
@@ -287,10 +291,11 @@
                [:figure {:class "image is-48x48"}
                 [:img {:src avatar_url}]]])
             [:div {:class "media-content"}
-             [:p [:a {:class  "title is-4"
-                      :target "new"
-                      :title  "Visiter le compte d'organisation"
-                      :href   organisation_url} (or nom login)]]
+             [:p
+              [:a {:class  "title is-4"
+                   :target "new"
+                   :title  "Visiter le compte d'organisation"
+                   :href   organisation_url} (or nom login)]]
              (let [d (to-locale-date date_creation)]
                (if d
                  [:p {:class "subtitle is-6"}
@@ -302,10 +307,20 @@
              [:div {:class "card-footer-item"
                     :title "Nombre de dépôts"}
               [:a {:title "Voir les dépôts"
-                   :href  (rfe/href :repos nil {:search-orgas login})}
+                   :href  (rfe/href :repos nil {:search-orgas organisation_url})}
                nombre_repertoires
                (if (= nombre_repertoires 1)
                  " dépôt" " dépôts")]])
+           (cond (= plateforme "GitHub")
+                 [:a {:class "card-footer-item"
+                      :title "Visiter sur GitHub"
+                      :href  organisation_url}
+                  (fab "fa-github")]
+                 (= plateforme "GitLab")
+                 [:a {:class "card-footer-item"
+                      :title "Visiter le groupe sur l'instance GitLab"
+                      :href  organisation_url}
+                  (fab "fa-gitlab")])
            (if email [:a {:class "card-footer-item"
                           :title "Contacter par email"
                           :href  (str "mailto:" email)}
