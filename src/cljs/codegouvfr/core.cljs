@@ -355,8 +355,15 @@
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
                 top_orgs_by_repos top_orgs_by_stars top_licenses
                 platforms software_heritage]
-         :as   stats}
-        @(re-frame/subscribe [:stats?])]
+         :as   stats} @(re-frame/subscribe [:stats?])
+        top_orgs_by_repos_0
+        (if (:plateforme (first top_orgs_by_repos))
+          ;; FIXME: remove if clause when not necessary anymore
+          (into {} (map #(vector (str (:organisation_nom %)
+                                      " (" (:plateforme %) ")")
+                                 (:count %))
+                        top_orgs_by_repos))
+          top_orgs_by_repos)]
     [:div
      [:div {:class "level"}
       (figure [:span [:a {:href  "/glossaire#depot"
@@ -375,7 +382,7 @@
                               :title "Voir le glossaire"} "Organisations/groupes"]
                    " avec le plus de "
                    [:a {:href  "/glossaire#depot"
-                        :title "Voir le glossaire"} "dépôts"]] top_orgs_by_repos)
+                        :title "Voir le glossaire"} "dépôts"]] top_orgs_by_repos_0)
       (stats-card "Organisations/groupes les plus étoilées" top_orgs_by_stars)]
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  "/glossaire#licence"
