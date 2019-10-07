@@ -357,13 +357,11 @@
                 platforms software_heritage]
          :as   stats} @(re-frame/subscribe [:stats?])
         top_orgs_by_repos_0
-        (if (:plateforme (first top_orgs_by_repos))
-          ;; FIXME: remove if clause when not necessary anymore
-          (into {} (map #(vector (str (:organisation_nom %)
-                                      " (" (:plateforme %) ")")
-                                 (:count %))
-                        top_orgs_by_repos))
-          top_orgs_by_repos)]
+        (into {} (map #(vector (str (:organisation_nom %)
+                                    " (" (:plateforme %) ")")
+                               (:count %))
+                      top_orgs_by_repos))
+        top_orgs_by_repos]
     [:div
      [:div {:class "level"}
       (figure [:span [:a {:href  "/glossaire#depot"
