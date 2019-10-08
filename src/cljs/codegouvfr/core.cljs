@@ -17,7 +17,7 @@
 (defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
 (defonce stats-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:lang "" :search "" :search-orgas "" :has-at-least-one-repo true})
+(def init-filter {:lang "" :licence "" :search "" :search-orgas "" :has-at-least-one-repo true})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -122,19 +122,22 @@
      (js/Date. (.parse js/Date s)))))
 
 (defn apply-repos-filters [m]
-  (let [f  @(re-frame/subscribe [:filter?])
-        s  (:search f)
-        o  (:search-orgas f)
-        la (:lang f)
-        de (:has-description f)
-        fk (:is-fork f)
-        ar (:is-archive f)
-        li (:is-licensed f)]
+  (let [f   @(re-frame/subscribe [:filter?])
+        s   (:search f)
+        o   (:search-orgas f)
+        la  (:lang f)
+        lic (:licence f)
+        de  (:has-description f)
+        fk  (:is-fork f)
+        ar  (:is-archive f)
+        li  (:is-licensed f)]
     (filter
      #(and (if fk (:est_fork %) true)
            (if ar (not (:est_archive %)) true)
            (if li (let [l (:licence %)]
                     (and l (not (= l "Other")))) true)
+           (if lic (re-find (re-pattern (str "(?i)" lic))
+                            (or (:licence %) "")) true)
            (if de (seq (:description %)) true)
            (if o (re-find (re-pattern (str "(?i)" o))
                           (or (:repertoire_url %) "")) true)
@@ -360,8 +363,7 @@
         (into {} (map #(vector (str (:organisation_nom %)
                                     " (" (:plateforme %) ")")
                                (:count %))
-                      top_orgs_by_repos))
-        top_orgs_by_repos]
+                      top_orgs_by_repos))]
     [:div
      [:div {:class "level"}
       (figure [:span [:a {:href  "/glossaire#depot"
@@ -423,6 +425,13 @@
     [:p {:class "control"}
      [:a {:class "button is-info"
           :href  (rfe/href :stats)} "Chiffres"]]
+    [:div {:class "level-item"}
+     [:input {:class       "input"
+              :size        20
+              :placeholder "Recherche libre"
+              :on-change   (fn [e]
+                             (let [ev (.-value (.-target e))]
+                               (async/go (async/>! filter-chan {:search ev}))))}]]
     (let [flt @(re-frame/subscribe [:filter?])]
       (if (seq (:search-orgas flt))
         [:p {:class "control"}
@@ -442,14 +451,14 @@
        [:div {:class "level-left"}
         [:div {:class "level-item"}
          [:input {:class       "input"
-                  :size        20
-                  :placeholder "Recherche libre"
+                  :size        12
+                  :placeholder "Licence"
                   :on-change   (fn [e]
                                  (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! filter-chan {:search ev}))))}]]
+                                   (async/go (async/>! filter-chan {:licence ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
-                  :size        10
+                  :size        12
                   :placeholder "Langage"
                   :on-change   (fn [e]
                                  (let [ev (.-value (.-target e))]
