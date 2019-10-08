@@ -381,7 +381,7 @@
                    " avec le plus de "
                    [:a {:href  "/glossaire#depot"
                         :title "Voir le glossaire"} "dépôts"]] top_orgs_by_repos_0)
-      (stats-card "Organisations/groupes les plus étoilées" top_orgs_by_stars)]
+      (stats-card "Organisations/groupes les plus étoilés" top_orgs_by_stars)]
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  "/glossaire#licence"
                               :title "Voir le glossaire"} "Licences"]
