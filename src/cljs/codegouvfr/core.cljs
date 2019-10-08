@@ -136,8 +136,12 @@
            (if ar (not (:est_archive %)) true)
            (if li (let [l (:licence %)]
                     (and l (not (= l "Other")))) true)
-           (if lic (re-find (re-pattern (str "(?i)" lic))
-                            (or (:licence %) "")) true)
+           (if lic
+             (cond (= lic "Inconnue")
+                   (not li)
+                   (re-find (re-pattern (str "(?i)" lic))
+                            (or (:licence %) ""))
+                   true))
            (if de (seq (:description %)) true)
            (if o (re-find (re-pattern (str "(?i)" o))
                           (or (:repertoire_url %) "")) true)
