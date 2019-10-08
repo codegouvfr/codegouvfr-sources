@@ -547,7 +547,7 @@
 (def routes
   [["/" :repos]
    ["/chiffres" :stats]
-   ["/organisations" :orgas]])
+   ["/groupes" :orgas]])
 
 (defn on-navigate [match]
   (let [target-page (:name (:data match))
