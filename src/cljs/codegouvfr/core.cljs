@@ -423,6 +423,7 @@
 (defn main-page []
   [:div
    [:div {:class "field is-grouped"}
+    ;; FIXME: why :p here? Use level?
     [:p {:class "control"}
      [:a {:class "button is-success"
           :href  (rfe/href :repos)} "Dépôts de code source"]]
@@ -433,7 +434,7 @@
     [:p {:class "control"}
      [:a {:class "button is-info"
           :href  (rfe/href :stats)} "Chiffres"]]
-    [:div {:class "level-item"}
+    [:p {:class "control"}
      [:input {:class       "input"
               :size        20
               :placeholder "Recherche libre"
