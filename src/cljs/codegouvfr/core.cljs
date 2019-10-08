@@ -363,7 +363,10 @@
         (into {} (map #(vector (str (:organisation_nom %)
                                     " (" (:plateforme %) ")")
                                (:count %))
-                      top_orgs_by_repos))]
+                      top_orgs_by_repos))
+        top_licenses_0
+        (into {} (map #(let [[k v] %] [[:a {:href (str "/?licence=" k)} k] v])
+                      (clojure.walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "level"}
       (figure [:span [:a {:href  "/glossaire#depot"
@@ -387,7 +390,8 @@
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  "/glossaire#licence"
                               :title "Voir le glossaire"} "Licences"]
-                   " les plus utilisées"] top_licenses)]
+                   " les plus utilisées"]
+                  top_licenses_0)]
      [:div {:class "columns"}
       (stats-card "Répartition par plateformes" platforms)
       (stats-card [:span "Sauvegarde sur "
