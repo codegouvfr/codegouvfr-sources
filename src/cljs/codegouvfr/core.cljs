@@ -504,14 +504,9 @@
               :disabled last-disabled}
           (fa "fa-fast-forward")]]])
      (= @(re-frame/subscribe [:view?]) :orgas)
-     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])]
+     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
+           orgas @(re-frame/subscribe [:orgas?])]
        [:div {:class "level-left"}
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :placeholder "Recherche libre"
-                  :on-change   (fn [e]
-                                 (let [ev (.-value (.-target e))]
-                                   (async/go (async/>! filter-chan {:search ev}))))}]]
         [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
          [:input {:type      "checkbox"
                   :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
@@ -526,7 +521,10 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
         [:a {:class    (str "button level-item is-" (if (= org-f :date) "black" "light"))
              :title    "Trier par date de création de l'organisation ou du groupe"
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]]))
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]
+        [:span {:class "button is-static level-item"}
+         (let [orgs (count orgas)]
+           (if (= orgs 1) "1 groupe" (str orgs " groupes")))]]))
    [:br]
    (case @(re-frame/subscribe [:view?])
      :repos [repositories-page]
