@@ -262,7 +262,7 @@
               ^{:key d}
               (let [{:keys [licence repertoire_url nom organisation_nom software_heritage_url
                             description derniere_mise_a_jour nombre_forks nombre_stars
-                            nombre_issues_ouvertes]} d]
+                            nombre_issues_ouvertes est_archive]} d]
                 [:tr
                  [:td [:div
                        [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
@@ -280,7 +280,8 @@
                        :title  "Lien vers l'archive faite par Software Heritage"
                        :target "new"}
                    [:img {:width "18px" :src "/images/swh-logo.png"}]]]
-                 [:td description]
+                 [:td {:class (when (:est_archive d) "has-text-grey")
+                       :title (when (:est_archive d) "Ce dépôt est archivé")} description]
                  [:td (or (to-locale-date derniere_mise_a_jour) "N/A")]
                  [:td {:class "has-text-right"} nombre_forks]
                  [:td {:class "has-text-right"} nombre_stars]
