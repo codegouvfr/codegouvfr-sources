@@ -13,9 +13,9 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
-(defonce repos-url "https://api-codes-sources-fr.antoine-augusti.fr/api/repertoires/all")
-(defonce orgas-url "https://api-codes-sources-fr.antoine-augusti.fr/api/organisations/all")
-(defonce stats-url "https://api-codes-sources-fr.antoine-augusti.fr/api/stats/general")
+(defonce repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
+(defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
+(defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
 (def init-filter {:lang "" :licence "" :search "" :search-orgas "" :has-at-least-one-repo true})
 
