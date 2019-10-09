@@ -46,6 +46,7 @@
                :pass config/smtp-password}
               {:from       config/from
                :message-id #(postal.support/message-id config/msgid-domain)
+               :reply-to   email
                :to         config/admin-email
                :subject    (str name " / " email " / " organization)
                :body       message})]
