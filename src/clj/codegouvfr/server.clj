@@ -47,7 +47,7 @@
               {:from       config/from
                :message-id #(postal.support/message-id config/msgid-domain)
                :to         config/admin-email
-               :subject    (str name " / " organization)
+               :subject    (str name " / " email "/" organization)
                :body       message})]
       (when (= (:error res) :SUCCESS) (timbre/info log)))
     (catch Exception e
