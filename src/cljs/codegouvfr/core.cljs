@@ -525,13 +525,13 @@
                   :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
                                                             (.-checked (.-target %))}])}]
          " Avec du code publié"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :name) "black" "light"))
+        [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
              :title    "Trier par ordre alphabétique des noms d'organisations ou de groupes"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Par ordre alphabétique"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :repos) "black" "light"))
+        [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
              :title    "Trier par nombre de dépôts"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :date) "black" "light"))
+        [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
              :title    "Trier par date de création de l'organisation ou du groupe"
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]
         [:span {:class "button is-static level-item"}
