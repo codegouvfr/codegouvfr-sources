@@ -60,7 +60,7 @@
   (GET "/merci" [] (views/thanks))
   (POST "/contact" req
         (let [params (clojure.walk/keywordize-keys (:form-params req))]
-          (send-email (conj params {:log (str "Sent message from " (:name params)
+          (send-email (conj params {:log (str "Sent message from " (:email params)
                                               " (" (:organization params) ")")}))
           (response/redirect "/merci")))
   (GET "/apropos" [] (views/about))
