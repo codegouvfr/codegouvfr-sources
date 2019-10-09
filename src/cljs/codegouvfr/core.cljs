@@ -121,6 +121,10 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
+;; FIXME: Also escape [ and ] characters
+(defn escape-search-string [s]
+  (clojure.string/replace s #"[.*+?^${}()|]" "\\$&"))
+
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
         s   (:search f)
@@ -439,7 +443,8 @@
               :size        20
               :placeholder "Recherche libre"
               :on-change   (fn [e]
-                             (let [ev (.-value (.-target e))]
+                             (let [ev0 (.-value (.-target e))
+                                   ev  (escape-search-string ev0)]
                                (async/go (async/>! filter-chan {:search ev}))))}]]
     (let [flt @(re-frame/subscribe [:filter?])]
       (if (seq (:search-orgas flt))
@@ -463,14 +468,16 @@
                   :size        12
                   :placeholder "Licence"
                   :on-change   (fn [e]
-                                 (let [ev (.-value (.-target e))]
+                                 (let [ev0 (.-value (.-target e))
+                                       ev  (escape-search-string ev0)]
                                    (async/go (async/>! filter-chan {:licence ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :size        12
                   :placeholder "Langage"
                   :on-change   (fn [e]
-                                 (let [ev (.-value (.-target e))]
+                                 (let [ev0 (.-value (.-target e))
+                                       ev  (escape-search-string ev0)]
                                    (async/go (async/>! filter-chan {:lang ev}))))}]]
         [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
          [:input {:type      "checkbox"
