@@ -32,11 +32,6 @@
     :stats         nil
     :filter        init-filter}))
 
-(defn unfuck [r]
-  (update r "licence"
-          #(when (string? %)
-             (clojure.string/replace % "F*ck" "Fuck"))))
-
 (re-frame/reg-event-db
  :update-repos!
  (fn [db [_ repos]] (if repos (assoc db :repos repos))))
@@ -555,7 +550,7 @@
     (fn []
       (GET repos-url :handler
            #(re-frame/dispatch
-             [:update-repos! (map (comp bean clj->js) (map unfuck %))]))
+             [:update-repos! (map (comp bean clj->js) %)]))
       (GET orgas-url :handler
            #(re-frame/dispatch
              [:update-orgas! (map (comp bean clj->js) %)]))
