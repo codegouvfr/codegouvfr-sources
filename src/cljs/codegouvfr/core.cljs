@@ -154,6 +154,7 @@
            (if s (re-find (re-pattern (str "(?i)" s))
                           (clojure.string/join
                            " " [(:nom %) (:login %)
+                                (:repertoire_url %)
                                 (:organisation_nom %)
                                 (:description %)]))))
      m)))
