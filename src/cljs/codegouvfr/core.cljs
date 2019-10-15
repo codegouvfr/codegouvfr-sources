@@ -493,10 +493,11 @@
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
          " Avec description"]
-        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
-         [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
-         " Avec licence identifiée"]
+        ;; FIXME: temporarily remove this
+        ;; [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
+        ;;  [:input {:type      "checkbox"
+        ;;           :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
+        ;;  " Avec licence identifiée"]
         [:span {:class "button is-static level-item"}
          (let [rps (count repos)]
            (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
