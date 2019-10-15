@@ -465,14 +465,15 @@
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
        [:div {:class "level-left"}
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :size        12
-                  :placeholder "Licence"
-                  :on-change   (fn [e]
-                                 (let [ev0 (.-value (.-target e))
-                                       ev  (escape-search-string ev0)]
-                                   (async/go (async/>! filter-chan {:licence ev}))))}]]
+        ;; FIXME: remove temporarily
+        ;; [:div {:class "level-item"}
+        ;;  [:input {:class       "input"
+        ;;           :size        12
+        ;;           :placeholder "Licence"
+        ;;           :on-change   (fn [e]
+        ;;                          (let [ev0 (.-value (.-target e))
+        ;;                                ev  (escape-search-string ev0)]
+        ;;                            (async/go (async/>! filter-chan {:licence ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :size        12
