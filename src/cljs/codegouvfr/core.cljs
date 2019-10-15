@@ -269,7 +269,7 @@
                        [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
                                                                              (- (count repertoire_url)
                                                                                 (+ 1 (count nom))))})
-                            :title "Voir la liste des dépôts de cette organisation"}
+                            :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
                         organisation_nom]
                        " / "
                        [:a {:href   repertoire_url
