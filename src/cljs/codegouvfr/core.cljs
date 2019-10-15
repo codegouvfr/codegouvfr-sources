@@ -294,9 +294,8 @@
    (for [d (partition-all 3 @(re-frame/subscribe [:orgas?]))]
      ^{:key d}
      [:div {:class "columns"}
-      (for [{:keys [nom login organisation_url site_web
-                    date_creation description nombre_repertoires email
-                    avatar_url plateforme]
+      (for [{:keys [nom login organisation_url site_web date_creation
+                    description nombre_repertoires email avatar_url plateforme]
              :as   o} d]
         ^{:key o}
         [:div {:class "column is-4"}
@@ -465,15 +464,14 @@
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
        [:div {:class "level-left"}
-        ;; FIXME: remove temporarily
-        ;; [:div {:class "level-item"}
-        ;;  [:input {:class       "input"
-        ;;           :size        12
-        ;;           :placeholder "Licence"
-        ;;           :on-change   (fn [e]
-        ;;                          (let [ev0 (.-value (.-target e))
-        ;;                                ev  (escape-search-string ev0)]
-        ;;                            (async/go (async/>! filter-chan {:licence ev}))))}]]
+        [:div {:class "level-item"}
+         [:input {:class       "input"
+                  :size        12
+                  :placeholder "Licence"
+                  :on-change   (fn [e]
+                                 (let [ev0 (.-value (.-target e))
+                                       ev  (escape-search-string ev0)]
+                                   (async/go (async/>! filter-chan {:licence ev}))))}]]
         [:div {:class "level-item"}
          [:input {:class       "input"
                   :size        12
@@ -494,11 +492,10 @@
          [:input {:type      "checkbox"
                   :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
          " Avec description"]
-        ;; FIXME: temporarily remove this
-        ;; [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
-        ;;  [:input {:type      "checkbox"
-        ;;           :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
-        ;;  " Avec licence identifiée"]
+        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
+         [:input {:type      "checkbox"
+                  :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
+         " Avec licence identifiée"]
         [:span {:class "button is-static level-item"}
          (let [rps (count repos)]
            (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
