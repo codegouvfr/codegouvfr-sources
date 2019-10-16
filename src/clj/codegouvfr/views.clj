@@ -168,7 +168,7 @@
      [:p "Oui !  Vous pouvez utiliser les paramètres \"s\", \"g\", \"language\" et \"license\" comme dans ces exemples :"]
      [:br]
      [:ul
-      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?s=API"} "https://code.etalab.gouv.fr/?s=API"]]
+      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?q=API"} "https://code.etalab.gouv.fr/?q=API"]]
       [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?g=beta"} "https://code.etalab.gouv.fr/?g=beta"]]
       [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?language=python"} "https://code.etalab.gouv.fr/?language=python"]]
       [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?license=Affero"} "https://code.etalab.gouv.fr/?license=Affero"]]
