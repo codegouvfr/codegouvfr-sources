@@ -122,8 +122,11 @@
      (js/Date. (.parse js/Date s)))))
 
 ;; FIXME: Also escape [ and ] characters
+;; (defn escape-search-string [s]
+;;   (clojure.string/replace s #"[.*+?^${}()|]" "\\$&"))
+
 (defn escape-search-string [s]
-  (clojure.string/replace s #"[.*+?^${}()|]" "\\$&"))
+  (clojure.string/replace s #"[.*+?^${}()|]]" "\\$&"))
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
@@ -226,7 +229,7 @@
 
 (defn repositories-page [repos-cnt]
   (if (= repos-cnt 0)
-    [:div [:p "Pas de dépôt : une autre idée de requête ?"]]
+    [:div [:p "Pas de dépôt trouvé : une autre idée de requête ?"] [:br]]
     (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
       [:div {:class "table-container"}
        [:table {:class "table is-hoverable is-fullwidth"}
@@ -294,7 +297,7 @@
   (into
    [:div]
    (if (= orgs-cnt 0)
-     [:div [:p "Pas d'organisation : une autre idée de requête ?"]]
+     [[:p "Pas d'organisation ou de groupe trouvé : une autre idée de requête ?"] [:br]]
      (for [d (partition-all 3 @(re-frame/subscribe [:orgas?]))]
        ^{:key d}
        [:div {:class "columns"}
