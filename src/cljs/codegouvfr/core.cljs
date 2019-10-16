@@ -140,13 +140,13 @@
     (filter
      #(and (if fk (:est_fork %) true)
            (if ar (not (:est_archive %)) true)
-           (if li (let [l (:license %)]
+           (if li (let [l (:licence %)]
                     (and l (not (= l "Other")))) true)
            (if lic
              (cond (= lic "Inconnue")
                    (not li)
                    (re-find (re-pattern (str "(?i)" lic))
-                            (or (:license %) ""))
+                            (or (:licence %) ""))
                    true))
            (if de (seq (:description %)) true)
            (if o (re-find (re-pattern (str "(?i)" o))
