@@ -332,7 +332,7 @@
                 [:a {:title "Voir les dépôts"
                      :href  (rfe/href :repos nil {:search-orgas organisation_url})}
                  nombre_repertoires
-                 (if (= nombre_repertoires 1)
+                 (if (< nombre_repertoires 2)
                    " dépôt" " dépôts")]])
              (cond (= plateforme "GitHub")
                    [:a {:class "card-footer-item"
@@ -507,7 +507,7 @@
           " Avec licence identifiée"]
          [:span {:class "button is-static level-item"}
           (let [rps (count repos)]
-            (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
+            (if (< rps 2) "1 dépôt" (str rps " dépôts")))]
          [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
           [:a {:class    "pagination-previous"
                :on-click #(change-page "first")
@@ -551,7 +551,7 @@
               :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]
          [:span {:class "button is-static level-item"}
           (let [orgs (count orgas)]
-            (if (= orgs 1) "1 groupe" (str orgs " groupes")))]]
+            (if (< orgs 2) "1 groupe" (str orgs " groupes")))]]
         [:br]
         [organizations-page (count orgas)]
         [:br]])
