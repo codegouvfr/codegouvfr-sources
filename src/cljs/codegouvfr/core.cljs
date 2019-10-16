@@ -17,7 +17,7 @@
 (defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:lang "" :licence "" :search "" :search-orgas "" :has-at-least-one-repo true})
+(def init-filter {:language "" :license "" :q "" :g "" :has-at-least-one-repo true})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -129,10 +129,10 @@
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
-        s   (:search f)
-        o   (:search-orgas f)
-        la  (:lang f)
-        lic (:licence f)
+        s   (:q f)
+        o   (:g f)
+        la  (:language f)
+        lic (:license f)
         de  (:has-description f)
         fk  (:is-fork f)
         ar  (:is-archive f)
@@ -140,13 +140,13 @@
     (filter
      #(and (if fk (:est_fork %) true)
            (if ar (not (:est_archive %)) true)
-           (if li (let [l (:licence %)]
+           (if li (let [l (:license %)]
                     (and l (not (= l "Other")))) true)
            (if lic
              (cond (= lic "Inconnue")
                    (not li)
                    (re-find (re-pattern (str "(?i)" lic))
-                            (or (:licence %) ""))
+                            (or (:license %) ""))
                    true))
            (if de (seq (:description %)) true)
            (if o (re-find (re-pattern (str "(?i)" o))
@@ -162,52 +162,52 @@
      m)))
 
 (defn apply-orgas-filters [m]
-(let [f  @(re-frame/subscribe [:filter?])
-      s  (:search f)
-      de (:has-description f)
-      re (:has-at-least-one-repo f)]
-  (filter
-   #(and (if de (seq (:description %)) true)
-         (if re (> (:nombre_repertoires %) 0) true)
-         (if s (re-find (re-pattern (str "(?i)" s))
-                        (clojure.string/join
-                         " " [(:nom %) (:login %)
-                              (:description %)
-                              (:site_web %)
-                              (:organisation_url %)]))))
-   m)))
+  (let [f  @(re-frame/subscribe [:filter?])
+        s  (:q f)
+        de (:has-description f)
+        re (:has-at-least-one-repo f)]
+    (filter
+     #(and (if de (seq (:description %)) true)
+           (if re (> (:nombre_repertoires %) 0) true)
+           (if s (re-find (re-pattern (str "(?i)" s))
+                          (clojure.string/join
+                           " " [(:nom %) (:login %)
+                                (:description %)
+                                (:site_web %)
+                                (:organisation_url %)]))))
+     m)))
 
 (def filter-chan (async/chan 10))
 
 (defn start-filter-loop []
-(async/go
-  (loop [f (async/<! filter-chan)]
-    (re-frame/dispatch [:filter! f])
-    (recur (async/<! filter-chan)))))
+  (async/go
+    (loop [f (async/<! filter-chan)]
+      (re-frame/dispatch [:filter! f])
+      (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
-:stats?
-(fn [db _] (:stats db)))
+ :stats?
+ (fn [db _] (:stats db)))
 
 (re-frame/reg-sub
-:repos?
-(fn [db _]
-  (let [repos0 (:repos db)
-        repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                 :name   (sort-by :nom repos0)
-                 :forks  (sort-by :nombre_forks repos0)
-                 :stars  (sort-by :nombre_stars repos0)
-                 :issues (sort-by :nombre_issues_ouvertes repos0)
-                 :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
-                                         (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
-                               repos0)
-                 :desc   (sort #(compare (count (:description %1))
-                                         (count (:description %2)))
-                               repos0)
-                 repos0)]
-    (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
-                           (reverse repos)
-                           repos)))))
+ :repos?
+ (fn [db _]
+   (let [repos0 (:repos db)
+         repos  (case @(re-frame/subscribe [:sort-repos-by?])
+                  :name   (sort-by :nom repos0)
+                  :forks  (sort-by :nombre_forks repos0)
+                  :stars  (sort-by :nombre_stars repos0)
+                  :issues (sort-by :nombre_issues_ouvertes repos0)
+                  :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
+                                          (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
+                                repos0)
+                  :desc   (sort #(compare (count (:description %1))
+                                          (count (:description %2)))
+                                repos0)
+                  repos0)]
+     (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
+                            (reverse repos)
+                            repos)))))
 
 (re-frame/reg-sub
  :orgas?
@@ -270,9 +270,9 @@
                               nombre_issues_ouvertes est_archive]} d]
                   [:tr
                    [:td [:div
-                         [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
-                                                                               (- (count repertoire_url)
-                                                                                  (+ 1 (count nom))))})
+                         [:a {:href  (rfe/href :repos nil {:g (subs repertoire_url 0
+                                                                    (- (count repertoire_url)
+                                                                       (+ 1 (count nom))))})
                               :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
                           organisation_nom]
                          " / "
@@ -329,7 +329,7 @@
                [:div {:class "card-footer-item"
                       :title "Nombre de dépôts"}
                 [:a {:title "Voir les dépôts"
-                     :href  (rfe/href :repos nil {:search-orgas organisation_url})}
+                     :href  (rfe/href :repos nil {:g organisation_url})}
                  nombre_repertoires
                  (if (< nombre_repertoires 2)
                    " dépôt" " dépôts")]])
@@ -450,17 +450,18 @@
      [:input {:class       "input"
               :size        20
               :placeholder "Recherche libre"
+              :value       (:q @(re-frame/subscribe [:filter?]))
               :on-change   (fn [e]
                              (let [ev0 (.-value (.-target e))
                                    ev  (escape-search-string ev0)]
-                               (async/go (async/>! filter-chan {:search ev}))))}]]
+                               (async/go (async/>! filter-chan {:q ev}))))}]]
     (let [flt @(re-frame/subscribe [:filter?])]
-      (if (seq (:search-orgas flt))
+      (if (seq (:g flt))
         [:p {:class "control"}
          [:a {:class "button is-outlined is-warning"
               :title "Supprimer le filtre : voir toutes les organisations ou groupes"
               :href  (rfe/href :repos)}
-          [:span (:search-orgas flt)]
+          [:span (:g flt)]
           (fa "fa-times")]]))]
    [:br]
    (cond
@@ -476,18 +477,20 @@
           [:input {:class       "input"
                    :size        12
                    :placeholder "Licence"
+                   :value       (:license @(re-frame/subscribe [:filter?]))
                    :on-change   (fn [e]
                                   (let [ev0 (.-value (.-target e))
                                         ev  (escape-search-string ev0)]
-                                    (async/go (async/>! filter-chan {:licence ev}))))}]]
+                                    (async/go (async/>! filter-chan {:license ev}))))}]]
          [:div {:class "level-item"}
           [:input {:class       "input"
                    :size        12
+                   :value       (:language @(re-frame/subscribe [:filter?]))
                    :placeholder "Langage"
                    :on-change   (fn [e]
                                   (let [ev0 (.-value (.-target e))
                                         ev  (escape-search-string ev0)]
-                                    (async/go (async/>! filter-chan {:lang ev}))))}]]
+                                    (async/go (async/>! filter-chan {:language ev}))))}]]
          [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
           [:input {:type      "checkbox"
                    :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
