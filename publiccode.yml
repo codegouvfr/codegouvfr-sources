@@ -15,7 +15,7 @@ softwareType: "standalone/web"
 
 description:
   en:
-    genericName: Choices
+    genericName: codegouvfr
     shortDescription: >
       Frontend to display public sector source code repositories
 
@@ -37,5 +37,4 @@ maintenance:
 localisation:
   localisationReady: no
   availableLanguages:
-    - en
     - fr
