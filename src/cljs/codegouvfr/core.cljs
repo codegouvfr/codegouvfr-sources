@@ -414,7 +414,8 @@
                   {"Dépôts dans Software Heritage"
                    (:repos_in_archive software_heritage)
                    "Proportion de dépôts archivés"
-                   (:ratio_in_archive software_heritage)})]]))
+                   (:ratio_in_archive software_heritage)})]
+     [:br]]))
 
 (defn change-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
@@ -522,7 +523,8 @@
                :disabled last-disabled}
            (fa "fa-fast-forward")]]]
         [:br]
-        [repositories-page (count repos)]])
+        [repositories-page (count repos)]
+        [:br]])
      
      (= @(re-frame/subscribe [:view?]) :orgas)
      (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
@@ -548,10 +550,12 @@
           (let [orgs (count orgas)]
             (if (= orgs 1) "1 groupe" (str orgs " groupes")))]]
         [:br]
-        [organizations-page (count orgas)]])
+        [organizations-page (count orgas)]
+        [:br]])
 
      (= @(re-frame/subscribe [:view?]) :stats)
      [stats-page])])
+
 (defn main-class []
   (reagent/create-class
    {:component-will-mount
