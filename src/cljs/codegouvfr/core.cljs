@@ -224,127 +224,131 @@
                             (reverse orgas)
                             orgas)))))
 
-(defn repositories-page []
-  (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
-    [:div {:class "table-container"}
-     [:table {:class "table is-hoverable is-fullwidth"}
-      [:thead
-       [:tr
-        [:th [:abbr {:title "Organisation / dépôt"}
-              [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
-                   :title    "Trier par ordre alphabétique des noms de dépôts"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
-        [:th [:abbr {:title "Archive"}
-              [:a {:class "button is-static"
-                   :title "Lien vers l'archive faite par Software Heritage"} "Archive"]]]
-        [:th [:abbr {:title "Description"}
-              [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
-                   :title    "Trier par longueur de description"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :desc])} "Description"]]]
-        [:th [:abbr {:title "Mise à jour"}
-              [:a {:class    (str "button" (when (= rep-f :date) " is-light"))
-                   :title    "Trier par date de mise à jour"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :date])} "MàJ"]]]
-        [:th [:abbr {:title "Fourches"}
-              [:a {:class    (str "button" (when (= rep-f :forks) " is-light"))
-                   :title    "Trier par nombre de fourches"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :forks])} "Fourches"]]]
-        [:th [:abbr {:title "Étoiles"}
-              [:a {:class    (str "button" (when (= rep-f :stars) " is-light"))
-                   :title    "Trier par nombre d'étoiles"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :stars])} "Étoiles"]]]
-        [:th [:abbr {:title "Tickets"}
-              [:a {:class    (str "button" (when (= rep-f :issues) " is-light"))
-                   :title    "Trier par nombre de tickets"
-                   :on-click #(re-frame/dispatch [:sort-repos-by! :issues])} "Tickets"]]]]]
-      (into [:tbody]
-            (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
-                                      @(re-frame/subscribe [:repos?])))]
-              ^{:key d}
-              (let [{:keys [licence repertoire_url nom organisation_nom software_heritage_url
-                            description derniere_mise_a_jour nombre_forks nombre_stars
-                            nombre_issues_ouvertes est_archive]} d]
-                [:tr
-                 [:td [:div
-                       [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
-                                                                             (- (count repertoire_url)
-                                                                                (+ 1 (count nom))))})
-                            :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
-                        organisation_nom]
-                       " / "
-                       [:a {:href   repertoire_url
-                            :target "new"
-                            :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
-                        (:nom d)]]]
-                 [:td {:class "has-text-centered"}
-                  [:a {:href   software_heritage_url
-                       :title  "Lien vers l'archive faite par Software Heritage"
-                       :target "new"}
-                   [:img {:width "18px" :src "/images/swh-logo.png"}]]]
-                 [:td {:class (when (:est_archive d) "has-text-grey")
-                       :title (when (:est_archive d) "Ce dépôt est archivé")} description]
-                 [:td (or (to-locale-date derniere_mise_a_jour) "N/A")]
-                 [:td {:class "has-text-right"} nombre_forks]
-                 [:td {:class "has-text-right"} nombre_stars]
-                 [:td {:class "has-text-right"} nombre_issues_ouvertes]])))]]))
+(defn repositories-page [repos-cnt]
+  (if (= repos-cnt 0)
+    [:div [:p "Pas de dépôt : une autre idée de requête ?"]]
+    (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
+      [:div {:class "table-container"}
+       [:table {:class "table is-hoverable is-fullwidth"}
+        [:thead
+         [:tr
+          [:th [:abbr {:title "Organisation / dépôt"}
+                [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
+                     :title    "Trier par ordre alphabétique des noms de dépôts"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
+          [:th [:abbr {:title "Archive"}
+                [:a {:class "button is-static"
+                     :title "Lien vers l'archive faite par Software Heritage"} "Archive"]]]
+          [:th [:abbr {:title "Description"}
+                [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
+                     :title    "Trier par longueur de description"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :desc])} "Description"]]]
+          [:th [:abbr {:title "Mise à jour"}
+                [:a {:class    (str "button" (when (= rep-f :date) " is-light"))
+                     :title    "Trier par date de mise à jour"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :date])} "MàJ"]]]
+          [:th [:abbr {:title "Fourches"}
+                [:a {:class    (str "button" (when (= rep-f :forks) " is-light"))
+                     :title    "Trier par nombre de fourches"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :forks])} "Fourches"]]]
+          [:th [:abbr {:title "Étoiles"}
+                [:a {:class    (str "button" (when (= rep-f :stars) " is-light"))
+                     :title    "Trier par nombre d'étoiles"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :stars])} "Étoiles"]]]
+          [:th [:abbr {:title "Tickets"}
+                [:a {:class    (str "button" (when (= rep-f :issues) " is-light"))
+                     :title    "Trier par nombre de tickets"
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :issues])} "Tickets"]]]]]
+        (into [:tbody]
+              (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
+                                        @(re-frame/subscribe [:repos?])))]
+                ^{:key d}
+                (let [{:keys [licence repertoire_url nom organisation_nom software_heritage_url
+                              description derniere_mise_a_jour nombre_forks nombre_stars
+                              nombre_issues_ouvertes est_archive]} d]
+                  [:tr
+                   [:td [:div
+                         [:a {:href  (rfe/href :repos nil {:search-orgas (subs repertoire_url 0
+                                                                               (- (count repertoire_url)
+                                                                                  (+ 1 (count nom))))})
+                              :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
+                          organisation_nom]
+                         " / "
+                         [:a {:href   repertoire_url
+                              :target "new"
+                              :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
+                          (:nom d)]]]
+                   [:td {:class "has-text-centered"}
+                    [:a {:href   software_heritage_url
+                         :title  "Lien vers l'archive faite par Software Heritage"
+                         :target "new"}
+                     [:img {:width "18px" :src "/images/swh-logo.png"}]]]
+                   [:td {:class (when (:est_archive d) "has-text-grey")
+                         :title (when (:est_archive d) "Ce dépôt est archivé")} description]
+                   [:td (or (to-locale-date derniere_mise_a_jour) "N/A")]
+                   [:td {:class "has-text-right"} nombre_forks]
+                   [:td {:class "has-text-right"} nombre_stars]
+                   [:td {:class "has-text-right"} nombre_issues_ouvertes]])))]])))
 
-(defn organizations-page []
+(defn organizations-page [orgs-cnt]
   (into
    [:div]
-   (for [d (partition-all 3 @(re-frame/subscribe [:orgas?]))]
-     ^{:key d}
-     [:div {:class "columns"}
-      (for [{:keys [nom login organisation_url site_web date_creation
-                    description nombre_repertoires email avatar_url plateforme]
-             :as   o} d]
-        ^{:key o}
-        [:div {:class "column is-4"}
-         [:div {:class "card"}
-          [:div {:class "card-content"}
-           [:div {:class "media"}
-            (if avatar_url
-              [:div {:class "media-left"}
-               [:figure {:class "image is-48x48"}
-                [:img {:src avatar_url}]]])
-            [:div {:class "media-content"}
-             [:p
-              [:a {:class  "title is-4"
-                   :target "new"
-                   :title  "Visiter le compte d'organisation"
-                   :href   organisation_url} (or nom login)]]
-             (let [d (to-locale-date date_creation)]
-               (if d
-                 [:p {:class "subtitle is-6"}
-                  (str "Créé le " d)]))]]
-           [:div {:class "content"}
-            [:p description]]]
-          [:div {:class "card-footer"}
-           (if nombre_repertoires
-             [:div {:class "card-footer-item"
-                    :title "Nombre de dépôts"}
-              [:a {:title "Voir les dépôts"
-                   :href  (rfe/href :repos nil {:search-orgas organisation_url})}
-               nombre_repertoires
-               (if (= nombre_repertoires 1)
-                 " dépôt" " dépôts")]])
-           (cond (= plateforme "GitHub")
-                 [:a {:class "card-footer-item"
-                      :title "Visiter sur GitHub"
-                      :href  organisation_url}
-                  (fab "fa-github")]
-                 (= plateforme "GitLab")
-                 [:a {:class "card-footer-item"
-                      :title "Visiter le groupe sur l'instance GitLab"
-                      :href  organisation_url}
-                  (fab "fa-gitlab")])
-           (if email [:a {:class "card-footer-item"
-                          :title "Contacter par email"
-                          :href  (str "mailto:" email)}
-                      (fa "fa-envelope")])
-           (if site_web [:a {:class  "card-footer-item"
-                             :title  "Visiter le site web"
-                             :target "new"
-                             :href   site_web} (fa "fa-globe")])]]])])))
+   (if (= orgs-cnt 0)
+     [:div [:p "Pas d'organisation : une autre idée de requête ?"]]
+     (for [d (partition-all 3 @(re-frame/subscribe [:orgas?]))]
+       ^{:key d}
+       [:div {:class "columns"}
+        (for [{:keys [nom login organisation_url site_web date_creation
+                      description nombre_repertoires email avatar_url plateforme]
+               :as   o} d]
+          ^{:key o}
+          [:div {:class "column is-4"}
+           [:div {:class "card"}
+            [:div {:class "card-content"}
+             [:div {:class "media"}
+              (if avatar_url
+                [:div {:class "media-left"}
+                 [:figure {:class "image is-48x48"}
+                  [:img {:src avatar_url}]]])
+              [:div {:class "media-content"}
+               [:p
+                [:a {:class  "title is-4"
+                     :target "new"
+                     :title  "Visiter le compte d'organisation"
+                     :href   organisation_url} (or nom login)]]
+               (let [d (to-locale-date date_creation)]
+                 (if d
+                   [:p {:class "subtitle is-6"}
+                    (str "Créé le " d)]))]]
+             [:div {:class "content"}
+              [:p description]]]
+            [:div {:class "card-footer"}
+             (if nombre_repertoires
+               [:div {:class "card-footer-item"
+                      :title "Nombre de dépôts"}
+                [:a {:title "Voir les dépôts"
+                     :href  (rfe/href :repos nil {:search-orgas organisation_url})}
+                 nombre_repertoires
+                 (if (= nombre_repertoires 1)
+                   " dépôt" " dépôts")]])
+             (cond (= plateforme "GitHub")
+                   [:a {:class "card-footer-item"
+                        :title "Visiter sur GitHub"
+                        :href  organisation_url}
+                    (fab "fa-github")]
+                   (= plateforme "GitLab")
+                   [:a {:class "card-footer-item"
+                        :title "Visiter le groupe sur l'instance GitLab"
+                        :href  organisation_url}
+                    (fab "fa-gitlab")])
+             (if email [:a {:class "card-footer-item"
+                            :title "Contacter par email"
+                            :href  (str "mailto:" email)}
+                        (fa "fa-envelope")])
+             (if site_web [:a {:class  "card-footer-item"
+                               :title  "Visiter le site web"
+                               :target "new"
+                               :href   site_web} (fa "fa-globe")])]]])]))))
 
 (defn figure [heading title]
   [:div {:class "level-item has-text-centered"}
@@ -463,87 +467,91 @@
            count-pages    (count (partition-all pages repos))
            first-disabled (= repos-pages 0)
            last-disabled  (= repos-pages (dec count-pages))]
-       [:div {:class "level-left"}
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :size        12
-                  :placeholder "Licence"
-                  :on-change   (fn [e]
-                                 (let [ev0 (.-value (.-target e))
-                                       ev  (escape-search-string ev0)]
-                                   (async/go (async/>! filter-chan {:licence ev}))))}]]
-        [:div {:class "level-item"}
-         [:input {:class       "input"
-                  :size        12
-                  :placeholder "Langage"
-                  :on-change   (fn [e]
-                                 (let [ev0 (.-value (.-target e))
-                                       ev  (escape-search-string ev0)]
-                                   (async/go (async/>! filter-chan {:lang ev}))))}]]
-        [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
-         [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
-         " Fourches seules"]
-        [:label {:class "checkbox level-item" :title "Ne pas inclure les dépôts archivés"}
-         [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:filter! {:is-archive (.-checked (.-target %))}])}]
-         " Sauf archives"]
-        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une description"}
-         [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
-         " Avec description"]
-        [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
-         [:input {:type      "checkbox"
-                  :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
-         " Avec licence identifiée"]
-        [:span {:class "button is-static level-item"}
-         (let [rps (count repos)]
-           (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
-        [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
-         [:a {:class    "pagination-previous"
-              :on-click #(change-page "first")
-              :disabled first-disabled}
-          (fa "fa-fast-backward")]
-         [:a {:class    "pagination-previous"
-              :on-click #(change-page nil)
-              :disabled first-disabled}
-          (fa "fa-step-backward")]
-         [:a {:class    "pagination-next"
-              :on-click #(change-page true)
-              :disabled last-disabled}
-          (fa "fa-step-forward")]
-         [:a {:class    "pagination-next"
-              :on-click #(change-page "last")
-              :disabled last-disabled}
-          (fa "fa-fast-forward")]]])
+       [:div
+        [:div {:class "level-left"}
+         [:div {:class "level-item"}
+          [:input {:class       "input"
+                   :size        12
+                   :placeholder "Licence"
+                   :on-change   (fn [e]
+                                  (let [ev0 (.-value (.-target e))
+                                        ev  (escape-search-string ev0)]
+                                    (async/go (async/>! filter-chan {:licence ev}))))}]]
+         [:div {:class "level-item"}
+          [:input {:class       "input"
+                   :size        12
+                   :placeholder "Langage"
+                   :on-change   (fn [e]
+                                  (let [ev0 (.-value (.-target e))
+                                        ev  (escape-search-string ev0)]
+                                    (async/go (async/>! filter-chan {:lang ev}))))}]]
+         [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
+          [:input {:type      "checkbox"
+                   :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
+          " Fourches seules"]
+         [:label {:class "checkbox level-item" :title "Ne pas inclure les dépôts archivés"}
+          [:input {:type      "checkbox"
+                   :on-change #(re-frame/dispatch [:filter! {:is-archive (.-checked (.-target %))}])}]
+          " Sauf archives"]
+         [:label {:class "checkbox level-item" :title "Que les dépôts ayant une description"}
+          [:input {:type      "checkbox"
+                   :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
+          " Avec description"]
+         [:label {:class "checkbox level-item" :title "Que les dépôts ayant une licence identifiée"}
+          [:input {:type      "checkbox"
+                   :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
+          " Avec licence identifiée"]
+         [:span {:class "button is-static level-item"}
+          (let [rps (count repos)]
+            (if (= rps 1) "1 dépôt" (str rps " dépôts")))]
+         [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
+          [:a {:class    "pagination-previous"
+               :on-click #(change-page "first")
+               :disabled first-disabled}
+           (fa "fa-fast-backward")]
+          [:a {:class    "pagination-previous"
+               :on-click #(change-page nil)
+               :disabled first-disabled}
+           (fa "fa-step-backward")]
+          [:a {:class    "pagination-next"
+               :on-click #(change-page true)
+               :disabled last-disabled}
+           (fa "fa-step-forward")]
+          [:a {:class    "pagination-next"
+               :on-click #(change-page "last")
+               :disabled last-disabled}
+           (fa "fa-fast-forward")]]]
+        [:br]
+        [repositories-page (count repos)]])
+     
      (= @(re-frame/subscribe [:view?]) :orgas)
      (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
            orgas @(re-frame/subscribe [:orgas?])]
-       [:div {:class "level-left"}
-        [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
-         [:input {:type      "checkbox"
-                  :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
-                  :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
-                                                            (.-checked (.-target %))}])}]
-         " Avec du code publié"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
-             :title    "Trier par ordre alphabétique des noms d'organisations ou de groupes"
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Par ordre alphabétique"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
-             :title    "Trier par nombre de dépôts"
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
-        [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
-             :title    "Trier par date de création de l'organisation ou du groupe"
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]
-        [:span {:class "button is-static level-item"}
-         (let [orgs (count orgas)]
-           (if (= orgs 1) "1 groupe" (str orgs " groupes")))]]))
-   [:br]
-   (case @(re-frame/subscribe [:view?])
-     :repos [repositories-page]
-     :stats [stats-page]
-     :orgas [organizations-page])])
+       [:div
+        [:div {:class "level-left"}
+         [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
+          [:input {:type      "checkbox"
+                   :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
+                   :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
+                                                             (.-checked (.-target %))}])}]
+          " Avec du code publié"]
+         [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
+              :title    "Trier par ordre alphabétique des noms d'organisations ou de groupes"
+              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} "Par ordre alphabétique"]
+         [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
+              :title    "Trier par nombre de dépôts"
+              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} "Par nombre de dépôts"]
+         [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
+              :title    "Trier par date de création de l'organisation ou du groupe"
+              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} "Par date de création"]
+         [:span {:class "button is-static level-item"}
+          (let [orgs (count orgas)]
+            (if (= orgs 1) "1 groupe" (str orgs " groupes")))]]
+        [:br]
+        [organizations-page (count orgas)]])
 
+     (= @(re-frame/subscribe [:view?]) :stats)
+     [stats-page])])
 (defn main-class []
   (reagent/create-class
    {:component-will-mount
