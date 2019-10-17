@@ -123,9 +123,10 @@
      (js/Date. (.parse js/Date s)))))
 
 (defn s-includes? [s sub]
-  (if (and (string? s) (string? sub)) 
-    (s/includes? (s/lower-case s) (s/lower-case sub))
-    true))
+  (cond (and (string? s) (string? sub)) 
+        (s/includes? (s/lower-case s) (s/lower-case sub))
+        :else
+        (string? s)))
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
