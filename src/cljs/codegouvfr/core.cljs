@@ -10,6 +10,7 @@
             [cljs-bean.core :refer [bean]]
             [ajax.core :refer [GET POST]]
             [markdown-to-hiccup.core :as md]
+            [clojure.string :as s]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
@@ -121,12 +122,6 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
-;; FIXME: more idiomatic way to escape \[ ?
-(defn escape-search-string [s]
-  (clojure.string/replace
-   (clojure.string/replace s #"[.*+?^${}()]|]" "\\$&")
-   "[" "\\["))
-
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
         s   (:q f)
@@ -145,20 +140,16 @@
            (if lic
              (cond (= lic "Inconnue")
                    (not li)
-                   (re-find (re-pattern (str "(?i)" lic))
-                            (or (:licence %) ""))
+                   (s/includes? (or (:licence %) "") lic)
                    true))
            (if de (seq (:description %)) true)
-           (if o (re-find (re-pattern (str "(?i)" o))
-                          (or (:repertoire_url %) "")) true)
-           (if la (re-find (re-pattern (str "(?i)" la))
-                           (or (:langage %) "")) true)
-           (if s (re-find (re-pattern (str "(?i)" s))
-                          (clojure.string/join
-                           " " [(:nom %) (:login %)
-                                (:repertoire_url %)
-                                (:organisation_nom %)
-                                (:description %)]))))
+           (if o (s/includes? (or (:repertoire_url %) "") o) true)
+           (if la (s/includes? (or (:langage %) "") la) true)
+           (if s (s/includes? (s/join " " [(:nom %) (:login %)
+                                           (:repertoire_url %)
+                                           (:organisation_nom %)
+                                           (:description %)])
+                              s)))
      m)))
 
 (defn apply-orgas-filters [m]
@@ -169,12 +160,12 @@
     (filter
      #(and (if de (seq (:description %)) true)
            (if re (> (:nombre_repertoires %) 0) true)
-           (if s (re-find (re-pattern (str "(?i)" s))
-                          (clojure.string/join
-                           " " [(:nom %) (:login %)
-                                (:description %)
-                                (:site_web %)
-                                (:organisation_url %)]))))
+           (if s (s/includes?
+                  (s/join " " [(:nom %) (:login %)
+                               (:description %)
+                               (:site_web %)
+                               (:organisation_url %)])
+                  s)))
      m)))
 
 (def filter-chan (async/chan 10))
@@ -452,8 +443,7 @@
               :placeholder "Recherche libre"
               :value       (:q @(re-frame/subscribe [:filter?]))
               :on-change   (fn [e]
-                             (let [ev0 (.-value (.-target e))
-                                   ev  (escape-search-string ev0)]
+                             (let [ev (.-value (.-target e))]
                                (async/go (async/>! filter-chan {:q ev}))))}]]
     (let [flt @(re-frame/subscribe [:filter?])]
       (if (seq (:g flt))
@@ -479,8 +469,7 @@
                    :placeholder "Licence"
                    :value       (:license @(re-frame/subscribe [:filter?]))
                    :on-change   (fn [e]
-                                  (let [ev0 (.-value (.-target e))
-                                        ev  (escape-search-string ev0)]
+                                  (let [ev (.-value (.-target e))]
                                     (async/go (async/>! filter-chan {:license ev}))))}]]
          [:div {:class "level-item"}
           [:input {:class       "input"
@@ -488,8 +477,7 @@
                    :value       (:language @(re-frame/subscribe [:filter?]))
                    :placeholder "Langage"
                    :on-change   (fn [e]
-                                  (let [ev0 (.-value (.-target e))
-                                        ev  (escape-search-string ev0)]
+                                  (let [ev (.-value (.-target e))]
                                     (async/go (async/>! filter-chan {:language ev}))))}]]
          [:label {:class "checkbox level-item" :title "Que les dépôts fourchés d'autres dépôts"}
           [:input {:type      "checkbox"
