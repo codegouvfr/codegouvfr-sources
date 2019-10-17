@@ -381,7 +381,7 @@
                                (:count %))
                       top_orgs_by_repos))
         top_licenses_0
-        (into {} (map #(let [[k v] %] [[:a {:href (str "/?licence=" k)} k] v])
+        (into {} (map #(let [[k v] %] [[:a {:href (str "/?license=" k)} k] v])
                       (clojure.walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "level"}
