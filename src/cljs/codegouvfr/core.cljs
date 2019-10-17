@@ -122,6 +122,11 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
+(defn s-includes? [s sub]
+  (if (and (string? s) (string? sub)) 
+    (s/includes? (s/lower-case s) (s/lower-case sub))
+    true))
+
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
         s   (:q f)
@@ -140,12 +145,12 @@
            (if lic
              (cond (= lic "Inconnue")
                    (not li)
-                   (s/includes? (or (:licence %) "") lic)
+                   (s-includes? (:licence %) lic)
                    true))
            (if de (seq (:description %)) true)
-           (if o (s/includes? (or (:repertoire_url %) "") o) true)
-           (if la (s/includes? (or (:langage %) "") la) true)
-           (if s (s/includes? (s/join " " [(:nom %) (:login %)
+           (if o (s-includes? (:repertoire_url %) o) true)
+           (if la (s-includes? (:langage %) la) true)
+           (if s (s-includes? (s/join " " [(:nom %) (:login %)
                                            (:repertoire_url %)
                                            (:organisation_nom %)
                                            (:description %)])
@@ -160,12 +165,11 @@
     (filter
      #(and (if de (seq (:description %)) true)
            (if re (> (:nombre_repertoires %) 0) true)
-           (if s (s/includes?
-                  (s/join " " [(:nom %) (:login %)
-                               (:description %)
-                               (:site_web %)
-                               (:organisation_url %)])
-                  s)))
+           (if s (s-includes? (s/join " " [(:nom %) (:login %)
+                                           (:description %)
+                                           (:site_web %)
+                                           (:organisation_url %)])
+                              s)))
      m)))
 
 (def filter-chan (async/chan 10))
