@@ -18,7 +18,7 @@
 (defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:language "" :license "" :q "" :g "" :has-at-least-one-repo true})
+(def init-filter {:q "" :g "" :language "" :license ""})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -88,6 +88,10 @@
  (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-event-db
+ :reverse-sort!
+ (fn [db _] (assoc db :reverse-sort (not (:reverse-sort db)))))
+
+(re-frame/reg-event-db
  :sort-repos-by!
  (fn [db [_ k]]
    (re-frame/dispatch [:repos-page! 0])
@@ -101,10 +105,6 @@
    (when (= k (:sort-orgas-by db))
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-orgas-by k)))
-
-(re-frame/reg-event-db
- :reverse-sort!
- (fn [db _] (assoc db :reverse-sort (not (:reverse-sort db)))))
 
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
@@ -172,12 +172,17 @@
                               s)))
      m)))
 
-(def filter-chan (async/chan 10))
+(def filter-chan (async/chan 100))
 
 (defn start-filter-loop []
   (async/go
     (loop [f (async/<! filter-chan)]
-      (re-frame/dispatch [:filter! f])
+      (let [v  @(re-frame/subscribe [:view?])
+            fs @(re-frame/subscribe [:filter?])]
+        (re-frame/dispatch [:filter! f])
+        (rfe/push-state v nil (filter #(and (string? (val %))
+                                            (not-empty (val %)))
+                                      (merge fs f))))
       (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
@@ -530,7 +535,7 @@
         [:div {:class "level-left"}
          [:label {:class "checkbox level-item" :title "Que les organisations ayant publié du code"}
           [:input {:type      "checkbox"
-                   :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
+                   ;; :checked   (:has-at-least-one-repo @(re-frame/subscribe [:filter?]))
                    :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
                                                              (.-checked (.-target %))}])}]
           " Avec du code publié"]
