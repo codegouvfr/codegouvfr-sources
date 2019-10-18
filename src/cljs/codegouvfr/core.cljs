@@ -123,7 +123,7 @@
      (js/Date. (.parse js/Date s)))))
 
 (defn s-includes? [s sub]
-  (cond (and (string? s) (string? sub)) 
+  (cond (and (string? s) (string? sub))
         (s/includes? (s/lower-case s) (s/lower-case sub))
         :else
         (string? s)))
@@ -154,6 +154,7 @@
            (if s (s-includes? (s/join " " [(:nom %) (:login %)
                                            (:repertoire_url %)
                                            (:organisation_nom %)
+                                           (:topics %)
                                            (:description %)])
                               s)))
      m)))
@@ -528,7 +529,7 @@
         [:br]
         [repositories-page (count repos)]
         [:br]])
-     
+
      (= @(re-frame/subscribe [:view?]) :orgas)
      (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
            orgas @(re-frame/subscribe [:orgas?])]
