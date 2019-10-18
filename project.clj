@@ -41,4 +41,4 @@
                                       [re-frame "0.10.9"]
                                       [reagent "0.8.1"]
                                       [reagent-utils "0.3.3"]
-                                      [metosin/reitit-frontend "0.3.9"]]}})
+                                      [metosin/reitit-frontend "0.3.10"]]}})
