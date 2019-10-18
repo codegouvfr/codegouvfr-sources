@@ -267,8 +267,8 @@
               (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
                                         @(re-frame/subscribe [:repos?])))]
                 ^{:key d}
-                (let [{:keys [licence repertoire_url nom organisation_nom software_heritage_url
-                              description derniere_mise_a_jour nombre_forks nombre_stars
+                (let [{:keys [licence repertoire_url nom organisation_nom description
+                              derniere_mise_a_jour nombre_forks nombre_stars
                               nombre_issues_ouvertes est_archive]} d]
                   [:tr
                    [:td [:div
@@ -283,7 +283,7 @@
                               :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
                           (:nom d)]]]
                    [:td {:class "has-text-centered"}
-                    [:a {:href   software_heritage_url
+                    [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" repertoire_url)
                          :title  "Lien vers l'archive faite par Software Heritage"
                          :target "new"}
                      [:img {:width "18px" :src "/images/swh-logo.png"}]]]
