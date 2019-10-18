@@ -34,6 +34,9 @@
              {:from config/from
               :to   config/admin-email})}})
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup email sending
+
 (defn send-email
   "Send a templated email."
   [{:keys [email name organization message log]}]
@@ -53,6 +56,9 @@
       (when (= (:error res) :SUCCESS) (timbre/info log)))
     (catch Exception e
       (timbre/error (str "Can't send email: " (:cause (Throwable->map e)))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup routes
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))

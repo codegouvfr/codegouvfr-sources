@@ -35,11 +35,11 @@
 
 (re-frame/reg-event-db
  :update-repos!
- (fn [db [_ repos]] (if repos (assoc db :repos repos))))
+ (fn [db [_ repos]] (assoc db :repos repos)))
 
 (re-frame/reg-event-db
  :update-stats!
- (fn [db [_ stats]] (if stats (assoc db :stats stats))))
+ (fn [db [_ stats]] (assoc db :stats stats)))
 
 (re-frame/reg-event-db
  :filter!
@@ -125,13 +125,15 @@
 (defn s-includes? [s sub]
   (cond (and (string? s) (string? sub))
         (s/includes? (s/lower-case s) (s/lower-case sub))
+        (and (not (string? s)) (string? sub))
+        true
         :else
         (string? s)))
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
         s   (:q f)
-        o   (:g f)
+        g   (:g f)
         la  (:language f)
         lic (:license f)
         de  (:has-description f)
@@ -142,21 +144,19 @@
      #(and (if fk (:est_fork %) true)
            (if ar (not (:est_archive %)) true)
            (if li (let [l (:licence %)]
-                    (and l (not (= l "Other")))) true)
-           (if lic
-             (cond (= lic "Inconnue")
-                   (not li)
-                   (s-includes? (:licence %) lic)
-                   true))
+                    (and l (not (= l "Other"))))
+               true)
+           (if lic (s-includes? (:licence %) lic) true)
            (if de (seq (:description %)) true)
-           (if o (s-includes? (:repertoire_url %) o) true)
+           (if g (s-includes? (:repertoire_url %) g) true)
            (if la (s-includes? (:langage %) la) true)
            (if s (s-includes? (s/join " " [(:nom %) (:login %)
                                            (:repertoire_url %)
                                            (:organisation_nom %)
                                            (:topics %)
                                            (:description %)])
-                              s)))
+                              s)
+               true))
      m)))
 
 (defn apply-orgas-filters [m]
