@@ -92,8 +92,6 @@
    repos-url
    [:software_heritage_url :software_heritage_exists :derniere_modification]))
 
-(update-repos)
-
 (defn update-orgas []
   (local-json-file "orgas.json" orgas-mapping orgas-url nil))
 
