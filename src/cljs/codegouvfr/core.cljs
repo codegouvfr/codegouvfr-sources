@@ -14,11 +14,9 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
-(defonce repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
-(defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
-(defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def pages 200) ;; FIXME: Make customizable?
-(def init-filter {:q "" :g "" :language "" :license ""})
+
+(def init-filter {:q nil :g nil :language nil :license nil})
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -123,12 +121,8 @@
      (js/Date. (.parse js/Date s)))))
 
 (defn s-includes? [s sub]
-  (cond (and (string? s) (string? sub))
-        (s/includes? (s/lower-case s) (s/lower-case sub))
-        (and (not (string? s)) (string? sub))
-        true
-        :else
-        (string? s)))
+  (if (and (string? s) (string? sub))
+    (s/includes? (s/lower-case s) (s/lower-case sub))))
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
@@ -141,21 +135,16 @@
         ar  (:is-archive f)
         li  (:is-licensed f)]
     (filter
-     #(and (if fk (:est_fork %) true)
-           (if ar (not (:est_archive %)) true)
-           (if li (let [l (:licence %)]
-                    (and l (not (= l "Other"))))
-               true)
-           (if lic (s-includes? (:licence %) lic) true)
-           (if de (seq (:description %)) true)
-           (if g (s-includes? (:repertoire_url %) g) true)
-           (if la (s-includes? (:langage %) la) true)
-           (if s (s-includes? (s/join " " [(:nom %) (:login %)
-                                           (:repertoire_url %)
-                                           (:organisation_nom %)
-                                           (:topics %)
-                                           (:description %)])
-                              s)
+     #(and (if fk (:f? %) true)
+           (if ar (not (:a? %)) true)
+           (if li (let [l (:li %)] (and l (not (= l "Other")))) true)
+           (if lic (s-includes? (:li %) lic) true)
+           (if la (s-includes? (:l %) la) true)
+           (if de (seq (:d %)) true)
+           (if g (s-includes? (:r %) g) true)
+           (if s (s-includes?
+                  (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)])
+                  s)
                true))
      m)))
 
@@ -165,13 +154,11 @@
         de (:has-description f)
         re (:has-at-least-one-repo f)]
     (filter
-     #(and (if de (seq (:description %)) true)
-           (if re (> (:nombre_repertoires %) 0) true)
-           (if s (s-includes? (s/join " " [(:nom %) (:login %)
-                                           (:description %)
-                                           (:site_web %)
-                                           (:organisation_url %)])
-                              s)))
+     #(and (if de (seq (:d %)) true)
+           (if re (> (:r %) 0) true)
+           (if s (s-includes?
+                  (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
+                  s)))
      m)))
 
 (def filter-chan (async/chan 100))
@@ -196,15 +183,15 @@
  (fn [db _]
    (let [repos0 (:repos db)
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :name   (sort-by :nom repos0)
-                  :forks  (sort-by :nombre_forks repos0)
-                  :stars  (sort-by :nombre_stars repos0)
-                  :issues (sort-by :nombre_issues_ouvertes repos0)
-                  :date   (sort #(compare (js/Date. (.parse js/Date (:derniere_mise_a_jour %1)))
-                                          (js/Date. (.parse js/Date (:derniere_mise_a_jour %2))))
+                  :name   (sort-by :n repos0)
+                  :forks  (sort-by :f repos0)
+                  :stars  (sort-by :s repos0)
+                  :issues (sort-by :i repos0)
+                  :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                          (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
-                  :desc   (sort #(compare (count (:description %1))
-                                          (count (:description %2)))
+                  :desc   (sort #(compare (count (:d %1))
+                                          (count (:d %2)))
                                 repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
@@ -216,12 +203,12 @@
  (fn [db _]
    (let [orgs  (:orgas db)
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
-                 :repos (sort-by :nombre_repertoires orgs)
-                 :date  (sort #(compare (js/Date. (.parse js/Date (:date_creation %1)))
-                                        (js/Date. (.parse js/Date (:date_creation %2))))
+                 :repos (sort-by :r orgs)
+                 :date  (sort #(compare (js/Date. (.parse js/Date (:c %1)))
+                                        (js/Date. (.parse js/Date (:c %2))))
                               orgs)
-                 :name  (sort #(compare (or-kwds %1 [:nom :login])
-                                        (or-kwds %2 [:nom :login]))
+                 :name  (sort #(compare (or-kwds %1 [:n :l])
+                                        (or-kwds %2 [:n :l]))
                               orgs)
                  orgs)]
      (apply-orgas-filters (if @(re-frame/subscribe [:reverse-sort?])
@@ -264,95 +251,91 @@
                      :title    "Trier par nombre de tickets"
                      :on-click #(re-frame/dispatch [:sort-repos-by! :issues])} "Tickets"]]]]]
         (into [:tbody]
-              (for [d (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
-                                        @(re-frame/subscribe [:repos?])))]
-                ^{:key d}
-                (let [{:keys [licence repertoire_url nom organisation_nom description
-                              derniere_mise_a_jour nombre_forks nombre_stars
-                              nombre_issues_ouvertes est_archive]} d]
+              (for [dd (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
+                                         @(re-frame/subscribe [:repos?])))]
+                ^{:key dd}
+                (let [{:keys [li r n o d u  f s i a?]} dd]
                   [:tr
                    [:td [:div
-                         [:a {:href  (rfe/href :repos nil {:g (subs repertoire_url 0
-                                                                    (- (count repertoire_url)
-                                                                       (+ 1 (count nom))))})
+                         [:a {:href  (rfe/href :repos nil
+                                               {:g (subs r 0 (- (count r) (+ 1 (count n))))})
                               :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
-                          organisation_nom]
+                          o]
                          " / "
-                         [:a {:href   repertoire_url
+                         [:a {:href   r
                               :target "new"
-                              :title  (str "Voir ce dépôt" (if licence (str " sous licence " licence)))}
-                          (:nom d)]]]
+                              :title  (str "Voir ce dépôt" (if li (str " sous licence " li)))}
+                          n]]]
                    [:td {:class "has-text-centered"}
-                    [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" repertoire_url)
+                    [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                          :title  "Lien vers l'archive faite par Software Heritage"
                          :target "new"}
                      [:img {:width "18px" :src "/images/swh-logo.png"}]]]
-                   [:td {:class (when (:est_archive d) "has-text-grey")
-                         :title (when (:est_archive d) "Ce dépôt est archivé")} description]
-                   [:td (or (to-locale-date derniere_mise_a_jour) "N/A")]
-                   [:td {:class "has-text-right"} nombre_forks]
-                   [:td {:class "has-text-right"} nombre_stars]
-                   [:td {:class "has-text-right"} nombre_issues_ouvertes]])))]])))
+                   [:td {:class (when a? "has-text-grey")
+                         :title (when a? "Ce dépôt est archivé")} d]
+                   [:td (or (to-locale-date u) "N/A")]
+                   [:td {:class "has-text-right"} f]
+                   [:td {:class "has-text-right"} s]
+                   [:td {:class "has-text-right"} i]])))]])))
 
 (defn organizations-page [orgs-cnt]
   (into
    [:div]
    (if (= orgs-cnt 0)
      [[:p "Pas d'organisation ou de groupe trouvé : une autre idée de requête ?"] [:br]]
-     (for [d (partition-all 3 @(re-frame/subscribe [:orgas?]))]
-       ^{:key d}
+     (for [dd (partition-all 3 @(re-frame/subscribe [:orgas?]))]
+       ^{:key dd}
        [:div {:class "columns"}
-        (for [{:keys [nom login organisation_url site_web date_creation
-                      description nombre_repertoires email avatar_url plateforme]
-               :as   o} d]
+        (for [{:keys [n l o h c d r e au p]
+               :as   o} dd]
           ^{:key o}
           [:div {:class "column is-4"}
            [:div {:class "card"}
             [:div {:class "card-content"}
              [:div {:class "media"}
-              (if avatar_url
+              (if au
                 [:div {:class "media-left"}
                  [:figure {:class "image is-48x48"}
-                  [:img {:src avatar_url}]]])
+                  [:img {:src au}]]])
               [:div {:class "media-content"}
                [:p
                 [:a {:class  "title is-4"
                      :target "new"
                      :title  "Visiter le compte d'organisation"
-                     :href   organisation_url} (or nom login)]]
-               (let [d (to-locale-date date_creation)]
-                 (if d
+                     :href   o} (or n l)]]
+               (let [date (to-locale-date c)]
+                 (if date
                    [:p {:class "subtitle is-6"}
-                    (str "Créé le " d)]))]]
+                    (str "Créé le " date)]))]]
              [:div {:class "content"}
-              [:p description]]]
+              [:p d]]]
             [:div {:class "card-footer"}
-             (if nombre_repertoires
+             (if r
                [:div {:class "card-footer-item"
                       :title "Nombre de dépôts"}
                 [:a {:title "Voir les dépôts"
-                     :href  (rfe/href :repos nil {:g organisation_url})}
-                 nombre_repertoires
-                 (if (< nombre_repertoires 2)
+                     :href  (rfe/href :repos nil {:g o})}
+                 r
+                 (if (< r 2)
                    " dépôt" " dépôts")]])
-             (cond (= plateforme "GitHub")
+             (cond (= p "GitHub")
                    [:a {:class "card-footer-item"
                         :title "Visiter sur GitHub"
-                        :href  organisation_url}
+                        :href  o}
                     (fab "fa-github")]
-                   (= plateforme "GitLab")
+                   (= p "GitLab")
                    [:a {:class "card-footer-item"
                         :title "Visiter le groupe sur l'instance GitLab"
-                        :href  organisation_url}
+                        :href  o}
                     (fab "fa-gitlab")])
-             (if email [:a {:class "card-footer-item"
-                            :title "Contacter par email"
-                            :href  (str "mailto:" email)}
-                        (fa "fa-envelope")])
-             (if site_web [:a {:class  "card-footer-item"
-                               :title  "Visiter le site web"
-                               :target "new"
-                               :href   site_web} (fa "fa-globe")])]]])]))))
+             (if e [:a {:class "card-footer-item"
+                        :title "Contacter par email"
+                        :href  (str "mailto:" e)}
+                    (fa "fa-envelope")])
+             (if h [:a {:class  "card-footer-item"
+                        :title  "Visiter le site web"
+                        :target "new"
+                        :href   h} (fa "fa-globe")])]]])]))))
 
 (defn figure [heading title]
   [:div {:class "level-item has-text-centered"}
@@ -564,13 +547,13 @@
   (reagent/create-class
    {:component-will-mount
     (fn []
-      (GET repos-url :handler
+      (GET "/repos" :handler
            #(re-frame/dispatch
              [:update-repos! (map (comp bean clj->js) %)]))
-      (GET orgas-url :handler
+      (GET "/orgas" :handler
            #(re-frame/dispatch
              [:update-orgas! (map (comp bean clj->js) %)]))
-      (GET stats-url :handler
+      (GET "/stats" :handler
            #(re-frame/dispatch
              [:update-stats! (clojure.walk/keywordize-keys %)])))
     :reagent-render main-page}))
