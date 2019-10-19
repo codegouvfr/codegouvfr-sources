@@ -158,7 +158,8 @@
            (if re (> (:r %) 0) true)
            (if s (s-includes?
                   (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
-                  s)))
+                  s)
+               true))
      m)))
 
 (def filter-chan (async/chan 100))
