@@ -465,14 +465,9 @@
      [:br]
      (cond
        (= @(re-frame/subscribe [:view?]) :home-redirect)
-       (rfe/push-state :repos {:lang lang})
-       
-       (= @(re-frame/subscribe [:view?]) :not-found)
        (if (contains? i/supported-languages lang)
-         (do (set! (.-location js/window) (str "/" lang "/repos"))
-             "")
-         (do (set! (.-location js/window) (str "/en/repos"))
-             ""))
+         (do (set! (.-location js/window) (str "/" lang "/repos")) "")
+         (do (set! (.-location js/window) (str "/en/repos")) ""))
 
        (= @(re-frame/subscribe [:view?]) :repos)
        (let [repos          @(re-frame/subscribe [:repos?])
@@ -565,7 +560,10 @@
           [:br]])
 
        (= @(re-frame/subscribe [:view?]) :stats)
-       [stats-page lang])]))
+       [stats-page lang]
+
+       :else
+       (rfe/push-state :repos {:lang lang}))]))
 
 (defn main-class []
   (reagent/create-class
