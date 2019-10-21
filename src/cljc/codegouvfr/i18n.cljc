@@ -86,7 +86,7 @@
     :source-code-available       ", code source disponible "
     :here                        "ici"
     :contact-form                "Formulaire de contact"
-    :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? N'hésitez pas à nous solliciter !"
+    :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :your-name                   "Votre nom"
     :your-email                  "Votre adresse de courriel"
     :email-placeholder           "Par ex. toto@modernisation.gouv.fr"
@@ -181,7 +181,7 @@
     :source-code-available       ", code source disponible "
     :here                        "ici"
     :contact-form                "Contact form"
-    :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? N'hésitez pas à nous solliciter !"
+    :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :your-name                   "Votre nom"
     :your-email                  "Votre adresse de courriel"
     :email-placeholder           "Par ex. toto@modernisation.gouv.fr"
@@ -190,7 +190,7 @@
     :your-message                "Message"
     :message-placeholder         "Votre message"
     :submit                      "Envoyer"
-    :message-received            "Message reçu ! Nous nous efforçons de répondre au plus vite."
+    :message-received            "Message reçu !"
     :message-received-ok         "Nous nous efforçons de répondre au plus vite."
     :back-to-repos               "Retour à la liste des dépôts de code source"}})
 
