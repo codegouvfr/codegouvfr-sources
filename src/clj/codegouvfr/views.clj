@@ -147,7 +147,7 @@
    (i/i lang [:message-received-ok])
    [:div {:class "has-text-centered"}
     [:a {:class "button is-large is-primary"
-         :href  "/"}
+         :href  (str "/" lang "/repos")}
      (i/i lang [:back-to-repos])]]))
 
 (defn fr-about [lang]
