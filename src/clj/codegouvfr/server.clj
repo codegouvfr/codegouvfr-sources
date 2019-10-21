@@ -4,9 +4,10 @@
 
 (ns codegouvfr.server
   (:require [ring.util.response :as response]
-            [codegouvfr.config :as config]
             [clojure.java.io :as io]
+            [codegouvfr.config :as config]
             [codegouvfr.views :as views]
+            [codegouvfr.i18n :as i]
             [org.httpkit.server :as server]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.params :as params]
@@ -141,20 +142,38 @@
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
-  (GET "/" [] (views/default))
-  (GET "/contact" [] (views/contact))
-  (GET "/merci" [] (views/thanks))
+  (GET "/orgas" [] (json-resource "orgas.json"))
+  (GET "/stats" [] (json-resource "stats.json"))
+  (GET "/repos" [] (json-resource "repos.json"))
+  
+  (GET "/en/about" [] (views/en-about "en"))
+  (GET "/en/contact" [] (views/contact "en"))
+  (GET "/en/glossary" [] (views/en-glossary "en"))
+  (GET "/en/ok" [] (views/ok "en"))
+  (GET "/fr/about" [] (views/fr-about "fr"))
+  (GET "/fr/contact" [] (views/contact "fr"))
+  (GET "/fr/glossary" [] (views/fr-glossary "fr"))
+  (GET "/fr/ok" [] (views/ok "fr"))
+
+  ;; Backward compatibility
+  (GET "/glossaire" [] (response/redirect "/fr/glossary"))
+  (GET "/contact" [] (response/redirect "/fr/contact"))
+  (GET "/apropos" [] (response/redirect "/fr/about"))
+
   (POST "/contact" req
         (let [params (clojure.walk/keywordize-keys (:form-params req))]
           (send-email (conj params {:log (str "Sent message from " (:email params)
                                               " (" (:organization params) ")")}))
-          (response/redirect "/merci")))
-  (GET "/apropos" [] (views/about))
-  (GET "/glossaire" [] (views/glossary))
-  (GET "/orgas" [] (json-resource "orgas.json"))
-  (GET "/stats" [] (json-resource "stats.json"))
-  (GET "/repos" [] (json-resource "repos.json"))
-  (GET "/:page" [page] (views/default))
+          (response/redirect (str "/" (:lang params) "/ok"))))
+  
+  (GET "/:lang/:page" [lang page]
+       (views/default
+        (if (contains? i/supported-languages lang)
+          lang
+          "en")))
+  (GET "/:page" [page] (views/default "en"))
+  (GET "/" [] (views/default "en"))
+  
   (resources "/")
   (not-found "Not Found"))
 
