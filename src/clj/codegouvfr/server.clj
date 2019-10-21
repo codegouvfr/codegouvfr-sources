@@ -4,10 +4,9 @@
 
 (ns codegouvfr.server
   (:require [ring.util.response :as response]
-            [clojure.java.io :as io]
             [codegouvfr.config :as config]
+            [clojure.java.io :as io]
             [codegouvfr.views :as views]
-            [codegouvfr.i18n :as i]
             [org.httpkit.server :as server]
             [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.params :as params]

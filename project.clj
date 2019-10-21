@@ -22,9 +22,8 @@
                  [org.clojure/tools.reader "1.3.2"]
                  [tea-time "1.0.1"]
                  [clj-http "3.10.0"]
-                 [cheshire "5.9.0"]
-                 [com.taoensso/tempura "1.2.1"]]
-  :source-paths ["src/clj" "src/cljc" "src/cljs"]
+                 [cheshire "5.9.0"]]
+  :source-paths ["src/clj" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
   :auto-clean false
@@ -34,7 +33,7 @@
             "fig:build" ["trampoline" "run" "-m" "figwheel.main" "-b" "dev" "-r"]
             "fig:min"   ["run" "-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]}
   :profiles {:uberjar {:aot :all}
-             :dev     {:source-paths ["src/cljs" "src/cljc"]
+             :dev     {:source-paths ["src/cljs"]
                        :dependencies [[cljs-ajax "0.8.0"]
                                       [cljs-bean "1.5.0"]
                                       [com.bhauman/figwheel-main "0.2.3"]
