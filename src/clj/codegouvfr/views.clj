@@ -172,7 +172,7 @@
      [:br]
      [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
      [:br]
-     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/glossaire\">glossaire</a> pour vous aider à tout comprendre."]
+     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/fr/glossary\">glossaire</a> pour vous aider à tout comprendre."]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je partager un lien vers une requête ?"]
@@ -216,7 +216,7 @@
      [:br]
      [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
      [:br]
-     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/glossaire\">glossaire</a> pour vous aider à tout comprendre."]
+     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/en/glossary\">glossaire</a> pour vous aider à tout comprendre."]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je partager un lien vers une requête ?"]
@@ -244,7 +244,7 @@
    "Glossaire pour code.etalab.gouv.fr" "Qu'est-ce qu'un dépôt ? Une « organisation » ? Une licence ?"
    [:div
     [:div {:class "container"}
-     [:a {:name "code-source"} [:h2 {:class "subtitle"} "Codes sources"]]
+     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codes sources"]]
      [:br]
      [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
      [:br]
@@ -252,11 +252,11 @@
      [:br]
      (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
      [:br]
-     [:a {:name "depot"} [:h2 {:class "subtitle"} "Dépôt"]]
+     [:a {:name "repository"} [:h2 {:class "subtitle"} "Dépôt"]]
      [:br]
      (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
-     [:a {:name "organisation-groupe"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
      [:br]
      (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
      [:br]
@@ -268,7 +268,7 @@
      [:br]
      (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
      [:br]
-     [:a {:name "licence"} [:h2 {:class "subtitle"} "Licence"]]
+     [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
      (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
      [:br]
@@ -283,7 +283,7 @@
    "Glossaire pour code.etalab.gouv.fr" "Qu'est-ce qu'un dépôt ? Une « organisation » ? Une licence ?"
    [:div
     [:div {:class "container"}
-     [:a {:name "code-source"} [:h2 {:class "subtitle"} "Codes sources"]]
+     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codes sources"]]
      [:br]
      [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
      [:br]
@@ -291,11 +291,11 @@
      [:br]
      (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
      [:br]
-     [:a {:name "depot"} [:h2 {:class "subtitle"} "Dépôt"]]
+     [:a {:name "repository"} [:h2 {:class "subtitle"} "Dépôt"]]
      [:br]
      (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
-     [:a {:name "organisation-groupe"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
      [:br]
      (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
      [:br]
@@ -307,7 +307,7 @@
      [:br]
      (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
      [:br]
-     [:a {:name "licence"} [:h2 {:class "subtitle"} "Licence"]]
+     [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
      (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
      [:br]

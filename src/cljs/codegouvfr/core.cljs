@@ -383,33 +383,33 @@
                       (clojure.walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "level"}
-      (figure [:span [:a {:href  "/glossaire#depot"
+      (figure [:span [:a {:href  (str "/" lang "/glossary#repository")
                           :title (i/i lang [:go-to-glossary])} (i/i lang [:repos-from])]
-               [:a {:href  "/glossaire#code-source"
+               [:a {:href  (str "/" lang "/glossary#source-code")
                     :title (i/i lang [:go-to-glossary])}
                 (i/i lang [:source-code])]] nb_repos)
-      (figure [:span [:a {:href  "/glossaire#organisation-groupe"
+      (figure [:span [:a {:href  (str "/" lang "/glossary#organization-group")
                           :title (i/i lang [:go-to-glossary])}
                       (i/i lang [:orgas-or-groups])]] nb_orgs)
       (figure (i/i lang [:mean-repos-by-orga]) avg_nb_repos)
       (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)]
      [:br]
      [:div {:class "columns"}
-      (stats-card [:span [:a {:href  "/glossaire#organisation-groupe"
+      (stats-card [:span [:a {:href  (str "/" lang "/glossary#organization-group")
                               :title (i/i lang [:go-to-glossary])} (i/i lang [:orgas-or-groups])]
                    (i/i lang [:with-more-of])
-                   [:a {:href  "/glossaire#depot"
+                   [:a {:href  (str "/" lang "/glossary#repository")
                         :title (i/i lang [:go-to-glossary])} (i/i lang [:repos])]] top_orgs_by_repos_0)
       (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
      [:div {:class "columns"}
-      (stats-card [:span [:a {:href  "/glossaire#licence"
+      (stats-card [:span [:a {:href  (str "/" lang "/glossary#license")
                               :title (i/i lang [:go-to-glossary])} (i/i lang [:licenses])]
                    (i/i lang [:more-used])]
                   top_licenses_0)]
      [:div {:class "columns"}
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span "Sauvegarde sur "
-                   [:a {:href  "/glossaire#software-heritage"
+                   [:a {:href  (str "/" lang "/glossary#software-heritage")
                         :title (i/i lang [:go-to-glossary])}
                     "Software Heritage"]]
                   {(i/i lang [:repos-on-swh])
