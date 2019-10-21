@@ -224,10 +224,10 @@
        [:table {:class "table is-hoverable is-fullwidth"}
         [:thead
          [:tr
-          [:th [:abbr {:title "Organisation / dépôt"}
+          [:th [:abbr {:title "Dépôt / groupe"}
                 [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
                      :title    "Trier par ordre alphabétique des noms de dépôts"
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Organisation / dépôt"]]]
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :name])} "Dépôt / groupe"]]]
           [:th [:abbr {:title "Archive"}
                 [:a {:class "button is-static"
                      :title "Lien vers l'archive faite par Software Heritage"} "Archive"]]]
@@ -258,15 +258,15 @@
                 (let [{:keys [li r n o d u  f s i a?]} dd]
                   [:tr
                    [:td [:div
-                         [:a {:href  (rfe/href :repos nil
-                                               {:g (subs r 0 (- (count r) (+ 1 (count n))))})
-                              :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
-                          o]
-                         " / "
                          [:a {:href   r
                               :target "new"
                               :title  (str "Voir ce dépôt" (if li (str " sous licence " li)))}
-                          n]]]
+                          n]
+                         " / "
+                         [:a {:href  (rfe/href :repos nil
+                                               {:g (subs r 0 (- (count r) (+ 1 (count n))))})
+                              :title "Voir la liste des dépôts de cette organisation ou de ce groupe"}
+                          o]]]
                    [:td {:class "has-text-centered"}
                     [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                          :title  "Lien vers l'archive faite par Software Heritage"
