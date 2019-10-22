@@ -15,7 +15,7 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
-(defonce dev? true)
+(defonce dev? false)
 (defonce pages 200) ;; FIXME: Make customizable?
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
