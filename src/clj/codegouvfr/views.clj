@@ -22,6 +22,7 @@
 
 (defn rss-feed []
   (rss/channel-xml
+   ;; FIXME: hardcode title/description if always english?
    {:title       (i/i "en" [:last-repos])
     :link        "https://code.etalab.gouv.fr/latest.xml"
     :description (i/i "en" [:last-repos])}
@@ -179,11 +180,11 @@
      [:p "Oui !  Vous pouvez utiliser les paramètres \"s\", \"g\", \"language\" et \"license\" comme dans ces exemples :"]
      [:br]
      [:ul
-      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?q=API"} "https://code.etalab.gouv.fr/?q=API"]]
-      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?g=beta"} "https://code.etalab.gouv.fr/?g=beta"]]
-      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?language=python"} "https://code.etalab.gouv.fr/?language=python"]]
-      [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?license=Affero"} "https://code.etalab.gouv.fr/?license=Affero"]]
-      [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?license=Affero&g=beta"} "https://code.etalab.gouv.fr/?license=Affero&g=beta"]]]
+      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
+      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
+      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python" "https://code.etalab.gouv.fr/fr/repos?language=python"}]]
+      [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
+      [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
@@ -216,18 +217,18 @@
      [:br]
      [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
      [:br]
-     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/en/glossary\">glossaire</a> pour vous aider à tout comprendre."]
+     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/fr/glossary\">glossaire</a> pour vous aider à tout comprendre."]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je partager un lien vers une requête ?"]
      [:p "Oui !  Vous pouvez utiliser les paramètres \"s\", \"g\", \"language\" et \"license\" comme dans ces exemples :"]
      [:br]
      [:ul
-      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?q=API"} "https://code.etalab.gouv.fr/?q=API"]]
-      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?g=beta"} "https://code.etalab.gouv.fr/?g=beta"]]
-      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?language=python"} "https://code.etalab.gouv.fr/?language=python"]]
-      [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?license=Affero"} "https://code.etalab.gouv.fr/?license=Affero"]]
-      [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/?license=Affero&g=beta"} "https://code.etalab.gouv.fr/?license=Affero&g=beta"]]]
+      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
+      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
+      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python" "https://code.etalab.gouv.fr/fr/repos?language=python"}]]
+      [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
+      [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
