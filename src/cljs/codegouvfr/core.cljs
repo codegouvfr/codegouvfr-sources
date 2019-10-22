@@ -379,7 +379,8 @@
                                (:count %))
                       top_orgs_by_repos))
         top_licenses_0
-        (into {} (map #(let [[k v] %] [[:a {:href (str "/?license=" k)} k] v])
+        (into {} (map #(let [[k v] %]
+                         [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
                       (clojure.walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "level"}
@@ -408,7 +409,7 @@
                   top_licenses_0)]
      [:div {:class "columns"}
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
-      (stats-card [:span "Sauvegarde sur "
+      (stats-card [:span (i/i lang [:archive-on])
                    [:a {:href  (str "/" lang "/glossary#software-heritage")
                         :title (i/i lang [:go-to-glossary])}
                     "Software Heritage"]]
