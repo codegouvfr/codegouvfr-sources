@@ -15,9 +15,9 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
-(def pages 200) ;; FIXME: Make customizable?
-
-(def init-filter {:q nil :g nil :language nil :license nil})
+(defonce pages 200) ;; FIXME: Make customizable?
+(defonce init-filter {:q nil :g nil :language nil :license nil})
+(defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -300,7 +300,7 @@
      (for [dd (partition-all 3 @(re-frame/subscribe [:orgas?]))]
        ^{:key dd}
        [:div {:class "columns"}
-        (for [{:keys [n l o h c d r e au p]
+        (for [{:keys [n l o h c d r e au p an]
                :as   o} dd]
           ^{:key o}
           [:div {:class "column is-4"}
@@ -349,7 +349,12 @@
              (if h [:a {:class  "card-footer-item"
                         :title  (i/i lang [:go-to-website])
                         :target "new"
-                        :href   h} (fa "fa-globe")])]]])]))))
+                        :href   h} (fa "fa-globe")])
+             (if an [:a {:class  "card-footer-item"
+                         :title  (i/i lang [:go-to-sig-website])
+                         :target "new"
+                         :href   (str annuaire-prefix an)}
+                     (fa "fa-link")])]]])]))))
 
 (defn figure [heading title]
   [:div {:class "level-item has-text-centered"}

@@ -20,7 +20,9 @@
             [taoensso.timbre.appenders (postal :as postal-appender)]
             [clj-http.client :as http]
             [cheshire.core :as json]
-            [tea-time.core :as tt])
+            [tea-time.core :as tt]
+            [clojure.data.csv :as data-csv]
+            [semantic-csv.core :as semantic-csv])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -45,6 +47,7 @@
 (defonce repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 (defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
+(defonce annuaire-url "https://www.data.gouv.fr/fr/datasets/r/ac26b864-6a3a-496b-8832-8cde436f5230")
 
 (def repos-mapping {:nom                    :n
                     :description            :d
@@ -77,13 +80,16 @@
                     :organisation_url   :o
                     :avatar_url         :au})
 
-(defn local-json-file [file remap url ks]
+(defn local-json-file [file remap url rm-ks annuaire]
   (spit file
         (json/generate-string
-         (map #(clojure.set/rename-keys
-                (apply dissoc % ks) remap)
-              (json/parse-string
-               (:body (http/get url)) true))))
+         (map #(if annuaire
+                 (assoc % :an ((keyword (:l %)) annuaire))
+                 %)
+              (map #(clojure.set/rename-keys
+                     (apply dissoc % rm-ks) remap)
+                   (json/parse-string
+                    (:body (http/get url)) true)))))
   (timbre/info (str "updated " file)))
 
 (defn update-repos []
@@ -91,10 +97,16 @@
    "repos.json"
    repos-mapping
    repos-url
-   [:software_heritage_url :software_heritage_exists :derniere_modification]))
+   [:software_heritage_url :software_heritage_exists :derniere_modification]
+   nil))
 
 (defn update-orgas []
-  (local-json-file "orgas.json" orgas-mapping orgas-url nil))
+  (let [annuaire (apply merge
+                        (map #(let [{:keys [github lannuaire]} %]
+                                {(keyword github) lannuaire})
+                             (semantic-csv/mappify
+                              (data-csv/read-csv (:body (http/get annuaire-url))))))]
+    (local-json-file "orgas.json" orgas-mapping orgas-url nil annuaire)))
 
 (defn update-stats []
   (spit "stats.json" (:body (http/get stats-url)))
