@@ -69,8 +69,8 @@
      [:div {:class "navbar-menu"}
       [:div {:class "navbar-end"}
        [:a {:href (str "/" lang "/contact") :title (i/i lang [:report-new-source-code]) :class "navbar-item"} "Contact"]
-       [:a {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms]) :class "navbar-item"} "Glossaire"]
-       [:a {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?]) :class "navbar-item"} "À propos"]
+       [:a {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms]) :class "navbar-item"} "Glossary"]
+       [:a {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?]) :class "navbar-item"} "About"]
        [:a {:href  "https://www.etalab.gouv.fr"
             :title (i/i lang [:main-etalab-website])
             :class "navbar-item"} "Etalab"]
@@ -154,7 +154,7 @@
 (defn fr-about [lang]
   (template
    lang
-   "À propos de code.etalab.gouv.fr" "D'où viennent les données, à quoi peuvent-elles servir ?"
+   "About code.etalab.gouv.fr" "D'où viennent les données, à quoi peuvent-elles servir ?"
    [:div
     [:div {:class "container"}
      [:h1 {:class "title"} "D'où viennent les données ?"]
