@@ -182,7 +182,7 @@
      [:ul
       [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
       [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
-      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python" "https://code.etalab.gouv.fr/fr/repos?language=python"}]]
+      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
       [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
       [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
@@ -226,7 +226,7 @@
      [:ul
       [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
       [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
-      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python" "https://code.etalab.gouv.fr/fr/repos?language=python"}]]
+      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
       [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
       [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
