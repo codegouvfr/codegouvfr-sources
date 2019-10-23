@@ -86,6 +86,7 @@
     :website-developed-by        "Site développé par la mission "
     :source-code-available       ", code source disponible "
     :here                        "ici"
+    :contact                     "Contact"
     :contact-form                "Formulaire de contact"
     :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :your-name                   "Votre nom"
@@ -99,7 +100,8 @@
     :message-received            "Message reçu !"
     :message-received-ok         "Nous nous efforçons de répondre au plus vite."
     :back-to-repos               "Retour à la liste des dépôts de code source"
-    }
+    :glossary                    "Glossaire"
+    :about                       "À propos"}
    :en
    {:no-repo-found               "Repository not found : would you like to make a new request?"
     :orga-repo                   "Repository / group"
@@ -182,6 +184,7 @@
     :website-developed-by        "This website is powered by "
     :source-code-available       ", the source code is available "
     :here                        "here"
+    :contact                     "Contact"
     :contact-form                "Contact form"
     :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :your-name                   "Your name"
@@ -194,7 +197,9 @@
     :submit                      "Send"
     :message-received            "Message received!"
     :message-received-ok         "We will do our best to reply as soon as possible."
-    :back-to-repos               "Retour à la liste des dépôts de code source"}})
+    :back-to-repos               "Retour à la liste des dépôts de code source"
+    :glossary                    "Glossary"
+    :about                       "À propos"}})
 
 (def opts {:dict localization})
 

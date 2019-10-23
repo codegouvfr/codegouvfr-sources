@@ -68,9 +68,9 @@
         "code.etalab.gouv.fr (alpha)"]]]
      [:div {:class "navbar-menu"}
       [:div {:class "navbar-end"}
-       [:a {:href (str "/" lang "/contact") :title (i/i lang [:report-new-source-code]) :class "navbar-item"} "Contact"]
-       [:a {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms]) :class "navbar-item"} "Glossary"]
-       [:a {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?]) :class "navbar-item"} "About"]
+       [:a {:href (str "/" lang "/contact") :title (i/i lang [:report-new-source-code]) :class "navbar-item"} (i/i lang [:contact])]
+       [:a {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms]) :class "navbar-item"} (i/i lang [:glossary])]
+       [:a {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?]) :class "navbar-item"} (i/i lang [:about])]
        [:a {:href  "https://www.etalab.gouv.fr"
             :title (i/i lang [:main-etalab-website])
             :class "navbar-item"} "Etalab"]
