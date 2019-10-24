@@ -66,6 +66,21 @@ can help or suggest a feature.
 Your help is welcome.  You can contribute with bug reports, pull
 requests or feature requests.
 
+** Translation
+
+The application was first available in french and will be soon
+available in english.
+
+If you want to help with the translation:
+
+- add a new file =resources/public/index.[yourlanguagecode].html= by
+  copying =resources/public/index.en.html=
+- add your language to =src/cljc/codegouvfr/i18n.cljc=
+- add relevant variables to =src/clj/codegouvfr/views.clj=
+
+Hack and send a /pull request/, I would be happy to integrate your
+contribution.
+
 * Support the Clojure(script) ecosystem
 
 If you like Clojure(script), please consider supporting maintainers by
