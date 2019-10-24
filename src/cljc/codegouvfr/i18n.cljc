@@ -105,24 +105,24 @@
    :en
    {:no-repo-found               "Repository not found : would you like to make a new request?"
     :orga-repo                   "Repository / group"
-    :sort-repos-alpha            "Trier par ordre alphabétique des noms de dépôts"
+    :sort-repos-alpha            "Sort repositories alphabetically"
     :archive                     "Archive"
     :swh-link                    "Lien vers l'archive faite par Software Heritage"
     :description                 "Description"
-    :sort-description-length     "Trier par longueur de description"
+    :sort-description-length     "Sort by description length"
     :update                      "Update"
-    :sort-update-date            "Trier par date de mise à jour"
+    :sort-update-date            "Sort by update date"
     :update-short                "MàJ"
     :forks                       "Forks"
-    :sort-forks                  "Trier par nombre de fourches"
+    :sort-forks                  "Sort by number of forks"
     :stars                       "Stars"
-    :sort-stars                  "Trier par nombre d'étoiles"
+    :sort-stars                  "Sort by number of stars"
     :issues                      "Issues"
-    :sort-issues                 "Trier par nombre de tickets"
+    :sort-issues                 "Sort by number of issues"
     :browse-repos-orga           "Voir la liste des dépôts de cette organisation ou de ce groupe"
     :go-to-repo                  "Voir ce dépôt"
     :under-license               " licensed "
-    :repo-archivedo              "Ce dépôt est archivé"
+    :repo-archivedo              "This is an archived repository"
     :no-orga-found               "Pas d'organisation ou de groupe trouvé : une autre idée de requête ?"
     :go-to-orga                  "Visiter le compte d'organisation ou le groupe"
     :created-at                  "Créé le "
@@ -199,7 +199,7 @@
     :message-received-ok         "We will do our best to reply as soon as possible."
     :back-to-repos               "Retour à la liste des dépôts de code source"
     :glossary                    "Glossary"
-    :about                       "À propos"}})
+    :about                       "About"}})
 
 (def opts {:dict localization})
 
