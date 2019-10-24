@@ -1,7 +1,7 @@
 (ns codegouvfr.i18n
   (:require [taoensso.tempura :refer [tr]]))
 
-(def supported-languages #{"en" "fr"})
+(def supported-languages #{"en" "fr" "it"})
 
 (def localization
   {:fr
