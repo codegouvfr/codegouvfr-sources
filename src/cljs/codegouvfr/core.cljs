@@ -607,10 +607,7 @@
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
   (re-frame/dispatch
-   [:lang! (subs (or (.-userLanguage js/navigator)
-                     (.-language js/navigator)
-                     (.-browserLanguage js/navigator)
-                     (.-systemLanguage js/navigator)) 0 2)])
+   [:lang! (subs (or js/navigator.language "en") 0 2)])
   (rfe/start!
    (rf/router routes {:conflicts nil})
    on-navigate
