@@ -198,18 +198,18 @@
 (defn en-about [lang]
   (template
    lang
-   "À propos de code.etalab.gouv.fr" "D'où viennent les données, à quoi peuvent-elles servir ?"
+   "About code.etalab.gouv.fr" "Where does the data come from, what can it be used for?"
    [:div
     [:div {:class "container"}
-     [:h1 {:class "title"} "D'où viennent les données ?"]
-     (md-to-string "Dans le cadre de la <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Politique de contribution de l'État aux logiciels libres</a>, la DINSIC collecte la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation</a> où des organismes publics partagent leurs codes sources. Nous nous servons de cette liste pour collecter des métadonnées sur tous les dépôts de code source.  Ces métadonnées sont publiées <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">sur data.gouv.fr</a> ou interrogeables depuis <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">cette API</a>.")
+     [:h1 {:class "title"} "Where does the data come from?"]
+     (md-to-string "As part of the <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">government's free software contribution policy</a>, DINSIC collects the <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">list of organizational accounts</a> where public bodies share their source codes. We use this list to collect metadata about all source code repositories. These metadata are published on <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">data.gouv.fr</a> and queryable through <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">this API</a>.")
      [:br]
-     (md-to-string "Le partage des codes sources est imposé par la <strong>Loi pour une République numérique</strong> : tout code source obtenu ou développé par un organisme remplissant une mission de service public est considéré comme un « document administratif » devant être publié en open data.  Pour connaître les conditions d'ouverture d'un logiciel du secteur public, vous pouvez consulter ce <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guide interactif</a>.")
+     (md-to-string "The publication of source codes is prescribed by the <strong>French Digital Republic Act (Loi pour une République numérique)</strong> : each source code obtained or developed by an organization fulfilling a public service mission is considered an "administrative document", and, therefore, has to be published in open data. To understand the requirements to open a public sector software, check out this <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">interactive guide</a>.")
      [:br]
-     [:h1 {:class "title"} "Je ne vois pas mes codes sources !"]
-     (md-to-string "C'est sûrement que votre forge, votre compte d'organisation ou votre groupe n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.")
+     [:h1 {:class "title"} "I can't find my source codes!"]
+     (md-to-string "It is likely that your forge, your organization or group account is not <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">listed here</a>.")
      [:br]
-     (md-to-string "<a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
+     (md-to-string "<a href=\"/contact\">Contact us</a> and we will add your forge or your organization account.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "En quoi cette liste peut m'être utile ?"]
