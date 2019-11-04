@@ -212,23 +212,23 @@
      (md-to-string "<a href=\"/contact\">Contact us</a> and we will add your forge or your organization account.")
      [:br]]
     [:div {:class "container"}
-     [:h1 {:class "title"} "En quoi cette liste peut m'être utile ?"]
-     [:p [:strong "Votre organisme accomplit une mission de service public ?"] " Avant de développer du code source par vous-même, vous pouvez chercher si du code déjà développé n'est pas disponible. Vous pouvez aussi repérer des projets qui vous intéressent pour vous rapprocher des organismes porteurs et leur demander comment contribuer."]
+     [:h1 {:class "title"} "How can this list help me?"]
+     [:p [:strong "If your organization fulfill a public service mission:"] " Before you start programming, you can check for available source code. You can also look for projects you are interested in to get closer to lead organizations and ask them how to contribute."]
      [:br]
-     [:p [:strong "Vous vous y connaissez en code ?"] " Vous pouvez trouver des projets qui vous intéressent et contribuer."]
+     [:p [:strong "If you know how to program:"] " You can find projects you are interested in and contribute."]
      [:br]
-     [:p [:strong "Je ne comprends pas ces mots !"] " Pas de panique : nous vous avons préparé un petit <a href=\"/fr/glossary\">glossaire</a> pour vous aider à tout comprendre."]
+     [:p [:strong "I don't understand these words!"] " Don't worry: we made a short  <a href=\"/fr/glossary\">glossary</a> to help you better understand those words."]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je partager un lien vers une requête ?"]
-     [:p "Oui !  Vous pouvez utiliser les paramètres \"s\", \"g\", \"language\" et \"license\" comme dans ces exemples :"]
+     [:p "Yes, you can!  You can use the parameters \"s\", \"g\", \"language\" and \"license\" as in the following examples:"]
      [:br]
      [:ul
-      [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
-      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
-      [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
-      [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
-      [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
+      [:li "Find repositories containing \"API\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
+      [:li "Find group repositories containing \"beta\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
+      [:li "Find repositories in Python: " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
+      [:li "Find repositories under the Affero GPL license: " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
+      [:li "Combine queries : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
