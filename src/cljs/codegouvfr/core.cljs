@@ -15,7 +15,7 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
-(defonce dev? false)
+(defonce dev? true)
 (defonce pages 100) ;; FIXME: Make customizable?
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
@@ -377,13 +377,17 @@
 (defn stats-page [lang]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
                 top_orgs_by_repos top_orgs_by_stars top_licenses
-                platforms software_heritage]
+                platforms software_heritage top_languages]
          :as   stats} @(re-frame/subscribe [:stats?])
         top_orgs_by_repos_0
         (into {} (map #(vector (str (:organisation_nom %)
                                     " (" (:plateforme %) ")")
                                (:count %))
                       top_orgs_by_repos))
+        top_languages_0
+        (into {} (map #(let [[k v] %]
+                         [[:a {:href (str "/" lang "/repos?language=" k)} k] v])
+                      (clojure.walk/stringify-keys top_languages)))
         top_licenses_0
         (into {} (map #(let [[k v] %]
                          [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
@@ -412,7 +416,9 @@
       (stats-card [:span [:a {:href  (str "/" lang "/glossary#license")
                               :title (i/i lang [:go-to-glossary])} (i/i lang [:licenses])]
                    (i/i lang [:more-used])]
-                  top_licenses_0)]
+                  top_licenses_0)
+      (stats-card [:span (i/i lang [:languages]) (i/i lang [:more-used])]
+                  top_languages_0)]
      [:div {:class "columns"}
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
