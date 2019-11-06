@@ -192,7 +192,7 @@
      [:br]
      (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
      [:br]
-     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/contact).")
+     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/fr/contact).")
      [:br]]]))
 
 (defn en-about [lang]
@@ -220,7 +220,7 @@
      [:p [:strong "I don't understand these words!"] " Don't worry: we made a short  <a href=\"/fr/glossary\">glossary</a> to help you better understand those words."]
      [:br]]
     [:div {:class "container"}
-     [:h1 {:class "title"} "Puis-je partager un lien vers une requête ?"]
+     [:h1 {:class "title"} "Can I share a link to a query?"]
      [:p "Yes, you can!  You can use the parameters \"s\", \"g\", \"language\" and \"license\" as in the following examples:"]
      [:br]
      [:ul
@@ -231,12 +231,12 @@
       [:li "Combine queries : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
      [:br]]
     [:div {:class "container"}
-     [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
-     (md-to-string "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
+     [:h1 {:class "title"} "Can I help enhancing this website?"]
+     (md-to-string "<strong>Yes!</strong> Harvesting <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">metadata of repositories</a> and exposing them via the <a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> is done by Antoine Augusti (Etalab). This frontend is developed <a href=\"https://github.com/etalab/codegouvfr\">here</a> by Bastien Guerry (Etalab).  Don't hesitate to send suggestions on these repositories, they are published under a free software license and every contribution is welcome.")
      [:br]
-     (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
+     (md-to-string "To read news about free software used and developed by the French public sector, subscribe to the <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">#bluehats newsletter</a>.")
      [:br]
-     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/contact).")
+     (md-to-string "For any other question, please [drop a message](/en/contact).")
      [:br]]]))
 
 (defn it-about [lang]
