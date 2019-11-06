@@ -395,10 +395,8 @@
     [:div
      [:div {:class "level"}
       (figure [:span [:a {:href  (str "/" lang "/glossary#repository")
-                          :title (i/i lang [:go-to-glossary])} (i/i lang [:repos-from])]
-               [:a {:href  (str "/" lang "/glossary#source-code")
-                    :title (i/i lang [:go-to-glossary])}
-                (i/i lang [:source-code])]] nb_repos)
+                          :title (i/i lang [:go-to-glossary])}
+                      (i/i lang [:repos-of-source-code])]] nb_repos)
       (figure [:span [:a {:href  (str "/" lang "/glossary#organization-group")
                           :title (i/i lang [:go-to-glossary])}
                       (i/i lang [:orgas-or-groups])]] nb_orgs)
