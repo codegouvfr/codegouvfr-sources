@@ -74,7 +74,7 @@
        [:a {:href  "https://www.etalab.gouv.fr"
             :title (i/i lang [:main-etalab-website])
             :class "navbar-item"} "Etalab"]
-       [:a {:href  "latest.xml" :target "new"
+       [:a {:href  "/latest.xml" :target "new"
             :title (i/i lang [:subscribe-rss-flux])
             :class "navbar-item button"} [:span {:class "icon"}
                                           [:i {:class "fas fa-rss"}]]]]]]
