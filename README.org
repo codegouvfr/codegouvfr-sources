@@ -68,9 +68,6 @@ requests or feature requests.
 
 ** Translation
 
-The application was first available in french and will be soon
-available in english.
-
 If you want to help with the translation:
 
 - add a new file =resources/public/index.[yourlanguagecode].html= by
