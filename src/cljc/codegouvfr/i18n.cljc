@@ -160,7 +160,7 @@
     :remove-filter               "Remove filter: display all the organizations or groups"
     :only-forks                  " Forks only"
     :only-forked-repos           "Forked repositories only"
-    :no-archives                 " Remove archives"
+    :no-archives                 " Hide archives"
     :no-archived-repos           "Do not include archived repositories"
     :only-with-description-repos "Repositories with a description only"
     :with-description            " With a description"
