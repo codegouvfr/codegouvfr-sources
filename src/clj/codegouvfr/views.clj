@@ -204,18 +204,18 @@
      [:h1 {:class "title"} "Where does the data come from?"]
      (md-to-string "As part of the <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">government's free software contribution policy</a>, DINSIC collects the <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">list of organizational accounts</a> where public bodies share their source codes. We use this list to collect metadata about all source code repositories. These metadata are published on <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">data.gouv.fr</a> and queryable through <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">this API</a>.")
      [:br]
-     (md-to-string "The publication of source codes is prescribed by the <strong>French Digital Republic Act (Loi pour une République numérique)</strong> : each source code obtained or developed by an organization fulfilling a public service mission is considered an administrative document, and, therefore, has to be published in open data. To understand the requirements to open a public sector software, check out this <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">interactive guide</a>.")
+     (md-to-string "The publication of source codes is prescribed by the <strong>French Digital Republic Act (Loi pour une République numérique)</strong> : each source code obtained or developed by an organization fulfilling a public service mission is considered an administrative document, and, therefore, has to be published in open data. To understand the requirements to publish a public sector software, check out this <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">(french) interactive guide</a>.")
      [:br]
      [:h1 {:class "title"} "I can't find my source codes!"]
-     (md-to-string "It is likely that your forge, your organization or group account is not <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">listed here</a>.")
+     (md-to-string "It is likely that your software forge, your organization or group account is not <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">listed here</a>.")
      [:br]
      (md-to-string "<a href=\"/contact\">Contact us</a> and we will add your forge or your organization account.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "How can this list help me?"]
-     [:p [:strong "If your organization fulfill a public service mission:"] " Before you start programming, you can check for available source code. You can also look for projects you are interested in to get closer to lead organizations and ask them how to contribute."]
+     [:p [:strong "If your organization fulfills a public service mission:"] " Before you start programming, you can check for available source code. You can also look for projects you are interested in to get closer to lead organizations and ask them how to contribute."]
      [:br]
-     [:p [:strong "If you know how to program:"] " You can find projects you are interested in and contribute."]
+     [:p [:strong "If you know how to program:"] " You can find projects you are interested in and contribute to them."]
      [:br]
      [:p [:strong "I don't understand these words!"] " Don't worry: we made a short  <a href=\"/fr/glossary\">glossary</a> to help you better understand those words."]
      [:br]]
@@ -364,7 +364,7 @@
 (defn it-glossary [lang]
   (template
    lang
-   "Glossariod i code.etalab.gouv.fr" "Cosa è un repository? Un'organizzazione? Una licenza?"
+   "Glossario di code.etalab.gouv.fr" "Cosa è un repository? Un'organizzazione? Una licenza?"
    [:div
     [:div {:class "container"}
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codici sorgenti"]]
