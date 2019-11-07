@@ -16,7 +16,8 @@
             [reitit.frontend.easy :as rfe]))
 
 (defonce dev? false)
-(defonce pages 100) ;; FIXME: Make customizable?
+(defonce repos-per-page 100) ;; FIXME: Make customizable?
+(defonce orgas-per-page 100) ;; FIXME: Make customizable?
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
@@ -28,6 +29,7 @@
  (fn [_ _]
    {:repos          nil
     :repos-page     0
+    :orgas-page     0
     :orgas          nil
     :sort-repos-by  :date
     :sort-orgas-by  :repos
@@ -59,6 +61,7 @@
  :filter!
  (fn [db [_ s]]
    (re-frame/dispatch [:repos-page! 0])
+   (re-frame/dispatch [:orgas-page! 0])
    ;; FIXME: Find a more idiomatic way?
    (assoc db :filter (merge (:filter db) s))))
 
@@ -72,9 +75,14 @@
  (fn [db [_ n]] (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
+ :orgas-page!
+ (fn [db [_ n]] (assoc db :orgas-page n)))
+
+(re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
+   (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
@@ -94,6 +102,10 @@
 (re-frame/reg-sub
  :repos-page?
  (fn [db _] (:repos-page db)))
+
+(re-frame/reg-sub
+ :orgas-page?
+ (fn [db _] (:orgas-page db)))
 
 (re-frame/reg-sub
  :filter?
@@ -126,6 +138,7 @@
 (re-frame/reg-event-db
  :sort-orgas-by!
  (fn [db [_ k]]
+   (re-frame/dispatch [:orgas-page! 0])
    (when (= k (:sort-orgas-by db))
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-orgas-by k)))
@@ -287,8 +300,9 @@
                      :title    (i/i lang [:sort-issues])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :issues])} (i/i lang [:issues])]]]]]
         (into [:tbody]
-              (for [dd (take pages (drop (* pages @(re-frame/subscribe [:repos-page?]))
-                                         @(re-frame/subscribe [:repos?])))]
+              (for [dd (take repos-per-page
+                             (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
+                                   @(re-frame/subscribe [:repos?])))]
                 ^{:key dd}
                 (let [{:keys [li r n o d u  f s i a?]} dd]
                   [:tr
@@ -319,7 +333,11 @@
    [:div]
    (if (= orgs-cnt 0)
      [[:p (i/i lang [:no-orga-found])] [:br]]
-     (for [dd (partition-all 3 @(re-frame/subscribe [:orgas?]))]
+     (for [dd (partition-all
+               3
+               (take orgas-per-page
+                     (drop (* repos-per-page @(re-frame/subscribe [:orgas-page?]))
+                           @(re-frame/subscribe [:orgas?]))))]
        ^{:key dd}
        [:div {:class "columns"}
         (for [{:keys [n l o h c d r e au p an]
@@ -450,9 +468,9 @@
                    (:ratio_in_archive software_heritage)})]
      [:br]]))
 
-(defn change-page [next]
+(defn change-repos-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
-        count-pages (count (partition-all pages @(re-frame/subscribe [:repos?])))]
+        count-pages (count (partition-all repos-per-page @(re-frame/subscribe [:repos?])))]
     (cond
       (= next "first")
       (re-frame/dispatch [:repos-page! 0])
@@ -462,6 +480,20 @@
       (re-frame/dispatch [:repos-page! (inc repos-page)])
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
+
+(defn change-orgas-page [next]
+  (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
+        count-pages (count (partition-all orgas-per-page @(re-frame/subscribe [:orgas?])))]
+    (.log js/console (pr-str count-pages))
+    (cond
+      (= next "first")
+      (re-frame/dispatch [:orgas-page! 0])
+      (= next "last")
+      (re-frame/dispatch [:orgas-page! (dec count-pages)])
+      (and (< orgas-page (dec count-pages)) next)
+      (re-frame/dispatch [:orgas-page! (inc orgas-page)])
+      (and (> orgas-page 0) (not next))
+      (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])]
@@ -510,7 +542,7 @@
        (= @(re-frame/subscribe [:view?]) :repos)
        (let [repos          @(re-frame/subscribe [:repos?])
              repos-pages    @(re-frame/subscribe [:repos-page?])
-             count-pages    (count (partition-all pages repos))
+             count-pages    (count (partition-all repos-per-page repos))
              first-disabled (= repos-pages 0)
              last-disabled  (= repos-pages (dec count-pages))]
          [:div
@@ -560,19 +592,19 @@
               (if (< rps 2) (i/i lang [:one-repo]) (str rps (i/i lang [:repos]))))]
            [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
             [:a {:class    "pagination-previous"
-                 :on-click #(change-page "first")
+                 :on-click #(change-repos-page "first")
                  :disabled first-disabled}
              (fa "fa-fast-backward")]
             [:a {:class    "pagination-previous"
-                 :on-click #(change-page nil)
+                 :on-click #(change-repos-page nil)
                  :disabled first-disabled}
              (fa "fa-step-backward")]
             [:a {:class    "pagination-next"
-                 :on-click #(change-page true)
+                 :on-click #(change-repos-page true)
                  :disabled last-disabled}
              (fa "fa-step-forward")]
             [:a {:class    "pagination-next"
-                 :on-click #(change-page "last")
+                 :on-click #(change-repos-page "last")
                  :disabled last-disabled}
              (fa "fa-fast-forward")]]
            [:a {:title (i/i lang [:download])
@@ -583,8 +615,12 @@
           [:br]])
 
        (= @(re-frame/subscribe [:view?]) :orgas)
-       (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
-             orgas @(re-frame/subscribe [:orgas?])]
+       (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
+             orgas          @(re-frame/subscribe [:orgas?])
+             orgas-pages    @(re-frame/subscribe [:orgas-page?])
+             count-pages    (count (partition-all orgas-per-page orgas))
+             first-disabled (= orgas-pages 0)
+             last-disabled  (= orgas-pages (dec count-pages))]
          [:div
           [:div {:class "level-left"}
            [:label {:class "checkbox level-item" :title (i/i lang [:only-orga-with-code])}
@@ -604,6 +640,23 @@
            [:span {:class "button is-static level-item"}
             (let [orgs (count orgas)]
               (if (< orgs 2) (i/i lang [:one-group]) (str orgs (i/i lang [:groups]))))]
+           [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
+            [:a {:class    "pagination-previous"
+                 :on-click #(change-orgas-page "first")
+                 :disabled first-disabled}
+             (fa "fa-fast-backward")]
+            [:a {:class    "pagination-previous"
+                 :on-click #(change-orgas-page nil)
+                 :disabled first-disabled}
+             (fa "fa-step-backward")]
+            [:a {:class    "pagination-next"
+                 :on-click #(change-orgas-page true)
+                 :disabled last-disabled}
+             (fa "fa-step-forward")]
+            [:a {:class    "pagination-next"
+                 :on-click #(change-orgas-page "last")
+                 :disabled last-disabled}
+             (fa "fa-fast-forward")]]
            [:a {:title (i/i lang [:download])
                 :href  orgas-csv-url}
             (fa "fa-file-csv")]]
