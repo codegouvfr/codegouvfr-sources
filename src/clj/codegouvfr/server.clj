@@ -80,82 +80,80 @@
                     :organisation_url   :o
                     :avatar_url         :au})
 
-(defn local-json-file [file remap url rm-ks annuaire]
-  (spit file
-        (json/generate-string
-         (map #(if annuaire
-                 (assoc % :an ((keyword (:l %)) annuaire))
-                 %)
-              (map #(clojure.set/rename-keys
-                     (apply dissoc % rm-ks) remap)
-                   (json/parse-string
-                    (:body (http/get url)) true)))))
-  (timbre/info (str "updated " file)))
+(defonce repos-rm-ks
+  [:software_heritage_url :software_heritage_exists :derniere_modification])
 
 (defn update-repos []
-  (local-json-file
-   "repos.json"
-   repos-mapping
-   repos-url
-   [:software_heritage_url :software_heritage_exists :derniere_modification]
-   nil))
+  (spit "repos.json"
+        (json/generate-string
+         (map #(clojure.set/rename-keys (apply dissoc % repos-rm-ks) repos-mapping)
+              (json/parse-string
+               (:body (http/get repos-url)) true))))
+  (timbre/info (str "updated repos.json")))
 
 (defn update-orgas []
-  (let [annuaire (apply merge
-                        (map #(let [{:keys [github lannuaire]} %]
-                                {(keyword github) lannuaire})
-                             (semantic-csv/mappify
-                              (data-csv/read-csv (:body (http/get annuaire-url))))))]
-    (local-json-file "orgas.json" orgas-mapping orgas-url nil annuaire)))
+  (let [annuaire
+        (apply merge
+               (map #(let [{:keys [github lannuaire]} %]
+                       {(keyword github) lannuaire})
+                    (semantic-csv/mappify
+                     (data-csv/read-csv (:body (http/get annuaire-url))))))]
+    (spit "orgas.json"
+          (json/generate-string
+           (map #(assoc % :an ((keyword (:l %)) annuaire))
+                (map #(clojure.set/rename-keys % orgas-mapping)
+                     (json/parse-string
+                      (:body (http/get orgas-url)) true)))))
+    (timbre/info (str "updated orgas.json"))))
 
 (defn update-stats []
-  (spit "stats.json" (:body (http/get stats-url)))
-  (timbre/info (str "updated stats.json")))
+(spit "stats.json" (:body (http/get stats-url)))
+(timbre/info (str "updated stats.json")))
 
 (defn start-tasks []
-  (tt/start!)
-  (def update-repos! (tt/every! 10800 update-repos))
-  (def update-orgas! (tt/every! 10800 update-orgas))
-  (def update-stats! (tt/every! 10800 update-stats))
-  (timbre/info "Tasks started!"))
+(tt/start!)
+(def update-repos! (tt/every! 10800 update-repos))
+(def update-orgas! (tt/every! 10800 update-orgas))
+(def update-stats! (tt/every! 10800 update-stats))
+(timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
 (defn json-resource [f]
-  (assoc
-   (response/response
-    (io/input-stream f))
-   :headers {"Content-Type" "application/json; charset=utf-8"}))
+(assoc
+ (response/response
+  (io/input-stream f))
+ :headers {"Content-Type" "application/json; charset=utf-8"}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup email sending
 
 (defn send-email
-  "Send a templated email."
+"Send a templated email."
   [{:keys [email name organization message log]}]
-  (try
-    (if-let
-        [res (postal/send-message
-              {:host config/smtp-host
-               :port 587
-               :user config/smtp-login
-               :pass config/smtp-password}
-              {:from       config/from
-               :message-id #(postal.support/message-id config/msgid-domain)
-               :reply-to   email
-               :to         config/admin-email
-               :subject    (str name " / " organization)
-               :body       message})]
-      (when (= (:error res) :SUCCESS) (timbre/info log)))
-    (catch Exception e
-      (timbre/error (str "Can't send email: " (:cause (Throwable->map e)))))))
+(try
+  (if-let
+      [res (postal/send-message
+            {:host config/smtp-host
+             :port 587
+             :user config/smtp-login
+             :pass config/smtp-password}
+            {:from       config/from
+             :message-id #(postal.support/message-id config/msgid-domain)
+             :reply-to   email
+             :to         config/admin-email
+             :subject    (str name " / " organization)
+             :body       message})]
+    (when (= (:error res) :SUCCESS) (timbre/info log)))
+  (catch Exception e
+    (timbre/error (str "Can't send email: " (:cause (Throwable->map e)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup routes
 
 (defroutes routes
-  (GET "/latest.xml" [] (views/rss))
-  (GET "/orgas" [] (json-resource "orgas.json"))
-  (GET "/stats" [] (json-resource "stats.json"))
+(GET "/latest.xml" [] (views/rss))
+(GET "/orgas" [] (json-resource "orgas.json"))
+(GET "/stats" [] (json-resource "stats.json"))
   (GET "/repos" [] (json-resource "repos.json"))
   
   (GET "/en/about" [] (views/en-about "en"))
