@@ -325,7 +325,7 @@
 (defn en-glossary [lang]
   (template
    lang
-   "Glossary for code.etalab.gouv.fr" "What is a repository? An organisation ? A licence ?"
+   "Glossary for code.etalab.gouv.fr" "What is a repository? An organization? A license?"
    [:div
     [:div {:class "container"}
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
