@@ -17,22 +17,24 @@
 
 (defonce dev? false)
 (defonce pages 100) ;; FIXME: Make customizable?
+(defonce timeout 100)
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
-   {:repos         nil
-    :repos-page    0
-    :orgas         nil
-    :sort-repos-by :date
-    :sort-orgas-by :repos
-    :view          :repos
-    :reverse-sort  true
-    :stats         nil
-    :filter        init-filter
-    :lang          "en"}))
+   {:repos          nil
+    :repos-page     0
+    :orgas          nil
+    :sort-repos-by  :date
+    :sort-orgas-by  :repos
+    :view           :repos
+    :reverse-sort   true
+    :stats          nil
+    :filter         init-filter
+    :display-filter init-filter
+    :lang           "en"}))
 
 (re-frame/reg-event-db
  :lang!
@@ -59,6 +61,11 @@
    (assoc db :filter (merge (:filter db) s))))
 
 (re-frame/reg-event-db
+ :display-filter!
+ (fn [db [_ s]]
+   (assoc db :display-filter (merge (:display-filter db) s))))
+
+(re-frame/reg-event-db
  :repos-page!
  (fn [db [_ n]] (assoc db :repos-page n)))
 
@@ -67,6 +74,7 @@
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
+   (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
 (re-frame/reg-event-db
@@ -88,6 +96,10 @@
 (re-frame/reg-sub
  :filter?
  (fn [db _] (:filter db)))
+
+(re-frame/reg-sub
+ :display-filter?
+ (fn [db _] (:display-filter db)))
 
 (re-frame/reg-sub
  :view?
@@ -175,6 +187,13 @@
      m)))
 
 (def filter-chan (async/chan 100))
+(def display-filter-chan (async/chan 100))
+
+(defn start-display-filter-loop []
+  (async/go
+    (loop [f (async/<! display-filter-chan)]
+      (re-frame/dispatch [:display-filter! f])
+      (recur (async/<! display-filter-chan)))))
 
 (defn start-filter-loop []
   (async/go
@@ -182,11 +201,11 @@
       (let [v  @(re-frame/subscribe [:view?])
             l  @(re-frame/subscribe [:lang?])
             fs @(re-frame/subscribe [:filter?])]
-        (re-frame/dispatch [:filter! f])
         (rfe/push-state v {:lang l}
                         (filter #(and (string? (val %))
                                       (not-empty (val %)))
                                 (merge fs f))))
+      (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
@@ -442,7 +461,7 @@
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
-(defn main-page []
+(defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])]
     [:div
      [:div {:class "field is-grouped"}
@@ -461,10 +480,14 @@
        [:input {:class       "input"
                 :size        20
                 :placeholder (i/i lang [:free-search])
-                :value       (:q @(re-frame/subscribe [:filter?]))
+                :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
                 :on-change   (fn [e]
                                (let [ev (.-value (.-target e))]
-                                 (async/go (async/>! filter-chan {:q ev}))))}]]
+                                 (reset! q ev)
+                                 (async/go
+                                   (async/>! display-filter-chan {:q ev})
+                                   (<! (async/timeout timeout))
+                                   (async/>! filter-chan {:q ev}))))}]]
       (let [flt @(re-frame/subscribe [:filter?])]
         (if (seq (:g flt))
           [:p {:class "control"}
@@ -494,18 +517,26 @@
             [:input {:class       "input"
                      :size        12
                      :placeholder (i/i lang [:license])
-                     :value       (:license @(re-frame/subscribe [:filter?]))
+                     :value       (or @license (:license @(re-frame/subscribe [:display-filter?])))
                      :on-change   (fn [e]
                                     (let [ev (.-value (.-target e))]
-                                      (async/go (async/>! filter-chan {:license ev}))))}]]
+                                      (reset! license ev)
+                                      (async/go
+                                        (async/>! display-filter-chan {:license ev})
+                                        (<! (async/timeout timeout))
+                                        (async/>! filter-chan {:license ev}))))}]]
            [:div {:class "level-item"}
             [:input {:class       "input"
                      :size        12
-                     :value       (:language @(re-frame/subscribe [:filter?]))
+                     :value       (or @language (:language @(re-frame/subscribe [:display-filter?])))
                      :placeholder (i/i lang [:language])
                      :on-change   (fn [e]
                                     (let [ev (.-value (.-target e))]
-                                      (async/go (async/>! filter-chan {:language ev}))))}]]
+                                      (reset! language ev)
+                                      (async/go
+                                        (async/>! display-filter-chan {:language ev})
+                                        (<! (async/timeout timeout))
+                                        (async/>! filter-chan {:language ev}))))}]]
            [:label {:class "checkbox level-item" :title (i/i lang [:only-forked-repos])}
             [:input {:type      "checkbox"
                      :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
@@ -579,19 +610,22 @@
        (rfe/push-state :repos {:lang lang}))]))
 
 (defn main-class []
-  (reagent/create-class
-   {:component-will-mount
-    (fn []
-      (GET "/repos" :handler
-           #(re-frame/dispatch
-             [:update-repos! (map (comp bean clj->js) %)]))
-      (GET "/orgas" :handler
-           #(re-frame/dispatch
-             [:update-orgas! (map (comp bean clj->js) %)]))
-      (GET "/stats" :handler
-           #(re-frame/dispatch
-             [:update-stats! (clojure.walk/keywordize-keys %)])))
-    :reagent-render main-page}))
+  (let [q        (reagent/atom nil)
+        license  (reagent/atom nil)
+        language (reagent/atom nil)]
+    (reagent/create-class
+     {:component-will-mount
+      (fn []
+        (GET "/repos" :handler
+             #(re-frame/dispatch
+               [:update-repos! (map (comp bean clj->js) %)]))
+        (GET "/orgas" :handler
+             #(re-frame/dispatch
+               [:update-orgas! (map (comp bean clj->js) %)]))
+        (GET "/stats" :handler
+             #(re-frame/dispatch
+               [:update-stats! (clojure.walk/keywordize-keys %)])))
+      :reagent-render (fn [] (main-page q license language))})))
 
 (def routes
   [["/" :home-redirect]
@@ -617,6 +651,7 @@
    on-navigate
    {:use-fragment false})
   (start-filter-loop)
+  (start-display-filter-loop)
   (reagent/render
    [main-class]
    (. js/document (getElementById "app"))))
