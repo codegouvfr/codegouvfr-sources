@@ -55,7 +55,7 @@
     [:meta {:name "keywords" :content (i/i lang [:keywords])}]
     [:meta {:name "description" :content (i/i lang [:keywords])}]
     [:meta {:name "viewport" :content "width=device-width, initial-scale=1, shrink-to-fit=yes"}]
-    (h/include-css "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css")
+    (h/include-css "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css")
     (h/include-css "/css/style.css")]
    [:body
     [:nav {:class "navbar" :role "navigation" :aria-label "main navigation"}
