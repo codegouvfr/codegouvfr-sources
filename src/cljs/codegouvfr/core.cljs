@@ -444,14 +444,17 @@
      [:br]
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  (str "/" lang "/glossary#organization-group")
-                              :title (i/i lang [:go-to-glossary])} (i/i lang [:orgas-or-groups])]
+                              :title (i/i lang [:go-to-glossary])}
+                          (i/i lang [:orgas-or-groups])]
                    (i/i lang [:with-more-of])
                    [:a {:href  (str "/" lang "/glossary#repository")
-                        :title (i/i lang [:go-to-glossary])} (i/i lang [:repos])]] top_orgs_by_repos_0)
+                        :title (i/i lang [:go-to-glossary])}
+                    (i/i lang [:repos])]] top_orgs_by_repos_0)
       (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  (str "/" lang "/glossary#license")
-                              :title (i/i lang [:go-to-glossary])} (i/i lang [:licenses])]
+                              :title (i/i lang [:go-to-glossary])}
+                          (i/i lang [:licenses])]
                    (i/i lang [:more-used])]
                   top_licenses_0)
       (stats-card [:span (i/i lang [:languages]) (i/i lang [:more-used])]
@@ -470,7 +473,8 @@
 
 (defn change-repos-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
-        count-pages (count (partition-all repos-per-page @(re-frame/subscribe [:repos?])))]
+        count-pages (count (partition-all
+                            repos-per-page @(re-frame/subscribe [:repos?])))]
     (cond
       (= next "first")
       (re-frame/dispatch [:repos-page! 0])
@@ -483,7 +487,8 @@
 
 (defn change-orgas-page [next]
   (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
-        count-pages (count (partition-all orgas-per-page @(re-frame/subscribe [:orgas?])))]
+        count-pages (count (partition-all
+                            orgas-per-page @(re-frame/subscribe [:orgas?])))]
     (.log js/console (pr-str count-pages))
     (cond
       (= next "first")
@@ -551,7 +556,8 @@
             [:input {:class       "input"
                      :size        12
                      :placeholder (i/i lang [:license])
-                     :value       (or @license (:license @(re-frame/subscribe [:display-filter?])))
+                     :value       (or @license
+                                      (:license @(re-frame/subscribe [:display-filter?])))
                      :on-change   (fn [e]
                                     (let [ev (.-value (.-target e))]
                                       (reset! license ev)
@@ -562,7 +568,8 @@
            [:div {:class "level-item"}
             [:input {:class       "input"
                      :size        12
-                     :value       (or @language (:language @(re-frame/subscribe [:display-filter?])))
+                     :value       (or @language
+                                      (:language @(re-frame/subscribe [:display-filter?])))
                      :placeholder (i/i lang [:language])
                      :on-change   (fn [e]
                                     (let [ev (.-value (.-target e))]
