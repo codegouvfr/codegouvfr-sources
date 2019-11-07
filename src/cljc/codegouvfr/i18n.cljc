@@ -102,7 +102,8 @@
     :message-received-ok         "Nous nous efforçons de répondre au plus vite."
     :back-to-repos               "Retour à la liste des dépôts de code source"
     :glossary                    "Glossaire"
-    :about                       "À propos"}
+    :about                       "À propos"
+    :download                    "Télécharger"}
    ;; English translation
    :en
    {:no-repo-found               "Repository not found : would you like to make a new request?"
@@ -201,7 +202,8 @@
     :message-received-ok         "We will do our best to reply as soon as possible."
     :back-to-repos               "Go back to the source code repository list"
     :glossary                    "Glossary"
-    :about                       "About"}
+    :about                       "About"
+    :download                    "Download"}
    ;; Italian translation
    :it
    {:no-repo-found               "Repository non trovato: vuoi provre a fare una nuova ricerca?"
@@ -300,7 +302,8 @@
     :message-received-ok         "Faremo del nostro meglio per rispondere il prima possibile."
     :back-to-repos               "Ritorna alla lista dei repository di codice sorgente"
     :glossary                    "Glossario"
-    :about                       "About"}})
+    :about                       "About"
+    :download                    "Scaricare"}})
 
 (def opts {:dict localization})
 
