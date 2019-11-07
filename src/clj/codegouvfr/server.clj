@@ -99,8 +99,6 @@
    "Do What The Fuck You Want To Public License"                "Do What The Fuck You Want To Public License (WTFPL)"
    "Creative Commons Attribution 4.0 International"             "Creative Commons Attribution 4.0 International (CC-BY-4.0)"})
 
-(get licenses-mapping "GNU Lesser General Public License v2.1")
-
 (defonce repos-rm-ks
   [:software_heritage_url :software_heritage_exists :derniere_modification])
 
