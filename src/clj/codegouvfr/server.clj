@@ -80,15 +80,38 @@
                     :organisation_url   :o
                     :avatar_url         :au})
 
+(def licenses-mapping
+  {"MIT License"                                                "MIT License (MIT)"
+   "GNU Affero General Public License v3.0"                     "GNU Affero General Public License v3.0 (AGPL-3.0)"
+   "GNU General Public License v3.0"                            "GNU General Public License v3.0 (GPL-3.0)"
+   "GNU Lesser General Public License v2.1"                     "GNU Lesser General Public License v2.1 (LGPL-2.1)"
+   "Apache License 2.0"                                         "Apache License 2.0 (Apache-2.0)"
+   "GNU General Public License v2.0"                            "GNU General Public License v2.0 (GPL-2.0)"
+   "GNU Lesser General Public License v3.0"                     "GNU Lesser General Public License v3.0 (LGPL-3.0)"
+   "Mozilla Public License 2.0"                                 "Mozilla Public License 2.0 (MPL-2.0)"
+   "Eclipse Public License 2.0"                                 "Eclipse Public License 2.0 (EPL-2.0)"
+   "Eclipse Public License 1.0"                                 "Eclipse Public License 1.0 (EPL-1.0)"
+   "BSD 3-Clause \"New\" or \"Revised\" License"                "BSD 3-Clause \"New\" or \"Revised\" License (BSD-3-Clause)"
+   "European Union Public License 1.2"                          "European Union Public License 1.2 (EUPL-1.2)"
+   "Creative Commons Attribution Share Alike 4.0 International" "Creative Commons Attribution Share Alike 4.0 International (CC-BY-NC-SA-4.0)"
+   "BSD 2-Clause \"Simplified\" License"                        "BSD 2-Clause \"Simplified\" License (BSD-2-Clause)"
+   "The Unlicense"                                              "The Unlicense (Unlicense)"
+   "Do What The Fuck You Want To Public License"                "Do What The Fuck You Want To Public License (WTFPL)"
+   "Creative Commons Attribution 4.0 International"             "Creative Commons Attribution 4.0 International (CC-BY-4.0)"})
+
+(get licenses-mapping "GNU Lesser General Public License v2.1")
+
 (defonce repos-rm-ks
   [:software_heritage_url :software_heritage_exists :derniere_modification])
 
 (defn update-repos []
   (spit "repos.json"
         (json/generate-string
-         (map #(clojure.set/rename-keys (apply dissoc % repos-rm-ks) repos-mapping)
-              (json/parse-string
-               (:body (http/get repos-url)) true))))
+         (map
+          (fn [r] (assoc r :li (get licenses-mapping (:li r))))
+          (map #(clojure.set/rename-keys (apply dissoc % repos-rm-ks) repos-mapping)
+               (json/parse-string
+                (:body (http/get repos-url)) true)))))
   (timbre/info (str "updated repos.json")))
 
 (defn update-orgas []
