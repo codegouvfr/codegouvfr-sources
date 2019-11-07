@@ -334,19 +334,19 @@
      [:br]
      [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
      [:br]
-     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
+     (md-to-string "Source code developed by a public agency must be published, under certain conditions.  This website offers the possibility to search within source code repositories that are identified as coming from public sector organisms.  It has been developed by [Etalab](https://www.etalab.gouv.fr/).")
      [:br]
      [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
      [:br]
-     (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
+     (md-to-string "A \"repository\" is a place where source code files are stored.  This is what you see when you browse a link to a source code as hosted on a software forge.  This is also what you copy on your machine to explore it locally.")
      [:br]
      [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation & Group"]]
      [:br]
-     (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
+     (md-to-string "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
      [:br]
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
-     (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
+     (md-to-string "A \"forked\" repository est is repository derived from another one.")
      [:br]
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stars"]]
      [:br]
