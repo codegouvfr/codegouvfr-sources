@@ -325,40 +325,40 @@
 (defn en-glossary [lang]
   (template
    lang
-   "Glossaire pour code.etalab.gouv.fr" "Qu'est-ce qu'un dépôt ? Une « organisation » ? Une licence ?"
+   "Glossary for code.etalab.gouv.fr" "What is a repository? An organisation ? A licence ?"
    [:div
     [:div {:class "container"}
-     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codes sources"]]
+     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
      [:br]
-     [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
+     [:p "A softare's source code is what a developer writes.  Source code can be just a few lines or quite a few of them. Source code can be made available under a free licence for others to freely distribute, modify and share."]
      [:br]
-     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Secteur public"]]
+     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
      [:br]
      (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
      [:br]
-     [:a {:name "repository"} [:h2 {:class "subtitle"} "Dépôt"]]
+     [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
      [:br]
      (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
-     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation & Group"]]
      [:br]
      (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
      [:br]
-     [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
+     [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
      (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
      [:br]
-     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
+     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stars"]]
      [:br]
-     (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
+     (md-to-string "Stars allow users to mark a repository as favourite. At the moment, we collect repository favouriteness data from GitHub, Gitlab and instances thereof. Favouriteness is not a source code quality metric.")
      [:br]
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
-     (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
+     (md-to-string "A software licence is a contract between a software's authors and its end-users. So-called \"libre\" licences grant licensees permission to distribute, modify and share a software's source code.")
      [:br]
-     [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
+     [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software Heritage"]]
      [:br]
-     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
+     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> is a project whose ambition is to collect, preserve, and share all software that is publicly available in source code form. Each repository here referenced is linked to its corresponding Software Heritage archive version.")
      [:br]]]))
 
 (defn it-glossary [lang]
