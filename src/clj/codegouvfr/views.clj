@@ -330,7 +330,7 @@
     [:div {:class "container"}
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
      [:br]
-     [:p "A softare's source code is what a developer writes.  Source code can be just a few lines or quite a few of them. Source code can be made available under a free licence for others to freely distribute, modify and share."]
+     [:p "A software's source code is what a developer writes.  Source code can be just a few lines or quite a few of them. Source code can be made available under a free licence for others to freely distribute, modify and share."]
      [:br]
      [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
      [:br]
