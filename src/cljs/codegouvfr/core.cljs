@@ -20,6 +20,8 @@
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
+(defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
+(defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -572,7 +574,10 @@
             [:a {:class    "pagination-next"
                  :on-click #(change-page "last")
                  :disabled last-disabled}
-             (fa "fa-fast-forward")]]]
+             (fa "fa-fast-forward")]]
+           [:a {:title (i/i lang [:download])
+                :href  repos-csv-url}
+            (fa "fa-file-csv")]]
           [:br]
           [repositories-page lang (count repos)]
           [:br]])
@@ -598,7 +603,10 @@
                 :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
            [:span {:class "button is-static level-item"}
             (let [orgs (count orgas)]
-              (if (< orgs 2) (i/i lang [:one-group]) (str orgs (i/i lang [:groups]))))]]
+              (if (< orgs 2) (i/i lang [:one-group]) (str orgs (i/i lang [:groups]))))]
+           [:a {:title (i/i lang [:download])
+                :href  orgas-csv-url}
+            (fa "fa-file-csv")]]
           [:br]
           [organizations-page lang (count orgas)]
           [:br]])
