@@ -595,7 +595,9 @@
             (i/i lang [:with-license])]
            [:span {:class "button is-static level-item"}
             (let [rps (count repos)]
-              (if (< rps 2) (i/i lang [:one-repo]) (str rps (i/i lang [:repos]))))]
+              (if (< rps 2)
+                (str rps (i/i lang [:repo]))
+                (str rps (i/i lang [:repos]))))]
            [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
             [:a {:class    "pagination-previous"
                  :on-click #(change-repos-page "first")
@@ -645,7 +647,9 @@
                 :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
            [:span {:class "button is-static level-item"}
             (let [orgs (count orgas)]
-              (if (< orgs 2) (i/i lang [:one-group]) (str orgs (i/i lang [:groups]))))]
+              (if (< orgs 2)
+                (str orgs (i/i lang [:one-group]))
+                (str orgs (i/i lang [:groups]))))]
            [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
             [:a {:class    "pagination-previous"
                  :on-click #(change-orgas-page "first")
