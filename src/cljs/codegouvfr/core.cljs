@@ -454,10 +454,9 @@
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  (str "/" lang "/glossary#license")
                               :title (i/i lang [:go-to-glossary])}
-                          (i/i lang [:licenses])]
-                   (i/i lang [:more-used])]
+                          (i/i lang [:most-used-licenses])]]
                   top_licenses_0)
-      (stats-card [:span (i/i lang [:languages]) (i/i lang [:more-used])]
+      (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_0)]
      [:div {:class "columns"}
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
