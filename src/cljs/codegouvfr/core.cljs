@@ -368,7 +368,10 @@
                [:div {:class "card-footer-item"
                       :title (i/i lang [:repos-number])}
                 [:a {:title (i/i lang [:go-to-repos])
-                     :href  (rfe/href :repos {:lang lang} {:g o})}
+                     :href  (rfe/href :repos {:lang lang}
+                                      ;; FIXME: hackish, orgas-mapping should give
+                                      ;; the forge base on top of "plateforme".
+                                      {:g (s/replace o "/groups/" "/")})}
                  r
                  (if (< r 2)
                    (i/i lang [:repo]) (i/i lang [:repos]))]])
