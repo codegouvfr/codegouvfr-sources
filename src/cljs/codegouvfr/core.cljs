@@ -491,7 +491,6 @@
   (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
         count-pages (count (partition-all
                             orgas-per-page @(re-frame/subscribe [:orgas?])))]
-    (.log js/console (pr-str count-pages))
     (cond
       (= next "first")
       (re-frame/dispatch [:orgas-page! 0])
