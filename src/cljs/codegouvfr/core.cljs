@@ -332,7 +332,7 @@
   (into
    [:div]
    (if (= orgs-cnt 0)
-     [[:p (i/i lang [:no-orga-found])] [:br]]
+     [:div [:p (i/i lang [:no-orga-found])] [:br]]
      (for [dd (partition-all
                3
                (take orgas-per-page
