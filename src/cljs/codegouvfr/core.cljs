@@ -336,7 +336,7 @@
      (for [dd (partition-all
                3
                (take orgas-per-page
-                     (drop (* repos-per-page @(re-frame/subscribe [:orgas-page?]))
+                     (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                            @(re-frame/subscribe [:orgas?]))))]
        ^{:key dd}
        [:div {:class "columns"}
