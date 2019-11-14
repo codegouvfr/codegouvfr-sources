@@ -12,13 +12,14 @@
                  [http-kit "2.3.0"]
                  [clj-http "3.10.0"]
                  [clj-rss "0.2.5"]
-                 ;; FIXME: Upgrade to ring 1.8.0
                  [ring "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
                  [cheshire "5.9.0"]
                  [com.draines/postal "2.0.3"]
                  [com.taoensso/timbre "4.10.0"]
                  [markdown-to-hiccup "0.6.2"]
+                 ;; FIXME: this explicit require should not be needed:
+                 [org.clojure/tools.reader "1.3.2"]
                  [tea-time "1.0.1"]
                  [clj-http "3.10.0"]
                  [cheshire "5.9.0"]
