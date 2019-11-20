@@ -304,12 +304,13 @@
                              (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
                                    @(re-frame/subscribe [:repos?])))]
                 ^{:key dd}
-                (let [{:keys [li r n o d u  f s i a?]} dd]
+                (let [{:keys [a? d f i li n o r s u]} dd]
                   [:tr
                    [:td [:div
                          [:a {:href   r
                               :target "new"
-                              :title  (str (i/i lang [:go-to-repo]) (if li (str (i/i lang [:under-license]) li)))}
+                              :title  (str (i/i lang [:go-to-repo])
+                                           (if li (str (i/i lang [:under-license]) li)))}
                           n]
                          " / "
                          [:a {:href  (rfe/href :repos {:lang lang}
