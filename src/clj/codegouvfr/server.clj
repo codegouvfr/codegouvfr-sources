@@ -100,7 +100,8 @@
    "Creative Commons Attribution 4.0 International"             "Creative Commons Attribution 4.0 International (CC-BY-4.0)"})
 
 (defonce repos-rm-ks
-  [:software_heritage_url :software_heritage_exists :derniere_modification])
+  [:software_heritage_url :software_heritage_exists :derniere_modification
+   :page_accueil :date_creation :topics :plateforme])
 
 (defn update-repos []
   (spit "repos.json"
