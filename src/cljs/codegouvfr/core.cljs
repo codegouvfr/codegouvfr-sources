@@ -329,76 +329,148 @@
                    [:td {:class "has-text-right"} s]
                    [:td {:class "has-text-right"} i]])))]])))
 
-(defn organizations-page [lang orgs-cnt]
-  (into
-   [:div]
-   (if (= orgs-cnt 0)
-     [[:p (i/i lang [:no-orga-found])] [:br]]
-     (for [dd (partition-all
-               3
-               (take orgas-per-page
-                     (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
-                           @(re-frame/subscribe [:orgas?]))))]
-       ^{:key dd}
-       [:div {:class "columns"}
-        (for [{:keys [n l o h c d r e au p an]
-               :as   o} dd]
-          ^{:key o}
-          [:div {:class "column is-4"}
-           [:div {:class "card"}
-            [:div {:class "card-content"}
-             [:div {:class "media"}
-              (if au
-                [:div {:class "media-left"}
-                 [:figure {:class "image is-48x48"}
-                  [:img {:src au}]]])
-              [:div {:class "media-content"}
-               [:p
-                [:a {:class  "title is-4"
-                     :target "new"
-                     :title  (i/i lang [:go-to-orga])
-                     :href   o} (or n l)]]
-               (let [date (to-locale-date c)]
-                 (if date
-                   [:p {:class "subtitle is-6"}
-                    (str (i/i lang [:created-at]) date)]))]]
-             [:div {:class "content"}
-              [:p d]]]
-            [:div {:class "card-footer"}
-             (if r
-               [:div {:class "card-footer-item"
-                      :title (i/i lang [:repos-number])}
-                [:a {:title (i/i lang [:go-to-repos])
-                     :href  (rfe/href :repos {:lang lang}
-                                      ;; FIXME: hackish, orgas-mapping should give
-                                      ;; the forge base on top of "plateforme".
-                                      {:g (s/replace o "/groups/" "/")})}
-                 r
-                 (if (< r 2)
-                   (i/i lang [:repo]) (i/i lang [:repos]))]])
-             (cond (= p "GitHub")
-                   [:a {:class "card-footer-item"
-                        :title (i/i lang [:visit-on-github])
-                        :href  o}
-                    (fab "fa-github")]
-                   (= p "GitLab")
-                   [:a {:class "card-footer-item"
-                        :title (i/i lang [:visit-on-gitlab])
-                        :href  o}
-                    (fab "fa-gitlab")])
-             (if e [:a {:class "card-footer-item"
-                        :title (i/i lang [:contact-by-email])
-                        :href  (str "mailto:" e)}
-                    (fa "fa-envelope")])
-             (if h [:a {:class  "card-footer-item"
-                        :title  (i/i lang [:go-to-website])
+(defn change-orgas-page [next]
+  (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
+        count-pages (count (partition-all
+                            orgas-per-page @(re-frame/subscribe [:orgas?])))]
+    (cond
+      (= next "first")
+      (re-frame/dispatch [:orgas-page! 0])
+      (= next "last")
+      (re-frame/dispatch [:orgas-page! (dec count-pages)])
+      (and (< orgas-page (dec count-pages)) next)
+      (re-frame/dispatch [:orgas-page! (inc orgas-page)])
+      (and (> orgas-page 0) (not next))
+      (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
+
+(defn organizations-page [lang]
+  (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
+        orgas          @(re-frame/subscribe [:orgas?])
+        orgs-cnt       (count orgas)
+        orgas-pages    @(re-frame/subscribe [:orgas-page?])
+        count-pages    (count (partition-all orgas-per-page orgas))
+        first-disabled (= orgas-pages 0)
+        last-disabled  (= orgas-pages (dec count-pages))]
+    [:div
+     [:div {:class "level-left"}
+      [:label {:class "checkbox level-item" :title (i/i lang [:only-orga-with-code])}
+       [:input {:type      "checkbox"
+                :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
+                                                          (.-checked (.-target %))}])}]
+       (i/i lang [:with-code])]
+      [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
+           :title    (i/i lang [:sort-orgas-alpha])
+           :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} (i/i lang [:sort-alpha])]
+      [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
+           :title    (i/i lang [:sort-repos])
+           :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} (i/i lang [:sort-repos])]
+      [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
+           :title    (i/i lang [:sort-orgas-creation])
+           :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
+      [:span {:class "button is-static level-item"}
+       (let [orgs (count orgas)]
+         (if (< orgs 2)
+           (str orgs (i/i lang [:one-group]))
+           (str orgs (i/i lang [:groups]))))]
+      [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
+       [:a {:class    "pagination-previous"
+            :on-click #(change-orgas-page "first")
+            :disabled first-disabled}
+        (fa "fa-fast-backward")]
+       [:a {:class    "pagination-previous"
+            :on-click #(change-orgas-page nil)
+            :disabled first-disabled}
+        (fa "fa-step-backward")]
+       [:a {:class    "pagination-next"
+            :on-click #(change-orgas-page true)
+            :disabled last-disabled}
+        (fa "fa-step-forward")]
+       [:a {:class    "pagination-next"
+            :on-click #(change-orgas-page "last")
+            :disabled last-disabled}
+        (fa "fa-fast-forward")]]
+      [:a {:title (i/i lang [:download])
+           :href  orgas-csv-url}
+       (fa "fa-file-csv")]]
+     [:br]
+     (into
+      [:div]
+      (if (= orgs-cnt 0)
+        [[:p (i/i lang [:no-orga-found])] [:br]]
+        (for [dd (partition-all
+                  3
+                  (take orgas-per-page
+                        (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
+                              @(re-frame/subscribe [:orgas?]))))]
+          ^{:key dd}
+          [:div {:class "columns"}
+           (for [{:keys [n l o h c d r e au p an]
+                  :as   o} dd]
+             ^{:key o}
+             [:div {:class "column is-4"}
+              [:div {:class "card"}
+               [:div {:class "card-content"}
+                [:div {:class "media"}
+                 (if au
+                   [:div {:class "media-left"}
+                    [:figure {:class "image is-48x48"}
+                     [:img {:src au}]]])
+                 [:div {:class "media-content"}
+                  [:p
+                   [:a {:class  "title is-4"
                         :target "new"
-                        :href   h} (fa "fa-globe")])
-             (if an [:a {:class  "card-footer-item"
-                         :title  (i/i lang [:go-to-sig-website])
-                         :target "new"
-                         :href   (str annuaire-prefix an)}
-                     (fa "fa-link")])]]])]))))
+                        :title  (i/i lang [:go-to-orga])
+                        :href   o} (or n l)]]
+                  (let [date (to-locale-date c)]
+                    (if date
+                      [:p {:class "subtitle is-6"}
+                       (str (i/i lang [:created-at]) date)]))]]
+                [:div {:class "content"}
+                 [:p d]]]
+               [:div {:class "card-footer"}
+                (if r
+                  [:div {:class "card-footer-item"
+                         :title (i/i lang [:repos-number])}
+                   [:a {:title (i/i lang [:go-to-repos])
+                        :href  (rfe/href :repos {:lang lang}
+                                         ;; FIXME: hackish, orgas-mapping should give
+                                         ;; the forge base on top of "plateforme".
+                                         {:g (s/replace o "/groups/" "/")})}
+                    r
+                    (if (< r 2)
+                      (i/i lang [:repo]) (i/i lang [:repos]))]])
+                (cond (= p "GitHub")
+                      [:a {:class "card-footer-item"
+                           :title (i/i lang [:visit-on-github])
+                           :href  o}
+                       (fab "fa-github")]
+                      (= p "GitLab")
+                      [:a {:class "card-footer-item"
+                           :title (i/i lang [:visit-on-gitlab])
+                           :href  o}
+                       (fab "fa-gitlab")])
+                (if e [:a {:class "card-footer-item"
+                           :title (i/i lang [:contact-by-email])
+                           :href  (str "mailto:" e)}
+                       (fa "fa-envelope")])
+                (if h [:a {:class  "card-footer-item"
+                           :title  (i/i lang [:go-to-website])
+                           :target "new"
+                           :href   h} (fa "fa-globe")])
+                (if an [:a {:class  "card-footer-item"
+                            :title  (i/i lang [:go-to-sig-website])
+                            :target "new"
+                            :href   (str annuaire-prefix an)}
+                        (fa "fa-link")])]]])])))]))
+
+(defn organizations-page-class [lang]
+  (reagent/create-class
+   {:component-will-mount
+    (fn []
+      (GET "/orgas" :handler
+           #(re-frame/dispatch
+             [:update-orgas! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (organizations-page lang))}))
 
 (defn figure [heading title]
   [:div {:class "level-item has-text-centered"}
@@ -474,6 +546,16 @@
                    (:ratio_in_archive software_heritage)})]
      [:br]]))
 
+
+(defn stats-page-class [lang]
+  (reagent/create-class
+   {:component-will-mount
+    (fn []
+      (GET "/stats" :handler
+           #(re-frame/dispatch
+             [:update-stats! (clojure.walk/keywordize-keys %)])))
+    :reagent-render (fn [] (stats-page lang))}))
+
 (defn change-repos-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
         count-pages (count (partition-all
@@ -487,20 +569,6 @@
       (re-frame/dispatch [:repos-page! (inc repos-page)])
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
-
-(defn change-orgas-page [next]
-  (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
-        count-pages (count (partition-all
-                            orgas-per-page @(re-frame/subscribe [:orgas?])))]
-    (cond
-      (= next "first")
-      (re-frame/dispatch [:orgas-page! 0])
-      (= next "last")
-      (re-frame/dispatch [:orgas-page! (dec count-pages)])
-      (and (< orgas-page (dec count-pages)) next)
-      (re-frame/dispatch [:orgas-page! (inc orgas-page)])
-      (and (> orgas-page 0) (not next))
-      (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])]
@@ -626,59 +694,10 @@
           [:br]])
 
        (= @(re-frame/subscribe [:view?]) :orgas)
-       (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
-             orgas          @(re-frame/subscribe [:orgas?])
-             orgas-pages    @(re-frame/subscribe [:orgas-page?])
-             count-pages    (count (partition-all orgas-per-page orgas))
-             first-disabled (= orgas-pages 0)
-             last-disabled  (= orgas-pages (dec count-pages))]
-         [:div
-          [:div {:class "level-left"}
-           [:label {:class "checkbox level-item" :title (i/i lang [:only-orga-with-code])}
-            [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
-                                                               (.-checked (.-target %))}])}]
-            (i/i lang [:with-code])]
-           [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
-                :title    (i/i lang [:sort-orgas-alpha])
-                :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} (i/i lang [:sort-alpha])]
-           [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
-                :title    (i/i lang [:sort-repos])
-                :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} (i/i lang [:sort-repos])]
-           [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
-                :title    (i/i lang [:sort-orgas-creation])
-                :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
-           [:span {:class "button is-static level-item"}
-            (let [orgs (count orgas)]
-              (if (< orgs 2)
-                (str orgs (i/i lang [:one-group]))
-                (str orgs (i/i lang [:groups]))))]
-           [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
-            [:a {:class    "pagination-previous"
-                 :on-click #(change-orgas-page "first")
-                 :disabled first-disabled}
-             (fa "fa-fast-backward")]
-            [:a {:class    "pagination-previous"
-                 :on-click #(change-orgas-page nil)
-                 :disabled first-disabled}
-             (fa "fa-step-backward")]
-            [:a {:class    "pagination-next"
-                 :on-click #(change-orgas-page true)
-                 :disabled last-disabled}
-             (fa "fa-step-forward")]
-            [:a {:class    "pagination-next"
-                 :on-click #(change-orgas-page "last")
-                 :disabled last-disabled}
-             (fa "fa-fast-forward")]]
-           [:a {:title (i/i lang [:download])
-                :href  orgas-csv-url}
-            (fa "fa-file-csv")]]
-          [:br]
-          [organizations-page lang (count orgas)]
-          [:br]])
+       [organizations-page-class lang]
 
        (= @(re-frame/subscribe [:view?]) :stats)
-       [stats-page lang]
+       [stats-page-class lang]
 
        :else
        (rfe/push-state :repos {:lang lang}))]))
@@ -692,13 +711,7 @@
       (fn []
         (GET "/repos" :handler
              #(re-frame/dispatch
-               [:update-repos! (map (comp bean clj->js) %)]))
-        (GET "/orgas" :handler
-             #(re-frame/dispatch
-               [:update-orgas! (map (comp bean clj->js) %)]))
-        (GET "/stats" :handler
-             #(re-frame/dispatch
-               [:update-stats! (clojure.walk/keywordize-keys %)])))
+               [:update-repos! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language))})))
 
 (def routes
