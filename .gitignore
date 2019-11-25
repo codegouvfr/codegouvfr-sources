@@ -16,4 +16,5 @@ pom.xml
 .dir-locals.el
 *txt
 .lsp/*
-*json
+data/*json
+data/deps/*json

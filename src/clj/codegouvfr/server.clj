@@ -104,7 +104,7 @@
    :page_accueil :date_creation :topics :plateforme])
 
 (defn update-repos []
-  (spit "repos.json"
+  (spit "data/repos.json"
         (json/generate-string
          (map
           (fn [r] (assoc r :li (get licenses-mapping (:li r))))
@@ -120,7 +120,7 @@
                        {(keyword github) lannuaire})
                     (semantic-csv/mappify
                      (data-csv/read-csv (:body (http/get annuaire-url))))))]
-    (spit "orgas.json"
+    (spit "data/orgas.json"
           (json/generate-string
            (map #(assoc % :an ((keyword (:l %)) annuaire))
                 (map #(clojure.set/rename-keys % orgas-mapping)
@@ -129,7 +129,7 @@
     (timbre/info (str "updated orgas.json"))))
 
 (defn update-stats []
-  (spit "stats.json" (:body (http/get stats-url)))
+  (spit "data/stats.json" (:body (http/get stats-url)))
   (timbre/info (str "updated stats.json")))
 
 (defn start-tasks []
@@ -174,9 +174,9 @@
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
-  (GET "/orgas" [] (json-resource "orgas.json"))
-  (GET "/stats" [] (json-resource "stats.json"))
-  (GET "/repos" [] (json-resource "repos.json"))
+  (GET "/orgas" [] (json-resource "data/orgas.json"))
+  (GET "/stats" [] (json-resource "data/stats.json"))
+  (GET "/repos" [] (json-resource "data/repos.json"))
   
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
