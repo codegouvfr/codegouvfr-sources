@@ -18,3 +18,4 @@ pom.xml
 .lsp/*
 data/*json
 data/deps/*json
+data/deps/orgas/*json
