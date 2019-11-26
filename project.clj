@@ -25,7 +25,8 @@
                  [cheshire "5.9.0"]
                  [com.taoensso/tempura "1.2.1"]
                  [org.clojure/data.csv "0.1.4"]
-                 [semantic-csv "0.2.0"]]
+                 [semantic-csv "0.2.0"]
+                 [hickory "0.7.1"]]
   :source-paths ["src/clj" "src/cljc" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
