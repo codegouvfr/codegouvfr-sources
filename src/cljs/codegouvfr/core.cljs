@@ -546,7 +546,6 @@
                    (:ratio_in_archive software_heritage)})]
      [:br]]))
 
-
 (defn stats-page-class [lang]
   (reagent/create-class
    {:component-will-mount
@@ -571,7 +570,8 @@
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
 (defn main-page [q license language]
-  (let [lang @(re-frame/subscribe [:lang?])]
+  (let [lang @(re-frame/subscribe [:lang?])
+        view @(re-frame/subscribe [:view?])]
     [:div
      [:div {:class "field is-grouped"}
       ;; FIXME: why :p here? Use level?
@@ -585,18 +585,19 @@
       [:p {:class "control"}
        [:a {:class "button is-info"
             :href  (rfe/href :stats {:lang lang})} (i/i lang [:stats])]]
-      [:p {:class "control"}
-       [:input {:class       "input"
-                :size        20
-                :placeholder (i/i lang [:free-search])
-                :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-                :on-change   (fn [e]
-                               (let [ev (.-value (.-target e))]
-                                 (reset! q ev)
-                                 (async/go
-                                   (async/>! display-filter-chan {:q ev})
-                                   (<! (async/timeout timeout))
-                                   (async/>! filter-chan {:q ev}))))}]]
+      (if (or (= view :repos) (= view :orgas))
+        [:p {:class "control"}
+         [:input {:class       "input"
+                  :size        20
+                  :placeholder (i/i lang [:free-search])
+                  :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+                  :on-change   (fn [e]
+                                 (let [ev (.-value (.-target e))]
+                                   (reset! q ev)
+                                   (async/go
+                                     (async/>! display-filter-chan {:q ev})
+                                     (<! (async/timeout timeout))
+                                     (async/>! filter-chan {:q ev}))))}]])
       (let [flt @(re-frame/subscribe [:filter?])]
         (if (seq (:g flt))
           [:p {:class "control"}
@@ -607,14 +608,14 @@
             (fa "fa-times")]]))]
      [:br]
      (cond
-       (= @(re-frame/subscribe [:view?]) :home-redirect)
+       (= view :home-redirect)
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
            (do (set! (.-location js/window) (str "/" lang "/repos")) "")
            (do (set! (.-location js/window) (str "/en/repos")) "")))
 
-       (= @(re-frame/subscribe [:view?]) :repos)
+       (= view :repos)
        (let [repos          @(re-frame/subscribe [:repos?])
              repos-pages    @(re-frame/subscribe [:repos-page?])
              count-pages    (count (partition-all repos-per-page repos))
@@ -693,10 +694,10 @@
           [repositories-page lang (count repos)]
           [:br]])
 
-       (= @(re-frame/subscribe [:view?]) :orgas)
+       (= view :orgas)
        [organizations-page-class lang]
 
-       (= @(re-frame/subscribe [:view?]) :stats)
+       (= view :stats)
        [stats-page-class lang]
 
        :else
