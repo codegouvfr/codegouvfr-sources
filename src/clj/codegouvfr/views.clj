@@ -298,6 +298,11 @@
      [:br]
      (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
+
+     [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dépendances"]]
+     [:br]
+     (md-to-string "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet d'en parcourir la liste.  Ces informations sont collectées depuis le site [backyourstack.com](https://backyourstack.com), qui détecte les dépendances de JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) et Python (Requirement).")
+     [:br]
      
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
      [:br]
@@ -335,6 +340,12 @@
    "Glossary for code.etalab.gouv.fr" "What is a repository? An organization? A license?"
    [:div
     [:div {:class "container"}
+
+     [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
+     [:br]
+     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).")
+     [:br]
+
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
      (md-to-string "A \"forked\" repository est is repository derived from another one.")
@@ -387,6 +398,12 @@
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codici sorgenti"]]
      [:br]
      [:p "Il codice sorgente di un programma informatico è quello che scrive una programmatrice o un programmatore. Questi possono essere sia programmi molto complessi che programmi di poche linee. Il codice sorgente può essere condiviso con una licenza aperta per consentire ad altri programmatori di studiare, modificare, distribuire e condividere i loro miglioramenti al codice."]
+     [:br]
+
+     ;; TODO: i18n
+     [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
+     [:br]
+     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).")
      [:br]
 
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]

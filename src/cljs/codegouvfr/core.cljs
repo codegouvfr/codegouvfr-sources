@@ -518,7 +518,10 @@
 (defn deps-card [heading deps lang]
   [:div {:class "column"}
    [:div {:class "card"}
-    [:h1 {:class "card-header-title subtitle"} heading]
+    [:h1 {:class "card-header-title subtitle"}
+     [:a {:href  (str "/" lang "/glossary#dependencies")
+          :title (i/i lang [:go-to-glossary])}
+      heading]]
     [:div {:class "card-content"}
      [:table {:class "table is-fullwidth"}
       [:thead [:tr
