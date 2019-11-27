@@ -45,11 +45,10 @@
               :to   config/admin-email})}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Download repos, orgas and stats locally
+;; Download repos, orgas and annuaire locally
 
 (defonce repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 (defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
-(defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce annuaire-url "https://www.data.gouv.fr/fr/datasets/r/ac26b864-6a3a-496b-8832-8cde436f5230")
 
 (def repos-mapping {:nom                    :n
@@ -151,11 +150,6 @@
                      @orgas-json))))
     (timbre/info (str "updated orgas.json"))))
 
-;; FIXME: Use the stats URL directly?
-(defn update-stats []
-  (spit "data/stats.json" (:body (http/get stats-url)))
-  (timbre/info (str "updated stats.json")))
-
 (defn get-deps [orga]
   ;; FIXME: Wrap http/get into a try clause
   (-> (http/get (str "https://backyourstack.com/" orga "/dependencies"))
@@ -220,10 +214,9 @@
 
 (defn start-tasks []
   (tt/start!)
-  (def update-stats! (tt/every! 10800 update-stats))
   (def update-orgas! (tt/every! 10800 update-orgas-json))
-  (def update-stats! (tt/every! 86400 5 update-orgas-repos-deps))
-  (def update-stats! (tt/every! 86400 160 update-deps))
+  (def update-orgas-repos-deps! (tt/every! 86400 5 update-orgas-repos-deps))
+  (def update-deps! (tt/every! 86400 160 update-deps))
   (def update-repos! (tt/every! 10800 165 update-repos))
   (def update-orgas! (tt/every! 10800 170 update-orgas))
   (timbre/info "Tasks started!"))
@@ -278,7 +271,6 @@
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
   (GET "/orgas" [] (resource-json "data/orgas.json"))
-  (GET "/stats" [] (resource-json "data/stats.json"))
   (GET "/repos" [] (resource-json "data/repos.json"))
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
