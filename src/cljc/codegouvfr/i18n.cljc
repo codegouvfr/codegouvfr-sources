@@ -7,7 +7,7 @@
   ;; French translation
   {:fr
    {:no-repo-found               "Pas de dépôt trouvé : une autre idée de requête ?"
-    :orga-repo                   "Dépôt / groupe"
+    :orga-repo                   "Dépôt < groupe"
     :sort-repos-alpha            "Trier par ordre alphabétique des noms de dépôts"
     :archive                     "Archive"
     :swh-link                    "Lien vers l'archive faite par Software Heritage"
@@ -107,7 +107,7 @@
    ;; English translation
    :en
    {:no-repo-found               "Repository not found : would you like to make a new request?"
-    :orga-repo                   "Repository / group"
+    :orga-repo                   "Repository < group"
     :sort-repos-alpha            "Sort repositories alphabetically"
     :archive                     "Archive"
     :swh-link                    "A link to the Software Heritage archive"
@@ -207,7 +207,7 @@
    ;; Italian translation
    :it
    {:no-repo-found               "Repository non trovato: vuoi provre a fare una nuova ricerca?"
-    :orga-repo                   "Repository / gruppo"
+    :orga-repo                   "Repository < gruppo"
     :sort-repos-alpha            "Ordina alfabeticamente i repository"
     :archive                     "Archivia"
     :swh-link                    "Link all'archivio fatto per il Software Heritage"

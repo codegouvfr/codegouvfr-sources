@@ -312,7 +312,7 @@
                               :title  (str (i/i lang [:go-to-repo])
                                            (if li (str (i/i lang [:under-license]) li)))}
                           n]
-                         " / "
+                         " < "
                          [:a {:href  (rfe/href :repos {:lang lang}
                                                {:g (subs r 0 (- (count r) (+ 1 (count n))))})
                               :title (i/i lang [:browse-repos-orga])}
