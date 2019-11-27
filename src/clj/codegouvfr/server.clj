@@ -106,18 +106,21 @@
   [:software_heritage_url :software_heritage_exists :derniere_modification
    :page_accueil :date_creation :topics :plateforme])
 
+(defonce repos-deps (atom nil))
+(defonce orgas-json (atom nil))
+
 (defn update-repos []
   (let [repos-json (json/parse-string (:body (http/get repos-url)) true)]
     (spit "data/repos.json"
           (json/generate-string
            (map
-            (fn [r] (assoc r :li (get licenses-mapping (:li r))))
+            (fn [r] (assoc r
+                           :li (get licenses-mapping (:li r))
+                           :dp (not (empty? (first (filter #(= (:n %) (:n r)) @repos-deps))))))
             (map #(clojure.set/rename-keys
                    (apply dissoc % repos-rm-ks) repos-mapping)
                  repos-json)))))
   (timbre/info (str "updated repos.json")))
-
-(defonce orgas-json (atom nil))
 
 (defn update-orgas-json []
   (let [old-orgas-json @orgas-json
@@ -127,7 +130,8 @@
                (do (timbre/error (str "Can't get groups: "
                                       (:cause (Throwable->map e))))
                    old-orgas-json)))]
-    (reset! orgas-json (json/parse-string result true))))
+    (reset! orgas-json (json/parse-string result true)))
+  (timbre/info (str "updated @orgas-json")))
 
 (defn update-orgas []
   (let [annuaire
@@ -138,7 +142,11 @@
                      (data-csv/read-csv (:body (http/get annuaire-url))))))]
     (spit "data/orgas.json"
           (json/generate-string
-           (map #(assoc % :an ((keyword (:l %)) annuaire))
+           (map #(assoc %
+                        :an ((keyword (:l %)) annuaire)
+                        :dp (let [f (str "data/deps/orgas/" (:l %) ".json")]
+                              (if (.exists (io/file f))
+                                (not (empty? (json/parse-string (slurp f)))))))
                 (map #(clojure.set/rename-keys % orgas-mapping)
                      @orgas-json))))
     (timbre/info (str "updated orgas.json"))))
@@ -164,19 +172,18 @@
 
 (defonce deps-rm-kws [:private :default_branch :language :id :checked :owner :full_name])
 
-(defonce repos-deps (atom nil))
-
 (defn update-orgas-repos-deps []
   (reset! repos-deps nil)
-  (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") (take 8 @orgas-json)))]
+  (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
     (doall
      (for [orga gh-orgas
            :let [data (get-deps orga)
-                 orga-deps (:dependencies data)
+                 orgas-deps0 (map #(dissoc % :project) (:dependencies data)) 
                  orga-repos0
                  (filter #(not (empty? (:dependencies %)))
                          (map (fn [r] (assoc r :g orga))
-                              (map #(apply dissoc % deps-rm-kws) (:repos data))))
+                              (map #(apply dissoc % deps-rm-kws)
+                                   (:repos data))))
                  orga-repos1
                  (map #(clojure.set/rename-keys
                         % {:name :n :dependencies :d}) orga-repos0)
@@ -186,13 +193,13 @@
                                               (:d %)))
                                  orga-repos1)]]
        (do (spit (str "data/deps/orgas/" orga ".json")
-                 (json/generate-string (map #(dissoc % :project) orga-deps)))
+                 (json/generate-string orgas-deps0))
            (swap! repos-deps (partial apply conj) orga-repos))))
     (spit (str "data/deps/repos-deps.json")
           (json/generate-string @repos-deps))
     (timbre/info (str "updated orgas and repos dependencies"))))
 
-(defn merge-with-colls [a b]
+(defn merge-colls [a b]
   (if (and (coll? a) (coll? b)) (into a b) b))
 
 (defn update-deps []
@@ -202,31 +209,23 @@
        (doall
         (for [d0   r-deps
               :let [d (apply dissoc d0 [:core :dev :peer :engines])]]
-          (swap! deps conj
-                 (assoc d :rs (vector (dissoc rep :d))))))))
-    (reset! deps (reverse (sort #(compare (count (:rs %1))
-                                          (count (:rs %2)))
-                                (map #(apply (partial merge-with merge-with-colls) %)
-                                     (vals (group-by :n @deps))))))
-    (spit "data/deps/deps-repos.json" (json/generate-string @deps))
-    (reset! deps (map #(assoc % :rs (count (:rs %))) @deps))
-    (spit "data/deps/deps-count.json" (json/generate-string @deps)))
-  (timbre/info (str "updated data/deps/*")))
-
-;; (first @repos-deps)
-;; (update-orgas-json)
-;; (update-orgas-repos-deps)
-;; (update-deps)
+          (swap! deps conj (assoc d :rs (vector (dissoc rep :d))))))))
+    (reset! deps (map (fn [x] (assoc x :rs (count (:rs x))))
+                      (reverse (sort #(compare (count (:rs %1)) (count (:rs %2)))
+                                     (map #(apply (partial merge-with merge-colls) %)
+                                          (vals (group-by :n @deps)))))))
+    (spit "data/deps/deps-total.json" (json/generate-string {:deps-total (count @deps)}))
+    (spit "data/deps/deps-count.json" (json/generate-string (take 100 @deps))))
+  (timbre/info (str "updated data/deps/deps-[total|count].json")))
 
 (defn start-tasks []
   (tt/start!)
-  (def update-orgas! (tt/every! 10800 update-orgas-json))
-  (def update-orgas! (tt/every! 10800 update-orgas))
-  (def update-repos! (tt/every! 10800 update-repos))
   (def update-stats! (tt/every! 10800 update-stats))
-  (def update-stats! (tt/every! 86400 10 update-orgas-repos-deps))
-  (def update-stats! (tt/every! 86400 20 update-deps))
-  ;; (def update-stats! (tt/every! 86400 10800 update-deps))
+  (def update-orgas! (tt/every! 10800 update-orgas-json))
+  (def update-stats! (tt/every! 86400 5 update-orgas-repos-deps))
+  (def update-stats! (tt/every! 86400 160 update-deps))
+  (def update-repos! (tt/every! 10800 165 update-repos))
+  (def update-orgas! (tt/every! 10800 170 update-orgas))
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
@@ -244,10 +243,11 @@
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
 (defn resource-repo-json [repo]
-  (assoc
-   (response/response
-    (json/generate-string (:d (first (filter #(= (:n %) repo) @repos-deps)))))
-   :headers {"Content-Type" "application/json; charset=utf-8"}))
+  (let [deps (first (filter #(= (:n %) repo) @repos-deps))]
+    (assoc
+     (response/response
+      (json/generate-string {:g (:g deps) :d (:d deps)}))
+     :headers {"Content-Type" "application/json; charset=utf-8"})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup email sending
@@ -282,8 +282,8 @@
   (GET "/repos" [] (resource-json "data/repos.json"))
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
+  (GET "/deps-total" [] (resource-json "data/deps/deps-total.json"))
   (GET "/deps" [] (resource-json "data/deps/deps-count.json"))
-  (GET "/deps-repos" [] (resource-json "data/deps/deps-repos.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
@@ -309,12 +309,28 @@
                                               " (" (:organization params) ")")}))
           (response/redirect (str "/" (:lang params) "/ok"))))
   
-  (GET "/:lang/:page" [lang page]
+  (POST "/contact" req
+        (let [params (clojure.walk/keywordize-keys (:form-params req))]
+          (send-email (conj params {:log (str "Sent message from " (:email params)
+                                              " (" (:organization params) ")")}))
+          (response/redirect (str "/" (:lang params) "/ok"))))
+
+  (GET "/:lang/:p1/:p2/:p3" [lang p1 p2 p3]
        (views/default
         (if (contains? i/supported-languages lang)
           lang
           "en")))
-  (GET "/:page" [page] (views/default "en"))
+  (GET "/:lang/:p1/:p2" [lang p1 p2]
+       (views/default
+        (if (contains? i/supported-languages lang)
+          lang
+          "en")))
+  (GET "/:lang/:p" [lang p]
+       (views/default
+        (if (contains? i/supported-languages lang)
+          lang
+          "en")))
+  (GET "/:p" [p] (views/default "en"))
   (GET "/" [] (views/default "en"))
   
   (resources "/")
@@ -324,7 +340,7 @@
              (wrap-defaults site-defaults)
              params/wrap-params
              ;; wrap-reload
-             ))
+             )) ;; FIXME: Don't wrap reload in production
 
 (defn -main [& args]
   (start-tasks)
@@ -332,4 +348,3 @@
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
-

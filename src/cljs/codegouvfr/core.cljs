@@ -35,27 +35,32 @@
     :sort-orgas-by  :repos
     :view           :repos
     :reverse-sort   true
-    :stats          nil
     :filter         init-filter
     :display-filter init-filter
-    :lang           "en"}))
+    :lang           "en"
+    :path-params    nil}))
 
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
    (assoc db :lang lang)))
 
+(re-frame/reg-event-db
+ :path-params!
+ (fn [db [_ path-params]]
+   (assoc db :path-params path-params)))
+
 (re-frame/reg-sub
  :lang?
  (fn [db _] (:lang db)))
 
+(re-frame/reg-sub
+ :path-params?
+ (fn [db _] (:path-params db)))
+
 (re-frame/reg-event-db
  :update-repos!
  (fn [db [_ repos]] (assoc db :repos repos)))
-
-(re-frame/reg-event-db
- :update-stats!
- (fn [db [_ stats]] (assoc db :stats stats)))
 
 (re-frame/reg-event-db
  :filter!
@@ -224,10 +229,6 @@
       (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
- :stats?
- (fn [db _] (:stats db)))
-
-(re-frame/reg-sub
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
@@ -278,7 +279,8 @@
                      :on-click #(re-frame/dispatch [:sort-repos-by! :name])} (i/i lang [:orga-repo])]]]
           [:th [:abbr {:title (i/i lang [:archive])}
                 [:a {:class "button is-static"
-                     :title (i/i lang [:swh-link])} (i/i lang [:archive])]]]
+                     :title (i/i lang [:swh-link])}
+                 (i/i lang [:archive])]]]
           [:th [:abbr {:title (i/i lang [:description])}
                 [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
                      :title    (i/i lang [:sort-description-length])
@@ -304,7 +306,9 @@
                              (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
                                    @(re-frame/subscribe [:repos?])))]
                 ^{:key dd}
-                (let [{:keys [a? d f i li n o r s u]} dd]
+                (let [{:keys [a? d f i li n o r s u dp]}
+                      dd
+                      group (subs r 0 (- (count r) (+ 1 (count n))))]
                   [:tr
                    [:td [:div
                          [:a {:href   r
@@ -313,8 +317,7 @@
                                            (if li (str (i/i lang [:under-license]) li)))}
                           n]
                          " < "
-                         [:a {:href  (rfe/href :repos {:lang lang}
-                                               {:g (subs r 0 (- (count r) (+ 1 (count n))))})
+                         [:a {:href  (rfe/href :repos {:lang lang} {:g group})
                               :title (i/i lang [:browse-repos-orga])}
                           o]]]
                    [:td {:class "has-text-centered"}
@@ -323,7 +326,19 @@
                          :target "new"}
                      [:img {:width "18px" :src "/images/swh-logo.png"}]]]
                    [:td {:class (when a? "has-text-grey")
-                         :title (when a? (i/i lang [:repo-archived]))} d]
+                         :title (when a? (i/i lang [:repo-archived]))}
+                    [:span
+                     (when dp
+                       [:span
+                        [:a {:class "has-text-grey"
+                             :title (i/i lang [:deps])
+                             :href  (rfe/href
+                                     :repo-deps 
+                                     {:lang lang
+                                      :orga o ;; (s/replace o "https://github.com/" "")
+                                      :repo n})}
+                         (fa "fa-cubes")]
+                        " "]) d]]
                    [:td (or (to-locale-date u) "N/A")]
                    [:td {:class "has-text-right"} f]
                    [:td {:class "has-text-right"} s]
@@ -404,7 +419,7 @@
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
           [:div {:class "columns"}
-           (for [{:keys [n l o h c d r e au p an]
+           (for [{:keys [n l o h c d r e au p an dp]
                   :as   o} dd]
              ^{:key o}
              [:div {:class "column is-4"}
@@ -451,6 +466,14 @@
                            :target "new"
                            :href   o}
                        (fab "fa-gitlab")])
+                (when dp
+                  [:a {:class "card-footer-item"
+                       :title (i/i lang [:deps])
+                       :href  (rfe/href
+                               :orga-deps
+                               {:lang lang
+                                :orga (s/replace o "https://github.com/" "")})}
+                   (fa "fa-cubes")])
                 (if e [:a {:class "card-footer-item"
                            :title (i/i lang [:contact-by-email])
                            :href  (str "mailto:" e)}
@@ -475,10 +498,11 @@
     :reagent-render (fn [] (organizations-page lang))}))
 
 (defn figure [heading title]
-  [:div {:class "level-item has-text-centered"}
-   [:div
-    [:p {:class "heading"} heading]
-    [:p {:class "title"} (str title)]]])
+  [:div {:class "column"}
+   [:div {:class "has-text-centered"}
+    [:div
+     [:p {:class "heading"} heading]
+     [:p {:class "title"} (str title)]]]])
 
 (defn stats-card [heading data]
   [:div {:class "column"}
@@ -491,11 +515,25 @@
          ^{:key (key o)}
          [:tr [:td (key o)] [:td (val o)]])]]]]])
 
-(defn stats-page [lang]
+(defn deps-card [heading deps lang]
+  [:div {:class "column"}
+   [:div {:class "card"}
+    [:h1 {:class "card-header-title subtitle"} heading]
+    [:div {:class "card-content"}
+     [:table {:class "table is-fullwidth"}
+      [:thead [:tr
+               [:th (i/i lang [:type])]
+               [:th (i/i lang [:name])]
+               [:th (i/i lang [:number-of-repos])]]]
+      [:tbody
+       (for [{:keys [t n rs] :as o} deps]
+         ^{:key o}
+         [:tr [:td t] [:td n] [:td rs]])]]]]])
+
+(defn stats-page [lang stats deps deps-total]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
                 top_orgs_by_repos top_orgs_by_stars top_licenses
-                platforms software_heritage top_languages]
-         :as   stats} @(re-frame/subscribe [:stats?])
+                platforms software_heritage top_languages]} stats
         top_orgs_by_repos_0
         (into {} (map #(vector (str (:organisation_nom %)
                                     " (" (:plateforme %) ")")
@@ -510,7 +548,7 @@
                          [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
                       (clojure.walk/stringify-keys top_licenses)))]
     [:div
-     [:div {:class "level"}
+     [:div {:class "columns"}
       (figure [:span [:a {:href  (str "/" lang "/glossary#repository")
                           :title (i/i lang [:go-to-glossary])}
                       (i/i lang [:repos-of-source-code])]] nb_repos)
@@ -518,7 +556,8 @@
                           :title (i/i lang [:go-to-glossary])}
                       (i/i lang [:orgas-or-groups])]] nb_orgs)
       (figure (i/i lang [:mean-repos-by-orga]) avg_nb_repos)
-      (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)]
+      (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)
+      (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
      [:br]
      [:div {:class "columns"}
       (stats-card [:span [:a {:href  (str "/" lang "/glossary#organization-group")
@@ -546,16 +585,27 @@
                    (:repos_in_archive software_heritage)
                    (i/i lang [:percent-of-repos-archived])
                    (:ratio_in_archive software_heritage)})]
+     [:div {:class "columns"}
+      (deps-card (i/i lang [:deps]) deps lang)]
      [:br]]))
 
 (defn stats-page-class [lang]
-  (reagent/create-class
-   {:component-will-mount
-    (fn []
-      (GET "/stats" :handler
-           #(re-frame/dispatch
-             [:update-stats! (clojure.walk/keywordize-keys %)])))
-    :reagent-render (fn [] (stats-page lang))}))
+  (let [deps       (reagent/atom nil)
+        stats      (reagent/atom nil)
+        deps-total (reagent/atom nil)]
+    (reagent/create-class
+     {:component-will-mount
+      (fn []
+        (GET "/deps-total" :handler
+             #(re-frame/dispatch
+               (reset! deps-total (clojure.walk/keywordize-keys %))))
+        (GET "/deps" :handler
+             #(re-frame/dispatch
+               (reset! deps (map (comp bean clj->js) %))))
+        (GET "/stats" :handler
+             #(re-frame/dispatch
+               (reset! stats (clojure.walk/keywordize-keys %)))))
+      :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
 (defn change-repos-page [next]
   (let [repos-page  @(re-frame/subscribe [:repos-page?])
@@ -570,6 +620,83 @@
       (re-frame/dispatch [:repos-page! (inc repos-page)])
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
+
+(defn repo-deps-page [lang orga repo deps]
+  (if (= (:g deps) orga)
+    [:div
+     [:div [:h1 (str (i/i lang [:deps-of]) repo " (" orga ")" )]]
+     [:br]
+     (if-let [dps (not-empty (:d deps))]
+       [:div {:class "table-container"}
+        [:table {:class "table is-hoverable is-fullwidth"}
+         [:thead [:tr
+                  [:th (i/i lang [:type])] [:th (i/i lang [:name])]
+                  [:th "Core"] [:th "Dev"] [:th "Peer"] [:th "Engines"]]]
+         (into [:tbody]
+               (for [{:keys [t n core dev engines peer] :as r} (:d deps)]
+                 ^{:key r}
+                 [:tr
+                  [:td t] [:td n]
+                  [:td core] [:td dev]
+                  [:td peer] [:td engines]]))]
+        [:br]]
+       [:div
+        [:p (i/i lang [:deps-not-found])]
+        [:br]])]
+    [:div
+     [:h2 (i/i lang [:group-repo-not-found])]
+     [:br]]))
+
+(defn repo-deps-page-class [lang]
+  (let [deps   (reagent/atom nil)
+        params @(re-frame/subscribe [:path-params?])
+        repo   (:repo params)
+        orga   (:orga params)]
+    (reagent/create-class
+     {:component-will-mount
+      (fn []
+        (GET (str "/deps/repos/" repo) :handler
+             #(re-frame/dispatch
+               (reset! deps (clojure.walk/keywordize-keys %)))))
+      :reagent-render
+      (fn [] (repo-deps-page lang (:orga params) (:repo params) @deps))})))
+
+(defn orga-deps-page [lang orga deps]
+  [:div
+   [:div [:h1 (i/i lang [:deps-of]) orga]]
+   [:br]
+   (if (not-empty deps)
+     [:div {:class "table-container"}
+      [:table {:class "table is-hoverable is-fullwidth"}
+       [:thead [:tr
+                [:th (i/i lang [:type])] [:th (i/i lang [:name])]
+                [:th "Core"] [:th "Dev"] [:th "Peer"] [:th "Engines"] ;; FIXME: i18n?
+                [:th (i/i lang [:Repos])]]]
+       (into [:tbody]
+             (for [{:keys [type name core dev engines peer repos] :as d} deps]
+               ^{:key d}
+               [:tr
+                [:td type] [:td name]
+                [:td core] [:td dev]
+                [:td peer] [:td engines]
+                [:td (for [{:keys [name full_name] :as r} repos]
+                       ^{:key r}
+                       [:span [:a {:href (str "https://github.com/" full_name)} name] " "])]]))]
+      [:br]]
+     [:div
+      [:h2 (i/i lang [:deps-not-found])]
+      [:br]])])
+
+(defn orga-deps-page-class [lang]
+  (let [deps (reagent/atom nil)
+        orga (:orga @(re-frame/subscribe [:path-params?]))]
+    (reagent/create-class
+     {:component-will-mount
+      (fn []
+        (GET (str "/deps/orgas/" orga) :handler
+             #(re-frame/dispatch
+               (reset! deps (clojure.walk/keywordize-keys %)))))
+      :reagent-render (fn [] (orga-deps-page lang orga @deps))})))
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
@@ -702,6 +829,12 @@
        (= view :stats)
        [stats-page-class lang]
 
+       (= view :repo-deps)
+       [repo-deps-page-class lang]
+
+       (= view :orga-deps)
+       [orga-deps-page-class lang]
+
        :else
        (rfe/push-state :repos {:lang lang}))]))
 
@@ -722,14 +855,17 @@
    ["/:lang"
     ["/repos" :repos]
     ["/groups" :orgas]
-    ["/stats" :stats]]])
+    ["/stats" :stats]
+    ["/deps"
+     ["/:orga"
+      ["/:repo" :repo-deps]
+      ["" :orga-deps]]]]])
 
 (defn on-navigate [match]
-  (let [target-page (:name (:data match))
-        lang        (:lang (:path-params match))
-        params      (:query-params match)]
+  (let [lang (:lang (:path-params match))]
     (when (string? lang) (re-frame/dispatch [:lang! lang]))
-    (re-frame/dispatch [:view! (keyword target-page) params])))
+    (re-frame/dispatch [:path-params! (:path-params match)])
+    (re-frame/dispatch [:view! (keyword (:name (:data match))) (:query-params match)])))
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
