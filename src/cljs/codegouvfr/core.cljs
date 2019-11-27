@@ -601,14 +601,11 @@
      {:component-will-mount
       (fn []
         (GET "/deps-total" :handler
-             #(re-frame/dispatch
-               (reset! deps-total (clojure.walk/keywordize-keys %))))
+             #(reset! deps-total (clojure.walk/keywordize-keys %)))
         (GET "/deps" :handler
-             #(re-frame/dispatch
-               (reset! deps (map (comp bean clj->js) %))))
+             #(reset! deps (map (comp bean clj->js) %)))
         (GET stats-url :handler
-             #(re-frame/dispatch
-               (reset! stats (clojure.walk/keywordize-keys %)))))
+             #(reset! stats (clojure.walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
 (defn change-repos-page [next]
@@ -660,8 +657,7 @@
      {:component-will-mount
       (fn []
         (GET (str "/deps/repos/" repo) :handler
-             #(re-frame/dispatch
-               (reset! deps (clojure.walk/keywordize-keys %)))))
+             #(reset! deps (clojure.walk/keywordize-keys %))))
       :reagent-render
       (fn [] (repo-deps-page lang (:orga params) (:repo params) @deps))})))
 
@@ -698,8 +694,7 @@
      {:component-will-mount
       (fn []
         (GET (str "/deps/orgas/" orga) :handler
-             #(re-frame/dispatch
-               (reset! deps (clojure.walk/keywordize-keys %)))))
+             #(reset! deps (clojure.walk/keywordize-keys %))))
       :reagent-render (fn [] (orga-deps-page lang orga @deps))})))
 
 (defn main-page [q license language]
