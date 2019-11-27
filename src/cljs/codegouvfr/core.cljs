@@ -440,14 +440,16 @@
                     (if (< r 2)
                       (i/i lang [:repo]) (i/i lang [:repos]))]])
                 (cond (= p "GitHub")
-                      [:a {:class "card-footer-item"
-                           :title (i/i lang [:visit-on-github])
-                           :href  o}
+                      [:a {:class  "card-footer-item"
+                           :title  (i/i lang [:visit-on-github])
+                           :target "new"
+                           :href   o}
                        (fab "fa-github")]
                       (= p "GitLab")
-                      [:a {:class "card-footer-item"
-                           :title (i/i lang [:visit-on-gitlab])
-                           :href  o}
+                      [:a {:class  "card-footer-item"
+                           :title  (i/i lang [:visit-on-gitlab])
+                           :target "new"
+                           :href   o}
                        (fab "fa-gitlab")])
                 (if e [:a {:class "card-footer-item"
                            :title (i/i lang [:contact-by-email])
