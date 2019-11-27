@@ -293,30 +293,37 @@
      [:br]
      [:p "Le code source d'un programme informatique est ce qu'écrit une programmeuse ou un programmeur.  Il peut s'agir de programmes complexes ou de quelques lignes. Ce code source peut être partagé sous licence libre pour permettre aux autres programmeurs de l'étudier, de le modifier, de le diffuser et de partager leurs améliorations."]
      [:br]
-     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Secteur public"]]
-     [:br]
-     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
-     [:br]
+
      [:a {:name "repository"} [:h2 {:class "subtitle"} "Dépôt"]]
      [:br]
      (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
-     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
-     [:br]
-     (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
-     [:br]
-     [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
-     [:br]
-     (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
-     [:br]
+     
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
      [:br]
      (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
      [:br]
+     
+     [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
+     [:br]
+     (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
+     [:br]
+     
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
      (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
      [:br]
+
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
+     [:br]
+     (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
+     [:br]
+
+     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Secteur public"]]
+     [:br]
+     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
+     [:br]
+     
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
      [:br]
      (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
@@ -328,38 +335,47 @@
    "Glossary for code.etalab.gouv.fr" "What is a repository? An organization? A license?"
    [:div
     [:div {:class "container"}
-     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
-     [:br]
-     [:p "A software's source code is what a developer writes.  Source code can be just a few lines or quite a few of them. Source code can be made available under a free licence for others to freely distribute, modify and share."]
-     [:br]
-     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
-     [:br]
-     (md-to-string "Source code developed by a public agency must be published, under certain conditions.  This website offers the possibility to search within source code repositories that are identified as coming from public sector organisms.  It has been developed by [Etalab](https://www.etalab.gouv.fr/).")
-     [:br]
-     [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
-     [:br]
-     (md-to-string "A \"repository\" is a place where source code files are stored.  This is what you see when you browse a link to a source code as hosted on a software forge.  This is also what you copy on your machine to explore it locally.")
-     [:br]
-     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation & Group"]]
-     [:br]
-     (md-to-string "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
-     [:br]
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
      (md-to-string "A \"forked\" repository est is repository derived from another one.")
      [:br]
-     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stars"]]
-     [:br]
-     (md-to-string "Stars allow users to mark a repository as favourite. At the moment, we collect repository favouriteness data from GitHub, Gitlab and instances thereof. Favouriteness is not a source code quality metric.")
-     [:br]
+
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
      (md-to-string "A software licence is a contract between a software's authors and its end-users. So-called \"libre\" licences grant licensees permission to distribute, modify and share a software's source code.")
      [:br]
+
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation & Group"]]
+     [:br]
+     (md-to-string "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
+     [:br]
+
+     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
+     [:br]
+     (md-to-string "Source code developed by a public agency must be published, under certain conditions.  This website offers the possibility to search within source code repositories that are identified as coming from public sector organisms.  It has been developed by [Etalab](https://www.etalab.gouv.fr/).")
+     [:br]
+
+     [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
+     [:br]
+     (md-to-string "A \"repository\" is a place where source code files are stored.  This is what you see when you browse a link to a source code as hosted on a software forge.  This is also what you copy on your machine to explore it locally.")
+     [:br]
+
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software Heritage"]]
      [:br]
      (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> is a project whose ambition is to collect, preserve, and share all software that is publicly available in source code form. Each repository here referenced is linked to its corresponding Software Heritage archive version.")
-     [:br]]]))
+     [:br]
+
+     [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
+     [:br]
+     [:p "A software's source code is what a developer writes.  Source code can be just a few lines or quite a few of them. Source code can be made available under a free licence for others to freely distribute, modify and share."]
+     [:br]
+
+     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stars"]]
+     [:br]
+     (md-to-string "Stars allow users to mark a repository as favourite. At the moment, we collect repository favouriteness data from GitHub, Gitlab and instances thereof. Favouriteness is not a source code quality metric.")
+     [:br]
+
+     ]]))
 
 (defn it-glossary [lang]
   (template
@@ -367,35 +383,45 @@
    "Glossario di code.etalab.gouv.fr" "Cosa è un repository? Un'organizzazione? Una licenza?"
    [:div
     [:div {:class "container"}
+     
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Codici sorgenti"]]
      [:br]
      [:p "Il codice sorgente di un programma informatico è quello che scrive una programmatrice o un programmatore. Questi possono essere sia programmi molto complessi che programmi di poche linee. Il codice sorgente può essere condiviso con una licenza aperta per consentire ad altri programmatori di studiare, modificare, distribuire e condividere i loro miglioramenti al codice."]
      [:br]
-     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Settore pubblico"]]
-     [:br]
-     (md-to-string "I codici sorgente sviluppati nell'ambito di servizi pubblici sono destinati a essere pubblicati in open source sotto determinate condizioni. Questo sito offre la possibilità di cercare nell'insieme di codici sorgenti oggi identificati come provenienti da un'organizzazione che svolge un compito di servizio pubblico. Il sito è stato sviluppato da [Etalab](https://www.etalab.gouv.fr/).")
-     [:br]
-     [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
-     [:br]
-     (md-to-string "Un repository è uno spazio dentro il quale vengono pubblicati i file di codice sorgente. Questo è ciò che si vede quando si visita un link al codice sorgente ospitato su un repository. &Egrave; anche quello che puoi copiare sul tuo computer per esplorarlo localmente.")
-     [:br]
-     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organizzazione e gruppi"]]
-     [:br]
-     (md-to-string "GitHub è un sito di verisonamento del codice e permette di avere dei repository personali e dei \"repository di organizzazione\". Un gruppo è la nozione più o meno equivalente sulle istanze di GitLab. Un organismo che svolge una missione di servizio pubblico può avere una o più organizzazioni e/o gruppi su una o più siti di verisonamento del codice.")
-     [:br]
+
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
      (md-to-string "Una fork è un repository che è stato sviluppato partendo dal codice presente in un altro repository pubblico.")
      [:br]
-     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stelle"]]
-     [:br]
-     (md-to-string "Le stelle («star» in inglese) sono un mezzo per permettere agi utilizzato delle piattaforme di versionamento del codice di mettere un repository tra i preferity. Al momento, noi memorizziamo questa informazion su GitHub, GitLab e le istanze private di GitLab. Questa non è una misura della qualità del codice sorgente.")
-     [:br]
+
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licenze"]]
      [:br]
      (md-to-string "Una licenza è un contratto sviluppato tra l'autore di un programma e i suoi utilizzatori. Le licenze dette \"libere\" concedono agli utilizzatori il diritto di riutilizzare il codice sorgente di un programma.")
      [:br]
+
+     [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organizzazione e gruppi"]]
+     [:br]
+     (md-to-string "GitHub è un sito di verisonamento del codice e permette di avere dei repository personali e dei \"repository di organizzazione\". Un gruppo è la nozione più o meno equivalente sulle istanze di GitLab. Un organismo che svolge una missione di servizio pubblico può avere una o più organizzazioni e/o gruppi su una o più siti di verisonamento del codice.")
+     [:br]
+
+     [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
+     [:br]
+     (md-to-string "Un repository è uno spazio dentro il quale vengono pubblicati i file di codice sorgente. Questo è ciò che si vede quando si visita un link al codice sorgente ospitato su un repository. &Egrave; anche quello che puoi copiare sul tuo computer per esplorarlo localmente.")
+     [:br]
+
+     [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Settore pubblico"]]
+     [:br]
+     (md-to-string "I codici sorgente sviluppati nell'ambito di servizi pubblici sono destinati a essere pubblicati in open source sotto determinate condizioni. Questo sito offre la possibilità di cercare nell'insieme di codici sorgenti oggi identificati come provenienti da un'organizzazione che svolge un compito di servizio pubblico. Il sito è stato sviluppato da [Etalab](https://www.etalab.gouv.fr/).")
+     [:br]
+
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
      [:br]
      (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> è un progetto che ha lo scopo di archiviare tutti i codici sorgenti disponbili. Per ciascun repository referenziato in questo sito, viene fornito il link alla versione archiviata su Software Heritage.")
-     [:br]]]))
+     [:br]
+
+     [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stelle"]]
+     [:br]
+     (md-to-string "Le stelle («star» in inglese) sono un mezzo per permettere agi utilizzato delle piattaforme di versionamento del codice di mettere un repository tra i preferity. Al momento, noi memorizziamo questa informazion su GitHub, GitLab e le istanze private di GitLab. Questa non è una misura della qualità del codice sorgente.")
+     [:br]
+
+     ]]))
