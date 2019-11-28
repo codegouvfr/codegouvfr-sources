@@ -420,8 +420,7 @@
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
           [:div {:class "columns"}
-           (for [{:keys [n l o h c d r e au p an dp]
-                  :as   o} dd]
+           (for [{:keys [n l o h c d r e au p an dp] :as o} dd]
              ^{:key o}
              [:div {:class "column is-4"}
               [:div {:class "card"}
@@ -432,41 +431,33 @@
                     [:figure {:class "image is-48x48"}
                      [:img {:src au}]]])
                  [:div {:class "media-content"}
-                  [:p
-                   [:a {:class  "title is-4"
-                        :target "new"
-                        :title  (i/i lang [:go-to-orga])
-                        :href   o} (or n l)]]
+                  [:a {:class  "title is-4"
+                       :target "new"
+                       :title  (i/i lang [:go-to-orga])
+                       :href   o}
+                   [:span (or n l)
+                    " "
+                    [:span {:class "is-size-5"}
+                     (cond (= p "GitHub")
+                           (fab "fa-github")
+                           (= p "GitLab")
+                           (fab "fa-gitlab"))]]]
+                  [:br]
                   (let [date (to-locale-date c)]
                     (if date
-                      [:p {:class "subtitle is-6"}
-                       (str (i/i lang [:created-at]) date)]))]]
+                      [:p {:class ""}
+                       (str (i/i lang [:created-at]) date)]))
+                  (if r
+                    ;; FIXME: hackish, orgas-mapping should give
+                    ;; the forge base on top of "plateforme".
+                    [:a {:title (i/i lang [:go-to-repos])
+                         :href  (rfe/href :repos {:lang lang}
+                                          {:g (s/replace o "/groups/" "/")})}
+                     r (if (< r 2)
+                         (i/i lang [:repo]) (i/i lang [:repos]))])]]
                 [:div {:class "content"}
                  [:p d]]]
                [:div {:class "card-footer"}
-                (if r
-                  [:div {:class "card-footer-item"
-                         :title (i/i lang [:repos-number])}
-                   [:a {:title (i/i lang [:go-to-repos])
-                        :href  (rfe/href :repos {:lang lang}
-                                         ;; FIXME: hackish, orgas-mapping should give
-                                         ;; the forge base on top of "plateforme".
-                                         {:g (s/replace o "/groups/" "/")})}
-                    r
-                    (if (< r 2)
-                      (i/i lang [:repo]) (i/i lang [:repos]))]])
-                (cond (= p "GitHub")
-                      [:a {:class  "card-footer-item"
-                           :title  (i/i lang [:visit-on-github])
-                           :target "new"
-                           :href   o}
-                       (fab "fa-github")]
-                      (= p "GitLab")
-                      [:a {:class  "card-footer-item"
-                           :title  (i/i lang [:visit-on-gitlab])
-                           :target "new"
-                           :href   o}
-                       (fab "fa-gitlab")])
                 (when dp
                   [:a {:class "card-footer-item"
                        :title (i/i lang [:deps])
