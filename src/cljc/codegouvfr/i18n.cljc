@@ -21,7 +21,8 @@
     :contact-form                "Formulaire de contact"
     :created-at                  "Créé le "
     :deps                        "Dépendances"
-    :deps-of                     "Dépendances identifiées pour "
+    :dep-of                      "dépendance identifiée pour"
+    :deps-of                     "dépendances identifiées pour"
     :deps-stats                  "Nombre de dépendances identifiées"
     :deps-not-found              "Pas de dépendances identifiées."
     :description                 "Description"
@@ -133,7 +134,8 @@
     :contact-form                "Contact form"
     :created-at                  "Created on "
     :deps                        "Dependencies"
-    :deps-of                     "Identified dependencies for "
+    :dep-of                      "identified dependency for"
+    :deps-of                     "identified dependencies for"
     :deps-stats                  "Number of identified dependencies"
     :deps-not-found              "No identified dependencies."
     :description                 "Description"
@@ -245,6 +247,7 @@
     :contact-form                "Contatti da"
     :created-at                  "Creato il "
     :deps                        "Dependencies"                      ;; TODO
+    :dep-of                      "identified dependency for"         ;; TODO
     :deps-of                     "Identified dependencies for "      ;; TODO
     :deps-stats                  "Number of identified dependencies" ;; TODO
     :deps-not-found              "No identified dependencies."       ;; TODO
