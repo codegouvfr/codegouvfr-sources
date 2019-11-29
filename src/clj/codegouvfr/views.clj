@@ -301,7 +301,7 @@
 
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dépendances"]]
      [:br]
-     (md-to-string "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet d'en parcourir la liste.  Ces informations sont collectées depuis le site [backyourstack.com](https://backyourstack.com), qui détecte les dépendances de JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) et Python (Requirement).")
+     (md-to-string "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet d'en parcourir la liste.  Ces informations sont collectées depuis le site [backyourstack.com](https://backyourstack.com), qui détecte les dépendances de JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) et Python (Requirement).  Les dépendances affichées sont celles nécessaires pour la mise en *production* ou pour le *développement*.")
      [:br]
      
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
@@ -343,7 +343,7 @@
 
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
      [:br]
-     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).")
+     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
      [:br]
 
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
@@ -403,7 +403,7 @@
      ;; TODO: i18n
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
      [:br]
-     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).")
+     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
      [:br]
 
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]

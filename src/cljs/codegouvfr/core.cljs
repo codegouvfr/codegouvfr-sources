@@ -635,21 +635,26 @@
        [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                    (i/i lang [:dep-of])
                                    (i/i lang [:deps-of]))
-                       " " repo " (" orga ")" )]]
+                       " " repo)
+              [:sup
+               [:a {:href  (str "/" lang "/glossary#dependencies")
+                    :class "has-text-grey is-size-6"
+                    :title (i/i lang [:go-to-glossary])}
+                (fa "fa-question-circle")]]
+              (str " (" orga ")")]]
        [:br]
        (if-let [dps (not-empty rdeps)]
          [:div {:class "table-container"}
           [:table {:class "table is-hoverable is-fullwidth"}
            [:thead [:tr
                     [:th (i/i lang [:type])] [:th (i/i lang [:name])]
-                    [:th "Core"] [:th "Dev"] [:th "Peer"] [:th "Engines"]]]
+                    [:th (i/i lang [:core-dep])] [:th (i/i lang [:dev-dep])]]]
            (into [:tbody]
-                 (for [{:keys [t n core dev engines peer] :as r} rdeps]
+                 (for [{:keys [t n core dev] :as r} rdeps]
                    ^{:key r}
                    [:tr
                     [:td t] [:td n]
-                    [:td core] [:td dev]
-                    [:td peer] [:td engines]]))]
+                    [:td core] [:td dev]]))]
           [:br]]
          [:div
           [:p (i/i lang [:deps-not-found])]
@@ -677,22 +682,26 @@
      [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                  (i/i lang [:dep-of])
                                  (i/i lang [:deps-of]))
-                     " " orga)]]
+                     " " orga)
+            [:sup
+             [:a {:href  (str "/" lang "/glossary#dependencies")
+                  :class "has-text-grey is-size-6"
+                  :title (i/i lang [:go-to-glossary])}
+              (fa "fa-question-circle")]]]]
      [:br]
      (if (not-empty deps)
        [:div {:class "table-container"}
         [:table {:class "table is-hoverable is-fullwidth"}
          [:thead [:tr
                   [:th (i/i lang [:type])] [:th (i/i lang [:name])]
-                  [:th "Core"] [:th "Dev"] [:th "Peer"] [:th "Engines"] ;; FIXME: i18n?
+                  [:th (i/i lang [:core-dep])] [:th (i/i lang [:dev-dep])]
                   [:th (i/i lang [:Repos])]]]
          (into [:tbody]
-               (for [{:keys [type name core dev engines peer repos] :as d} deps]
+               (for [{:keys [type name core dev repos] :as d} deps]
                  ^{:key d}
                  [:tr
                   [:td type] [:td name]
                   [:td core] [:td dev]
-                  [:td peer] [:td engines]
                   [:td (for [{:keys [name full_name] :as r} repos]
                          ^{:key r}
                          [:span [:a {:href (str "https://github.com/" full_name)} name] " "])]]))]

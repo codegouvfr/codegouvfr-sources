@@ -172,7 +172,12 @@
     (doall
      (for [orga gh-orgas
            :let [data (get-deps orga)
-                 orgas-deps0 (map #(dissoc % :project) (:dependencies data)) 
+                 orga-deps0 (map #(apply dissoc % [:project :peer :engines])
+                                 (:dependencies data))
+                 orga-deps (map (fn [r]
+                                  (let [rs (:repos r)]
+                                    (assoc r :repos (map #(dissoc % :id) rs))))
+                                orga-deps0)
                  orga-repos0
                  (filter #(not (empty? (:dependencies %)))
                          (map (fn [r] (assoc r :g orga))
@@ -182,12 +187,15 @@
                  (map #(clojure.set/rename-keys
                         % {:name :n :dependencies :d}) orga-repos0)
                  orga-repos (map #(assoc % :d
-                                         (map (fn [r] (clojure.set/rename-keys
-                                                       r {:type :t :name :n}))
+                                         (map (fn [r]
+                                                (apply dissoc
+                                                       (clojure.set/rename-keys
+                                                        r {:type :t :name :n})
+                                                       [:engines :peer]))
                                               (:d %)))
                                  orga-repos1)]]
        (do (spit (str "data/deps/orgas/" orga ".json")
-                 (json/generate-string orgas-deps0))
+                 (json/generate-string orga-deps))
            (swap! repos-deps (partial apply conj) orga-repos))))
     (spit (str "data/deps/repos-deps.json")
           (json/generate-string @repos-deps))

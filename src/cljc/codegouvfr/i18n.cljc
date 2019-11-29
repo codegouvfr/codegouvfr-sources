@@ -19,6 +19,7 @@
     :contact-baseline            "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :contact-by-email            "Contacter par email"
     :contact-form                "Formulaire de contact"
+    :core-dep                    "Production"
     :created-at                  "Créé le "
     :deps                        "Dépendances"
     :dep-of                      "dépendance identifiée pour"
@@ -26,6 +27,7 @@
     :deps-stats                  "Nombre de dépendances identifiées"
     :deps-not-found              "Pas de dépendances identifiées."
     :description                 "Description"
+    :dev-dep                     "Développement"
     :distribution-by-platform    "Répartition par plateforme"
     :download                    "Télécharger"
     :email-placeholder           "Par ex. toto@modernisation.gouv.fr"
@@ -132,6 +134,7 @@
     :contact-baseline            "Want to share an organization? A repository? Let us know!"
     :contact-by-email            "Contact by email"
     :contact-form                "Contact form"
+    :core-dep                    "Core"
     :created-at                  "Created on "
     :deps                        "Dependencies"
     :dep-of                      "identified dependency for"
@@ -139,6 +142,7 @@
     :deps-stats                  "Number of identified dependencies"
     :deps-not-found              "No identified dependencies."
     :description                 "Description"
+    :dev-dep                     "Development"
     :distribution-by-platform    "Distribution per platform"
     :download                    "Download"
     :email-placeholder           "E.g. toto@modernisation.gouv.fr"
@@ -245,6 +249,7 @@
     :contact-baseline            "Hai un account organizzativo da segnalare? Un repository di codice da aprire? Scrivici!"
     :contact-by-email            "Contatta per email"
     :contact-form                "Contatti da"
+    :core-dep                    "Core"                              ;; TODO
     :created-at                  "Creato il "
     :deps                        "Dependencies"                      ;; TODO
     :dep-of                      "identified dependency for"         ;; TODO
@@ -252,6 +257,7 @@
     :deps-stats                  "Number of identified dependencies" ;; TODO
     :deps-not-found              "No identified dependencies."       ;; TODO
     :description                 "Descrizione"
+    :dev-dep                     "Development"                       ;; TODO
     :distribution-by-platform    "Distribuzione per piattaforma"
     :download                    "Scaricare"
     :email-placeholder           "Es toto@modernisation.gouv.fr"
