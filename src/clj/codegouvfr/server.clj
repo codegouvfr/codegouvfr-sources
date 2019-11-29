@@ -25,7 +25,8 @@
             [semantic-csv.core :as semantic-csv]
             [hickory.core :as h]
             [hickory.zip :as hz]
-            [hickory.select :as hs])
+            [hickory.select :as hs]
+            [clojure.string :as s])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -194,7 +195,7 @@
                                                        [:engines :peer]))
                                               (:d %)))
                                  orga-repos1)]]
-       (do (spit (str "data/deps/orgas/" orga ".json")
+       (do (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
                  (json/generate-string orga-deps))
            (swap! repos-deps (partial apply conj) orga-repos))))
     (spit (str "data/deps/repos-deps.json")
@@ -239,12 +240,13 @@
 (defn resource-orga-json [orga]
   (assoc
    (response/response
-    (try (slurp (str "data/deps/orgas/" orga ".json"))
+    (try (slurp (str "data/deps/orgas/" (s/lower-case orga) ".json"))
          (catch Exception e (str "No file named " orga ".json"))))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
 (defn resource-repo-json [repo]
-  (let [deps (first (filter #(= (:n %) repo) @repos-deps))]
+  (let [deps (first (filter #(= (s/lower-case (:n %)) (s/lower-case repo))
+                            @repos-deps))]
     (assoc
      (response/response
       (json/generate-string {:g (:g deps) :d (:d deps)}))
