@@ -511,9 +511,12 @@
   [:div {:class "column"}
    [:div {:class "card"}
     [:h1 {:class "card-header-title subtitle"}
-     [:a {:href  (str "/" lang "/glossary#dependencies")
-          :title (i/i lang [:go-to-glossary])}
-      heading]]
+     heading
+     [:sup
+      [:a {:href  (str "/" lang "/glossary#dependencies")
+           :class "has-text-grey is-size-7"
+           :title (i/i lang [:go-to-glossary])}
+       (fa "fa-question-circle")]]]
     [:div {:class "card-content"}
      [:table {:class "table is-fullwidth"}
       [:thead [:tr
@@ -544,38 +547,49 @@
                       (clojure.walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "columns"}
-      (figure [:span [:a {:href  (str "/" lang "/glossary#repository")
-                          :title (i/i lang [:go-to-glossary])}
-                      (i/i lang [:repos-of-source-code])]] nb_repos)
-      (figure [:span [:a {:href  (str "/" lang "/glossary#organization-group")
-                          :title (i/i lang [:go-to-glossary])}
-                      (i/i lang [:orgas-or-groups])]] nb_orgs)
+      (figure (i/i lang [:repos-of-source-code]) nb_repos)
+      (figure (i/i lang [:orgas-or-groups]) nb_orgs)
       (figure (i/i lang [:mean-repos-by-orga]) avg_nb_repos)
       (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)
       (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
      [:br]
      [:div {:class "columns"}
-      (stats-card [:span [:a {:href  (str "/" lang "/glossary#organization-group")
-                              :title (i/i lang [:go-to-glossary])}
-                          (i/i lang [:orgas-or-groups])]
+      (stats-card [:span
+                   (i/i lang [:orgas-or-groups])
+                   [:sup
+                    [:a {:href  (str "/" lang "/glossary#organization-group")
+                         :class "has-text-grey is-size-7"
+                         :title (i/i lang [:go-to-glossary])}
+                     (fa "fa-question-circle")]]
+                   " "
                    (i/i lang [:with-more-of])
-                   [:a {:href  (str "/" lang "/glossary#repository")
-                        :title (i/i lang [:go-to-glossary])}
-                    (i/i lang [:repos])]] top_orgs_by_repos_0)
+                   (i/i lang [:repos])
+                   [:sup
+                    [:a {:href  (str "/" lang "/glossary#repository")
+                         :class "has-text-grey is-size-7"
+                         :title (i/i lang [:go-to-glossary])}
+                     (fa "fa-question-circle")]]]
+                  top_orgs_by_repos_0)
       (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
      [:div {:class "columns"}
-      (stats-card [:span [:a {:href  (str "/" lang "/glossary#license")
-                              :title (i/i lang [:go-to-glossary])}
-                          (i/i lang [:most-used-licenses])]]
+      (stats-card [:span
+                   (i/i lang [:most-used-licenses])
+                   [:sup
+                    [:a {:href  (str "/" lang "/glossary#license")
+                         :class "has-text-grey is-size-7"
+                         :title (i/i lang [:go-to-glossary])}
+                     (fa "fa-question-circle")]]]
                   top_licenses_0)
       (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_0)]
      [:div {:class "columns"}
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
-                   [:a {:href  (str "/" lang "/glossary#software-heritage")
-                        :title (i/i lang [:go-to-glossary])}
-                    "Software Heritage"]]
+                   "Software Heritage"
+                   [:sup [:a {:href  (str "/" lang "/glossary#software-heritage")
+                              :title (i/i lang [:go-to-glossary])
+                              :class "has-text-grey is-size-7"}
+                          (fa "fa-question-circle")]]]
                   {(i/i lang [:repos-on-swh])
                    (:repos_in_archive software_heritage)
                    (i/i lang [:percent-of-repos-archived])
