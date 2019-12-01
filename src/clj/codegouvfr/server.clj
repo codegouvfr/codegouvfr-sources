@@ -217,34 +217,33 @@
   []
   (reset! repos-deps nil)
   (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
-    (doall
-     (for [orga gh-orgas
-           :let [data (get-deps orga)
-                 orga-deps0 (map #(apply dissoc % [:project :peer :engines])
-                                 (:dependencies data))
-                 orga-deps (map (fn [r]
-                                  (let [rs (:repos r)]
-                                    (assoc r :repos (map #(dissoc % :id) rs))))
-                                orga-deps0)
-                 orga-repos0
-                 (filter #(not (empty? (:dependencies %)))
-                         (map (fn [r] (assoc r :g orga))
-                              (map #(apply dissoc % deps-rm-kws)
-                                   (:repos data))))
-                 orga-repos1
-                 (map #(set/rename-keys
-                        % {:name :n :dependencies :d}) orga-repos0)
-                 orga-repos (map #(assoc % :d
-                                         (map (fn [r]
-                                                (apply dissoc
-                                                       (set/rename-keys
-                                                        r {:type :t :name :n})
-                                                       [:engines :peer]))
-                                              (:d %)))
-                                 orga-repos1)]]
-       (do (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
-                 (json/generate-string orga-deps))
-           (swap! repos-deps (partial apply conj) orga-repos))))
+    (doseq [orga gh-orgas
+            :let [data (get-deps orga)
+                  orga-deps0 (map #(apply dissoc % [:project :peer :engines])
+                                  (:dependencies data))
+                  orga-deps (map (fn [r]
+                                   (let [rs (:repos r)]
+                                     (assoc r :repos (map #(dissoc % :id) rs))))
+                                 orga-deps0)
+                  orga-repos0
+                  (filter #(not (empty? (:dependencies %)))
+                          (map (fn [r] (assoc r :g orga))
+                               (map #(apply dissoc % deps-rm-kws)
+                                    (:repos data))))
+                  orga-repos1
+                  (map #(set/rename-keys
+                         % {:name :n :dependencies :d}) orga-repos0)
+                  orga-repos (map #(assoc % :d
+                                          (map (fn [r]
+                                                 (apply dissoc
+                                                        (set/rename-keys
+                                                         r {:type :t :name :n})
+                                                        [:engines :peer]))
+                                               (:d %)))
+                                  orga-repos1)]]
+      (do (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
+                (json/generate-string orga-deps))
+          (swap! repos-deps (partial apply conj) orga-repos)))
     (spit (str "data/deps/repos-deps.json")
           (json/generate-string @repos-deps))
     (timbre/info (str "updated orgas and repos dependencies"))))
@@ -256,12 +255,10 @@
   "Generate data/deps/deps*.json."
   []
   (let [deps (atom nil)]
-    (doall
-     (for [rep @repos-deps :let [r-deps (:d rep)]]
-       (doall
-        (for [d0   r-deps
+    (doseq [rep @repos-deps :let [r-deps (:d rep)]]
+      (doseq [d0   r-deps
               :let [d (apply dissoc d0 [:core :dev :peer :engines])]]
-          (swap! deps conj (assoc d :rs (vector (dissoc rep :d))))))))
+        (swap! deps conj (assoc d :rs (vector (dissoc rep :d))))))
     (reset! deps (map (fn [x] (assoc x :rs (count (:rs x))))
                       (reverse (sort #(compare (count (:rs %1)) (count (:rs %2)))
                                      (map #(apply (partial merge-with merge-colls) %)
