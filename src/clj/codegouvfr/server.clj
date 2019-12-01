@@ -15,6 +15,7 @@
             [compojure.core :refer [GET POST defroutes]]
             [compojure.route :refer [not-found resources]]
             [postal.core :as postal]
+            [postal.support]
             [taoensso.timbre :as timbre]
             [taoensso.timbre.appenders.core :as appenders]
             [taoensso.timbre.appenders (postal :as postal-appender)]
@@ -26,7 +27,8 @@
             [hickory.core :as h]
             [hickory.zip :as hz]
             [hickory.select :as hs]
-            [clojure.string :as s])
+            [clojure.string :as s]
+            [clojure.set :as set])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -48,42 +50,60 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Download repos, orgas and annuaire locally
 
-(defonce repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
-(defonce orgas-url "https://api-code.etalab.gouv.fr/api/organisations/all")
-(defonce annuaire-url "https://www.data.gouv.fr/fr/datasets/r/ac26b864-6a3a-496b-8832-8cde436f5230")
+(defonce
+  ^{:doc "The URL from where to fetch repository data."}
+  repos-url
+  "https://api-code.etalab.gouv.fr/api/repertoires/all")
 
-(def repos-mapping {:nom                    :n
-                    :description            :d
-                    :page_accueil           :h
-                    :organisation_nom       :o
-                    :plateforme             :p
-                    :langage                :l
-                    :licence                :li
-                    :repertoire_url         :r
-                    :topics                 :t
-                    :date_creation          :c
-                    :derniere_mise_a_jour   :u
-                    :derniere_modification  :m
-                    :nombre_forks           :f
-                    :nombre_issues_ouvertes :i
-                    :nombre_stars           :s
-                    :est_archive            :a?
-                    :est_fork               :f?})
+(defonce
+  ^{:doc "The URL from where to fetch groups/organizations data."}
+  orgas-url
+  "https://api-code.etalab.gouv.fr/api/organisations/all")
 
-(def orgas-mapping {:description        :d
-                    :adresse            :a
-                    :email              :e
-                    :nom                :n
-                    :plateforme         :p
-                    :site_web           :h
-                    :est_verifiee       :v?
-                    :login              :l
-                    :date_creation      :c
-                    :nombre_repertoires :r
-                    :organisation_url   :o
-                    :avatar_url         :au})
+(defonce
+  ^{:doc "The URL from where to fetch information about organizations as
+  provided by https://lannuaire.service-public.fr."}
+  annuaire-url
+  "https://www.data.gouv.fr/fr/datasets/r/ac26b864-6a3a-496b-8832-8cde436f5230")
+
+(def repos-mapping
+  "Mapping from repositories keywords to local short versions."
+  {:nom                    :n
+   :description            :d
+   :page_accueil           :h
+   :organisation_nom       :o
+   :plateforme             :p
+   :langage                :l
+   :licence                :li
+   :repertoire_url         :r
+   :topics                 :t
+   :date_creation          :c
+   :derniere_mise_a_jour   :u
+   :derniere_modification  :m
+   :nombre_forks           :f
+   :nombre_issues_ouvertes :i
+   :nombre_stars           :s
+   :est_archive            :a?
+   :est_fork               :f?})
+
+(def orgas-mapping
+  "Mapping from groups/organizations keywords to local short versions."
+  {:description        :d
+   :adresse            :a
+   :email              :e
+   :nom                :n
+   :plateforme         :p
+   :site_web           :h
+   :est_verifiee       :v?
+   :login              :l
+   :date_creation      :c
+   :nombre_repertoires :r
+   :organisation_url   :o
+   :avatar_url         :au})
 
 (def licenses-mapping
+  "Mapping from GitHub license strings to the their license+SDPX short
+  identifier version."
   {"MIT License"                                                "MIT License (MIT)"
    "GNU Affero General Public License v3.0"                     "GNU Affero General Public License v3.0 (AGPL-3.0)"
    "GNU General Public License v3.0"                            "GNU General Public License v3.0 (GPL-3.0)"
@@ -102,14 +122,30 @@
    "Do What The Fuck You Want To Public License"                "Do What The Fuck You Want To Public License (WTFPL)"
    "Creative Commons Attribution 4.0 International"             "Creative Commons Attribution 4.0 International (CC-BY-4.0)"})
 
-(defonce repos-rm-ks
+(defonce
+  ^{:doc "A list of keywords to ignore when exposing repository data from the
+  backend."}
+  repos-rm-ks
   [:software_heritage_url :software_heritage_exists :derniere_modification
    :page_accueil :date_creation :topics :plateforme])
 
-(defonce repos-deps (atom nil))
-(defonce orgas-json (atom nil))
+(defonce
+  ^{:doc "A list of repositories dependencies, updated by the fonction
+  `update-orgas-repos-deps` and stored for further retrieval in
+  `update-deps`."}
+  repos-deps
+  (atom nil))
 
-(defn update-repos []
+(defonce
+  ^{:doc "The parsed output of retrieving orgas-url, updated by the fonction
+  `update-orgas-json` and stored for further retrieval in
+  `update-orgas` and `update-orgas-repos-deps`."}
+  orgas-json
+  (atom nil))
+
+(defn update-repos
+  "Generate data/repos.json from `repos-url`."
+  []
   (let [repos-json (json/parse-string (:body (http/get repos-url)) true)]
     (spit "data/repos.json"
           (json/generate-string
@@ -117,12 +153,14 @@
             (fn [r] (assoc r
                            :li (get licenses-mapping (:li r))
                            :dp (not (empty? (first (filter #(= (:n %) (:n r)) @repos-deps))))))
-            (map #(clojure.set/rename-keys
+            (map #(set/rename-keys
                    (apply dissoc % repos-rm-ks) repos-mapping)
                  repos-json)))))
   (timbre/info (str "updated repos.json")))
 
-(defn update-orgas-json []
+(defn update-orgas-json
+  "Reset `orgas-json` from `orgas-url`."
+  []
   (let [old-orgas-json @orgas-json
         result
         (try (:body (http/get orgas-url))
@@ -133,7 +171,9 @@
     (reset! orgas-json (json/parse-string result true)))
   (timbre/info (str "updated @orgas-json")))
 
-(defn update-orgas []
+(defn update-orgas
+  "Generate data/orgas.json from `orgas-json` and `annuaire-url`."
+  []
   (let [annuaire
         (apply merge
                (map #(let [{:keys [github lannuaire]} %]
@@ -147,11 +187,13 @@
                         :dp (let [f (str "data/deps/orgas/" (:l %) ".json")]
                               (if (.exists (io/file f))
                                 (not (empty? (json/parse-string (slurp f)))))))
-                (map #(clojure.set/rename-keys % orgas-mapping)
+                (map #(set/rename-keys % orgas-mapping)
                      @orgas-json))))
     (timbre/info (str "updated orgas.json"))))
 
-(defn get-deps [orga]
+(defn get-deps
+  "Scrap backyourstack to get dependencies of an organization."
+  [orga]
   ;; FIXME: Wrap http/get into a try clause
   (-> (http/get (str "https://backyourstack.com/" orga "/dependencies"))
       :body
@@ -165,9 +207,14 @@
       :props
       :pageProps))
 
-(defonce deps-rm-kws [:private :default_branch :language :id :checked :owner :full_name])
+(defonce
+  ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
+  deps-rm-kws
+  [:private :default_branch :language :id :checked :owner :full_name])
 
-(defn update-orgas-repos-deps []
+(defn update-orgas-repos-deps
+  "Generate data/deps/orgas/* and data/deps/repos-deps.json."
+  []
   (reset! repos-deps nil)
   (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
     (doall
@@ -185,12 +232,12 @@
                               (map #(apply dissoc % deps-rm-kws)
                                    (:repos data))))
                  orga-repos1
-                 (map #(clojure.set/rename-keys
+                 (map #(set/rename-keys
                         % {:name :n :dependencies :d}) orga-repos0)
                  orga-repos (map #(assoc % :d
                                          (map (fn [r]
                                                 (apply dissoc
-                                                       (clojure.set/rename-keys
+                                                       (set/rename-keys
                                                         r {:type :t :name :n})
                                                        [:engines :peer]))
                                               (:d %)))
@@ -205,7 +252,9 @@
 (defn merge-colls [a b]
   (if (and (coll? a) (coll? b)) (into a b) b))
 
-(defn update-deps []
+(defn update-deps
+  "Generate data/deps/deps*.json."
+  []
   (let [deps (atom nil)]
     (doall
      (for [rep @repos-deps :let [r-deps (:d rep)]]
@@ -221,30 +270,43 @@
     (spit "data/deps/deps-count.json" (json/generate-string (take 100 @deps))))
   (timbre/info (str "updated data/deps/deps-[total|count].json")))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Define tasks
+
+(def update-orgas-json! (tt/every! 10800 update-orgas-json))
+(def update-orgas-repos-deps! (tt/every! 86400 5 update-orgas-repos-deps))
+(def update-deps! (tt/every! 86400 160 update-deps))
+(def update-repos! (tt/every! 10800 165 update-repos))
+(def update-orgas! (tt/every! 10800 170 update-orgas))
+
 (defn start-tasks []
   (tt/start!)
-  (def update-orgas! (tt/every! 10800 update-orgas-json))
-  (def update-orgas-repos-deps! (tt/every! 86400 5 update-orgas-repos-deps))
-  (def update-deps! (tt/every! 86400 160 update-deps))
-  (def update-repos! (tt/every! 10800 165 update-repos))
-  (def update-orgas! (tt/every! 10800 170 update-orgas))
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
-(defn resource-json [f]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Expose json resources
+
+(defn resource-json
+  "Expose a json resource."
+  [f]
   (assoc
    (response/response
     (io/input-stream f))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
-(defn resource-orga-json [orga]
+(defn resource-orga-json
+  "Expose [orga].json as a json resource."
+  [orga]
   (assoc
    (response/response
     (try (slurp (str "data/deps/orgas/" (s/lower-case orga) ".json"))
          (catch Exception e (str "No file named " orga ".json"))))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
-(defn resource-repo-json [repo]
+(defn resource-repo-json
+  "Expose the json resource corresponding to `repo`."
+  [repo]
   (let [deps (first (filter #(= (s/lower-case (:n %)) (s/lower-case repo))
                             @repos-deps))]
     (assoc
@@ -344,9 +406,11 @@
              ;; wrap-reload
              )) ;; FIXME: Don't wrap reload in production
 
-(defn -main [& args]
+(defn -main
+  "Start tasks and the HTTP server."
+  [& args]
   (start-tasks)
-  (def server (server/run-server app {:port config/codegouvfr_port}))
+  (server/run-server app {:port config/codegouvfr_port})
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
