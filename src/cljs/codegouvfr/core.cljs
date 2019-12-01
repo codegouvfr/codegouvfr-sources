@@ -24,6 +24,19 @@
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
+(defonce filter-chan (async/chan 100))
+(defonce display-filter-chan (async/chan 100))
+
+(defonce routes
+  [["/" :home-redirect]
+   ["/:lang"
+    ["/repos" :repos]
+    ["/groups" :orgas]
+    ["/stats" :stats]
+    ["/deps"
+     ["/:orga"
+      ["/:repo" :repo-deps]
+      ["" :orga-deps]]]]])
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -206,9 +219,6 @@
                   s)
                true))
      m)))
-
-(def filter-chan (async/chan 100))
-(def display-filter-chan (async/chan 100))
 
 (defn start-display-filter-loop []
   (async/go
@@ -871,17 +881,6 @@
              #(re-frame/dispatch
                [:update-repos! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language))})))
-
-(def routes
-  [["/" :home-redirect]
-   ["/:lang"
-    ["/repos" :repos]
-    ["/groups" :orgas]
-    ["/stats" :stats]
-    ["/deps"
-     ["/:orga"
-      ["/:repo" :repo-deps]
-      ["" :orga-deps]]]]])
 
 (defn on-navigate [match]
   (let [lang (:lang (:path-params match))]
