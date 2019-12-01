@@ -15,9 +15,11 @@
   (System/getenv "SMTP_PASSWORD"))
 
 (def msgid-domain
+  "The message-id domain to enhance email deliverability."
   (System/getenv "CODEGOUVFR_MSGID_DOMAIN"))
 
 (def admin-email
+  "The email address where to receive contact emails."
   (or (System/getenv "CODEGOUVFR_ADMIN_EMAIL")
       "bastien.guerry@data.gouv.fr"))
 
@@ -29,4 +31,6 @@
   (or (read-string (System/getenv "CODEGOUVFR_PORT"))
       3000))
 
-(def log-file "log.txt")
+(def log-file
+  "Where to store the application logs."
+  "log.txt")
