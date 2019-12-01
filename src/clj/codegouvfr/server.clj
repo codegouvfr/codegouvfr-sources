@@ -28,7 +28,7 @@
             [hickory.zip :as hz]
             [hickory.select :as hs]
             [clojure.string :as s]
-            [clojure.set :as set])
+            [clojure.set :as clset])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -162,7 +162,7 @@
             (fn [r] (assoc r
                            :li (get licenses-mapping (:li r))
                            :dp (not (empty? (first (filter #(= (:n %) (:n r)) @repos-deps))))))
-            (map #(set/rename-keys
+            (map #(clset/rename-keys
                    (apply dissoc % repos-rm-ks) repos-mapping)
                  repos-json)))))
   (timbre/info (str "updated repos.json")))
@@ -196,7 +196,7 @@
                         :dp (let [f (str "data/deps/orgas/" (:l %) ".json")]
                               (if (.exists (io/file f))
                                 (not (empty? (json/parse-string (slurp f)))))))
-                (map #(set/rename-keys % orgas-mapping)
+                (map #(clset/rename-keys % orgas-mapping)
                      @orgas-json))))
     (timbre/info (str "updated orgas.json"))))
 
