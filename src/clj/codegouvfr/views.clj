@@ -10,17 +10,23 @@
             [markdown-to-hiccup.core :as md]
             [codegouvfr.i18n :as i]))
 
-(defn md-to-string [s]
+(defn md-to-hiccup
+  "Convert a markdown `s` string to hiccup structure."
+  [s]
   (-> s (md/md->hiccup) (md/component)))
 
-(defonce last-repositories-url "https://api-code.etalab.gouv.fr/api/stats/last_repositories")
+(defonce ^{:doc "The URL for the latest repositories."}
+  latest-repositories-url
+  "https://api-code.etalab.gouv.fr/api/stats/last_repositories")
 
-(defn codegouvfr-latest-repositories []
-  (let [reps (try (http/get last-repositories-url)
+(defn latest-repositories []
+  (let [reps (try (http/get latest-repositories-url)
                   (catch Exception e nil))]
     (json/parse-string (:body reps) true)))
 
-(defn rss-feed []
+(defn rss-feed
+  "Generate a RSS feed from `lastest-repositories`."
+  []
   (rss/channel-xml
    ;; FIXME: hardcode title/description if always english?
    {:title       (i/i "en" [:last-repos])
@@ -31,9 +37,11 @@
                     :description (:description item)
                     :author      (:organisation_nom item)
                     :pubDate     (inst/read-instant-date (:derniere_mise_a_jour item))})
-        (codegouvfr-latest-repositories))))
+        (latest-repositories))))
 
-(defn rss []
+(defn rss
+  "Expose the RSS feed."
+  []
   (assoc
    (response/response (rss-feed))
    :headers {"Content-Type" "text/xml; charset=utf-8"}))
@@ -46,7 +54,9 @@
       (str "public/index." lang ".html"))))
    :headers {"Content-Type" "text/html; charset=utf-8"}))
 
-(defn template [lang title subtitle content]
+(defn template
+  "Main template."
+  [lang title subtitle content]
   (h/html5
    {:lang lang}
    [:head
@@ -97,7 +107,9 @@
          (i/i lang [:source-code-available]) [:a {:href "https://github.com/etalab/codegouvfr"}
                                               (i/i lang [:here])]]]]]]]))
 
-(defn contact [lang]
+(defn contact
+  "Contact template."
+  [lang]
   (template
    lang
    (i/i lang [:contact-form])
@@ -141,7 +153,9 @@
                :class "button is-medium is-info"}]]]
     [:br]]))
 
-(defn ok [lang] ;; FIXME: unused
+(defn ok
+  "Template for the contact form feedback."
+  [lang] ;; FIXME: unused
   (template
    lang
    (i/i lang [:message-received])
@@ -158,14 +172,14 @@
    [:div
     [:div {:class "container"}
      [:h1 {:class "title"} "D'où viennent les données ?"]
-     (md-to-string "Dans le cadre de la <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Politique de contribution de l'État aux logiciels libres</a>, la DINSIC collecte la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation</a> où des organismes publics publient leurs codes sources. Nous nous servons de cette liste pour collecter des métadonnées sur tous les dépôts de code source.  Ces métadonnées sont publiées <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">sur data.gouv.fr</a> ou requêtables depuis <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">cette API</a>.")
+     (md-to-hiccup "Dans le cadre de la <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Politique de contribution de l'État aux logiciels libres</a>, la DINSIC collecte la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">liste des comptes d'organisation</a> où des organismes publics publient leurs codes sources. Nous nous servons de cette liste pour collecter des métadonnées sur tous les dépôts de code source.  Ces métadonnées sont publiées <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">sur data.gouv.fr</a> ou requêtables depuis <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">cette API</a>.")
      [:br]
-     (md-to-string "La publication des codes sources est imposée par la <strong>Loi pour une République numérique</strong> : tout code source obtenu ou développé par un organisme remplissant une mission de service public est considéré comme un « document administratif » devant être publié en open data.  Pour connaître les conditions d'ouverture d'un logiciel du secteur public, vous pouvez consulter ce <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guide interactif</a>.")
+     (md-to-hiccup "La publication des codes sources est imposée par la <strong>Loi pour une République numérique</strong> : tout code source obtenu ou développé par un organisme remplissant une mission de service public est considéré comme un « document administratif » devant être publié en open data.  Pour connaître les conditions d'ouverture d'un logiciel du secteur public, vous pouvez consulter ce <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guide interactif</a>.")
      [:br]
      [:h1 {:class "title"} "Je ne vois pas mes codes sources !"]
-     (md-to-string "C'est sûrement que votre forge, votre compte d'organisation ou votre groupe n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.")
+     (md-to-hiccup "C'est sûrement que votre forge, votre compte d'organisation ou votre groupe n'est pas <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">référencé ici</a>.")
      [:br]
-     (md-to-string "<a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
+     (md-to-hiccup "<a href=\"/contact\">Écrivez-nous</a> et nous ajouterons votre forge ou votre compte d'organisation.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "En quoi cette liste peut m'être utile ?"]
@@ -188,11 +202,11 @@
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Puis-je aider à faire évoluer ce site ?"]
-     (md-to-string "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
+     (md-to-hiccup "<strong>Oui !</strong> La collecte des <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">métadonnées des dépôts</a> et l'<a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> sont maintenus par Antoine Augusti (Etalab) ; le site que vous consultez est <a href=\"https://github.com/etalab/codegouvfr\">développé ici</a> par Bastien Guerry (Etalab).  N'hésitez pas à faire des suggestions sur ces dépôts, ils sont sous licence libre et toute contribution est la bienvenue.")
      [:br]
-     (md-to-string "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
+     (md-to-hiccup "Pour suivre l'actualité des logiciels libres utilisés et produits par l'administration, inscrivez-vous à la <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazette #bluehats</a>.")
      [:br]
-     (md-to-string "Et pour toute autre question, n'hésitez pas à [nous écrire](/fr/contact).")
+     (md-to-hiccup "Et pour toute autre question, n'hésitez pas à [nous écrire](/fr/contact).")
      [:br]]]))
 
 (defn en-about [lang]
@@ -202,14 +216,14 @@
    [:div
     [:div {:class "container"}
      [:h1 {:class "title"} "Where does the data come from?"]
-     (md-to-string "As part of the <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">government's free software contribution policy</a>, DINSIC collects the <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">list of organizational accounts</a> where public bodies share their source codes. We use this list to collect metadata about all source code repositories. These metadata are published on <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">data.gouv.fr</a> and queryable through <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">this API</a>.")
+     (md-to-hiccup "As part of the <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">government's free software contribution policy</a>, DINSIC collects the <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">list of organizational accounts</a> where public bodies share their source codes. We use this list to collect metadata about all source code repositories. These metadata are published on <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">data.gouv.fr</a> and queryable through <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">this API</a>.")
      [:br]
-     (md-to-string "The publication of source codes is prescribed by the <strong>French Digital Republic Act (Loi pour une République numérique)</strong> : each source code obtained or developed by an organization fulfilling a public service mission is considered an administrative document, and, therefore, has to be published in open data. To understand the requirements to publish a public sector software, check out this <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">(french) interactive guide</a>.")
+     (md-to-hiccup "The publication of source codes is prescribed by the <strong>French Digital Republic Act (Loi pour une République numérique)</strong> : each source code obtained or developed by an organization fulfilling a public service mission is considered an administrative document, and, therefore, has to be published in open data. To understand the requirements to publish a public sector software, check out this <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">(french) interactive guide</a>.")
      [:br]
      [:h1 {:class "title"} "I can't find my source codes!"]
-     (md-to-string "It is likely that your software forge, your organization or group account is not <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">listed here</a>.")
+     (md-to-hiccup "It is likely that your software forge, your organization or group account is not <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">listed here</a>.")
      [:br]
-     (md-to-string "<a href=\"/contact\">Contact us</a> and we will add your forge or your organization account.")
+     (md-to-hiccup "<a href=\"/contact\">Contact us</a> and we will add your forge or your organization account.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "How can this list help me?"]
@@ -232,11 +246,11 @@
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Can I help enhancing this website?"]
-     (md-to-string "<strong>Yes!</strong> Harvesting <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">metadata of repositories</a> and exposing them via the <a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> is done by Antoine Augusti (Etalab). This frontend is developed <a href=\"https://github.com/etalab/codegouvfr\">here</a> by Bastien Guerry (Etalab).  Don't hesitate to send suggestions on these repositories, they are published under a free software license and every contribution is welcome.")
+     (md-to-hiccup "<strong>Yes!</strong> Harvesting <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">metadata of repositories</a> and exposing them via the <a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> is done by Antoine Augusti (Etalab). This frontend is developed <a href=\"https://github.com/etalab/codegouvfr\">here</a> by Bastien Guerry (Etalab).  Don't hesitate to send suggestions on these repositories, they are published under a free software license and every contribution is welcome.")
      [:br]
-     (md-to-string "To read news about free software used and developed by the French public sector, subscribe to the <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">#bluehats newsletter</a>.")
+     (md-to-hiccup "To read news about free software used and developed by the French public sector, subscribe to the <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">#bluehats newsletter</a>.")
      [:br]
-     (md-to-string "For any other question, please [drop a message](/en/contact).")
+     (md-to-hiccup "For any other question, please [drop a message](/en/contact).")
      [:br]]]))
 
 (defn it-about [lang]
@@ -246,14 +260,14 @@
    [:div
     [:div {:class "container"}
      [:h1 {:class "title"} "Da dove provengono i dati"]
-     (md-to-string "Nel quadro della <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Politica di contribuzione dello Stato per il software libero</a>, il DINSIC raccoglie la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">lista dei repository delle organizzazioni</a> o degli organismi pubblici che condivido il loro codici sorgenti. Usiamo questo elenco per raccogliere metadati su tutti i repository di codice sorgente. Questi matadati sono pubblicati <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">su data.gouv.fr</a> o ricercabili da <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">questa API</a>.")
+     (md-to-hiccup "Nel quadro della <a target=\"new\" href=\"https://www.numerique.gouv.fr/publications/politique-logiciel-libre/\">Politica di contribuzione dello Stato per il software libero</a>, il DINSIC raccoglie la <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">lista dei repository delle organizzazioni</a> o degli organismi pubblici che condivido il loro codici sorgenti. Usiamo questo elenco per raccogliere metadati su tutti i repository di codice sorgente. Questi matadati sono pubblicati <a href=\"https://www.data.gouv.fr/fr/datasets/inventaire-des-depots-de-code-source-des-organismes-publics/\">su data.gouv.fr</a> o ricercabili da <a href=\"https://api-code.etalab.gouv.fr/api/repertoires/all\">questa API</a>.")
      [:br]
-     (md-to-string "La condivisione di codice sorgente è imposta dalla <strong>Legge per una Repubblica digitale</strong>: qualsiasi codice sorgente ottenuto o sviluppato da un'organizzazione che compie una missione di servizio pubblico è considerato un \"documento amministrativo\" da pubblicare come dato aperto. Per conoscere le condizioni di apertura di un software del settore pubblico, è possibile consultare questa <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guida interattiva</a>.")
+     (md-to-hiccup "La condivisione di codice sorgente è imposta dalla <strong>Legge per una Repubblica digitale</strong>: qualsiasi codice sorgente ottenuto o sviluppato da un'organizzazione che compie una missione di servizio pubblico è considerato un \"documento amministrativo\" da pubblicare come dato aperto. Per conoscere le condizioni di apertura di un software del settore pubblico, è possibile consultare questa <a target=\"new\" href=\"https://guide-juridique-logiciel-libre.etalab.gouv.fr\">guida interattiva</a>.")
      [:br]
      [:h1 {:class "title"} "Non vedo i miei sorgenti di codice!"]
-     (md-to-string "&Egrave; sicuramente perchè il vostro repository, il vostro account d'organizzazione o il vostro gruppo non è <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">registrato qui</a>.")
+     (md-to-hiccup "&Egrave; sicuramente perchè il vostro repository, il vostro account d'organizzazione o il vostro gruppo non è <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">registrato qui</a>.")
      [:br]
-     (md-to-string "<a href=\"/contact\">Scrivici</a> e noi aggiungeremo il vostor repository o il vostro acocunt d'organizzazione.")
+     (md-to-hiccup "<a href=\"/contact\">Scrivici</a> e noi aggiungeremo il vostor repository o il vostro acocunt d'organizzazione.")
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Come questa lista mi può essere utile?"]
@@ -276,11 +290,11 @@
      [:br]]
     [:div {:class "container"}
      [:h1 {:class "title"} "Posso aiutare a far evolvere questo sito?"]
-     (md-to-string "<strong>Sì!</strong> La raccoota di <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">metadati dei repository</a> e le <a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> sono mantenute da Antoine Augusti (Etalab); il sito che state consultando è <a href=\"https://github.com/etalab/codegouvfr\">sviluppato</a> da Bastien Guerry (Etalab).  Hon esitate a dare suggerimenti su questi repository, sono sotto licenza libera e tutte le contribuzioni sono benvenute.")
+     (md-to-hiccup "<strong>Sì!</strong> La raccoota di <a target=\"new\" href=\"https://github.com/etalab/data-codes-sources-fr\">metadati dei repository</a> e le <a target=\"new\" href=\"https://github.com/etalab/api-codes-sources-fr\">API</a> sono mantenute da Antoine Augusti (Etalab); il sito che state consultando è <a href=\"https://github.com/etalab/codegouvfr\">sviluppato</a> da Bastien Guerry (Etalab).  Hon esitate a dare suggerimenti su questi repository, sono sotto licenza libera e tutte le contribuzioni sono benvenute.")
      [:br]
-     (md-to-string "Per seguire le notizie del software gratuito utilizzato e prodotto dall'amministrazione, iscriviti alla <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazzetta #bluehats</a>.")
+     (md-to-hiccup "Per seguire le notizie del software gratuito utilizzato e prodotto dall'amministrazione, iscriviti alla <a target=\"new\" href=\"https://lists.eig-forever.org/subscribe/bluehats@mail.etalab.studio\">gazzetta #bluehats</a>.")
      [:br]
-     (md-to-string "E per qualsiasi altra domanda, non esitare a [scriverci](/contact).")
+     (md-to-hiccup "E per qualsiasi altra domanda, non esitare a [scriverci](/contact).")
      [:br]]]))
 
 (defn fr-glossary [lang]
@@ -296,42 +310,42 @@
 
      [:a {:name "repository"} [:h2 {:class "subtitle"} "Dépôt"]]
      [:br]
-     (md-to-string "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
+     (md-to-hiccup "Un « dépôt » est un espace dans lequel sont publiés les fichiers de code source. C'est ce que vous voyez lorsque vous visitez un lien vers un code source hébergé sur une forge. C'est aussi ce que vous pouvez copier sur votre machine pour l'explorer localement.")
      [:br]
 
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dépendances"]]
      [:br]
-     (md-to-string "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet d'en parcourir la liste.  Ces informations sont collectées depuis le site [backyourstack.com](https://backyourstack.com), qui détecte les dépendances de JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) et Python (Requirement).  Les dépendances affichées sont celles nécessaires pour la mise en *production* ou pour le *développement*.")
+     (md-to-hiccup "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet d'en parcourir la liste.  Ces informations sont collectées depuis le site [backyourstack.com](https://backyourstack.com), qui détecte les dépendances de JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) et Python (Requirement).  Les dépendances affichées sont celles nécessaires pour la mise en *production* ou pour le *développement*.")
      [:br]
      
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Étoiles"]]
      [:br]
-     (md-to-string "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
+     (md-to-hiccup "Les « étoiles » (« stars » en anglais) sont un moyen pour les utilisateurs des plates-formes de mettre un dépôt en favori.  Pour l'instant, nous collectons cette information sur GitHub, GitLab et les instances de GitLab.  Ce n'est pas une mesure de la qualité du code source.")
      [:br]
      
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fourche"]]
      [:br]
-     (md-to-string "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
+     (md-to-hiccup "Un dépôt « fourché » (ou « forké » en franglais) est un dépôt de code source qui a été développé à partir d'un autre.")
      [:br]
      
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
-     (md-to-string "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
+     (md-to-hiccup "Une licence logicielle est un contrat passé entre les auteurs d'un logiciel et ses réutilisateurs.  Les licences dites « libres » accordent aux utilisateurs le droit de réutiliser le code source d'un logiciel.")
      [:br]
 
      [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation et groupe"]]
      [:br]
-     (md-to-string "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
+     (md-to-hiccup "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
      [:br]
 
      [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Secteur public"]]
      [:br]
-     (md-to-string "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
+     (md-to-hiccup "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
      [:br]
      
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
      [:br]
-     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
+     (md-to-hiccup "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> est un projet dont le but est d'archiver tous les codes sources disponibles.  Pour chaque dépôt référencé sur ce site, nous donnons le lien vers la version archivée sur Software Heritage.")
      [:br]]]))
 
 (defn en-glossary [lang]
@@ -343,37 +357,37 @@
 
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
      [:br]
-     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
+     (md-to-hiccup "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
      [:br]
 
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
-     (md-to-string "A \"forked\" repository est is repository derived from another one.")
+     (md-to-hiccup "A \"forked\" repository est is repository derived from another one.")
      [:br]
 
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licence"]]
      [:br]
-     (md-to-string "A software licence is a contract between a software's authors and its end-users. So-called \"libre\" licences grant licensees permission to distribute, modify and share a software's source code.")
+     (md-to-hiccup "A software licence is a contract between a software's authors and its end-users. So-called \"libre\" licences grant licensees permission to distribute, modify and share a software's source code.")
      [:br]
 
      [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organisation & Group"]]
      [:br]
-     (md-to-string "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
+     (md-to-hiccup "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
      [:br]
 
      [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Public Sector"]]
      [:br]
-     (md-to-string "Source code developed by a public agency must be published, under certain conditions.  This website offers the possibility to search within source code repositories that are identified as coming from public sector organisms.  It has been developed by [Etalab](https://www.etalab.gouv.fr/).")
+     (md-to-hiccup "Source code developed by a public agency must be published, under certain conditions.  This website offers the possibility to search within source code repositories that are identified as coming from public sector organisms.  It has been developed by [Etalab](https://www.etalab.gouv.fr/).")
      [:br]
 
      [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
      [:br]
-     (md-to-string "A \"repository\" is a place where source code files are stored.  This is what you see when you browse a link to a source code as hosted on a software forge.  This is also what you copy on your machine to explore it locally.")
+     (md-to-hiccup "A \"repository\" is a place where source code files are stored.  This is what you see when you browse a link to a source code as hosted on a software forge.  This is also what you copy on your machine to explore it locally.")
      [:br]
 
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software Heritage"]]
      [:br]
-     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> is a project whose ambition is to collect, preserve, and share all software that is publicly available in source code form. Each repository here referenced is linked to its corresponding Software Heritage archive version.")
+     (md-to-hiccup "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> is a project whose ambition is to collect, preserve, and share all software that is publicly available in source code form. Each repository here referenced is linked to its corresponding Software Heritage archive version.")
      [:br]
 
      [:a {:name "source-code"} [:h2 {:class "subtitle"} "Source Code"]]
@@ -383,7 +397,7 @@
 
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stars"]]
      [:br]
-     (md-to-string "Stars allow users to mark a repository as favourite. At the moment, we collect repository favouriteness data from GitHub, Gitlab and instances thereof. Favouriteness is not a source code quality metric.")
+     (md-to-hiccup "Stars allow users to mark a repository as favourite. At the moment, we collect repository favouriteness data from GitHub, Gitlab and instances thereof. Favouriteness is not a source code quality metric.")
      [:br]
 
      ]]))
@@ -403,42 +417,42 @@
      ;; TODO: i18n
      [:a {:name "dependencies"} [:h2 {:class "subtitle"} "Dependencies"]]
      [:br]
-     (md-to-string "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
+     (md-to-hiccup "Softwares often open source libraries. These libraries are the \"dependencies\" of a software. This website allows you to browse a repository or a group dependencies.  They are collected from [backyourstack.com](https://backyourstack.com), which detects dependencies from JavaScript (NPM), PHP (Composer), .NET (Nuget), Go (dep), Ruby (Gem) and Python (Requirement).  We display both *production* and *development* dependencies.")
      [:br]
 
      [:a {:name "fourche"} [:h2 {:class "subtitle"} "Fork"]]
      [:br]
-     (md-to-string "Una fork è un repository che è stato sviluppato partendo dal codice presente in un altro repository pubblico.")
+     (md-to-hiccup "Una fork è un repository che è stato sviluppato partendo dal codice presente in un altro repository pubblico.")
      [:br]
 
      [:a {:name "license"} [:h2 {:class "subtitle"} "Licenze"]]
      [:br]
-     (md-to-string "Una licenza è un contratto sviluppato tra l'autore di un programma e i suoi utilizzatori. Le licenze dette \"libere\" concedono agli utilizzatori il diritto di riutilizzare il codice sorgente di un programma.")
+     (md-to-hiccup "Una licenza è un contratto sviluppato tra l'autore di un programma e i suoi utilizzatori. Le licenze dette \"libere\" concedono agli utilizzatori il diritto di riutilizzare il codice sorgente di un programma.")
      [:br]
 
      [:a {:name "organization-group"} [:h2 {:class "subtitle"} "Organizzazione e gruppi"]]
      [:br]
-     (md-to-string "GitHub è un sito di verisonamento del codice e permette di avere dei repository personali e dei \"repository di organizzazione\". Un gruppo è la nozione più o meno equivalente sulle istanze di GitLab. Un organismo che svolge una missione di servizio pubblico può avere una o più organizzazioni e/o gruppi su una o più siti di verisonamento del codice.")
+     (md-to-hiccup "GitHub è un sito di verisonamento del codice e permette di avere dei repository personali e dei \"repository di organizzazione\". Un gruppo è la nozione più o meno equivalente sulle istanze di GitLab. Un organismo che svolge una missione di servizio pubblico può avere una o più organizzazioni e/o gruppi su una o più siti di verisonamento del codice.")
      [:br]
 
      [:a {:name "repository"} [:h2 {:class "subtitle"} "Repository"]]
      [:br]
-     (md-to-string "Un repository è uno spazio dentro il quale vengono pubblicati i file di codice sorgente. Questo è ciò che si vede quando si visita un link al codice sorgente ospitato su un repository. &Egrave; anche quello che puoi copiare sul tuo computer per esplorarlo localmente.")
+     (md-to-hiccup "Un repository è uno spazio dentro il quale vengono pubblicati i file di codice sorgente. Questo è ciò che si vede quando si visita un link al codice sorgente ospitato su un repository. &Egrave; anche quello che puoi copiare sul tuo computer per esplorarlo localmente.")
      [:br]
 
      [:a {:name "secteur-public"} [:h2 {:class "subtitle"} "Settore pubblico"]]
      [:br]
-     (md-to-string "I codici sorgente sviluppati nell'ambito di servizi pubblici sono destinati a essere pubblicati in open source sotto determinate condizioni. Questo sito offre la possibilità di cercare nell'insieme di codici sorgenti oggi identificati come provenienti da un'organizzazione che svolge un compito di servizio pubblico. Il sito è stato sviluppato da [Etalab](https://www.etalab.gouv.fr/).")
+     (md-to-hiccup "I codici sorgente sviluppati nell'ambito di servizi pubblici sono destinati a essere pubblicati in open source sotto determinate condizioni. Questo sito offre la possibilità di cercare nell'insieme di codici sorgenti oggi identificati come provenienti da un'organizzazione che svolge un compito di servizio pubblico. Il sito è stato sviluppato da [Etalab](https://www.etalab.gouv.fr/).")
      [:br]
 
      [:a {:name "software-heritage"} [:h2 {:class "subtitle"} "Software heritage"]]
      [:br]
-     (md-to-string "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> è un progetto che ha lo scopo di archiviare tutti i codici sorgenti disponbili. Per ciascun repository referenziato in questo sito, viene fornito il link alla versione archiviata su Software Heritage.")
+     (md-to-hiccup "<a target=\"new\" href=\"https://www.softwareheritage.org/\">Software Heritage</a> è un progetto che ha lo scopo di archiviare tutti i codici sorgenti disponbili. Per ciascun repository referenziato in questo sito, viene fornito il link alla versione archiviata su Software Heritage.")
      [:br]
 
      [:a {:name "etoile"} [:h2 {:class "subtitle"} "Stelle"]]
      [:br]
-     (md-to-string "Le stelle («star» in inglese) sono un mezzo per permettere agi utilizzato delle piattaforme di versionamento del codice di mettere un repository tra i preferity. Al momento, noi memorizziamo questa informazion su GitHub, GitLab e le istanze private di GitLab. Questa non è una misura della qualità del codice sorgente.")
+     (md-to-hiccup "Le stelle («star» in inglese) sono un mezzo per permettere agi utilizzato delle piattaforme di versionamento del codice di mettere un repository tra i preferity. Al momento, noi memorizziamo questa informazion su GitHub, GitLab e le istanze private di GitLab. Questa non è una misura della qualità del codice sorgente.")
      [:br]
 
      ]]))
