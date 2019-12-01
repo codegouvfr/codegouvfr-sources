@@ -1,7 +1,9 @@
 (ns codegouvfr.i18n
   (:require [taoensso.tempura :refer [tr]]))
 
-(def supported-languages #{"en" "fr" "it"})
+(def supported-languages
+  "A set of supported langages."
+  #{"en" "fr" "it"})
 
 (def localization
   ;; French translation
@@ -353,4 +355,7 @@
 
 (def opts {:dict localization})
 
-(defn i [lang input] (tr opts [lang] input))
+(defn i
+  "Main i18n fonction."
+  [lang input]
+  (tr opts [lang] input))
