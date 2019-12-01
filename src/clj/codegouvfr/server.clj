@@ -216,6 +216,24 @@
       :props
       :pageProps))
 
+(defn extract-deps-repos [orga]
+  (let [short-deps
+        #(apply dissoc (clset/rename-keys % {:type :t :name :n})
+                [:engines :peer])]
+    (comp
+     (filter #(not (empty? (:dependencies %))))
+     (map #(apply dissoc % deps-rm-kws))
+     (map #(clset/rename-keys % {:name :n :dependencies :d}))
+     (map #(assoc % :d (map (fn [r] (short-deps r)) (:d %))))
+     (map #(assoc % :g orga)))))
+
+(defonce extract-orga-deps
+  (comp
+   (map #(apply dissoc % [:project :peer :engines]))
+   (map (fn [r]
+          (let [rs (:repos r)]
+            (assoc r :repos (map #(dissoc % :id) rs)))))))
+
 (defn update-orgas-repos-deps
   "Generate data/deps/orgas/* and data/deps/repos-deps.json.
   Also reset the `repos-deps` atom."
@@ -224,28 +242,8 @@
   (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
     (doseq [orga gh-orgas
             :let [data (get-deps orga)
-                  orga-deps0 (map #(apply dissoc % [:project :peer :engines])
-                                  (:dependencies data))
-                  orga-deps (map (fn [r]
-                                   (let [rs (:repos r)]
-                                     (assoc r :repos (map #(dissoc % :id) rs))))
-                                 orga-deps0)
-                  orga-repos0
-                  (filter #(not (empty? (:dependencies %)))
-                          (map (fn [r] (assoc r :g orga))
-                               (map #(apply dissoc % deps-rm-kws)
-                                    (:repos data))))
-                  orga-repos1
-                  (map #(set/rename-keys
-                         % {:name :n :dependencies :d}) orga-repos0)
-                  orga-repos (map #(assoc % :d
-                                          (map (fn [r]
-                                                 (apply dissoc
-                                                        (set/rename-keys
-                                                         r {:type :t :name :n})
-                                                        [:engines :peer]))
-                                               (:d %)))
-                                  orga-repos1)]]
+                  orga-deps (sequence extract-orga-deps (:dependencies data))
+                  orga-repos (sequence (extract-deps-repos orga) (:repos data))]]
       (do (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
                 (json/generate-string orga-deps))
           (swap! repos-deps (partial apply conj) orga-repos)))
@@ -256,20 +254,26 @@
 (defn merge-colls [a b]
   (if (and (coll? a) (coll? b)) (into a b) b))
 
+(defonce reduce-deps
+  (comp
+   (map #(apply (partial merge-with merge-colls) %))
+   (map #(assoc % :rs (count (:rs %))))))
+
 (defn update-deps
   "Generate data/deps/deps*.json."
   []
   (let [deps (atom nil)]
-    (doseq [rep @repos-deps :let [r-deps (:d rep)]]
+    (doseq [repo @repos-deps :let [r-deps (:d repo)]]
       (doseq [d0   r-deps
               :let [d (apply dissoc d0 [:core :dev :peer :engines])]]
-        (swap! deps conj (assoc d :rs (vector (dissoc rep :d))))))
-    (reset! deps (map (fn [x] (assoc x :rs (count (:rs x))))
-                      (reverse (sort #(compare (count (:rs %1)) (count (:rs %2)))
-                                     (map #(apply (partial merge-with merge-colls) %)
-                                          (vals (group-by :n @deps)))))))
-    (spit "data/deps/deps-total.json" (json/generate-string {:deps-total (count @deps)}))
-    (spit "data/deps/deps-count.json" (json/generate-string (take 100 @deps))))
+        (swap! deps conj (assoc d :rs (vector (dissoc repo :d))))))
+    (reset! deps
+            (reverse (sort-by :rs (sequence reduce-deps
+                                            (vals (group-by :n @deps))))))
+    (spit "data/deps/deps-total.json"
+          (json/generate-string {:deps-total (count @deps)}))
+    (spit "data/deps/deps-count.json"
+          (json/generate-string (take 100 @deps))))
   (timbre/info (str "updated data/deps/deps-[total|count].json")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
