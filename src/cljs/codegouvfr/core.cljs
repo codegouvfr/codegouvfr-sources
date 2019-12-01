@@ -538,7 +538,8 @@
          ^{:key o}
          [:tr [:td t] [:td n] [:td rs]])]]]]])
 
-(defn stats-page [lang stats deps deps-total]
+(defn stats-page
+  [lang stats deps deps-total]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
                 top_orgs_by_repos top_orgs_by_stars top_licenses
                 platforms software_heritage top_languages]} stats
@@ -637,7 +638,9 @@
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
-(defn repo-deps-page [lang orga repo deps]
+(defn repo-deps-page
+  "Table with repository dependencies."
+  [lang orga repo deps]
   (let [rdeps (:d deps)
         cdeps (count rdeps)]
     (if (= (:g deps) orga)
@@ -686,7 +689,9 @@
       :reagent-render
       (fn [] (repo-deps-page lang (:orga params) (:repo params) @deps))})))
 
-(defn orga-deps-page [lang orga deps]
+(defn orga-deps-page
+  "Table with group/organization dependencies."
+  [lang orga deps]
   (let [cdeps (count deps)]
     [:div
      [:div [:h1 (str cdeps " " (if (< cdeps 2)
@@ -730,44 +735,47 @@
              #(reset! deps (clojure.walk/keywordize-keys %))))
       :reagent-render (fn [] (orga-deps-page lang orga @deps))})))
 
+(defn main-menu [q lang view]
+  [:div {:class "field is-grouped"}
+   ;; FIXME: why :p here? Use level?
+   [:p {:class "control"}
+    [:a {:class "button is-success"
+         :href  (rfe/href :repos {:lang lang})} (i/i lang [:repos-of-source-code])]]
+   [:p {:class "control"}
+    [:a {:class "button is-danger"
+         :title (i/i lang [:github-gitlab-etc])
+         :href  (rfe/href :orgas {:lang lang})} (i/i lang [:orgas-or-groups])]]
+   [:p {:class "control"}
+    [:a {:class "button is-info"
+         :href  (rfe/href :stats {:lang lang})} (i/i lang [:stats])]]
+   (if (or (= view :repos) (= view :orgas))
+     [:p {:class "control"}
+      [:input {:class       "input"
+               :size        20
+               :placeholder (i/i lang [:free-search])
+               :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+               :on-change   (fn [e]
+                              (let [ev (.-value (.-target e))]
+                                (reset! q ev)
+                                (async/go
+                                  (async/>! display-filter-chan {:q ev})
+                                  (<! (async/timeout timeout))
+                                  (async/>! filter-chan {:q ev}))))}]])
+   (let [flt @(re-frame/subscribe [:filter?])]
+     (if (seq (:g flt))
+       [:p {:class "control"}
+        [:a {:class "button is-outlined is-warning"
+             :title (i/i lang [:remove-filter])
+             :href  (rfe/href :repos {:lang lang})}
+         [:span (:g flt)]
+         (fa "fa-times")]]))
+   [:br]])
+
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
-     [:div {:class "field is-grouped"}
-      ;; FIXME: why :p here? Use level?
-      [:p {:class "control"}
-       [:a {:class "button is-success"
-            :href  (rfe/href :repos {:lang lang})} (i/i lang [:repos-of-source-code])]]
-      [:p {:class "control"}
-       [:a {:class "button is-danger"
-            :title (i/i lang [:github-gitlab-etc])
-            :href  (rfe/href :orgas {:lang lang})} (i/i lang [:orgas-or-groups])]]
-      [:p {:class "control"}
-       [:a {:class "button is-info"
-            :href  (rfe/href :stats {:lang lang})} (i/i lang [:stats])]]
-      (if (or (= view :repos) (= view :orgas))
-        [:p {:class "control"}
-         [:input {:class       "input"
-                  :size        20
-                  :placeholder (i/i lang [:free-search])
-                  :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-                  :on-change   (fn [e]
-                                 (let [ev (.-value (.-target e))]
-                                   (reset! q ev)
-                                   (async/go
-                                     (async/>! display-filter-chan {:q ev})
-                                     (<! (async/timeout timeout))
-                                     (async/>! filter-chan {:q ev}))))}]])
-      (let [flt @(re-frame/subscribe [:filter?])]
-        (if (seq (:g flt))
-          [:p {:class "control"}
-           [:a {:class "button is-outlined is-warning"
-                :title (i/i lang [:remove-filter])
-                :href  (rfe/href :repos {:lang lang})}
-            [:span (:g flt)]
-            (fa "fa-times")]]))]
-     [:br]
+     [main-menu q lang view]
      (cond
        (= view :home-redirect)
        (if dev?
@@ -775,7 +783,7 @@
          (if (contains? i/supported-languages lang)
            (do (set! (.-location js/window) (str "/" lang "/repos")) "")
            (do (set! (.-location js/window) (str "/en/repos")) "")))
-
+       ;; Table to display repository
        (= view :repos)
        (let [repos          @(re-frame/subscribe [:repos?])
              repos-pages    @(re-frame/subscribe [:repos-page?])
@@ -854,19 +862,19 @@
           [:br]
           [repositories-page lang (count repos)]
           [:br]])
-
+       ;; Table to display organizations
        (= view :orgas)
        [organizations-page-class lang]
-
+       ;; Table to display statistiques
        (= view :stats)
        [stats-page-class lang]
-
+       ;; Table to display a repository dependencies
        (= view :repo-deps)
        [repo-deps-page-class lang]
-
+       ;; Table to display a group dependencies
        (= view :orga-deps)
        [orga-deps-page-class lang]
-
+       ;; Fall back on the repository page
        :else
        (rfe/push-state :repos {:lang lang}))]))
 
