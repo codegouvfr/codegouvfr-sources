@@ -475,7 +475,7 @@
                 [:div {:class "content"}
                  [:p d]]]
                [:div {:class "card-footer"}
-                (when dp
+                (when (and (= p "GitHub") dp)
                   [:a {:class "card-footer-item"
                        :title (i/i lang [:deps])
                        :href  (rfe/href
