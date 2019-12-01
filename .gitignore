@@ -19,3 +19,4 @@ pom.xml
 data/*json
 data/deps/*json
 data/deps/orgas/*json
+.eastwood
