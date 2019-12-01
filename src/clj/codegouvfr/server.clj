@@ -48,7 +48,7 @@
               :to   config/admin-email})}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Download repos, orgas and annuaire locally
+;; Define variables later needed
 
 (defonce
   ^{:doc "The URL from where to fetch repository data."}
@@ -101,9 +101,10 @@
    :organisation_url   :o
    :avatar_url         :au})
 
-(def licenses-mapping
-  "Mapping from GitHub license strings to the their license+SDPX short
-  identifier version."
+(defonce
+  ^{:doc "Mapping from GitHub license strings to the their license+SDPX short
+  identifier version."}
+  licenses-mapping
   {"MIT License"                                                "MIT License (MIT)"
    "GNU Affero General Public License v3.0"                     "GNU Affero General Public License v3.0 (AGPL-3.0)"
    "GNU General Public License v3.0"                            "GNU General Public License v3.0 (GPL-3.0)"
@@ -130,6 +131,11 @@
    :page_accueil :date_creation :topics :plateforme])
 
 (defonce
+  ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
+  deps-rm-kws
+  [:private :default_branch :language :id :checked :owner :full_name])
+
+(defonce
   ^{:doc "A list of repositories dependencies, updated by the fonction
   `update-orgas-repos-deps` and stored for further retrieval in
   `update-deps`."}
@@ -142,6 +148,9 @@
   `update-orgas` and `update-orgas-repos-deps`."}
   orgas-json
   (atom nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Download repos, orgas and annuaire locally
 
 (defn update-repos
   "Generate data/repos.json from `repos-url`."
@@ -207,13 +216,9 @@
       :props
       :pageProps))
 
-(defonce
-  ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
-  deps-rm-kws
-  [:private :default_branch :language :id :checked :owner :full_name])
-
 (defn update-orgas-repos-deps
-  "Generate data/deps/orgas/* and data/deps/repos-deps.json."
+  "Generate data/deps/orgas/* and data/deps/repos-deps.json.
+  Also reset the `repos-deps` atom."
   []
   (reset! repos-deps nil)
   (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
