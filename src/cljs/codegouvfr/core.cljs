@@ -12,6 +12,7 @@
             [markdown-to-hiccup.core :as md]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
+            [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]))
 
@@ -494,7 +495,8 @@
   (reagent/create-class
    {:component-will-mount
     (fn []
-      (GET "/orgas" :handler
+      (GET "/orgas"
+           :handler
            #(re-frame/dispatch
              [:update-orgas! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (organizations-page lang))}))
@@ -513,7 +515,7 @@
     [:div {:class "card-content"}
      [:table {:class "table is-fullwidth"}
       [:tbody
-       (for [o (reverse (clojure.walk/stringify-keys (sort-by val data)))]
+       (for [o (reverse (walk/stringify-keys (sort-by val data)))]
          ^{:key (key o)}
          [:tr [:td (key o)] [:td (val o)]])]]]]])
 
@@ -551,11 +553,11 @@
         top_languages_0
         (into {} (map #(let [[k v] %]
                          [[:a {:href (str "/" lang "/repos?language=" k)} k] v])
-                      (clojure.walk/stringify-keys top_languages)))
+                      (walk/stringify-keys top_languages)))
         top_licenses_0
         (into {} (map #(let [[k v] %]
                          [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
-                      (clojure.walk/stringify-keys top_licenses)))]
+                      (walk/stringify-keys top_licenses)))]
     [:div
      [:div {:class "columns"}
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
@@ -616,12 +618,12 @@
     (reagent/create-class
      {:component-will-mount
       (fn []
-        (GET "/deps-total" :handler
-             #(reset! deps-total (clojure.walk/keywordize-keys %)))
-        (GET "/deps" :handler
-             #(reset! deps (map (comp bean clj->js) %)))
-        (GET stats-url :handler
-             #(reset! stats (clojure.walk/keywordize-keys %))))
+        (GET "/deps-total"
+             :handler #(reset! deps-total (walk/keywordize-keys %)))
+        (GET "/deps"
+             :handler #(reset! deps (map (comp bean clj->js) %)))
+        (GET stats-url
+             :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
 (defn change-repos-page [next]
@@ -648,13 +650,16 @@
        [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                    (i/i lang [:dep-of])
                                    (i/i lang [:deps-of]))
-                       " " repo)
+                       " ")
+              [:a {:href (rfe/href :repos {:lang lang} {:q repo})} repo]
               [:sup
                [:a {:href  (str "/" lang "/glossary#dependencies")
                     :class "has-text-grey is-size-6"
                     :title (i/i lang [:go-to-glossary])}
                 (fa "fa-question-circle")]]
-              (str " (" orga ")")]]
+              " ("
+              [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
+              ")"]]
        [:br]
        (if-let [dps (not-empty rdeps)]
          [:div {:class "table-container"}
@@ -684,8 +689,8 @@
     (reagent/create-class
      {:component-will-mount
       (fn []
-        (GET (str "/deps/repos/" repo) :handler
-             #(reset! deps (clojure.walk/keywordize-keys %))))
+        (GET (str "/deps/repos/" repo)
+             :handler #(reset! deps (walk/keywordize-keys %))))
       :reagent-render
       (fn [] (repo-deps-page lang (:orga params) (:repo params) @deps))})))
 
@@ -697,7 +702,8 @@
      [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                  (i/i lang [:dep-of])
                                  (i/i lang [:deps-of]))
-                     " " orga)
+                     " ")
+            [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
             [:sup
              [:a {:href  (str "/" lang "/glossary#dependencies")
                   :class "has-text-grey is-size-6"
@@ -707,10 +713,11 @@
      (if (not-empty deps)
        [:div {:class "table-container"}
         [:table {:class "table is-hoverable is-fullwidth"}
-         [:thead [:tr
-                  [:th (i/i lang [:type])] [:th (i/i lang [:name])]
-                  [:th (i/i lang [:core-dep])] [:th (i/i lang [:dev-dep])]
-                  [:th (i/i lang [:Repos])]]]
+         [:thead
+          [:tr
+           [:th (i/i lang [:type])] [:th (i/i lang [:name])]
+           [:th (i/i lang [:core-dep])] [:th (i/i lang [:dev-dep])]
+           [:th (i/i lang [:Repos])]]]
          (into [:tbody]
                (for [{:keys [type name core dev repos] :as d} deps]
                  ^{:key d}
@@ -719,7 +726,10 @@
                   [:td core] [:td dev]
                   [:td (for [{:keys [name full_name] :as r} repos]
                          ^{:key r}
-                         [:span [:a {:href (str "https://github.com/" full_name)} name] " "])]]))]
+                         [:span [:a {:href
+                                     (str "https://github.com/"
+                                          full_name)}
+                                 name] " "])]]))]
         [:br]]
        [:div
         [:h2 (i/i lang [:deps-not-found])]
@@ -731,8 +741,9 @@
     (reagent/create-class
      {:component-will-mount
       (fn []
-        (GET (str "/deps/orgas/" orga) :handler
-             #(reset! deps (clojure.walk/keywordize-keys %))))
+        (GET (str "/deps/orgas/" orga)
+             :handler
+             #(reset! deps (walk/keywordize-keys %))))
       :reagent-render (fn [] (orga-deps-page lang orga @deps))})))
 
 (defn main-menu [q lang view]
@@ -740,14 +751,17 @@
    ;; FIXME: why :p here? Use level?
    [:p {:class "control"}
     [:a {:class "button is-success"
-         :href  (rfe/href :repos {:lang lang})} (i/i lang [:repos-of-source-code])]]
+         :href  (rfe/href :repos {:lang lang})}
+     (i/i lang [:repos-of-source-code])]]
    [:p {:class "control"}
     [:a {:class "button is-danger"
          :title (i/i lang [:github-gitlab-etc])
-         :href  (rfe/href :orgas {:lang lang})} (i/i lang [:orgas-or-groups])]]
+         :href  (rfe/href :orgas {:lang lang})}
+     (i/i lang [:orgas-or-groups])]]
    [:p {:class "control"}
     [:a {:class "button is-info"
-         :href  (rfe/href :stats {:lang lang})} (i/i lang [:stats])]]
+         :href  (rfe/href :stats {:lang lang})}
+     (i/i lang [:stats])]]
    (if (or (= view :repos) (= view :orgas))
      [:p {:class "control"}
       [:input {:class       "input"
@@ -885,7 +899,8 @@
     (reagent/create-class
      {:component-will-mount
       (fn []
-        (GET "/repos" :handler
+        (GET "/repos"
+             :handler
              #(re-frame/dispatch
                [:update-repos! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language))})))
