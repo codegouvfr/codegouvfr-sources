@@ -273,14 +273,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define tasks
 
-(def update-orgas-json! (tt/every! 10800 update-orgas-json))
-(def update-orgas-repos-deps! (tt/every! 86400 5 update-orgas-repos-deps))
-(def update-deps! (tt/every! 86400 160 update-deps))
-(def update-repos! (tt/every! 10800 165 update-repos))
-(def update-orgas! (tt/every! 10800 170 update-orgas))
-
 (defn start-tasks []
   (tt/start!)
+  (tt/every! 10800 update-orgas-json)
+  (tt/every! 86400 5 update-orgas-repos-deps)
+  (tt/every! 86400 160 update-deps)
+  (tt/every! 10800 165 update-repos)
+  (tt/every! 10800 170 update-orgas)
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
