@@ -282,10 +282,10 @@
 (defn start-tasks []
   (tt/start!)
   (tt/every! 10800 update-orgas-json)
-  (tt/every! 86400 5 update-orgas-repos-deps)
-  (tt/every! 86400 160 update-deps)
-  (tt/every! 10800 165 update-repos)
-  (tt/every! 10800 170 update-orgas)
+  (tt/every! 86400 10 update-orgas-repos-deps)
+  (tt/every! 86400 180 update-deps)
+  (tt/every! 10800 200 update-repos)
+  (tt/every! 10800 220 update-orgas)
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
