@@ -195,7 +195,8 @@
      [:br]
      [:ul
       [:li "Trouver les dépôts contenant \"API\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
-      [:li "Trouver les dépôts des groupes contenant \"beta\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
+      [:li "Trouver les dépôts des groupes contenant \"betagouv\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?g=betagouv"} "https://code.etalab.gouv.fr/fr/repos?g=betagouv"]]
+      [:li "Trouver les groupes contenant \"medialab\" : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?q=medialab"} "https://code.etalab.gouv.fr/fr/groups?q=medialab"]]
       [:li "Trouver les dépôts en Python : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
       [:li "Trouver les dépôts sous Affero GPL : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
       [:li "Combiner les requêtes : " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/fr/repos?license=Affero&g=beta"]]]
@@ -239,6 +240,8 @@
      [:br]
      [:ul
       [:li "Find repositories containing \"API\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?q=API"} "https://code.etalab.gouv.fr/fr/repos?q=API"]]
+      [:li "Find group repositories containing \"betagouv\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?g=betagouv"} "https://code.etalab.gouv.fr/fr/repos?g=betagouv"]]
+      [:li "Find groups containing \"medialab\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?q=medialab"} "https://code.etalab.gouv.fr/fr/groups?q=medialab"]]
       [:li "Find group repositories containing \"beta\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?g=beta"} "https://code.etalab.gouv.fr/fr/groups?g=beta"]]
       [:li "Find repositories in Python: " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?language=python"} "https://code.etalab.gouv.fr/fr/repos?language=python"]]
       [:li "Find repositories under the Affero GPL license: " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/repos?license=Affero"} "https://code.etalab.gouv.fr/fr/repos?license=Affero"]]
@@ -283,7 +286,8 @@
      [:br]
      [:ul
       [:li "Travare i repository contenti \"API\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/repos?q=API"} "https://code.etalab.gouv.fr/it/repos?q=API"]]
-      [:li "Trovare i repository dei gruppi contenenti \"beta\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/groups?g=beta"} "https://code.etalab.gouv.fr/it/groups?g=beta"]]
+      [:li "Trovare i repository dei gruppi contenenti \"betagouv\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/repos?g=betagouv"} "https://code.etalab.gouv.fr/it/repos?g=betagouv"]]
+      [:li "Find groups containing \"medialab\": " [:a {:target "new" :href "https://code.etalab.gouv.fr/fr/groups?q=medialab"} "https://code.etalab.gouv.fr/fr/groups?q=medialab"]] ;; TODO
       [:li "Trovare i repository su Python: " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/repos?language=python"} "https://code.etalab.gouv.fr/it/repos?language=python"]]
       [:li "Trovare i repository sotto licenza Affero GPL: " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/repos?license=Affero"} "https://code.etalab.gouv.fr/it/repos?license=Affero"]]
       [:li "Combinare le richieste: " [:a {:target "new" :href "https://code.etalab.gouv.fr/it/repos?license=Affero&g=beta"} "https://code.etalab.gouv.fr/it/repos?license=Affero&g=beta"]]]
