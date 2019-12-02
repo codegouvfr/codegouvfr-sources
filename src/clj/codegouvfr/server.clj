@@ -161,7 +161,8 @@
            (map
             (fn [r] (assoc r
                            :li (get licenses-mapping (:li r))
-                           :dp (not (empty? (first (filter #(= (:n %) (:n r)) @repos-deps))))))
+                           :dp (not (empty? (first (filter #(= (:n %) (:n r))
+                                                           @repos-deps))))))
             (map #(clset/rename-keys
                    (apply dissoc % repos-rm-ks) repos-mapping)
                  repos-json)))))
