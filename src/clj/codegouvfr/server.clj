@@ -66,6 +66,18 @@
   annuaire-url
   "https://www.data.gouv.fr/fr/datasets/r/ac26b864-6a3a-496b-8832-8cde436f5230")
 
+(defonce
+  ^{:doc "The URL to get emoji char/name pairs."}
+  emoji-json-url
+  "https://raw.githubusercontent.com/amio/emoji.json/master/emoji.json")
+
+(defonce
+  ^{:doc "A map of emoji with {:char \"\" :name \"\"."}
+  emoji-json
+  (->> (json/parse-string (:body (http/get emoji-json-url)) true)
+       (map #(select-keys % [:char :name]))
+       (map #(update % :name (fn [n] (str ":" (s/replace n " " "_") ":"))))))
+
 (def repos-mapping
   "Mapping from repositories keywords to local short versions."
   {:nom                    :n
@@ -152,20 +164,32 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Download repos, orgas and annuaire locally
 
+(def cleanup-repos
+  (comp
+   (map #(clset/rename-keys (apply dissoc % repos-rm-ks) repos-mapping))
+   (map (fn [r] (assoc
+                 r
+                 :li (get licenses-mapping (:li r))
+                 :dp (not (empty? (first (filter #(= (:n %) (:n r))
+                                                 @repos-deps)))))))
+   (map (fn [r] (update
+                 r
+                 :d
+                 (fn [d]
+                   (let [desc (atom d)]
+                     (doseq [e emoji-json]
+                       (swap! desc (fn [x]
+                                     (when (string? x)
+                                       (s/replace x (:name e) (:char e))))))
+                     @desc)))))))
+
 (defn update-repos
   "Generate data/repos.json from `repos-url`."
   []
   (let [repos-json (json/parse-string (:body (http/get repos-url)) true)]
     (spit "data/repos.json"
           (json/generate-string
-           (map
-            (fn [r] (assoc r
-                           :li (get licenses-mapping (:li r))
-                           :dp (not (empty? (first (filter #(= (:n %) (:n r))
-                                                           @repos-deps))))))
-            (map #(clset/rename-keys
-                   (apply dissoc % repos-rm-ks) repos-mapping)
-                 repos-json)))))
+           (sequence cleanup-repos repos-json))))
   (timbre/info (str "updated repos.json")))
 
 (defn update-orgas-json
