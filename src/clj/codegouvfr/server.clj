@@ -128,7 +128,7 @@
   backend."}
   repos-rm-ks
   [:software_heritage_url :software_heritage_exists :derniere_modification
-   :page_accueil :date_creation :topics :plateforme])
+   :page_accueil :date_creation :plateforme])
 
 (defonce
   ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
