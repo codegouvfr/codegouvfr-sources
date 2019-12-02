@@ -39,6 +39,21 @@
       ["/:repo" :repo-deps]
       ["" :orga-deps]]]]])
 
+(defn set-item!
+  "Set `key` in browser's localStorage to `val`."
+  [key val]
+  (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val))))
+
+(defn get-item
+  "Returns value of `key` from browser's localStorage."
+  [key]
+  (js->clj (.parse js/JSON (.getItem (.-localStorage js/window) key))))
+
+(defn remove-item!
+  "Remove the browser's localStorage value for the given `key`."
+  [key]
+  (.removeItem (.-localStorage js/window) key))
+
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
@@ -244,11 +259,14 @@
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
+         favs   (get-item :favs)
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (sort-by :n repos0)
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
                   :issues (sort-by :i repos0)
+                  :favs   (concat (filter #(some #{(:n %)} favs) repos0)
+                                  (filter #(not (some #{(:n %)} favs)) repos0))
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
@@ -277,6 +295,33 @@
                             (reverse orgas)
                             orgas)))))
 
+(defn favorite [lang n]
+  (let [fav-class
+        (reagent/atom (if (some #{n} (get-item :favs)) "" "has-text-grey"))]
+    [:a {:class    @fav-class
+         :title    (i/i lang [:fav-add])
+         :on-click #(let [favs (get-item :favs)]
+                      (if (some #{n} favs)
+                        (do (set-item! :favs (remove (fn [x] (= n x)) favs))
+                            (reset! fav-class "has-text-grey"))
+                        (do (set-item! :favs (distinct (conj favs n)))
+                            (reset! fav-class ""))))}
+     (fa "fa-star")]))
+
+(defn change-repos-page [next]
+  (let [repos-page  @(re-frame/subscribe [:repos-page?])
+        count-pages (count (partition-all
+                            repos-per-page @(re-frame/subscribe [:repos?])))]
+    (cond
+      (= next "first")
+      (re-frame/dispatch [:repos-page! 0])
+      (= next "last")
+      (re-frame/dispatch [:repos-page! (dec count-pages)])
+      (and (< repos-page (dec count-pages)) next)
+      (re-frame/dispatch [:repos-page! (inc repos-page)])
+      (and (> repos-page 0) (not next))
+      (re-frame/dispatch [:repos-page! (dec repos-page)]))))
+
 (defn repositories-page [lang repos-cnt]
   (if (= repos-cnt 0)
     [:div [:p (i/i lang [:no-repo-found])] [:br]]
@@ -285,36 +330,41 @@
        [:table {:class "table is-hoverable is-fullwidth"}
         [:thead
          [:tr
-          [:th [:abbr {:title (i/i lang [:orga-repo])}
+          [:th [:abbr
+                [:a {:class    (when-not (= rep-f :favs) "has-text-grey")
+                     :title    (i/i lang [:fav-sort])
+                     :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
+                 (fa "fa-star")]]]
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
                      :title    (i/i lang [:sort-repos-alpha])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
                  (i/i lang [:orga-repo])]]]
-          [:th [:abbr {:title (i/i lang [:archive])}
+          [:th [:abbr
                 [:a {:class "button is-static"
                      :title (i/i lang [:swh-link])}
                  (i/i lang [:archive])]]]
-          [:th [:abbr {:title (i/i lang [:description])}
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
                      :title    (i/i lang [:sort-description-length])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
                  (i/i lang [:description])]]]
-          [:th [:abbr {:title (i/i lang [:update])}
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :date) " is-light"))
                      :title    (i/i lang [:sort-update-date])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
                  (i/i lang [:update-short])]]]
-          [:th [:abbr {:title (i/i lang [:forks])}
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :forks) " is-light"))
                      :title    (i/i lang [:sort-forks])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
                  (i/i lang [:forks])]]]
-          [:th [:abbr {:title (i/i lang [:stars])}
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :stars) " is-light"))
                      :title    (i/i lang [:sort-stars])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
                  (i/i lang [:stars])]]]
-          [:th [:abbr {:title (i/i lang [:issues])}
+          [:th [:abbr
                 [:a {:class    (str "button" (when (= rep-f :issues) " is-light"))
                      :title    (i/i lang [:sort-issues])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
@@ -326,8 +376,10 @@
                 ^{:key dd}
                 (let [{:keys [a? d f i li n o r s u dp]}
                       dd
-                      group (subs r 0 (- (count r) (+ 1 (count n))))]
+                      group
+                      (subs r 0 (- (count r) (+ 1 (count n))))]
                   [:tr
+                   [:td [favorite lang n]]
                    [:td [:div
                          [:a {:href   r
                               :target "new"
@@ -632,20 +684,6 @@
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
-(defn change-repos-page [next]
-  (let [repos-page  @(re-frame/subscribe [:repos-page?])
-        count-pages (count (partition-all
-                            repos-per-page @(re-frame/subscribe [:repos?])))]
-    (cond
-      (= next "first")
-      (re-frame/dispatch [:repos-page! 0])
-      (= next "last")
-      (re-frame/dispatch [:repos-page! (dec count-pages)])
-      (and (< repos-page (dec count-pages)) next)
-      (re-frame/dispatch [:repos-page! (inc repos-page)])
-      (and (> repos-page 0) (not next))
-      (re-frame/dispatch [:repos-page! (dec repos-page)]))))
-
 (defn repo-deps-page
   "Table with repository dependencies."
   [lang orga repo deps sort-key sort-rev?]
@@ -675,6 +713,7 @@
            [:thead [:tr
                     [:th
                      [:a {:class    (str "button" (when (= @sort-key :t) " is-light"))
+                          :title    (i/i lang [:sort])
                           :on-click #(if (= @sort-key :t)
                                        (reset! sort-rev? (not @sort-rev?))
                                        (reset! sort-key :t))}
@@ -755,6 +794,7 @@
           [:tr
            [:th
             [:a {:class    (str "button" (when (= @sort-key :type) " is-light"))
+                 :title    (i/i lang [:sort])
                  :on-click #(reset! sort-key :type)}
              (i/i lang [:type])]]
            [:th
