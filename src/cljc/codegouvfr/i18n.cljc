@@ -151,6 +151,8 @@
     :distribution-by-platform    "Distribution per platform"
     :download                    "Download"
     :email-placeholder           "E.g. toto@modernisation.gouv.fr"
+    :fav-add                     "Add to favorites"
+    :fav-sort                    "Sort by favorites"                        
     :forks                       "Forks"
     :free-search                 "Free search"
     :github-gitlab-etc           "On GitHub or on GitLab instances"
@@ -267,6 +269,8 @@
     :distribution-by-platform    "Distribuzione per piattaforma"
     :download                    "Scaricare"
     :email-placeholder           "Es toto@modernisation.gouv.fr"
+    :fav-add                     "Add to favorites"                  ;; TODO
+    :fav-sort                    "Sort by favorites"                 ;; TODO                 
     :forks                       "Fork"
     :free-search                 "Ricerca libera"
     :github-gitlab-etc           "Su GitHub o su istanze di GitLab"
