@@ -44,7 +44,7 @@ Then go to https://localhost:3000 or to your custom base URL.
 
 ** Deploy with Docker
 
-Assuming your environments variables are stored in ~~/.codegouvfr_envs~
+Assuming your environments variables are stored in =~/.codegouvfr_envs=
 and you want to expose the 3000 port:
 
 : ~$ git clone https://github.com/etalab/codegouvfr
