@@ -78,26 +78,27 @@
        (map #(select-keys % [:char :name]))
        (map #(update % :name (fn [n] (str ":" (s/replace n " " "_") ":"))))))
 
+;; Ignore these keywords
+;; :software_heritage_url :software_heritage_exists :derniere_modification
+;; :page_accueil :date_creation :plateforme
 (def repos-mapping
   "Mapping from repositories keywords to local short versions."
   {:nom                    :n
    :description            :d
-   :page_accueil           :h
    :organisation_nom       :o
-   :plateforme             :p
    :langage                :l
    :licence                :li
    :repertoire_url         :r
    :topics                 :t
-   :date_creation          :c
    :derniere_mise_a_jour   :u
-   :derniere_modification  :m
    :nombre_forks           :f
    :nombre_issues_ouvertes :i
    :nombre_stars           :s
    :est_archive            :a?
    :est_fork               :f?})
 
+;; Ignore these keywords
+;; :private :default_branch :language :id :checked :owner :full_name
 (def orgas-mapping
   "Mapping from groups/organizations keywords to local short versions."
   {:description        :d
@@ -136,18 +137,6 @@
    "Creative Commons Attribution 4.0 International"             "Creative Commons Attribution 4.0 International (CC-BY-4.0)"})
 
 (defonce
-  ^{:doc "A list of keywords to ignore when exposing repository data from the
-  backend."}
-  repos-rm-ks
-  [:software_heritage_url :software_heritage_exists :derniere_modification
-   :page_accueil :date_creation :plateforme])
-
-(defonce
-  ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
-  deps-rm-kws
-  [:private :default_branch :language :id :checked :owner :full_name])
-
-(defonce
   ^{:doc "A list of repositories dependencies, updated by the fonction
   `update-orgas-repos-deps` and stored for further retrieval in
   `update-deps`."}
@@ -166,7 +155,7 @@
 
 (def cleanup-repos
   (comp
-   (map #(clset/rename-keys (apply dissoc % repos-rm-ks) repos-mapping))
+   (map #(clset/rename-keys (select-keys % (keys repos-mapping)) repos-mapping))
    (map (fn [r] (assoc
                  r
                  :li (get licenses-mapping (:li r))
@@ -247,7 +236,7 @@
                 [:engines :peer])]
     (comp
      (filter #(not (empty? (:dependencies %))))
-     (map #(apply dissoc % deps-rm-kws))
+     (map #(select-keys % (keys orgas-mapping)))
      (map #(clset/rename-keys % {:name :n :dependencies :d}))
      (map #(assoc % :d (map (fn [r] (short-deps r)) (:d %))))
      (map #(assoc % :g orga)))))
