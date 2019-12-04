@@ -78,6 +78,11 @@
        (map #(select-keys % [:char :name]))
        (map #(update % :name (fn [n] (str ":" (s/replace n " " "_") ":"))))))
 
+(defonce
+  ^{:doc "A list of keywords to ignore when generating data/orgas/[orga].json."}
+  deps-rm-kws
+  [:private :default_branch :language :id :checked :owner :full_name])
+
 ;; Ignore these keywords
 ;; :software_heritage_url :software_heritage_exists :derniere_modification
 ;; :page_accueil :date_creation :plateforme
@@ -230,15 +235,16 @@
       :props
       :pageProps))
 
-(defn extract-deps-repos [orga]
-  (let [short-deps
-        #(apply dissoc (clset/rename-keys % {:type :t :name :n})
-                [:engines :peer])]
+(defn extract-deps-repos
+  [orga]
+  (let [s-deps #(select-keys
+                 (clset/rename-keys % {:type :t :name :n})
+                 [:t :n :core :dev])]
     (comp
      (filter #(not (empty? (:dependencies %))))
-     (map #(select-keys % (keys orgas-mapping)))
+     (map #(select-keys % [:name :dependencies]))
      (map #(clset/rename-keys % {:name :n :dependencies :d}))
-     (map #(assoc % :d (map (fn [r] (short-deps r)) (:d %))))
+     (map #(assoc % :d (map (fn [r] (s-deps r)) (:d %))))
      (map #(assoc % :g orga)))))
 
 (defonce extract-orga-deps
