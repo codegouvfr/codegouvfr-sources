@@ -1,4 +1,4 @@
-[![sha](sha.png) Software Heritage Archive](https://archive.softwareheritage.org/browse/origin/https://github.com/etalab/codegouvfr/)
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/etalab/codegouvfr/)](https://archive.softwareheritage.org/browse/origin/https://github.com/etalab/codegouvfr/)
 
 # codegouvfr
 
