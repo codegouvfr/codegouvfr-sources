@@ -301,11 +301,11 @@
 
 (defn start-tasks []
   (tt/start!)
-  (tt/every! 10800 update-orgas-json)
-  (tt/every! 86400 10 update-orgas-repos-deps)
-  (tt/every! 86400 180 update-deps)
-  (tt/every! 10800 200 update-repos)
-  (tt/every! 10800 220 update-orgas)
+  (tt/every! 10800 update-orgas-json) ; set @orgas-json
+  (tt/every! 10800 10 update-orgas-repos-deps) ; set @repos-deps
+  (tt/every! 10800 180 update-deps)
+  (tt/every! 10800 200 update-repos) ; use @repos-deps
+  (tt/every! 10800 220 update-orgas) ; use @orgas-json
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
