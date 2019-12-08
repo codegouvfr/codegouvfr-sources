@@ -296,8 +296,8 @@
     (spit "data/deps/deps-total.json"
           (json/generate-string {:deps-total (count @deps)}))
     (spit "data/deps/deps-count.json"
-          (json/generate-string (take 100 @deps))))
-  (timbre/info (str "updated deps-count and deps-total (" (count @deps) ")")))
+          (json/generate-string (take 100 @deps)))
+    (timbre/info (str "updated deps-count and deps-total (" (count @deps) ")"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define tasks
