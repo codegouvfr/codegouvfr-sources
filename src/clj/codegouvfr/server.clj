@@ -197,7 +197,7 @@
                                       (:cause (Throwable->map e))))
                    old-orgas-json)))]
     (reset! orgas-json (json/parse-string result true)))
-  (timbre/info (str "updated @orgas-json")))
+  (timbre/info (str "updated @orgas-json: " (count @orgas-json) " organisations")))
 
 (defn update-orgas
   "Generate data/orgas.json from `orgas-json` and `annuaire-url`."
@@ -222,18 +222,21 @@
 (defn get-deps
   "Scrap backyourstack to get dependencies of an organization."
   [orga]
-  ;; FIXME: Wrap http/get into a try clause
-  (-> (http/get (str "https://backyourstack.com/" orga "/dependencies"))
-      :body
-      h/parse
-      h/as-hickory
-      (as-> dps (hs/select (hs/child (hs/id :__NEXT_DATA__)) dps))
-      first
-      :content
-      first
-      (json/parse-string true)
-      :props
-      :pageProps))
+  (if-let [deps (try (http/get (str "https://backyourstack.com/" orga "/dependencies"))
+                     (catch Exception e
+                       (timbre/error (str "Can't get dependencies: "
+                                          (:cause (Throwable->map e))))))]
+    (-> deps
+        :body
+        h/parse
+        h/as-hickory
+        (as-> dps (hs/select (hs/child (hs/id :__NEXT_DATA__)) dps))
+        first
+        :content
+        first
+        (json/parse-string true)
+        :props
+        :pageProps)))
 
 (defn extract-deps-repos
   [orga]
@@ -260,16 +263,16 @@
   []
   (reset! repos-deps nil)
   (let [gh-orgas (map :login (filter #(= (:plateforme %) "GitHub") @orgas-json))]
-    (doseq [orga gh-orgas
-            :let [data (get-deps orga)
-                  orga-deps (sequence extract-orga-deps (:dependencies data))
-                  orga-repos (sequence (extract-deps-repos orga) (:repos data))]]
-      (do (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
+    (doseq [orga gh-orgas]
+      (if-let [data (get-deps orga)]
+        (let [orga-deps  (sequence extract-orga-deps (:dependencies data))
+              orga-repos (sequence (extract-deps-repos orga) (:repos data))]
+          (spit (str "data/deps/orgas/" (s/lower-case orga) ".json")
                 (json/generate-string orga-deps))
-          (swap! repos-deps (partial apply conj) orga-repos)))
+          (swap! repos-deps (partial apply conj) orga-repos))))
     (spit (str "data/deps/repos-deps.json")
           (json/generate-string @repos-deps))
-    (timbre/info (str "updated orgas and repos dependencies"))))
+    (timbre/info (str "updated orgas/repos " (count @repos-deps) " dependencies"))))
 
 (defn merge-colls [a b]
   (if (and (coll? a) (coll? b)) (into a b) b))
@@ -294,7 +297,7 @@
           (json/generate-string {:deps-total (count @deps)}))
     (spit "data/deps/deps-count.json"
           (json/generate-string (take 100 @deps))))
-  (timbre/info (str "updated data/deps/deps-[total|count].json")))
+  (timbre/info (str "updated deps-count and deps-total (" (count @deps) ")")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define tasks
