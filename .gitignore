@@ -20,3 +20,4 @@ data/*json
 data/deps/*json
 data/deps/orgas/*json
 .eastwood
+todo.org
