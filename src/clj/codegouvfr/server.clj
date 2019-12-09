@@ -180,11 +180,15 @@
 (defn update-repos
   "Generate data/repos.json from `repos-url`."
   []
-  (let [repos-json (json/parse-string (:body (http/get repos-url)) true)]
+  (when-let [repos-json
+             (try (json/parse-string
+                   (:body (http/get repos-url)) true)
+                  (catch Exception e
+                    (timbre/error "Can't reach repos-url")))]
     (spit "data/repos.json"
           (json/generate-string
-           (sequence cleanup-repos repos-json))))
-  (timbre/info (str "updated repos.json")))
+           (sequence cleanup-repos repos-json)))
+    (timbre/info "updated repos.json")))
 
 (defn update-orgas-json
   "Reset `orgas-json` from `orgas-url`."
@@ -197,17 +201,20 @@
                                       (:cause (Throwable->map e))))
                    old-orgas-json)))]
     (reset! orgas-json (json/parse-string result true)))
-  (timbre/info (str "updated @orgas-json: " (count @orgas-json) " organisations")))
+  (timbre/info (str "updated @orgas-json (" (count @orgas-json) " organisations)")))
 
 (defn update-orgas
   "Generate data/orgas.json from `orgas-json` and `annuaire-url`."
   []
-  (let [annuaire
-        (apply merge
-               (map #(let [{:keys [github lannuaire]} %]
-                       {(keyword github) lannuaire})
-                    (semantic-csv/mappify
-                     (data-csv/read-csv (:body (http/get annuaire-url))))))]
+  (when-let [annuaire (apply merge
+                             (map #(let [{:keys [github lannuaire]} %]
+                                     {(keyword github) lannuaire})
+                                  (-> (try (:body (http/get annuaire-url))
+                                           (catch Exception e
+                                             (timbre/error
+                                              "Can't reach annuaire-url")))
+                                      data-csv/read-csv
+                                      semantic-csv/mappify)))]
     (spit "data/orgas.json"
           (json/generate-string
            (map #(assoc %
@@ -272,7 +279,8 @@
           (swap! repos-deps (partial apply conj) orga-repos))))
     (spit (str "data/deps/repos-deps.json")
           (json/generate-string @repos-deps))
-    (timbre/info (str "updated orgas/repos " (count @repos-deps) " dependencies"))))
+    (timbre/info (str "updated orgas dependencies and "
+                      (count @repos-deps) " repos dependencies"))))
 
 (defn merge-colls [a b]
   (if (and (coll? a) (coll? b)) (into a b) b))
@@ -295,9 +303,10 @@
                                             (vals (group-by :n @deps))))))
     (spit "data/deps/deps-total.json"
           (json/generate-string {:deps-total (count @deps)}))
-    (spit "data/deps/deps-count.json"
+    (spit "data/deps/deps-top.json"
           (json/generate-string (take 100 @deps)))
-    (timbre/info (str "updated deps-count and deps-total (" (count @deps) ")"))))
+    (timbre/info (str "updated deps-top and deps-total ("
+                      (count @deps) ")"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define tasks
@@ -306,9 +315,9 @@
   (tt/start!)
   (tt/every! 10800 update-orgas-json) ; set @orgas-json
   (tt/every! 10800 10 update-orgas-repos-deps) ; set @repos-deps
-  (tt/every! 10800 180 update-deps)
-  (tt/every! 10800 200 update-repos) ; use @repos-deps
-  (tt/every! 10800 220 update-orgas) ; use @orgas-json
+  (tt/every! 10800 240 update-deps)
+  (tt/every! 10800 260 update-repos) ; use @repos-deps
+  (tt/every! 10800 280 update-orgas) ; use @orgas-json
   (timbre/info "Tasks started!"))
 ;; (tt/cancel! update-*!)
 
@@ -375,7 +384,7 @@
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
   (GET "/deps-total" [] (resource-json "data/deps/deps-total.json"))
-  (GET "/deps" [] (resource-json "data/deps/deps-count.json"))
+  (GET "/deps" [] (resource-json "data/deps/deps-top.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
