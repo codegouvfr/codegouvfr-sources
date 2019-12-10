@@ -64,7 +64,7 @@
     :sort-repos-by  :date
     :sort-orgas-by  :repos
     :view           :repos
-    :reverse-sort   true
+    :reverse-sort   false
     :filter         init-filter
     :display-filter init-filter
     :lang           "en"
