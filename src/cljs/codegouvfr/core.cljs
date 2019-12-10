@@ -262,7 +262,7 @@
    (let [repos0 (:repos db)
          favs   (get-item :favs)
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :name   (sort-by :n repos0)
+                  :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
                   :issues (sort-by :i repos0)
@@ -288,9 +288,9 @@
                  :date  (sort #(compare (js/Date. (.parse js/Date (:c %1)))
                                         (js/Date. (.parse js/Date (:c %2))))
                               orgs)
-                 :name  (sort #(compare (or-kwds %1 [:n :l])
-                                        (or-kwds %2 [:n :l]))
-                              orgs)
+                 :name  (reverse (sort #(compare (or-kwds %1 [:n :l])
+                                                 (or-kwds %2 [:n :l]))
+                                       orgs))
                  orgs)]
      (apply-orgas-filters (if @(re-frame/subscribe [:reverse-sort?])
                             orgas
