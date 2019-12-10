@@ -167,6 +167,7 @@
  (fn [db [_ k]]
    (re-frame/dispatch [:repos-page! 0])
    (when (= k (:sort-repos-by db))
+     (println "j'inverse le sort")
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-repos-by k)))
 
@@ -275,8 +276,8 @@
                                 repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
-                            (reverse repos)
-                            repos)))))
+                            repos
+                            (reverse repos))))))
 
 (re-frame/reg-sub
  :orgas?
@@ -292,8 +293,8 @@
                               orgs)
                  orgs)]
      (apply-orgas-filters (if @(re-frame/subscribe [:reverse-sort?])
-                            (reverse orgas)
-                            orgas)))))
+                            orgas
+                            (reverse orgas))))))
 
 (defn favorite [lang n]
   (let [fav-class
