@@ -167,7 +167,6 @@
  (fn [db [_ k]]
    (re-frame/dispatch [:repos-page! 0])
    (when (= k (:sort-repos-by db))
-     (println "j'inverse le sort")
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-repos-by k)))
 
