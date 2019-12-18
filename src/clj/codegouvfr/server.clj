@@ -160,6 +160,7 @@
 
 (def cleanup-repos
   (comp
+   (map #(into {} %))
    (map #(clset/rename-keys (select-keys % (keys repos-mapping)) repos-mapping))
    (map (fn [r] (assoc
                  r
@@ -187,7 +188,7 @@
                     (timbre/error "Can't reach repos-url")))]
     (spit "data/repos.json"
           (json/generate-string
-           (sequence cleanup-repos repos-json)))
+           (sequence cleanup-repos (into #{} repos-json))))
     (timbre/info "updated repos.json")))
 
 (defn update-orgas-json
@@ -200,7 +201,7 @@
                (do (timbre/error (str "Can't get groups: "
                                       (:cause (Throwable->map e))))
                    old-orgas-json)))]
-    (reset! orgas-json (json/parse-string result true)))
+    (reset! orgas-json (map #(into {} %) (into #{} (json/parse-string result true)))))
   (timbre/info (str "updated @orgas-json (" (count @orgas-json) " organisations)")))
 
 (defn update-orgas
