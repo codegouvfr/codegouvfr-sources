@@ -182,11 +182,11 @@
   (first (remove nil? (map #(apply % [m]) ks))))
 
 (defn fa [s]
-  [:span {:class "icon"}
+  [:span.icon
    [:i {:class (str "fas " s)}]])
 
 (defn fab [s]
-  [:span {:class "icon"}
+  [:span.icon
    [:i {:class (str "fab " s)}]])
 
 (defn to-locale-date [s]
@@ -326,8 +326,8 @@
   (if (= repos-cnt 0)
     [:div [:p (i/i lang [:no-repo-found])] [:br]]
     (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
-      [:div {:class "table-container"}
-       [:table {:class "table is-hoverable is-fullwidth"}
+      [:div.table-container
+       [:table.table.is-hoverable.is-fullwidth
         [:thead
          [:tr
           [:th [:abbr
@@ -336,38 +336,37 @@
                      :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
                  (fa "fa-star")]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :name) " is-light"))
-                     :title    (i/i lang [:sort-repos-alpha])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
+                [:a.button {:class    (when (= rep-f :name) "is-light")
+                            :title    (i/i lang [:sort-repos-alpha])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
                  (i/i lang [:orga-repo])]]]
           [:th [:abbr
-                [:a {:class "button is-static"
-                     :title (i/i lang [:swh-link])}
+                [:a.button.is-static {:title (i/i lang [:swh-link])}
                  (i/i lang [:archive])]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :desc) " is-light"))
-                     :title    (i/i lang [:sort-description-length])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
+                [:a.button {:class    (when (= rep-f :desc) "is-light")
+                            :title    (i/i lang [:sort-description-length])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
                  (i/i lang [:description])]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :date) " is-light"))
-                     :title    (i/i lang [:sort-update-date])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
+                [:a.button {:class    (when (= rep-f :date) "is-light")
+                            :title    (i/i lang [:sort-update-date])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
                  (i/i lang [:update-short])]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :forks) " is-light"))
-                     :title    (i/i lang [:sort-forks])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
+                [:a.button {:class    (when (= rep-f :forks) "is-light")
+                            :title    (i/i lang [:sort-forks])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
                  (i/i lang [:forks])]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :stars) " is-light"))
-                     :title    (i/i lang [:sort-stars])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
+                [:a.button {:class    (when (= rep-f :stars) "is-light")
+                            :title    (i/i lang [:sort-stars])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
                  (i/i lang [:stars])]]]
           [:th [:abbr
-                [:a {:class    (str "button" (when (= rep-f :issues) " is-light"))
-                     :title    (i/i lang [:sort-issues])
-                     :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
+                [:a.button {:class    (when (= rep-f :issues) "is-light")
+                            :title    (i/i lang [:sort-issues])
+                            :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
                  (i/i lang [:issues])]]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
@@ -390,7 +389,7 @@
                          [:a {:href  (rfe/href :repos {:lang lang} {:g group})
                               :title (i/i lang [:browse-repos-orga])}
                           o]]]
-                   [:td {:class "has-text-centered"}
+                   [:td.has-text-centered
                     [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                          :title  (i/i lang [:swh-link])
                          :target "new"}
@@ -400,19 +399,19 @@
                     [:span
                      (when dp
                        [:span
-                        [:a {:class "has-text-grey"
-                             :title (i/i lang [:deps])
-                             :href  (rfe/href
-                                     :repo-deps
-                                     {:lang lang
-                                      :orga o ;; (s/replace o "https://github.com/" "")
-                                      :repo n})}
+                        [:a.has-text-grey
+                         {:title (i/i lang [:deps])
+                          :href  (rfe/href
+                                  :repo-deps
+                                  {:lang lang
+                                   :orga o ;; (s/replace o "https://github.com/" "")
+                                   :repo n})}
                          (fa "fa-cubes")]
                         " "]) d]]
                    [:td (or (to-locale-date u) "N/A")]
-                   [:td {:class "has-text-right"} f]
-                   [:td {:class "has-text-right"} s]
-                   [:td {:class "has-text-right"} i]])))]])))
+                   [:td.has-text-right f]
+                   [:td.has-text-right s]
+                   [:td.has-text-right i]])))]])))
 
 (defn change-orgas-page [next]
   (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
@@ -437,42 +436,45 @@
         first-disabled (= orgas-pages 0)
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div
-     [:div {:class "level-left"}
-      [:label {:class "checkbox level-item" :title (i/i lang [:only-orga-with-code])}
+     [:div.level-left
+      [:label.checkbox.level-item {:title (i/i lang [:only-orga-with-code])}
        [:input {:type      "checkbox"
                 :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
                                                           (.-checked (.-target %))}])}]
        (i/i lang [:with-code])]
-      [:a {:class    (str "button level-item is-" (if (= org-f :name) "warning" "light"))
-           :title    (i/i lang [:sort-orgas-alpha])
-           :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} (i/i lang [:sort-alpha])]
-      [:a {:class    (str "button level-item is-" (if (= org-f :repos) "warning" "light"))
-           :title    (i/i lang [:sort-repos])
-           :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} (i/i lang [:sort-repos])]
-      [:a {:class    (str "button level-item is-" (if (= org-f :date) "warning" "light"))
-           :title    (i/i lang [:sort-orgas-creation])
-           :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
-      [:span {:class "button is-static level-item"}
+      [:a.button.level-item
+       {:class    (str "is-" (if (= org-f :name) "warning" "light"))
+        :title    (i/i lang [:sort-orgas-alpha])
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} (i/i lang [:sort-alpha])]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= org-f :repos) "warning" "light"))
+        :title    (i/i lang [:sort-repos])
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} (i/i lang [:sort-repos])]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= org-f :date) "warning" "light"))
+        :title    (i/i lang [:sort-orgas-creation])
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
+      [:span.button.is-static.level-item
        (let [orgs (count orgas)]
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
            (str orgs (i/i lang [:groups]))))]
-      [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
-       [:a {:class    "pagination-previous"
-            :on-click #(change-orgas-page "first")
-            :disabled first-disabled}
+      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+       [:a.pagination-previous
+        {:on-click #(change-orgas-page "first")
+         :disabled first-disabled}
         (fa "fa-fast-backward")]
-       [:a {:class    "pagination-previous"
-            :on-click #(change-orgas-page nil)
-            :disabled first-disabled}
+       [:a.pagination-previous
+        {:on-click #(change-orgas-page nil)
+         :disabled first-disabled}
         (fa "fa-step-backward")]
-       [:a {:class    "pagination-next"
-            :on-click #(change-orgas-page true)
-            :disabled last-disabled}
+       [:a.pagination-next
+        {:on-click #(change-orgas-page true)
+         :disabled last-disabled}
         (fa "fa-step-forward")]
-       [:a {:class    "pagination-next"
-            :on-click #(change-orgas-page "last")
-            :disabled last-disabled}
+       [:a.pagination-next
+        {:on-click #(change-orgas-page "last")
+         :disabled last-disabled}
         (fa "fa-fast-forward")]]
       [:a {:title (i/i lang [:download])
            :href  orgas-csv-url}
@@ -488,25 +490,25 @@
                         (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
-          [:div {:class "columns"}
+          [:div.columns
            (for [{:keys [n l o h c d r e au p an dp] :as o} dd]
              ^{:key o}
-             [:div {:class "column is-4"}
-              [:div {:class "card"}
-               [:div {:class "card-content"}
-                [:div {:class "media"}
+             [:div.column.is-4
+              [:div.card
+               [:div.card-content
+                [:div.media
                  (if au
-                   [:div {:class "media-left"}
-                    [:figure {:class "image is-48x48"}
+                   [:div.media-left
+                    [:figure.image.is-48x48
                      [:img {:src au}]]])
-                 [:div {:class "media-content"}
-                  [:a {:class  "title is-4"
-                       :target "new"
-                       :title  (i/i lang [:go-to-orga])
-                       :href   o}
+                 [:div.media-content
+                  [:a.title.is-4
+                   {:target "new"
+                    :title  (i/i lang [:go-to-orga])
+                    :href   o}
                    [:span (or n l)
                     " "
-                    [:span {:class "is-size-5"}
+                    [:span.is-size-5
                      (cond (= p "GitHub")
                            (fab "fa-github")
                            (= p "GitLab")
@@ -514,8 +516,7 @@
                   [:br]
                   (let [date (to-locale-date c)]
                     (if date
-                      [:p {:class ""}
-                       (str (i/i lang [:created-at]) date)]))
+                      [:p (str (i/i lang [:created-at]) date)]))
                   (if r
                     ;; FIXME: hackish, orgas-mapping should give
                     ;; the forge base on top of "plateforme".
@@ -524,29 +525,29 @@
                                           {:g (s/replace o "/groups/" "/")})}
                      r (if (< r 2)
                          (i/i lang [:repo]) (i/i lang [:repos]))])]]
-                [:div {:class "content"}
+                [:div.content
                  [:p d]]]
-               [:div {:class "card-footer"}
+               [:div.card-footer
                 (when (and (= p "GitHub") dp)
-                  [:a {:class "card-footer-item"
-                       :title (i/i lang [:deps])
-                       :href  (rfe/href
-                               :orga-deps
-                               {:lang lang
-                                :orga (s/replace o "https://github.com/" "")})}
+                  [:a.card-footer-item
+                   {:title (i/i lang [:deps])
+                    :href  (rfe/href
+                            :orga-deps
+                            {:lang lang
+                             :orga (s/replace o "https://github.com/" "")})}
                    (fa "fa-cubes")])
-                (if e [:a {:class "card-footer-item"
-                           :title (i/i lang [:contact-by-email])
-                           :href  (str "mailto:" e)}
+                (if e [:a.card-footer-item
+                       {:title (i/i lang [:contact-by-email])
+                        :href  (str "mailto:" e)}
                        (fa "fa-envelope")])
-                (if h [:a {:class  "card-footer-item"
-                           :title  (i/i lang [:go-to-website])
-                           :target "new"
-                           :href   h} (fa "fa-globe")])
-                (if an [:a {:class  "card-footer-item"
-                            :title  (i/i lang [:go-to-sig-website])
-                            :target "new"
-                            :href   (str annuaire-prefix an)}
+                (if h [:a.card-footer-item
+                       {:title  (i/i lang [:go-to-website])
+                        :target "new"
+                        :href   h} (fa "fa-globe")])
+                (if an [:a.card-footer-item
+                        {:title  (i/i lang [:go-to-sig-website])
+                         :target "new"
+                         :href   (str annuaire-prefix an)}
                         (fa "fa-link")])]]])])))]))
 
 (defn organizations-page-class [lang]
@@ -560,35 +561,35 @@
     :reagent-render (fn [] (organizations-page lang))}))
 
 (defn figure [heading title]
-  [:div {:class "column"}
-   [:div {:class "has-text-centered"}
+  [:div.column
+   [:div.has-text-centered
     [:div
-     [:p {:class "heading"} heading]
-     [:p {:class "title"} (str title)]]]])
+     [:p.heading heading]
+     [:p.title (str title)]]]])
 
 (defn stats-card [heading data]
-  [:div {:class "column"}
-   [:div {:class "card"}
-    [:h1 {:class "card-header-title subtitle"} heading]
-    [:div {:class "card-content"}
-     [:table {:class "table is-fullwidth"}
+  [:div.column
+   [:div.card
+    [:h1.card-header-title.subtitle heading]
+    [:div.card-content
+     [:table.table.is-fullwidth
       [:tbody
        (for [o (reverse (walk/stringify-keys (sort-by val data)))]
          ^{:key (key o)}
          [:tr [:td (key o)] [:td (val o)]])]]]]])
 
 (defn deps-card [heading deps lang]
-  [:div {:class "column"}
-   [:div {:class "card"}
-    [:h1 {:class "card-header-title subtitle"}
+  [:div.column
+   [:div.card
+    [:h1.card-header-title.subtitle
      heading
      [:sup
-      [:a {:href  (str "/" lang "/glossary#dependencies")
-           :class "has-text-grey is-size-7"
-           :title (i/i lang [:go-to-glossary])}
+      [:a.has-text-grey.is-size-7
+       {:href  (str "/" lang "/glossary#dependencies")
+        :title (i/i lang [:go-to-glossary])}
        (fa "fa-question-circle")]]]
-    [:div {:class "card-content"}
-     [:table {:class "table is-fullwidth"}
+    [:div.card-content
+     [:table.table.is-fullwidth
       [:thead [:tr
                [:th (i/i lang [:type])]
                [:th (i/i lang [:name])]
@@ -617,55 +618,55 @@
                          [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
                       (walk/stringify-keys top_licenses)))]
     [:div
-     [:div {:class "columns"}
+     [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
       (figure (i/i lang [:orgas-or-groups]) nb_orgs)
       (figure (i/i lang [:mean-repos-by-orga]) avg_nb_repos)
       (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)
       (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
      [:br]
-     [:div {:class "columns"}
+     [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
                    [:sup
-                    [:a {:href  (str "/" lang "/glossary#organization-group")
-                         :class "has-text-grey is-size-7"
-                         :title (i/i lang [:go-to-glossary])}
+                    [:a.has-text-grey.is-size-7
+                     {:href  (str "/" lang "/glossary#organization-group")
+                      :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]
                    " "
                    (i/i lang [:with-more-of])
                    (i/i lang [:repos])
                    [:sup
-                    [:a {:href  (str "/" lang "/glossary#repository")
-                         :class "has-text-grey is-size-7"
-                         :title (i/i lang [:go-to-glossary])}
+                    [:a.has-text-grey.is-size-7
+                     {:href  (str "/" lang "/glossary#repository")
+                      :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_orgs_by_repos_0)
       (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
-     [:div {:class "columns"}
+     [:div.columns
       (stats-card [:span
                    (i/i lang [:most-used-licenses])
                    [:sup
-                    [:a {:href  (str "/" lang "/glossary#license")
-                         :class "has-text-grey is-size-7"
-                         :title (i/i lang [:go-to-glossary])}
+                    [:a.has-text-grey.is-size-7
+                     {:href  (str "/" lang "/glossary#license")
+                      :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_licenses_0)
       (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_0)]
-     [:div {:class "columns"}
+     [:div.columns
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
                    "Software Heritage"
-                   [:sup [:a {:href  (str "/" lang "/glossary#software-heritage")
-                              :title (i/i lang [:go-to-glossary])
-                              :class "has-text-grey is-size-7"}
+                   [:sup [:a.has-text-grey.is-size-7
+                          {:href  (str "/" lang "/glossary#software-heritage")
+                           :title (i/i lang [:go-to-glossary])}
                           (fa "fa-question-circle")]]]
                   {(i/i lang [:repos-on-swh])
                    (:repos_in_archive software_heritage)
                    (i/i lang [:percent-of-repos-archived])
                    (:ratio_in_archive software_heritage)})]
-     [:div {:class "columns"}
+     [:div.columns
       (deps-card (i/i lang [:deps]) deps lang)]
      [:br]]))
 
@@ -699,42 +700,46 @@
                        " ")
               [:a {:href (rfe/href :repos {:lang lang} {:q repo})} repo]
               [:sup
-               [:a {:href  (str "/" lang "/glossary#dependencies")
-                    :class "has-text-grey is-size-6"
-                    :title (i/i lang [:go-to-glossary])}
+               [:a.has-text-grey.is-size-6
+                {:href  (str "/" lang "/glossary#dependencies")
+                 :title (i/i lang [:go-to-glossary])}
                 (fa "fa-question-circle")]]
               " ("
               [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
               ")"]]
        [:br]
        (if-let [dps (not-empty rdeps)]
-         [:div {:class "table-container"}
-          [:table {:class "table is-hoverable is-fullwidth"}
+         [:div.table-container
+          [:table.table.is-hoverable.is-fullwidth
            [:thead [:tr
                     [:th
-                     [:a {:class    (str "button" (when (= @sort-key :t) " is-light"))
-                          :title    (i/i lang [:sort])
-                          :on-click #(if (= @sort-key :t)
-                                       (reset! sort-rev? (not @sort-rev?))
-                                       (reset! sort-key :t))}
+                     [:a.button
+                      {:class    (when (= @sort-key :t) "is-light")
+                       :title    (i/i lang [:sort])
+                       :on-click #(if (= @sort-key :t)
+                                    (reset! sort-rev? (not @sort-rev?))
+                                    (reset! sort-key :t))}
                       (i/i lang [:type])]]
                     [:th
-                     [:a {:class    (str "button" (when (= @sort-key :n) " is-light"))
-                          :on-click #(if (= @sort-key :n)
-                                       (reset! sort-rev? (not @sort-rev?))
-                                       (reset! sort-key :n))}
+                     [:a.button
+                      {:class    (when (= @sort-key :n) "is-light")
+                       :on-click #(if (= @sort-key :n)
+                                    (reset! sort-rev? (not @sort-rev?))
+                                    (reset! sort-key :n))}
                       (i/i lang [:name])]]
                     [:th
-                     [:a {:class    (str "button" (when (= @sort-key :core) " is-light"))
-                          :on-click #(if (= @sort-key :core)
-                                       (reset! sort-rev? (not @sort-rev?))
-                                       (reset! sort-key :core))}
+                     [:a.button
+                      {:class    (when (= @sort-key :core) "is-light")
+                       :on-click #(if (= @sort-key :core)
+                                    (reset! sort-rev? (not @sort-rev?))
+                                    (reset! sort-key :core))}
                       (i/i lang [:core-dep])]]
                     [:th
-                     [:a {:class    (str "button" (when (= @sort-key :dev) " is-light"))
-                          :on-click #(if (= @sort-key :dev)
-                                       (reset! sort-rev? (not @sort-rev?))
-                                       (reset! sort-key :dev))}
+                     [:a.button
+                      {:class    (when (= @sort-key :dev) "is-light")
+                       :on-click #(if (= @sort-key :dev)
+                                    (reset! sort-rev? (not @sort-rev?))
+                                    (reset! sort-key :dev))}
                       (i/i lang [:dev-dep])]]]]
            (into [:tbody]
                  (for [{:keys [t n core dev] :as r} rdeps]
@@ -782,44 +787,49 @@
                      " ")
             [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
             [:sup
-             [:a {:href  (str "/" lang "/glossary#dependencies")
-                  :class "has-text-grey is-size-6"
-                  :title (i/i lang [:go-to-glossary])}
+             [:a.has-text-grey.is-size-6
+              {:href  (str "/" lang "/glossary#dependencies")
+               :title (i/i lang [:go-to-glossary])}
               (fa "fa-question-circle")]]]]
      [:br]
      (if (not-empty deps)
-       [:div {:class "table-container"}
-        [:table {:class "table is-hoverable is-fullwidth"}
+       [:div.table-container
+        [:table.table.is-hoverable.is-fullwidth
          [:thead
           [:tr
            [:th
-            [:a {:class    (str "button" (when (= @sort-key :type) " is-light"))
-                 :title    (i/i lang [:sort])
-                 :on-click #(reset! sort-key :type)}
+            [:a.button
+             {:class    (when (= @sort-key :type) "is-light")
+              :title    (i/i lang [:sort])
+              :on-click #(reset! sort-key :type)}
              (i/i lang [:type])]]
            [:th
-            [:a {:class    (str "button" (when (= @sort-key :name) " is-light"))
-                 :on-click #(if (= @sort-key :name)
-                              (reset! sort-rev? (not @sort-rev?))
-                              (reset! sort-key :name))}
+            [:a.button
+             {:class    (when (= @sort-key :name) "is-light")
+              :on-click #(if (= @sort-key :name)
+                           (reset! sort-rev? (not @sort-rev?))
+                           (reset! sort-key :name))}
              (i/i lang [:name])]]
            [:th
-            [:a {:class    (str "button" (when (= @sort-key :core) " is-light"))
-                 :on-click #(if (= @sort-key :core)
-                              (reset! sort-rev? (not @sort-rev?))
-                              (reset! sort-key :core))}
+            [:a.button
+             {:class    (when (= @sort-key :core) "is-light")
+              :on-click #(if (= @sort-key :core)
+                           (reset! sort-rev? (not @sort-rev?))
+                           (reset! sort-key :core))}
              (i/i lang [:core-dep])]]
            [:th
-            [:a {:class    (str "button" (when (= @sort-key :dev) " is-light"))
-                 :on-click #(if (= @sort-key :dev)
-                              (reset! sort-rev? (not @sort-rev?))
-                              (reset! sort-key :dev))}
+            [:a.button
+             {:class    (when (= @sort-key :dev) "is-light")
+              :on-click #(if (= @sort-key :dev)
+                           (reset! sort-rev? (not @sort-rev?))
+                           (reset! sort-key :dev))}
              (i/i lang [:dev-dep])]]
            [:th
-            [:a {:class    (str "button" (when (= @sort-key :repos) " is-light"))
-                 :on-click #(if (= @sort-key :repos)
-                              (reset! sort-rev? (not @sort-rev?))
-                              (reset! sort-key :repos))}
+            [:a.button
+             {:class    (when (= @sort-key :repos) "is-light")
+              :on-click #(if (= @sort-key :repos)
+                           (reset! sort-rev? (not @sort-rev?))
+                           (reset! sort-key :repos))}
              (i/i lang [:Repos])]]]]
          (into [:tbody]
                (for [{:keys [type name core dev repos] :as d} deps]
@@ -852,40 +862,38 @@
       :reagent-render (fn [] (orga-deps-page lang orga @deps sort-key sort-rev?))})))
 
 (defn main-menu [q lang view]
-  [:div {:class "field is-grouped"}
+  [:div.field.is-grouped
    ;; FIXME: why :p here? Use level?
-   [:p {:class "control"}
-    [:a {:class "button is-success"
-         :href  (rfe/href :repos {:lang lang})}
+   [:p.control
+    [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
      (i/i lang [:repos-of-source-code])]]
-   [:p {:class "control"}
-    [:a {:class "button is-danger"
-         :title (i/i lang [:github-gitlab-etc])
-         :href  (rfe/href :orgas {:lang lang})}
+   [:p.control
+    [:a.button.is-danger
+     {:title (i/i lang [:github-gitlab-etc])
+      :href  (rfe/href :orgas {:lang lang})}
      (i/i lang [:orgas-or-groups])]]
-   [:p {:class "control"}
-    [:a {:class "button is-info"
-         :href  (rfe/href :stats {:lang lang})}
+   [:p.control
+    [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
      (i/i lang [:stats])]]
    (if (or (= view :repos) (= view :orgas))
-     [:p {:class "control"}
-      [:input {:class       "input"
-               :size        20
-               :placeholder (i/i lang [:free-search])
-               :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-               :on-change   (fn [e]
-                              (let [ev (.-value (.-target e))]
-                                (reset! q ev)
-                                (async/go
-                                  (async/>! display-filter-chan {:q ev})
-                                  (<! (async/timeout timeout))
-                                  (async/>! filter-chan {:q ev}))))}]])
+     [:p.control
+      [:input.input
+       {:size        20
+        :placeholder (i/i lang [:free-search])
+        :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+        :on-change   (fn [e]
+                       (let [ev (.-value (.-target e))]
+                         (reset! q ev)
+                         (async/go
+                           (async/>! display-filter-chan {:q ev})
+                           (<! (async/timeout timeout))
+                           (async/>! filter-chan {:q ev}))))}]])
    (let [flt @(re-frame/subscribe [:filter?])]
      (if (seq (:g flt))
-       [:p {:class "control"}
-        [:a {:class "button is-outlined is-warning"
-             :title (i/i lang [:remove-filter])
-             :href  (rfe/href :repos {:lang lang})}
+       [:p.control
+        [:a.button.is-outlined.is-warning
+         {:title (i/i lang [:remove-filter])
+          :href  (rfe/href :repos {:lang lang})}
          [:span (:g flt)]
          (fa "fa-times")]]))
    [:br]])
@@ -910,70 +918,71 @@
              first-disabled (= repos-pages 0)
              last-disabled  (= repos-pages (dec count-pages))]
          [:div
-          [:div {:class "level-left"}
-           [:div {:class "level-item"}
-            [:input {:class       "input"
-                     :size        12
-                     :placeholder (i/i lang [:license])
-                     :value       (or @license
-                                      (:license @(re-frame/subscribe [:display-filter?])))
-                     :on-change   (fn [e]
-                                    (let [ev (.-value (.-target e))]
-                                      (reset! license ev)
-                                      (async/go
-                                        (async/>! display-filter-chan {:license ev})
-                                        (<! (async/timeout timeout))
-                                        (async/>! filter-chan {:license ev}))))}]]
-           [:div {:class "level-item"}
-            [:input {:class       "input"
-                     :size        12
-                     :value       (or @language
-                                      (:language @(re-frame/subscribe [:display-filter?])))
-                     :placeholder (i/i lang [:language])
-                     :on-change   (fn [e]
-                                    (let [ev (.-value (.-target e))]
-                                      (reset! language ev)
-                                      (async/go
-                                        (async/>! display-filter-chan {:language ev})
-                                        (<! (async/timeout timeout))
-                                        (async/>! filter-chan {:language ev}))))}]]
-           [:label {:class "checkbox level-item" :title (i/i lang [:only-forked-repos])}
+          [:div.level-left
+           [:div.level-item
+            [:input.input
+             {:size        12
+              :placeholder (i/i lang [:license])
+              :value       (or @license
+                               (:license @(re-frame/subscribe [:display-filter?])))
+              :on-change   (fn [e]
+                             (let [ev (.-value (.-target e))]
+                               (reset! license ev)
+                               (async/go
+                                 (async/>! display-filter-chan {:license ev})
+                                 (<! (async/timeout timeout))
+                                 (async/>! filter-chan {:license ev}))))}]]
+           [:div.level-item
+            [:input.input
+             {:size        12
+              :value       (or @language
+                               (:language @(re-frame/subscribe [:display-filter?])))
+              :placeholder (i/i lang [:language])
+              :on-change   (fn [e]
+                             (let [ev (.-value (.-target e))]
+                               (reset! language ev)
+                               (async/go
+                                 (async/>! display-filter-chan {:language ev})
+                                 (<! (async/timeout timeout))
+                                 (async/>! filter-chan {:language ev}))))}]]
+           [:label.checkbox.level-item
+            {:title (i/i lang [:only-forked-repos])}
             [:input {:type      "checkbox"
                      :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
             (i/i lang [:only-forks])]
-           [:label {:class "checkbox level-item" :title (i/i lang [:no-archived-repos])}
+           [:label.checkbox.level-item {:title (i/i lang [:no-archived-repos])}
             [:input {:type      "checkbox"
                      :on-change #(re-frame/dispatch [:filter! {:is-archive (.-checked (.-target %))}])}]
             (i/i lang [:no-archives])]
-           [:label {:class "checkbox level-item" :title (i/i lang [:only-with-description-repos])}
+           [:label.checkbox.level-item {:title (i/i lang [:only-with-description-repos])}
             [:input {:type      "checkbox"
                      :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
             (i/i lang [:with-description])]
-           [:label {:class "checkbox level-item" :title (i/i lang [:only-with-license])}
+           [:label.checkbox.level-item {:title (i/i lang [:only-with-license])}
             [:input {:type      "checkbox"
                      :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
             (i/i lang [:with-license])]
-           [:span {:class "button is-static level-item"}
+           [:span.button.is-static.level-item
             (let [rps (count repos)]
               (if (< rps 2)
                 (str rps (i/i lang [:repo]))
                 (str rps (i/i lang [:repos]))))]
-           [:nav {:class "pagination level-item" :role "navigation" :aria-label "pagination"}
-            [:a {:class    "pagination-previous"
-                 :on-click #(change-repos-page "first")
-                 :disabled first-disabled}
+           [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+            [:a.pagination-previous
+             {:on-click #(change-repos-page "first")
+              :disabled first-disabled}
              (fa "fa-fast-backward")]
-            [:a {:class    "pagination-previous"
-                 :on-click #(change-repos-page nil)
-                 :disabled first-disabled}
+            [:a.pagination-previous
+             {:on-click #(change-repos-page nil)
+              :disabled first-disabled}
              (fa "fa-step-backward")]
-            [:a {:class    "pagination-next"
-                 :on-click #(change-repos-page true)
-                 :disabled last-disabled}
+            [:a.pagination-next
+             {:on-click #(change-repos-page true)
+              :disabled last-disabled}
              (fa "fa-step-forward")]
-            [:a {:class    "pagination-next"
-                 :on-click #(change-repos-page "last")
-                 :disabled last-disabled}
+            [:a.pagination-next
+             {:on-click #(change-repos-page "last")
+              :disabled last-disabled}
              (fa "fa-fast-forward")]]
            [:a {:title (i/i lang [:download])
                 :href  repos-csv-url}
