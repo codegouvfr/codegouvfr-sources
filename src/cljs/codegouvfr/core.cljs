@@ -903,15 +903,15 @@
         view @(re-frame/subscribe [:view?])]
     [:div
      [main-menu q lang view]
-     (cond
-       (= view :home-redirect)
+     (condp = view
+       :home-redirect
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
            (do (set! (.-location js/window) (str "/" lang "/repos")) "")
            (do (set! (.-location js/window) (str "/en/repos")) "")))
        ;; Table to display repository
-       (= view :repos)
+       :repos
        (let [repos          @(re-frame/subscribe [:repos?])
              repos-pages    @(re-frame/subscribe [:repos-page?])
              count-pages    (count (partition-all repos-per-page repos))
@@ -948,19 +948,23 @@
            [:label.checkbox.level-item
             {:title (i/i lang [:only-forked-repos])}
             [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch [:filter! {:is-fork (.-checked (.-target %))}])}]
+                     :on-change #(re-frame/dispatch
+                                  [:filter! {:is-fork (.-checked (.-target %))}])}]
             (i/i lang [:only-forks])]
            [:label.checkbox.level-item {:title (i/i lang [:no-archived-repos])}
             [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch [:filter! {:is-archive (.-checked (.-target %))}])}]
+                     :on-change #(re-frame/dispatch
+                                  [:filter! {:is-archive (.-checked (.-target %))}])}]
             (i/i lang [:no-archives])]
            [:label.checkbox.level-item {:title (i/i lang [:only-with-description-repos])}
             [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch [:filter! {:has-description (.-checked (.-target %))}])}]
+                     :on-change #(re-frame/dispatch
+                                  [:filter! {:has-description (.-checked (.-target %))}])}]
             (i/i lang [:with-description])]
            [:label.checkbox.level-item {:title (i/i lang [:only-with-license])}
             [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch [:filter! {:is-licensed (.-checked (.-target %))}])}]
+                     :on-change #(re-frame/dispatch
+                                  [:filter! {:is-licensed (.-checked (.-target %))}])}]
             (i/i lang [:with-license])]
            [:span.button.is-static.level-item
             (let [rps (count repos)]
@@ -991,20 +995,15 @@
           [repositories-page lang (count repos)]
           [:br]])
        ;; Table to display organizations
-       (= view :orgas)
-       [organizations-page-class lang]
+       :orgas     [organizations-page-class lang]
        ;; Table to display statistiques
-       (= view :stats)
-       [stats-page-class lang]
+       :stats     [stats-page-class lang]
        ;; Table to display a repository dependencies
-       (= view :repo-deps)
-       [repo-deps-page-class lang]
+       :repo-deps [repo-deps-page-class lang]
        ;; Table to display a group dependencies
-       (= view :orga-deps)
-       [orga-deps-page-class lang]
+       :orga-deps [orga-deps-page-class lang]
        ;; Fall back on the repository page
-       :else
-       (rfe/push-state :repos {:lang lang}))]))
+       :else      (rfe/push-state :repos {:lang lang}))]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
