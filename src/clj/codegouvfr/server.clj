@@ -9,7 +9,7 @@
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
             [org.httpkit.server :as server]
-            [ring.middleware.reload :refer [wrap-reload]]
+            ;; [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.params :as params]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
