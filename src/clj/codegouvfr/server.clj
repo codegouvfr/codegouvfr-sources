@@ -8,8 +8,8 @@
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
-            [org.httpkit.server :as server]
             ;; [ring.middleware.reload :refer [wrap-reload]]
+            [ring.adapter.jetty :as jetty]
             [ring.middleware.params :as params]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
@@ -448,7 +448,7 @@
   "Start tasks and the HTTP server."
   [& args]
   (start-tasks)
-  (server/run-server app {:port config/codegouvfr_port})
+  (jetty/run-jetty app {:port config/codegouvfr_port})
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
