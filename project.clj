@@ -23,8 +23,7 @@
                  [org.clojure/tools.reader "1.3.2"]
                  [tea-time "1.0.1"]
                  [clj-http "3.10.0"]
-                 [cheshire "5.9.0"]
-                 ;; ;; FIXME: https://github.com/ptaoussanis/tempura/issues/29#issuecomment-557178091
+                 ;; FIXME: https://github.com/ptaoussanis/tempura/issues/29#issuecomment-557178091
                  [com.taoensso/tempura "1.2.1"]
                  [org.clojure/data.csv "0.1.4"]
                  [semantic-csv "0.2.0"]
