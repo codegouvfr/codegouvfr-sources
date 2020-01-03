@@ -82,6 +82,8 @@
   deps-rm-kws
   [:private :default_branch :language :id :checked :owner :full_name])
 
+(defonce http-get-params {:cookie-policy :standard})
+
 ;; Ignore these keywords
 ;; :software_heritage_url :software_heritage_exists :derniere_modification
 ;; :page_accueil :date_creation :plateforme
@@ -229,7 +231,9 @@
 (defn get-deps
   "Scrap backyourstack to get dependencies of an organization."
   [orga]
-  (if-let [deps (try (http/get (str "https://backyourstack.com/" orga "/dependencies"))
+  (if-let [deps (try (http/get
+                      (str "https://backyourstack.com/" orga "/dependencies")
+                      http-get-params)
                      (catch Exception e
                        (timbre/error (str "Can't get dependencies: "
                                           (:cause (Throwable->map e))))))]
@@ -439,13 +443,14 @@
 
 (def app (-> #'routes
              (wrap-defaults site-defaults)
+             ;; FIXME: Don't wrap reload in production
              ;; wrap-reload
-             )) ;; FIXME: Don't wrap reload in production
+             ))
 
 (defn -main
   "Start tasks and the HTTP server."
   [& args]
-  (start-tasks)
+  ;; (start-tasks)
   (jetty/run-jetty app {:port config/codegouvfr_port})
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
