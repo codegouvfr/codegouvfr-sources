@@ -450,7 +450,7 @@
 (defn -main
   "Start tasks and the HTTP server."
   [& args]
-  ;; (start-tasks)
+  (start-tasks)
   (jetty/run-jetty app {:port config/codegouvfr_port})
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
