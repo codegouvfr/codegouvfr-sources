@@ -37,15 +37,15 @@
  {:level     :debug
   :output-fn (partial timbre/default-output-fn {:stacktrace-fonts {}})
   :appenders
-  {:println   (timbre/println-appender {:stream :auto})
-   :spit      (appenders/spit-appender {:fname config/log-file})
-   :min-level :error
-   :postal    (postal-appender/postal-appender ;; :min-level :warn
-               ^{:host config/smtp-host
-                 :user config/smtp-login
-                 :pass config/smtp-password}
-               {:from config/from
-                :to   config/admin-email})}})
+  {:println (timbre/println-appender {:stream :auto})
+   :spit    (appenders/spit-appender {:fname config/log-file})
+   :postal  (merge (postal-appender/postal-appender ;; :min-level :warn
+                    ^{:host config/smtp-host
+                      :user config/smtp-login
+                      :pass config/smtp-password}
+                    {:from config/from
+                     :to   config/admin-email})
+                   {:min-level :error})}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define variables later needed
