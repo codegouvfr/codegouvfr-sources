@@ -37,14 +37,15 @@
  {:level     :debug
   :output-fn (partial timbre/default-output-fn {:stacktrace-fonts {}})
   :appenders
-  {:println (timbre/println-appender {:stream :auto})
-   :spit    (appenders/spit-appender {:fname config/log-file})
-   :postal  (postal-appender/postal-appender ;; :min-level :warn
-             ^{:host config/smtp-host
-               :user config/smtp-login
-               :pass config/smtp-password}
-             {:from config/from
-              :to   config/admin-email})}})
+  {:println   (timbre/println-appender {:stream :auto})
+   :spit      (appenders/spit-appender {:fname config/log-file})
+   :min-level :error
+   :postal    (postal-appender/postal-appender ;; :min-level :warn
+               ^{:host config/smtp-host
+                 :user config/smtp-login
+                 :pass config/smtp-password}
+               {:from config/from
+                :to   config/admin-email})}})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Define variables later needed
@@ -235,8 +236,8 @@
                       (str "https://backyourstack.com/" orga "/dependencies")
                       http-get-params)
                      (catch Exception e
-                       (timbre/error (str "Can't get dependencies: "
-                                          (:cause (Throwable->map e))))))]
+                       (timbre/warn (str "Can't get dependencies: "
+                                         (:cause (Throwable->map e))))))]
     (-> deps
         :body
         h/parse
