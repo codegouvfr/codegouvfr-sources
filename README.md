@@ -80,6 +80,6 @@ If you like Clojure(script), please consider supporting maintainers by donating 
 
 # License
 
-2019 DINUM, Bastien Guerry.
+2019-2020 DINUM, Bastien Guerry.
 
 This application is published under the EPL 2.0 license.
