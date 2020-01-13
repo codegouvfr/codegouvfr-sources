@@ -1,6 +1,6 @@
-[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/etalab/codegouvfr/)](https://archive.softwareheritage.org/browse/origin/https://github.com/etalab/codegouvfr/)
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/etalab/code.etalab.gouv.fr/)](https://archive.softwareheritage.org/browse/origin/https://github.com/etalab/code.etalab.gouv.fr/)
 
-# codegouvfr
+# code.etalab.gouv.fr
 
 Browse public sector source code repositories.
 
@@ -10,8 +10,8 @@ This frontend retrives information source code [repositories](https://api-code.e
 
 # Develop
 
-    ~$ git clone https://github.com/etalab/codegouvfr
-    ~$ cd codegouvfr/
+    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
+    ~$ cd code.etalab.gouv.fr/
     ~$ lein test
     ~$ lein fig:build
 
@@ -33,8 +33,8 @@ You will need to configure these environment variables:
 
 ## Deploy with lein uberjar
 
-    ~$ git clone https://github.com/etalab/codegouvfr
-    ~$ cd codegouvfr/
+    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
+    ~$ cd code.etalab.gouv.fr/
     ~$ lein clean
     ~$ lein fig:min
     ~$ lein uberjar
@@ -47,8 +47,8 @@ Then go to <https://localhost:3000> or to your custom base URL.
 Assuming your environments variables are stored in `~/.codegouvfr_envs`
 and you want to expose the 3000 port:
 
-    ~$ git clone https://github.com/etalab/codegouvfr
-    ~$ cd codegouvfr/
+    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
+    ~$ cd code.etalab.gouv.fr/
     ~$ lein fig:min
     ~$ lein uberjar
     ~$ docker build -t codegouvfr .
@@ -58,7 +58,7 @@ Then go to <http://localhost:3000>.
 
 # Roadmap
 
-There is no real roadmap but you can check [our issues](https://github.com/etalab/codegouvfr/issues) to see if you can help or suggest a feature.
+There is no real roadmap but you can check [our issues](https://github.com/etalab/code.etalab.gouv.fr/issues) to see if you can help or suggest a feature.
 
 # Contribute
 
