@@ -862,41 +862,41 @@
       :reagent-render (fn [] (orga-deps-page lang orga @deps sort-key sort-rev?))})))
 
 (defn main-menu [q lang view]
-  [:div.field.is-grouped
-   ;; FIXME: why :p here? Use level?
-   [:p.control
-    [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
-     (i/i lang [:repos-of-source-code])]]
-   [:p.control
-    [:a.button.is-danger
-     {:title (i/i lang [:github-gitlab-etc])
-      :href  (rfe/href :orgas {:lang lang})}
-     (i/i lang [:orgas-or-groups])]]
-   [:p.control
-    [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
-     (i/i lang [:stats])]]
-   (if (or (= view :repos) (= view :orgas))
-     [:p.control
-      [:input.input
-       {:size        20
-        :placeholder (i/i lang [:free-search])
-        :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-        :on-change   (fn [e]
-                       (let [ev (.-value (.-target e))]
-                         (reset! q ev)
-                         (async/go
-                           (async/>! display-filter-chan {:q ev})
-                           (<! (async/timeout timeout))
-                           (async/>! filter-chan {:q ev}))))}]])
-   (let [flt @(re-frame/subscribe [:filter?])]
-     (if (seq (:g flt))
-       [:p.control
-        [:a.button.is-outlined.is-warning
-         {:title (i/i lang [:remove-filter])
-          :href  (rfe/href :repos {:lang lang})}
-         [:span (:g flt)]
-         (fa "fa-times")]]))
-   [:br]])
+  [:div.level
+   [:div.level-left
+    ;; FIXME: why :p here? Use level?
+    [:p.control.level-item
+     [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
+      (i/i lang [:repos-of-source-code])]]
+    [:p.control.level-item
+     [:a.button.is-danger
+      {:title (i/i lang [:github-gitlab-etc])
+       :href  (rfe/href :orgas {:lang lang})}
+      (i/i lang [:orgas-or-groups])]]
+    [:p.control.level-item
+     [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
+      (i/i lang [:stats])]]
+    (if (or (= view :repos) (= view :orgas))
+      [:p.control.level-item
+       [:input.input
+        {:size        20
+         :placeholder (i/i lang [:free-search])
+         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+         :on-change   (fn [e]
+                        (let [ev (.-value (.-target e))]
+                          (reset! q ev)
+                          (async/go
+                            (async/>! display-filter-chan {:q ev})
+                            (<! (async/timeout timeout))
+                            (async/>! filter-chan {:q ev}))))}]])
+    (let [flt @(re-frame/subscribe [:filter?])]
+      (if (seq (:g flt))
+        [:p.control.level-item
+         [:a.button.is-outlined.is-warning
+          {:title (i/i lang [:remove-filter])
+           :href  (rfe/href :repos {:lang lang})}
+          [:span (:g flt)]
+          (fa "fa-times")]]))]])
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
