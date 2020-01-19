@@ -452,7 +452,7 @@
   "Start tasks and the HTTP server."
   [& args]
   (start-tasks)
-  (jetty/run-jetty app {:port config/codegouvfr_port})
+  (jetty/run-jetty app {:port config/codegouvfr_port :join? false})
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
