@@ -2,7 +2,7 @@
   (:require [taoensso.tempura :refer [tr]]))
 
 (def supported-languages
-  "A set of supported langages."
+  "A set of supported languages."
   #{"en" "fr" "it"})
 
 (def localization
