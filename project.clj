@@ -45,8 +45,8 @@
                                       [com.bhauman/rebel-readline-cljs "0.1.4"]
                                       [markdown-to-hiccup "0.6.2"]
                                       [org.clojure/clojurescript "1.10.597"]
-                                      [org.clojure/core.async "0.6.532"]
-                                      [re-frame "0.10.9"]
-                                      [reagent "0.8.1"]
+                                      [org.clojure/core.async "0.7.559"]
+                                      [re-frame "0.11.0"]
+                                      [reagent "0.9.1"]
                                       [reagent-utils "0.3.3"]
-                                      [metosin/reitit-frontend "0.3.10"]]}})
+                                      [metosin/reitit-frontend "0.4.2"]]}})
