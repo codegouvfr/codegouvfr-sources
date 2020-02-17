@@ -63,7 +63,7 @@
     :orgas          nil
     :sort-repos-by  :date
     :sort-orgas-by  :repos
-    :view           :repos
+    :view           :orgas
     :reverse-sort   false
     :filter         init-filter
     :display-filter init-filter
@@ -908,8 +908,8 @@
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
-           (do (set! (.-location js/window) (str "/" lang "/repos")) "")
-           (do (set! (.-location js/window) (str "/en/repos")) "")))
+           (do (set! (.-location js/window) (str "/" lang "/groups")) "")
+           (do (set! (.-location js/window) (str "/en/groups")) "")))
        ;; Table to display repository
        :repos
        (let [repos          @(re-frame/subscribe [:repos?])
