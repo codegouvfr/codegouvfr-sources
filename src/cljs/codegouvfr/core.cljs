@@ -427,6 +427,90 @@
       (and (> orgas-page 0) (not next))
       (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
 
+(defn repos-page [lang license language]
+  (let [repos          @(re-frame/subscribe [:repos?])
+        repos-pages    @(re-frame/subscribe [:repos-page?])
+        count-pages    (count (partition-all repos-per-page repos))
+        first-disabled (= repos-pages 0)
+        last-disabled  (= repos-pages (dec count-pages))]
+    [:div
+     [:div.level-left
+      [:div.level-item
+       [:input.input
+        {:size        12
+         :placeholder (i/i lang [:license])
+         :value       (or @license
+                          (:license @(re-frame/subscribe [:display-filter?])))
+         :on-change   (fn [e]
+                        (let [ev (.-value (.-target e))]
+                          (reset! license ev)
+                          (async/go
+                            (async/>! display-filter-chan {:license ev})
+                            (<! (async/timeout timeout))
+                            (async/>! filter-chan {:license ev}))))}]]
+      [:div.level-item
+       [:input.input
+        {:size        12
+         :value       (or @language
+                          (:language @(re-frame/subscribe [:display-filter?])))
+         :placeholder (i/i lang [:language])
+         :on-change   (fn [e]
+                        (let [ev (.-value (.-target e))]
+                          (reset! language ev)
+                          (async/go
+                            (async/>! display-filter-chan {:language ev})
+                            (<! (async/timeout timeout))
+                            (async/>! filter-chan {:language ev}))))}]]
+      [:label.checkbox.level-item
+       {:title (i/i lang [:only-forked-repos])}
+       [:input {:type      "checkbox"
+                :on-change #(re-frame/dispatch
+                             [:filter! {:is-fork (.-checked (.-target %))}])}]
+       (i/i lang [:only-forks])]
+      [:label.checkbox.level-item {:title (i/i lang [:no-archived-repos])}
+       [:input {:type      "checkbox"
+                :on-change #(re-frame/dispatch
+                             [:filter! {:is-archive (.-checked (.-target %))}])}]
+       (i/i lang [:no-archives])]
+      [:label.checkbox.level-item {:title (i/i lang [:only-with-description-repos])}
+       [:input {:type      "checkbox"
+                :on-change #(re-frame/dispatch
+                             [:filter! {:has-description (.-checked (.-target %))}])}]
+       (i/i lang [:with-description])]
+      [:label.checkbox.level-item {:title (i/i lang [:only-with-license])}
+       [:input {:type      "checkbox"
+                :on-change #(re-frame/dispatch
+                             [:filter! {:is-licensed (.-checked (.-target %))}])}]
+       (i/i lang [:with-license])]
+      [:span.button.is-static.level-item
+       (let [rps (count repos)]
+         (if (< rps 2)
+           (str rps (i/i lang [:repo]))
+           (str rps (i/i lang [:repos]))))]
+      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+       [:a.pagination-previous
+        {:on-click #(change-repos-page "first")
+         :disabled first-disabled}
+        (fa "fa-fast-backward")]
+       [:a.pagination-previous
+        {:on-click #(change-repos-page nil)
+         :disabled first-disabled}
+        (fa "fa-step-backward")]
+       [:a.pagination-next
+        {:on-click #(change-repos-page true)
+         :disabled last-disabled}
+        (fa "fa-step-forward")]
+       [:a.pagination-next
+        {:on-click #(change-repos-page "last")
+         :disabled last-disabled}
+        (fa "fa-fast-forward")]]
+      [:a {:title (i/i lang [:download])
+           :href  repos-csv-url}
+       (fa "fa-file-csv")]]
+     [:br]
+     [repositories-page lang (count repos)]
+     [:br]]))
+
 (defn organizations-page [lang]
   (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
         orgas          @(re-frame/subscribe [:orgas?])
@@ -549,6 +633,16 @@
                          :target "new"
                          :href   (str annuaire-prefix an)}
                         (fa "fa-link")])]]])])))]))
+
+(defn repos-page-class [lang license language]
+  (reagent/create-class
+   {:component-will-mount
+    (fn []
+      (GET "/repos"
+           :handler
+           #(re-frame/dispatch
+             [:update-repos! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (repos-page lang license language))}))
 
 (defn organizations-page-class [lang]
   (reagent/create-class
@@ -908,102 +1002,20 @@
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
-           (do (set! (.-location js/window) (str "/" lang "/groups")) "")
-           (do (set! (.-location js/window) (str "/en/groups")) "")))
+           (rfe/push-state :orgas {:lang lang})
+           (rfe/push-state :orgas {:lang "en"})))
        ;; Table to display repository
-       :repos
-       (let [repos          @(re-frame/subscribe [:repos?])
-             repos-pages    @(re-frame/subscribe [:repos-page?])
-             count-pages    (count (partition-all repos-per-page repos))
-             first-disabled (= repos-pages 0)
-             last-disabled  (= repos-pages (dec count-pages))]
-         [:div
-          [:div.level-left
-           [:div.level-item
-            [:input.input
-             {:size        12
-              :placeholder (i/i lang [:license])
-              :value       (or @license
-                               (:license @(re-frame/subscribe [:display-filter?])))
-              :on-change   (fn [e]
-                             (let [ev (.-value (.-target e))]
-                               (reset! license ev)
-                               (async/go
-                                 (async/>! display-filter-chan {:license ev})
-                                 (<! (async/timeout timeout))
-                                 (async/>! filter-chan {:license ev}))))}]]
-           [:div.level-item
-            [:input.input
-             {:size        12
-              :value       (or @language
-                               (:language @(re-frame/subscribe [:display-filter?])))
-              :placeholder (i/i lang [:language])
-              :on-change   (fn [e]
-                             (let [ev (.-value (.-target e))]
-                               (reset! language ev)
-                               (async/go
-                                 (async/>! display-filter-chan {:language ev})
-                                 (<! (async/timeout timeout))
-                                 (async/>! filter-chan {:language ev}))))}]]
-           [:label.checkbox.level-item
-            {:title (i/i lang [:only-forked-repos])}
-            [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch
-                                  [:filter! {:is-fork (.-checked (.-target %))}])}]
-            (i/i lang [:only-forks])]
-           [:label.checkbox.level-item {:title (i/i lang [:no-archived-repos])}
-            [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch
-                                  [:filter! {:is-archive (.-checked (.-target %))}])}]
-            (i/i lang [:no-archives])]
-           [:label.checkbox.level-item {:title (i/i lang [:only-with-description-repos])}
-            [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch
-                                  [:filter! {:has-description (.-checked (.-target %))}])}]
-            (i/i lang [:with-description])]
-           [:label.checkbox.level-item {:title (i/i lang [:only-with-license])}
-            [:input {:type      "checkbox"
-                     :on-change #(re-frame/dispatch
-                                  [:filter! {:is-licensed (.-checked (.-target %))}])}]
-            (i/i lang [:with-license])]
-           [:span.button.is-static.level-item
-            (let [rps (count repos)]
-              (if (< rps 2)
-                (str rps (i/i lang [:repo]))
-                (str rps (i/i lang [:repos]))))]
-           [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
-            [:a.pagination-previous
-             {:on-click #(change-repos-page "first")
-              :disabled first-disabled}
-             (fa "fa-fast-backward")]
-            [:a.pagination-previous
-             {:on-click #(change-repos-page nil)
-              :disabled first-disabled}
-             (fa "fa-step-backward")]
-            [:a.pagination-next
-             {:on-click #(change-repos-page true)
-              :disabled last-disabled}
-             (fa "fa-step-forward")]
-            [:a.pagination-next
-             {:on-click #(change-repos-page "last")
-              :disabled last-disabled}
-             (fa "fa-fast-forward")]]
-           [:a {:title (i/i lang [:download])
-                :href  repos-csv-url}
-            (fa "fa-file-csv")]]
-          [:br]
-          [repositories-page lang (count repos)]
-          [:br]])
+       :repos     [repos-page-class lang license language]
        ;; Table to display organizations
-       :orgas     [organizations-page-class lang]
+       :orgas     [organizations-page-class lang language]
        ;; Table to display statistiques
        :stats     [stats-page-class lang]
        ;; Table to display a repository dependencies
        :repo-deps [repo-deps-page-class lang]
        ;; Table to display a group dependencies
        :orga-deps [orga-deps-page-class lang]
-       ;; Fall back on the repository page
-       :else      (rfe/push-state :repos {:lang lang}))]))
+       ;; Fall back on the organizations page
+       :else      (rfe/push-state :orgas {:lang lang}))]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
