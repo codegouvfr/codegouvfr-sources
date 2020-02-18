@@ -644,16 +644,6 @@
              [:update-repos! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (repos-page lang license language))}))
 
-(defn organizations-page-class [lang]
-  (reagent/create-class
-   {:component-will-mount
-    (fn []
-      (GET "/orgas"
-           :handler
-           #(re-frame/dispatch
-             [:update-orgas! (map (comp bean clj->js) %)])))
-    :reagent-render (fn [] (organizations-page lang))}))
-
 (defn figure [heading title]
   [:div.column
    [:div.has-text-centered
@@ -1002,12 +992,12 @@
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
-           (rfe/push-state :orgas {:lang lang})
-           (rfe/push-state :orgas {:lang "en"})))
+           (do (set! (.-location js/window) (str "/" lang "/groups")))
+           (do (set! (.-location js/window) (str "/en/groups")))))
+       ;; Table to display organizations
+       :orgas     [organizations-page lang]
        ;; Table to display repository
        :repos     [repos-page-class lang license language]
-       ;; Table to display organizations
-       :orgas     [organizations-page-class lang language]
        ;; Table to display statistiques
        :stats     [stats-page-class lang]
        ;; Table to display a repository dependencies
@@ -1024,10 +1014,10 @@
     (reagent/create-class
      {:component-will-mount
       (fn []
-        (GET "/repos"
+        (GET "/orgas"
              :handler
              #(re-frame/dispatch
-               [:update-repos! (map (comp bean clj->js) %)])))
+               [:update-orgas! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language))})))
 
 (defn on-navigate [match]
