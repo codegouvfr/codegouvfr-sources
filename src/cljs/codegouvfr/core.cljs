@@ -992,8 +992,8 @@
        (if dev?
          [:p "Testing."]
          (if (contains? i/supported-languages lang)
-           (do (set! (.-location js/window) (str "/" lang "/groups")))
-           (do (set! (.-location js/window) (str "/en/groups")))))
+           (do (set! (.-location js/window) (str "/" lang "/groups")) "")
+           (do (set! (.-location js/window) (str "/en/groups")) "")))
        ;; Table to display organizations
        :orgas     [organizations-page lang]
        ;; Table to display repository
