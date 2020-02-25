@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
-(defproject codegouvfr "0.9.7"
+(defproject codegouvfr "0.9.8"
   :description "Frontend to display public sector source code repositories"
   :url "https://github.com/etalab/codegouvfr"
   :license {:name "Eclipse Public License - v 2.0"
@@ -21,13 +21,8 @@
                  [markdown-to-hiccup "0.6.2"]
                  ;; FIXME: this explicit require should not be needed:
                  [org.clojure/tools.reader "1.3.2"]
-                 [tea-time "1.0.1"]
-                 [clj-http "3.10.0"]
                  ;; FIXME: https://github.com/ptaoussanis/tempura/issues/29#issuecomment-557178091
-                 [com.taoensso/tempura "1.2.1"]
-                 [org.clojure/data.csv "1.0.0"]
-                 [semantic-csv "0.2.0"]
-                 [hickory "0.7.1"]]
+                 [com.taoensso/tempura "1.2.1"]]
   :source-paths ["src/clj" "src/cljc" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
