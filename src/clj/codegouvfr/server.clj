@@ -63,9 +63,9 @@
   "Expose the json resource corresponding to `repo`."
   [repo]
   (let [repos-deps (json/parse-string
-                    (try (slurp "deps/repos-deps.json")
+                    (try (slurp "data/deps/repos-deps.json")
                          (catch Exception e
-                           (timbre/error "Can't find deps/repos-deps.json")))
+                           (timbre/error "Can't find repos-deps.json")))
                     true)
         deps       (first (filter
                            #(= (s/lower-case (:n %)) (s/lower-case repo))
