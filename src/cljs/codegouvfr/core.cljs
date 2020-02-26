@@ -335,39 +335,46 @@
                      :title    (i/i lang [:fav-sort])
                      :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
                  (fa "fa-star")]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :name) "is-light")
-                            :title    (i/i lang [:sort-repos-alpha])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
-                 (i/i lang [:orga-repo])]]]
-          [:th [:abbr
-                [:a.button.is-static {:title (i/i lang [:swh-link])}
-                 (i/i lang [:archive])]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :desc) "is-light")
-                            :title    (i/i lang [:sort-description-length])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
-                 (i/i lang [:description])]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :date) "is-light")
-                            :title    (i/i lang [:sort-update-date])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
-                 (i/i lang [:update-short])]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :forks) "is-light")
-                            :title    (i/i lang [:sort-forks])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
-                 (i/i lang [:forks])]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :stars) "is-light")
-                            :title    (i/i lang [:sort-stars])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
-                 (i/i lang [:stars])]]]
-          [:th [:abbr
-                [:a.button {:class    (when (= rep-f :issues) "is-light")
-                            :title    (i/i lang [:sort-issues])
-                            :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
-                 (i/i lang [:issues])]]]]]
+          [:th.has-text-left
+           [:abbr
+            [:a.button {:class    (when (= rep-f :name) "is-light")
+                        :title    (i/i lang [:sort-repos-alpha])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
+             (i/i lang [:orga-repo])]]]
+          [:th.has-text-centered
+           [:abbr
+            [:a.button.is-static {:title (i/i lang [:swh-link])}
+             (i/i lang [:archive])]]]
+          [:th.has-text-left
+           [:abbr
+            [:a.button {:class    (when (= rep-f :desc) "is-light")
+                        :title    (i/i lang [:sort-description-length])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
+             (i/i lang [:description])]]]
+          [:th.has-text-right
+           [:abbr
+            [:a.button {:class    (when (= rep-f :date) "is-light")
+                        :title    (i/i lang [:sort-update-date])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
+             (i/i lang [:update-short])]]]
+          [:th.has-text-right
+           [:abbr
+            [:a.button {:class    (when (= rep-f :forks) "is-light")
+                        :title    (i/i lang [:sort-forks])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
+             (i/i lang [:forks])]]]
+          [:th.has-text-right
+           [:abbr
+            [:a.button {:class    (when (= rep-f :stars) "is-light")
+                        :title    (i/i lang [:sort-stars])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
+             (i/i lang [:stars])]]]
+          [:th.has-text-right
+           [:abbr
+            [:a.button {:class    (when (= rep-f :issues) "is-light")
+                        :title    (i/i lang [:sort-issues])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
+             (i/i lang [:issues])]]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
                              (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
