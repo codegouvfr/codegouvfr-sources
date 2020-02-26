@@ -265,6 +265,7 @@
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
                   :issues (sort-by :i repos0)
+                  :reused (sort-by :g repos0)
                   :favs   (concat (filter #(not (some #{(:n %)} favs)) repos0)
                                   (filter #(some #{(:n %)} favs) repos0))
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
