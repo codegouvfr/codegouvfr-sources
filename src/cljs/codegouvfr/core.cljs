@@ -37,7 +37,8 @@
     ["/deps"
      ["/:orga"
       ["/:repo" :repo-deps]
-      ["" :orga-deps]]]]])
+      ["" :orga-deps]]
+     ["" :reuses]]]])
 
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
@@ -93,10 +94,15 @@
  (fn [db [_ repos]] (assoc db :repos repos)))
 
 (re-frame/reg-event-db
+ :update-reuses!
+ (fn [db [_ repos]] (assoc db :reuses repos)))
+
+(re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
+   (re-frame/dispatch [:reuses-page! 0])
    ;; FIXME: Find a more idiomatic way?
    (assoc db :filter (merge (:filter db) s))))
 
@@ -114,10 +120,15 @@
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
 (re-frame/reg-event-db
+ :reuses-page!
+ (fn [db [_ n]] (assoc db :orgas-page n)))
+
+(re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
+   (re-frame/dispatch [:reuses-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
@@ -137,6 +148,10 @@
 (re-frame/reg-sub
  :repos-page?
  (fn [db _] (:repos-page db)))
+
+(re-frame/reg-sub
+ :reuses-page?
+ (fn [db _] (:reuses-page db)))
 
 (re-frame/reg-sub
  :orgas-page?
@@ -279,6 +294,11 @@
                             repos
                             (reverse repos))))))
 
+;; FIXME: what do we need more?
+(re-frame/reg-sub
+ :reuses?
+ (fn [db _] (:reuses db)))
+
 (re-frame/reg-sub
  :orgas?
  (fn [db _]
@@ -322,6 +342,20 @@
       (re-frame/dispatch [:repos-page! (inc repos-page)])
       (and (> repos-page 0) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
+
+(defn change-reuses-page [next]
+  (let [reuses-page @(re-frame/subscribe [:reuses-page?])
+        count-pages (count (partition-all
+                            repos-per-page @(re-frame/subscribe [:reuses?])))]
+    (cond
+      (= next "first")
+      (re-frame/dispatch [:reuses-page! 0])
+      (= next "last")
+      (re-frame/dispatch [:reuses-page! (dec count-pages)])
+      (and (< reuses-page (dec count-pages)) next)
+      (re-frame/dispatch [:reuses-page! (inc reuses-page)])
+      (and (> reuses-page 0) (not next))
+      (re-frame/dispatch [:reuses-page! (dec reuses-page)]))))
 
 (defn repositories-page [lang repos-cnt]
   (if (= repos-cnt 0)
@@ -657,6 +691,56 @@
                          :href   (str annuaire-prefix an)}
                         (fa "fa-link")])]]])])))]))
 
+(defn reuses-table [lang]
+  [:div.table-container
+   [:table.table.is-hoverable.is-fullwidth
+    [:thead
+     [:tr [:th "Nom"] [:th "Type"]]]
+    (into [:tbody]
+          (for [dd (take repos-per-page
+                         (drop (* repos-per-page @(re-frame/subscribe [:reuses-page?]))
+                               @(re-frame/subscribe [:reuses?])))]
+            ^{:key dd}
+            (let [{:keys [type name]} dd]
+              [:tr
+               [:td name]
+               [:td type]])))]])
+
+;; FIXME
+(defn reuses-page [lang]
+  (let [reuses         @(re-frame/subscribe [:reuses?])
+        reuses-pages   @(re-frame/subscribe [:reuses-page?])
+        count-pages    (count (partition-all repos-per-page reuses))
+        first-disabled (= reuses-pages 0)
+        last-disabled  (= reuses-pages (dec count-pages))]
+    [:div
+     [:div.level-left
+      ;; [:span.button.is-static.level-item
+      ;;  (let [rps (count repos)]
+      ;;    (if (< rps 2)
+      ;;      (str rps (i/i lang [:repo]))
+      ;;      (str rps (i/i lang [:repos]))))]
+      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+       [:a.pagination-previous
+        {:on-click #(change-reuses-page "first")
+         :disabled first-disabled}
+        (fa "fa-fast-backward")]
+       [:a.pagination-previous
+        {:on-click #(change-reuses-page nil)
+         :disabled first-disabled}
+        (fa "fa-step-backward")]
+       [:a.pagination-next
+        {:on-click #(change-reuses-page true)
+         :disabled last-disabled}
+        (fa "fa-step-forward")]
+       [:a.pagination-next
+        {:on-click #(change-reuses-page "last")
+         :disabled last-disabled}
+        (fa "fa-fast-forward")]]]
+     [:br]
+     [reuses-table lang]
+     [:br]]))
+
 (defn repos-page-class [lang license language]
   (reagent/create-class
    {:component-will-mount
@@ -666,6 +750,16 @@
            #(re-frame/dispatch
              [:update-repos! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (repos-page lang license language))}))
+
+(defn reuses-page-class [lang]
+  (reagent/create-class
+   {:component-will-mount
+    (fn []
+      (GET "/deps"
+           :handler
+           #(re-frame/dispatch
+             [:update-reuses! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (reuses-page lang))}))
 
 (defn figure [heading title]
   [:div.column
@@ -786,7 +880,7 @@
       (fn []
         (GET "/deps-total"
              :handler #(reset! deps-total (walk/keywordize-keys %)))
-        (GET "/deps"
+        (GET "/deps-top"
              :handler #(reset! deps (map (comp bean clj->js) %)))
         (GET stats-url
              :handler #(reset! stats (walk/keywordize-keys %))))
@@ -972,14 +1066,23 @@
   [:div.level
    [:div.level-left
     ;; FIXME: why :p here? Use level?
+    ;; Repos
     [:p.control.level-item
      [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
       (i/i lang [:repos-of-source-code])]]
+    ;; Orgas
     [:p.control.level-item
      [:a.button.is-danger
       {:title (i/i lang [:github-gitlab-etc])
        :href  (rfe/href :orgas {:lang lang})}
       (i/i lang [:orgas-or-groups])]]
+    ;; Reuses
+    [:p.control.level-item
+     [:a.button.is-warning
+      {:title (i/i lang [:reuses-expand])
+       :href  (rfe/href :reuses {:lang lang})}
+      (i/i lang [:reuses])]]
+    ;; Stats
     [:p.control.level-item
      [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
       (i/i lang [:stats])]]
@@ -1023,6 +1126,8 @@
        :repos     [repos-page-class lang license language]
        ;; Table to display statistiques
        :stats     [stats-page-class lang]
+       ;; Table to display statistiques
+       :reuses    [reuses-page-class lang]
        ;; Table to display a repository dependencies
        :repo-deps [repo-deps-page-class lang]
        ;; Table to display a group dependencies

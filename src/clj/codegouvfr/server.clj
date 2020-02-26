@@ -108,7 +108,8 @@
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
   (GET "/deps-total" [] (resource-json "data/deps/deps-total.json"))
-  (GET "/deps" [] (resource-json "data/deps/deps-top.json"))
+  (GET "/deps-top" [] (resource-json "data/deps/deps-top.json"))
+  (GET "/deps" [] (resource-json "data/deps/deps-repos.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
