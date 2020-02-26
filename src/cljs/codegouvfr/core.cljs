@@ -374,18 +374,25 @@
             [:a.button {:class    (when (= rep-f :issues) "is-light")
                         :title    (i/i lang [:sort-issues])
                         :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
-             (i/i lang [:issues])]]]]]
+             (i/i lang [:issues])]]]
+          [:th.has-text-right
+           [:abbr
+            [:a.button {:class    (when (= rep-f :issues) "is-light")
+                        :title    (i/i lang [:sort-reused])
+                        :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
+             (i/i lang [:reused])]]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
                              (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
                                    @(re-frame/subscribe [:repos?])))]
                 ^{:key dd}
-                (let [{:keys [a? d f i li n o r s u dp]}
+                (let [{:keys [a? d f i li n o r s u dp g]}
                       dd
-                      group
-                      (subs r 0 (- (count r) (+ 1 (count n))))]
+                      group (subs r 0 (- (count r) (+ 1 (count n))))]
                   [:tr
+                   ;; Favorite star
                    [:td [favorite lang n]]
+                   ;; Repo < orga
                    [:td [:div
                          [:a {:href   r
                               :target "new"
@@ -396,11 +403,13 @@
                          [:a {:href  (rfe/href :repos {:lang lang} {:g group})
                               :title (i/i lang [:browse-repos-orga])}
                           o]]]
+                   ;; SWH link
                    [:td.has-text-centered
                     [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                          :title  (i/i lang [:swh-link])
                          :target "new"}
                      [:img {:width "18px" :src "/images/swh-logo.png"}]]]
+                   ;; Description
                    [:td {:class (when a? "has-text-grey")
                          :title (when a? (i/i lang [:repo-archived]))}
                     [:span
@@ -415,10 +424,16 @@
                                    :repo n})}
                          (fa "fa-cubes")]
                         " "]) d]]
+                   ;; Update
                    [:td (or (to-locale-date u) "N/A")]
+                   ;; Forks
                    [:td.has-text-right f]
+                   ;; Stars
                    [:td.has-text-right s]
-                   [:td.has-text-right i]])))]])))
+                   ;; Issues
+                   [:td.has-text-right i]
+                   ;; Reused
+                   [:td.has-text-right g]])))]])))
 
 (defn change-orgas-page [next]
   (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
