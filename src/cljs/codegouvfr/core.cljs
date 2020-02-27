@@ -1043,7 +1043,7 @@
           [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
           [:td rs]])]]]]])
 
-(defn top-languages-clean-up [top lang]
+(defn top-clean-up [top lang param]
   (let [total (reduce + (map val top))]
     (apply merge
            (sequence
@@ -1053,7 +1053,7 @@
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
              (map #(let [[k v] %]
-                     {[:a {:href (str "/" lang "/repos?language=" k)} k] v})))
+                     {[:a {:href (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
 (defn stats-page
@@ -1067,12 +1067,9 @@
                                (:count %))
                       top_orgs_by_repos))
         top_languages_1
-        (top-languages-clean-up top_languages lang)
+        (top-clean-up top_languages lang "language")
         top_licenses_0
-        (into {}
-              (map #(let [[k v] %]
-                      [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
-                   (walk/stringify-keys top_licenses)))]
+        (top-clean-up top_licenses lang "license")]
     [:div
      [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
