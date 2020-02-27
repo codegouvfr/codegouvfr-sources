@@ -19,6 +19,7 @@
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
+(defonce deps-per-page 100) ;; FIXME: Make customizable?
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
@@ -346,7 +347,7 @@
 (defn change-deps-page [next]
   (let [deps-page   @(re-frame/subscribe [:deps-page?])
         count-pages (count (partition-all
-                            repos-per-page @(re-frame/subscribe [:deps?])))]
+                            deps-per-page @(re-frame/subscribe [:deps?])))]
     (cond
       (= next "first")
       (re-frame/dispatch [:deps-page! 0])
@@ -697,8 +698,8 @@
     [:thead
      [:tr [:th "Nom"] [:th "Type"] [:th "Core"] [:th "Dev"]]]
     (into [:tbody]
-          (for [dd (take repos-per-page
-                         (drop (* repos-per-page @(re-frame/subscribe [:deps-page?]))
+          (for [dd (take deps-per-page
+                         (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
                                @(re-frame/subscribe [:deps?])))]
             ^{:key dd}
             (let [{:keys [t n c d]} dd]
@@ -712,7 +713,7 @@
 (defn deps-page [lang]
   (let [deps           @(re-frame/subscribe [:deps?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
-        count-pages    (count (partition-all repos-per-page deps))
+        count-pages    (count (partition-all deps-per-page deps))
         first-disabled (= deps-pages 0)
         last-disabled  (= deps-pages (dec count-pages))]
     [:div
