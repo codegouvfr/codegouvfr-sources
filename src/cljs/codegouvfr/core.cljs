@@ -1180,11 +1180,11 @@
                                     (reset! sort-key :dev))}
                       (i/i lang [:dev-dep])]]]]
            (into [:tbody]
-                 (for [{:keys [t n core dev] :as r} rdeps]
+                 (for [{:keys [t n c d] :as r} rdeps]
                    ^{:key r}
                    [:tr
                     [:td t] [:td n]
-                    [:td core] [:td dev]]))]
+                    [:td c] [:td d]]))]
           [:br]]
          [:div
           [:p (i/i lang [:deps-not-found])]
@@ -1270,12 +1270,12 @@
                            (reset! sort-key :repos))}
              (i/i lang [:Repos])]]]]
          (into [:tbody]
-               (for [{:keys [t n c d rs] :as d} deps]
+               (for [{:keys [type name core dev repos] :as d} deps]
                  ^{:key d}
                  [:tr
-                  [:td t] [:td n]
-                  [:td c] [:td d]
-                  [:td (for [{:keys [name full_name] :as r} rs]
+                  [:td type] [:td name]
+                  [:td core] [:td dev]
+                  [:td (for [{:keys [name full_name] :as r} repos]
                          ^{:key r}
                          [:span [:a {:href
                                      (str "https://github.com/"
