@@ -62,6 +62,7 @@
    {:repos          nil
     :repos-page     0
     :orgas-page     0
+    :deps-page      0
     :orgas          nil
     :sort-repos-by  :date
     :sort-orgas-by  :repos
@@ -238,6 +239,14 @@
                true))
      m)))
 
+(defn apply-deps-filters [m]
+  (let [f @(re-frame/subscribe [:filter?])
+        s (:q f)]
+    (filter
+     #(and (if s (s-includes? (s/join " " [(:n %) (:t %)]) s)
+               true))
+     m)))
+
 (defn apply-orgas-filters [m]
   (let [f  @(re-frame/subscribe [:filter?])
         s  (:q f)
@@ -298,7 +307,11 @@
 ;; FIXME: what do we need more?
 (re-frame/reg-sub
  :deps?
- (fn [db _] (:deps db)))
+ (fn [db _]
+   (let [deps (:deps db)]
+     (apply-deps-filters
+      (if @(re-frame/subscribe [:reverse-sort?])
+        deps (reverse deps))))))
 
 (re-frame/reg-sub
  :orgas?
@@ -1040,12 +1053,12 @@
                            (reset! sort-key :repos))}
              (i/i lang [:Repos])]]]]
          (into [:tbody]
-               (for [{:keys [type name core dev repos] :as d} deps]
+               (for [{:keys [t n c d rs] :as d} deps]
                  ^{:key d}
                  [:tr
-                  [:td type] [:td name]
-                  [:td core] [:td dev]
-                  [:td (for [{:keys [name full_name] :as r} repos]
+                  [:td t] [:td n]
+                  [:td c] [:td d]
+                  [:td (for [{:keys [name full_name] :as r} rs]
                          ^{:key r}
                          [:span [:a {:href
                                      (str "https://github.com/"
@@ -1073,16 +1086,16 @@
   [:div.level
    [:div.level-left
     ;; FIXME: why :p here? Use level?
-    ;; Repos
-    [:p.control.level-item
-     [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
-      (i/i lang [:repos-of-source-code])]]
     ;; Orgas
     [:p.control.level-item
      [:a.button.is-danger
       {:title (i/i lang [:github-gitlab-etc])
        :href  (rfe/href :orgas {:lang lang})}
       (i/i lang [:orgas-or-groups])]]
+    ;; Repos
+    [:p.control.level-item
+     [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
+      (i/i lang [:repos-of-source-code])]]
     ;; Deps
     [:p.control.level-item
      [:a.button.is-warning
@@ -1093,7 +1106,7 @@
     [:p.control.level-item
      [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
       (i/i lang [:stats])]]
-    (if (or (= view :repos) (= view :orgas))
+    (if (or (= view :repos) (= view :orgas) (= view :deps))
       [:p.control.level-item
        [:input.input
         {:size        20
