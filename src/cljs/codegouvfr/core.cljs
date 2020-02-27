@@ -375,9 +375,10 @@
                                                  (or-kwds %2 [:n :l]))
                                        orgs))
                  orgs)]
-     (apply-orgas-filters (if @(re-frame/subscribe [:reverse-sort?])
-                            orgas
-                            (reverse orgas))))))
+     (apply-orgas-filters
+      (if @(re-frame/subscribe [:reverse-sort?])
+        orgas
+        (reverse orgas))))))
 
 (defn favorite [lang n]
   (let [fav-class
@@ -1149,8 +1150,7 @@
       [:div
        [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                    (i/i lang [:dep-of])
-                                   (i/i lang [:deps-of]))
-                       " ")
+                                   (i/i lang [:deps-of])) " ")
               [:a {:href (rfe/href :repos {:lang lang} {:q repo})} repo]
               [:sup
                [:a.has-text-grey.is-size-6
@@ -1168,38 +1168,37 @@
                     [:th
                      [:a.button
                       {:class    (when (= @sort-key :t) "is-light")
-                       :title    (i/i lang [:sort])
-                       :on-click #(if (= @sort-key :t)
-                                    (reset! sort-rev? (not @sort-rev?))
-                                    (reset! sort-key :t))}
+                       :on-click #(do (if (= @sort-key :t)
+                                        (reset! sort-rev? (not @sort-rev?)))
+                                      (reset! sort-key :t))}
                       (i/i lang [:type])]]
                     [:th
                      [:a.button
                       {:class    (when (= @sort-key :n) "is-light")
-                       :on-click #(if (= @sort-key :n)
-                                    (reset! sort-rev? (not @sort-rev?))
-                                    (reset! sort-key :n))}
+                       :on-click #(do (if (= @sort-key :n)
+                                        (reset! sort-rev? (not @sort-rev?)))
+                                      (reset! sort-key :n))}
                       (i/i lang [:name])]]
                     [:th.has-text-right
                      [:a.button
-                      {:class    (when (= @sort-key :core) "is-light")
-                       :on-click #(if (= @sort-key :core)
-                                    (reset! sort-rev? (not @sort-rev?))
-                                    (reset! sort-key :core))}
+                      {:class    (when (= @sort-key :c) "is-light")
+                       :on-click #(do (if (= @sort-key :c)
+                                        (reset! sort-rev? (not @sort-rev?)))
+                                      (reset! sort-key :c))}
                       (i/i lang [:core-dep])]]
                     [:th.has-text-right
                      [:a.button
-                      {:class    (when (= @sort-key :dev) "is-light")
-                       :on-click #(if (= @sort-key :dev)
-                                    (reset! sort-rev? (not @sort-rev?))
-                                    (reset! sort-key :dev))}
+                      {:class    (when (= @sort-key :d) "is-light")
+                       :on-click #(do (if (= @sort-key :d)
+                                        (reset! sort-rev? (not @sort-rev?)))
+                                      (reset! sort-key :d))}
                       (i/i lang [:dev-dep])]]]]
            (into [:tbody]
                  (for [{:keys [t n c d] :as r} rdeps]
                    ^{:key r}
                    [:tr
                     [:td t] [:td n]
-                    [:td c] [:td d]]))]
+                    [:td.has-text-right c] [:td.has-text-right d]]))]
           [:br]]
          [:div
           [:p (i/i lang [:deps-not-found])]
@@ -1213,7 +1212,7 @@
         params    @(re-frame/subscribe [:path-params?])
         repo      (:repo params)
         orga      (:orga params)
-        sort-key  (reagent/atom :t)
+        sort-key  (reagent/atom :c)
         sort-rev? (reagent/atom false)]
     (reagent/create-class
      {:component-will-mount
@@ -1236,8 +1235,7 @@
     [:div
      [:div [:h1 (str cdeps " " (if (< cdeps 2)
                                  (i/i lang [:dep-of])
-                                 (i/i lang [:deps-of]))
-                     " ")
+                                 (i/i lang [:deps-of])) " ")
             [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
             [:sup
              [:a.has-text-grey.is-size-6
@@ -1253,43 +1251,44 @@
            [:th
             [:a.button
              {:class    (when (= @sort-key :type) "is-light")
-              :title    (i/i lang [:sort])
-              :on-click #(reset! sort-key :type)}
+              :on-click #(do (reset! sort-rev? (not @sort-rev?))
+                             (reset! sort-key :type))}
              (i/i lang [:type])]]
            [:th
             [:a.button
              {:class    (when (= @sort-key :name) "is-light")
-              :on-click #(if (= @sort-key :name)
-                           (reset! sort-rev? (not @sort-rev?))
-                           (reset! sort-key :name))}
+              :on-click #(do (if (= @sort-key :name)
+                               (reset! sort-rev? (not @sort-rev?)))
+                             (reset! sort-key :name))}
              (i/i lang [:name])]]
-           [:th
+           [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :core) "is-light")
-              :on-click #(if (= @sort-key :core)
-                           (reset! sort-rev? (not @sort-rev?))
-                           (reset! sort-key :core))}
+              :on-click #(do (if (= @sort-key :core)
+                               (reset! sort-rev? (not @sort-rev?)))
+                             (reset! sort-key :core))}
              (i/i lang [:core-dep])]]
            [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :dev) "is-light")
-              :on-click #(if (= @sort-key :dev)
-                           (reset! sort-rev? (not @sort-rev?))
-                           (reset! sort-key :dev))}
+              :on-click #(do (if (= @sort-key :dev)
+                               (reset! sort-rev? (not @sort-rev?)))
+                             (reset! sort-key :dev))}
              (i/i lang [:dev-dep])]]
-           [:th.has-text-right
+           [:th
             [:a.button
-             {:class    (when (= @sort-key :repos) "is-light")
-              :on-click #(if (= @sort-key :repos)
-                           (reset! sort-rev? (not @sort-rev?))
-                           (reset! sort-key :repos))}
+             {:class (when (= @sort-key :repos) "is-light")
+              :on-click
+              #(do (if (= @sort-key :repos)
+                     (reset! sort-rev? (not @sort-rev?)))
+                   (reset! sort-key :repos))}
              (i/i lang [:Repos])]]]]
          (into [:tbody]
                (for [{:keys [type name core dev repos] :as d} deps]
                  ^{:key d}
                  [:tr
                   [:td type] [:td name]
-                  [:td core] [:td dev]
+                  [:td.has-text-right core] [:td.has-text-right dev]
                   [:td (for [{:keys [name full_name] :as r} repos]
                          ^{:key r}
                          [:span [:a {:href
@@ -1304,8 +1303,8 @@
 (defn orga-deps-page-class [lang]
   (let [deps      (reagent/atom nil)
         orga      (:orga @(re-frame/subscribe [:path-params?]))
-        sort-key  (reagent/atom :type)
-        sort-rev? (reagent/atom false)]
+        sort-key  (reagent/atom :repos)
+        sort-rev? (reagent/atom true)]
     (reagent/create-class
      {:component-will-mount
       (fn []
