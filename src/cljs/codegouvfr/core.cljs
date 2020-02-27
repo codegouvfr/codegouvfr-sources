@@ -1032,7 +1032,10 @@
       [:tbody
        (for [{:keys [t n rs] :as o} deps]
          ^{:key o}
-         [:tr [:td t] [:td n] [:td rs]])]]]]])
+         [:tr
+          [:td t]
+          [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
+          [:td rs]])]]]]])
 
 (defn stats-page
   [lang stats deps deps-total]
