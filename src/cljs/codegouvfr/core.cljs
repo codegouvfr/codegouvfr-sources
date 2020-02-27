@@ -577,7 +577,7 @@
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
            (str rps (i/i lang [:repos]))))]
-      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+      [:nav.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
         {:on-click #(change-repos-page "first")
          :disabled first-disabled}
@@ -594,8 +594,8 @@
         {:on-click #(change-repos-page "last")
          :disabled last-disabled}
         (fa "fa-fast-forward")]]
-      [:a {:title (i/i lang [:download])
-           :href  repos-csv-url}
+      [:a.level-item {:title (i/i lang [:download])
+                      :href  repos-csv-url}
        (fa "fa-file-csv")]]
      [:br]
      [repositories-page lang (count repos)]
@@ -633,7 +633,7 @@
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
            (str orgs (i/i lang [:groups]))))]
-      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+      [:nav.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
         {:on-click #(change-orgas-page "first")
          :disabled first-disabled}
@@ -792,7 +792,7 @@
        {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
         :title    "Trier par development"
         :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
-      [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
+      [:nav.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
         {:on-click #(change-deps-page "first")
          :disabled first-disabled}
