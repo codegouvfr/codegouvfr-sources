@@ -759,9 +759,15 @@
   (let [rep-f @(re-frame/subscribe [:sort-repos-by?])
         repos @(re-frame/subscribe [:dep-repos?])
         q     (:q @(re-frame/subscribe [:filter?]))
-        title (str (count repos) " repositories depending on "
+        cnt   (count repos)
+        title (str cnt (if (= cnt 1)
+                         (i/i lang [:repo-depending-on])
+                         (i/i lang [:repos-depending-on]))
                    (gstring/urlDecode d)
-                   (if q (str " and matching \"" q "\"")))]
+                   (if q (str (if (= cnt 1)
+                                (i/i lang [:matching])
+                                (i/i lang [:matching-s]))
+                              "\"" q "\"")))]
     [:div
      [:h2 title]
      [:br]
@@ -1037,6 +1043,19 @@
           [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
           [:td rs]])]]]]])
 
+(defn top-languages-clean-up [top lang]
+  (let [total (reduce + (map val top))]
+    (apply merge
+           (sequence
+            (comp
+             (filter (fn [[k v]] (not (= k :Inconnu))))
+             (map (fn [[k v]]
+                    [k (js/parseFloat
+                        (gstring/format "%.2f" (* (/ v total) 100)))]))
+             (map #(let [[k v] %]
+                     {[:a {:href (str "/" lang "/repos?language=" k)} k] v})))
+            top))))
+
 (defn stats-page
   [lang stats deps deps-total]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
@@ -1047,23 +1066,13 @@
                                     " (" (:plateforme %) ")")
                                (:count %))
                       top_orgs_by_repos))
-        top_languages_0
-        (filter (fn [[k v]] (not (= k "Inconnu")))
-                (walk/stringify-keys top_languages))
-        total_langages
-        (reduce + (map val top_languages_0))
-        top_languages_0
-        (map (fn [[k v]] [k (js/parseFloat
-                             (gstring/format "%.2f" (* (/ v total_langages) 100)))])
-             top_languages_0)
         top_languages_1
-        (into {} (map #(let [[k v] %]
-                         [[:a {:href (str "/" lang "/repos?language=" k)} k] v])
-                      top_languages_0))
+        (top-languages-clean-up top_languages lang)
         top_licenses_0
-        (into {} (map #(let [[k v] %]
-                         [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
-                      (walk/stringify-keys top_licenses)))]
+        (into {}
+              (map #(let [[k v] %]
+                      [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
+                   (walk/stringify-keys top_licenses)))]
     [:div
      [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
