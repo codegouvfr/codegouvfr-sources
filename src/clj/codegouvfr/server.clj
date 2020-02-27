@@ -75,6 +75,22 @@
       (json/generate-string {:g (:g deps) :d (:d deps)}))
      :headers {"Content-Type" "application/json; charset=utf-8"})))
 
+(defn resource-dep-json
+  "Expose the json resource corresponding to `dep`."
+  [dep]
+  (let [deps-repos (json/parse-string
+                    (try (slurp "data/deps/deps-repos.json")
+                         (catch Exception e
+                           (timbre/error "Can't find deps-repos.json")))
+                    true)
+        dep        (first (filter
+                           #(= (s/lower-case (:name %)) (s/lower-case dep))
+                           deps-repos))]
+    (assoc
+     (response/response
+      (json/generate-string dep))
+     :headers {"Content-Type" "application/json; charset=utf-8"})))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup email sending
 
@@ -107,9 +123,10 @@
   (GET "/repos" [] (resource-json "data/repos.json"))
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
+  (GET "/deps/:dep" [dep] (resource-dep-json dep))
   (GET "/deps-total" [] (resource-json "data/deps/deps-total.json"))
   (GET "/deps-top" [] (resource-json "data/deps/deps-top.json"))
-  (GET "/deps" [] (resource-json "data/deps/deps-repos.json"))
+  (GET "/deps" [] (resource-json "data/deps/deps.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
