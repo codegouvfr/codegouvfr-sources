@@ -1048,9 +1048,18 @@
                                (:count %))
                       top_orgs_by_repos))
         top_languages_0
+        (filter (fn [[k v]] (not (= k "Inconnu")))
+                (walk/stringify-keys top_languages))
+        total_langages
+        (reduce + (map val top_languages_0))
+        top_languages_0
+        (map (fn [[k v]] [k (js/parseFloat
+                             (gstring/format "%.2f" (* (/ v total_langages) 100)))])
+             top_languages_0)
+        top_languages_1
         (into {} (map #(let [[k v] %]
                          [[:a {:href (str "/" lang "/repos?language=" k)} k] v])
-                      (walk/stringify-keys top_languages)))
+                      top_languages_0))
         top_licenses_0
         (into {} (map #(let [[k v] %]
                          [[:a {:href (str "/" lang "/repos?license=" k)} k] v])
@@ -1091,7 +1100,7 @@
                      (fa "fa-question-circle")]]]
                   top_licenses_0)
       (stats-card [:span (i/i lang [:most-used-languages])]
-                  top_languages_0)]
+                  top_languages_1)]
      [:div.columns
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
