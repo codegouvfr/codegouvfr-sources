@@ -8,6 +8,7 @@
             [reagent.core :as reagent]
             [reagent.session :as session]
             [cljs-bean.core :refer [bean]]
+            [goog.string :as gstring]
             [ajax.core :refer [GET POST]]
             [markdown-to-hiccup.core :as md]
             [codegouvfr.i18n :as i]
@@ -21,7 +22,7 @@
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
 (defonce deps-per-page 100) ;; FIXME: Make customizable?
 (defonce timeout 100)
-(defonce init-filter {:q nil :g nil :language nil :license nil})
+(defonce init-filter {:q nil :g nil :d nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
@@ -60,10 +61,11 @@
  :initialize-db!
  (fn [_ _]
    {:repos          nil
+    :orgas          nil
+    :dep-repos      nil
     :repos-page     0
     :orgas-page     0
     :deps-page      0
-    :orgas          nil
     :sort-repos-by  :date
     :sort-orgas-by  :repos
     :sort-deps-by   :production
@@ -99,6 +101,10 @@
 (re-frame/reg-event-db
  :update-deps!
  (fn [db [_ repos]] (assoc db :deps repos)))
+
+(re-frame/reg-event-db
+ :update-dep-repos!
+ (fn [db [_ repos]] (assoc db :dep-repos repos)))
 
 (re-frame/reg-event-db
  :filter!
@@ -294,6 +300,30 @@
       (recur (async/<! filter-chan)))))
 
 (re-frame/reg-sub
+ :dep-repos?
+ (fn [db _]
+   (let [repos0 (:dep-repos db)
+         favs   (get-item :favs)
+         repos  (case @(re-frame/subscribe [:sort-repos-by?])
+                  :name   (reverse (sort-by :n repos0))
+                  :forks  (sort-by :f repos0)
+                  :stars  (sort-by :s repos0)
+                  :issues (sort-by :i repos0)
+                  :reused (sort-by :g repos0)
+                  :favs   (concat (filter #(not (some #{(:n %)} favs)) repos0)
+                                  (filter #(some #{(:n %)} favs) repos0))
+                  :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                          (js/Date. (.parse js/Date (:u %2))))
+                                repos0)
+                  :desc   (sort #(compare (count (:d %1))
+                                          (count (:d %2)))
+                                repos0)
+                  repos0)]
+     (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
+                            repos
+                            (reverse repos))))))
+
+(re-frame/reg-sub
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
@@ -393,7 +423,9 @@
 (defn repositories-page [lang repos-cnt]
   (if (= repos-cnt 0)
     [:div [:p (i/i lang [:no-repo-found])] [:br]]
-    (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
+    (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
+          repos-page @(re-frame/subscribe [:repos-page?])
+          repos      @(re-frame/subscribe [:repos?])]
       [:div.table-container
        [:table.table.is-hoverable.is-fullwidth
         [:thead
@@ -451,8 +483,7 @@
              (i/i lang [:reused])]]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
-                             (drop (* repos-per-page @(re-frame/subscribe [:repos-page?]))
-                                   @(re-frame/subscribe [:repos?])))]
+                             (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
                 (let [{:keys [a? d f i li n o r s u dp g]}
                       dd
@@ -724,6 +755,123 @@
                          :href   (str annuaire-prefix an)}
                         (fa "fa-link")])]]])])))]))
 
+(defn deps-dep-page [lang d]
+  (let [rep-f @(re-frame/subscribe [:sort-repos-by?])
+        repos @(re-frame/subscribe [:dep-repos?])
+        q     (:q @(re-frame/subscribe [:filter?]))
+        title (str (count repos) " repositories depending on "
+                   (gstring/urlDecode d)
+                   (if q (str " and matching \"" q "\"")))]
+    [:div
+     [:h2 title]
+     [:br]
+     [:div.table-container
+      [:table.table.is-hoverable.is-fullwidth
+       [:thead
+        [:tr
+         [:th [:abbr
+               [:a {:class    (when-not (= rep-f :favs) "has-text-grey")
+                    :title    (i/i lang [:fav-sort])
+                    :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
+                (fa "fa-star")]]]
+         [:th.has-text-left
+          [:abbr
+           [:a.button {:class    (when (= rep-f :name) "is-light")
+                       :title    (i/i lang [:sort-repos-alpha])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
+            (i/i lang [:orga-repo])]]]
+         [:th.has-text-centered
+          [:abbr
+           [:a.button.is-static {:title (i/i lang [:swh-link])}
+            (i/i lang [:archive])]]]
+         [:th.has-text-left
+          [:abbr
+           [:a.button {:class    (when (= rep-f :desc) "is-light")
+                       :title    (i/i lang [:sort-description-length])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
+            (i/i lang [:description])]]]
+         [:th.has-text-right
+          [:abbr
+           [:a.button {:class    (when (= rep-f :date) "is-light")
+                       :title    (i/i lang [:sort-update-date])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
+            (i/i lang [:update-short])]]]
+         [:th.has-text-right
+          [:abbr
+           [:a.button {:class    (when (= rep-f :forks) "is-light")
+                       :title    (i/i lang [:sort-forks])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
+            (i/i lang [:forks])]]]
+         [:th.has-text-right
+          [:abbr
+           [:a.button {:class    (when (= rep-f :stars) "is-light")
+                       :title    (i/i lang [:sort-stars])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
+            (i/i lang [:stars])]]]
+         [:th.has-text-right
+          [:abbr
+           [:a.button {:class    (when (= rep-f :issues) "is-light")
+                       :title    (i/i lang [:sort-issues])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
+            (i/i lang [:issues])]]]
+         [:th.has-text-right
+          [:abbr
+           [:a.button {:class    (when (= rep-f :reused) "is-light")
+                       :title    (i/i lang [:sort-reused])
+                       :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
+            (i/i lang [:reused])]]]]]
+       (into [:tbody]
+             (for [dd repos]
+               ^{:key dd}
+               (let [{:keys [a? d f i li n o r s u dp g]}
+                     dd
+                     group (subs r 0 (- (count r) (+ 1 (count n))))]
+                 [:tr
+                  ;; Favorite star
+                  [:td [favorite lang n]]
+                  ;; Repo < orga
+                  [:td [:div
+                        [:a {:href   r
+                             :target "new"
+                             :title  (str (i/i lang [:go-to-repo])
+                                          (if li (str (i/i lang [:under-license]) li)))}
+                         n]
+                        " < "
+                        [:a {:href  (rfe/href :repos {:lang lang} {:g group})
+                             :title (i/i lang [:browse-repos-orga])}
+                         o]]]
+                  ;; SWH link
+                  [:td.has-text-centered
+                   [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
+                        :title  (i/i lang [:swh-link])
+                        :target "new"}
+                    [:img {:width "18px" :src "/images/swh-logo.png"}]]]
+                  ;; Description
+                  [:td {:class (when a? "has-text-grey")
+                        :title (when a? (i/i lang [:repo-archived]))}
+                   [:span
+                    (when dp
+                      [:span
+                       [:a.has-text-grey
+                        {:title (i/i lang [:deps])
+                         :href  (rfe/href
+                                 :repo-deps
+                                 {:lang lang
+                                  :orga o
+                                  :repo n})}
+                        (fa "fa-cubes")]
+                       " "]) d]]
+                  ;; Update
+                  [:td (or (to-locale-date u) "N/A")]
+                  ;; Forks
+                  [:td.has-text-right f]
+                  ;; Stars
+                  [:td.has-text-right s]
+                  ;; Issues
+                  [:td.has-text-right i]
+                  ;; Reused
+                  [:td.has-text-right g]])))]]]))
+
 (defn deps-table [lang]
   (let [dep-f @(re-frame/subscribe [:sort-deps-by?])]
     [:div.table-container
@@ -761,56 +909,70 @@
               ^{:key dd}
               (let [{:keys [t n c d]} dd]
                 [:tr
-                 [:td n]
+                 [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
                  [:td t]
                  [:td.has-text-right c]
                  [:td.has-text-right d]])))]]))
 
-;; FIXME
+(defn deps-dep-page-class [lang d]
+  (reagent/create-class
+   {:component-will-mount
+    (fn []
+      (GET (str "/deps/" d)
+           :handler
+           #(re-frame/dispatch
+             [:update-dep-repos! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (deps-dep-page lang d))}))
+
 (defn deps-page [lang]
-  (let [deps           @(re-frame/subscribe [:deps?])
+  (let [flt            @(re-frame/subscribe [:filter?])
+        single-dep     (:d flt)
+        deps           @(re-frame/subscribe [:deps?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (= deps-pages 0)
         last-disabled  (= deps-pages (dec count-pages))
         dep-f          @(re-frame/subscribe [:sort-deps-by?])]
     [:div
-     [:div.level-left
-      [:a.button.level-item
-       {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
-        :title    "Trier par nom"
-        :on-click #(re-frame/dispatch [:sort-deps-by! :name])} "Trier par nom"]
-      [:a.button.level-item
-       {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
-        :title    "Trier par type"
-        :on-click #(re-frame/dispatch [:sort-deps-by! :type])} "Trier par type"]
-      [:a.button.level-item
-       {:class    (str "is-" (if (= dep-f :production) "info is-light" "light"))
-        :title    "Trier par production"
-        :on-click #(re-frame/dispatch [:sort-deps-by! :production])} "Trier par production"]
-      [:a.button.level-item
-       {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
-        :title    "Trier par development"
-        :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
-      [:nav.level-item {:role "navigation" :aria-label "pagination"}
-       [:a.pagination-previous
-        {:on-click #(change-deps-page "first")
-         :disabled first-disabled}
-        (fa "fa-fast-backward")]
-       [:a.pagination-previous
-        {:on-click #(change-deps-page nil)
-         :disabled first-disabled}
-        (fa "fa-step-backward")]
-       [:a.pagination-next
-        {:on-click #(change-deps-page true)
-         :disabled last-disabled}
-        (fa "fa-step-forward")]
-       [:a.pagination-next
-        {:on-click #(change-deps-page "last")
-         :disabled last-disabled}
-        (fa "fa-fast-forward")]]]
+     (when-not single-dep
+       [:div.level-left
+        [:a.button.level-item
+         {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
+          :title    "Trier par nom"
+          :on-click #(re-frame/dispatch [:sort-deps-by! :name])} "Trier par nom"]
+        [:a.button.level-item
+         {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
+          :title    "Trier par type"
+          :on-click #(re-frame/dispatch [:sort-deps-by! :type])} "Trier par type"]
+        [:a.button.level-item
+         {:class    (str "is-" (if (= dep-f :production) "info is-light" "light"))
+          :title    "Trier par production"
+          :on-click #(re-frame/dispatch [:sort-deps-by! :production])} "Trier par production"]
+        [:a.button.level-item
+         {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
+          :title    "Trier par development"
+          :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
+        [:nav.level-item {:role "navigation" :aria-label "pagination"}
+         [:a.pagination-previous
+          {:on-click #(change-deps-page "first")
+           :disabled first-disabled}
+          (fa "fa-fast-backward")]
+         [:a.pagination-previous
+          {:on-click #(change-deps-page nil)
+           :disabled first-disabled}
+          (fa "fa-step-backward")]
+         [:a.pagination-next
+          {:on-click #(change-deps-page true)
+           :disabled last-disabled}
+          (fa "fa-step-forward")]
+         [:a.pagination-next
+          {:on-click #(change-deps-page "last")
+           :disabled last-disabled}
+          (fa "fa-fast-forward")]]])
      [:br]
-     [deps-table lang]
+     (if single-dep
+       [deps-dep-page-class lang single-dep]
+       [deps-table lang])
      [:br]]))
 
 (defn repos-page-class [lang license language]
@@ -1224,7 +1386,9 @@
   (let [lang (:lang (:path-params match))]
     (when (string? lang) (re-frame/dispatch [:lang! lang]))
     (re-frame/dispatch [:path-params! (:path-params match)])
-    (re-frame/dispatch [:view! (keyword (:name (:data match))) (:query-params match)])))
+    (re-frame/dispatch [:view!
+                        (keyword (:name (:data match)))
+                        (:query-params match)])))
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)

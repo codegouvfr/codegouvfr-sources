@@ -88,7 +88,7 @@
                            deps-repos))]
     (assoc
      (response/response
-      (json/generate-string dep))
+      (json/generate-string (:rs dep)))
      :headers {"Content-Type" "application/json; charset=utf-8"})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
