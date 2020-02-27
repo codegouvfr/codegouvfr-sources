@@ -1165,14 +1165,14 @@
                                     (reset! sort-rev? (not @sort-rev?))
                                     (reset! sort-key :n))}
                       (i/i lang [:name])]]
-                    [:th
+                    [:th.has-text-right
                      [:a.button
                       {:class    (when (= @sort-key :core) "is-light")
                        :on-click #(if (= @sort-key :core)
                                     (reset! sort-rev? (not @sort-rev?))
                                     (reset! sort-key :core))}
                       (i/i lang [:core-dep])]]
-                    [:th
+                    [:th.has-text-right
                      [:a.button
                       {:class    (when (= @sort-key :dev) "is-light")
                        :on-click #(if (= @sort-key :dev)
@@ -1255,14 +1255,14 @@
                            (reset! sort-rev? (not @sort-rev?))
                            (reset! sort-key :core))}
              (i/i lang [:core-dep])]]
-           [:th
+           [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :dev) "is-light")
               :on-click #(if (= @sort-key :dev)
                            (reset! sort-rev? (not @sort-rev?))
                            (reset! sort-key :dev))}
              (i/i lang [:dev-dep])]]
-           [:th
+           [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :repos) "is-light")
               :on-click #(if (= @sort-key :repos)
