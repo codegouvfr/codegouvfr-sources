@@ -66,6 +66,7 @@
     :orgas          nil
     :sort-repos-by  :date
     :sort-orgas-by  :repos
+    :sort-deps-by   :production
     :view           :orgas
     :reverse-sort   false
     :filter         init-filter
@@ -148,6 +149,10 @@
  (fn [db _] (:sort-orgas-by db)))
 
 (re-frame/reg-sub
+ :sort-deps-by?
+ (fn [db _] (:sort-deps-by db)))
+
+(re-frame/reg-sub
  :repos-page?
  (fn [db _] (:repos-page db)))
 
@@ -194,6 +199,14 @@
    (when (= k (:sort-orgas-by db))
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-orgas-by k)))
+
+(re-frame/reg-event-db
+ :sort-deps-by!
+ (fn [db [_ k]]
+   (re-frame/dispatch [:deps-page! 0])
+   (when (= k (:sort-deps-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-deps-by k)))
 
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
@@ -308,7 +321,13 @@
 (re-frame/reg-sub
  :deps?
  (fn [db _]
-   (let [deps (:deps db)]
+   (let [deps0 (:deps db)
+         deps  (case @(re-frame/subscribe [:sort-deps-by?])
+                 :name        (reverse (sort-by :n deps0))
+                 :type        (reverse (sort-by :t deps0))
+                 :production  (sort-by :c deps0)
+                 :development (sort-by :d deps0)
+                 deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
         deps (reverse deps))))))
@@ -426,7 +445,7 @@
              (i/i lang [:issues])]]]
           [:th.has-text-right
            [:abbr
-            [:a.button {:class    (when (= rep-f :issues) "is-light")
+            [:a.button {:class    (when (= rep-f :reused) "is-light")
                         :title    (i/i lang [:sort-reused])
                         :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
              (i/i lang [:reused])]]]]]
@@ -598,15 +617,15 @@
                                                           (.-checked (.-target %))}])}]
        (i/i lang [:with-code])]
       [:a.button.level-item
-       {:class    (str "is-" (if (= org-f :name) "warning" "light"))
+       {:class    (str "is-" (if (= org-f :name) "info is-light" "light"))
         :title    (i/i lang [:sort-orgas-alpha])
         :on-click #(re-frame/dispatch [:sort-orgas-by! :name])} (i/i lang [:sort-alpha])]
       [:a.button.level-item
-       {:class    (str "is-" (if (= org-f :repos) "warning" "light"))
+       {:class    (str "is-" (if (= org-f :repos) "info is-light" "light"))
         :title    (i/i lang [:sort-repos])
         :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])} (i/i lang [:sort-repos])]
       [:a.button.level-item
-       {:class    (str "is-" (if (= org-f :date) "warning" "light"))
+       {:class    (str "is-" (if (= org-f :date) "info is-light" "light"))
         :title    (i/i lang [:sort-orgas-creation])
         :on-click #(re-frame/dispatch [:sort-orgas-by! :date])} (i/i lang [:sort-creation])]
       [:span.button.is-static.level-item
@@ -706,25 +725,46 @@
                         (fa "fa-link")])]]])])))]))
 
 (defn deps-table [lang]
-  [:div.table-container
-   [:table.table.is-hoverable.is-fullwidth
-    [:thead
-     [:tr
-      [:th (i/i lang [:name])]
-      [:th (i/i lang [:type])]
-      [:th (i/i lang [:core-dep])]
-      [:th (i/i lang [:dev-dep])]]]
-    (into [:tbody]
-          (for [dd (take deps-per-page
-                         (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
-                               @(re-frame/subscribe [:deps?])))]
-            ^{:key dd}
-            (let [{:keys [t n c d]} dd]
-              [:tr
-               [:td n]
-               [:td t]
-               [:td c]
-               [:td d]])))]])
+  (let [dep-f @(re-frame/subscribe [:sort-deps-by?])]
+    [:div.table-container
+     [:table.table.is-hoverable.is-fullwidth
+      [:thead
+       [:tr
+        [:th
+         [:abbr
+          [:a.button
+           {:class    (str (if (= dep-f :name) "is-light"))
+            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
+           (i/i lang [:name])]]]
+        [:th
+         [:abbr
+          [:a.button
+           {:class    (str (if (= dep-f :type) "is-light"))
+            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
+           (i/i lang [:type])]]]
+        [:th.has-text-right
+         [:abbr
+          [:a.button
+           {:class    (str (if (= dep-f :production) "is-light"))
+            :on-click #(re-frame/dispatch [:sort-deps-by! :production])}
+           (i/i lang [:core-dep])]]]
+        [:th.has-text-right
+         [:abbr
+          [:a.button
+           {:class    (str (if (= dep-f :development) "is-light"))
+            :on-click #(re-frame/dispatch [:sort-deps-by! :development])}
+           (i/i lang [:dev-dep])]]]]]
+      (into [:tbody]
+            (for [dd (take deps-per-page
+                           (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
+                                 @(re-frame/subscribe [:deps?])))]
+              ^{:key dd}
+              (let [{:keys [t n c d]} dd]
+                [:tr
+                 [:td n]
+                 [:td t]
+                 [:td.has-text-right c]
+                 [:td.has-text-right d]])))]]))
 
 ;; FIXME
 (defn deps-page [lang]
@@ -732,14 +772,26 @@
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (= deps-pages 0)
-        last-disabled  (= deps-pages (dec count-pages))]
+        last-disabled  (= deps-pages (dec count-pages))
+        dep-f          @(re-frame/subscribe [:sort-deps-by?])]
     [:div
      [:div.level-left
-      ;; [:span.button.is-static.level-item
-      ;;  (let [rps (count repos)]
-      ;;    (if (< rps 2)
-      ;;      (str rps (i/i lang [:repo]))
-      ;;      (str rps (i/i lang [:repos]))))]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
+        :title    "Trier par nom"
+        :on-click #(re-frame/dispatch [:sort-deps-by! :name])} "Trier par nom"]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
+        :title    "Trier par type"
+        :on-click #(re-frame/dispatch [:sort-deps-by! :type])} "Trier par type"]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :production) "info is-light" "light"))
+        :title    "Trier par production"
+        :on-click #(re-frame/dispatch [:sort-deps-by! :production])} "Trier par production"]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
+        :title    "Trier par development"
+        :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
       [:nav.pagination.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
         {:on-click #(change-deps-page "first")
