@@ -1294,7 +1294,7 @@
                          [:span [:a {:href
                                      (str "https://github.com/"
                                           full_name)}
-                                 name] " "])]]))]
+                                 name] " · "])]]))]
         [:br]]
        [:div
         [:h2 (i/i lang [:deps-not-found])]
