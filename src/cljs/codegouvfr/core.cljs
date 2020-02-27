@@ -696,7 +696,11 @@
   [:div.table-container
    [:table.table.is-hoverable.is-fullwidth
     [:thead
-     [:tr [:th "Nom"] [:th "Type"] [:th "Core"] [:th "Dev"]]]
+     [:tr
+      [:th (i/i lang [:name])]
+      [:th (i/i lang [:type])]
+      [:th (i/i lang [:core-dep])]
+      [:th (i/i lang [:dev-dep])]]]
     (into [:tbody]
           (for [dd (take deps-per-page
                          (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
