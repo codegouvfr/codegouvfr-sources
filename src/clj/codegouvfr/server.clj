@@ -78,25 +78,17 @@
 (defn resource-dep-json
   "Expose the json resource corresponding to `dep`."
   [dep]
-  (let [reps       (json/parse-string
-                    (try (slurp "data/repos.json")
-                         (catch Exception e
-                           (timbre/error "Can't find repos.json")))
-                    true)
-        deps-repos (json/parse-string
+  (let [deps-repos (json/parse-string
                     (try (slurp "data/deps/deps-repos.json")
                          (catch Exception e
                            (timbre/error "Can't find deps-repos.json")))
                     true)
         dep        (first (filter
-                           #(= (s/lower-case (:name %)) (s/lower-case dep))
-                           deps-repos))
-        repos      (map (fn [r]
-                          (first (filter #(s/includes? (:r %) (:full_name r))                                               reps)))
-                        (:repos dep))]
+                           #(= (s/lower-case (:n %)) (s/lower-case dep))
+                           deps-repos))]
     (assoc
      (response/response
-      (json/generate-string (assoc dep :repos repos)))
+      (json/generate-string dep))
      :headers {"Content-Type" "application/json; charset=utf-8"})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

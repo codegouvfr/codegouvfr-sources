@@ -122,7 +122,7 @@
 
 (re-frame/reg-event-db
  :deps-page!
- (fn [db [_ n]] (assoc db :orgas-page n)))
+ (fn [db [_ n]] (assoc db :deps-page n)))
 
 (re-frame/reg-event-db
  :view!
