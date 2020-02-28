@@ -15,7 +15,8 @@
             [clojure.string :as s]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
-            [reitit.frontend.easy :as rfe]))
+            [reitit.frontend.easy :as rfe]
+            [cljsjs.chartjs]))
 
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
@@ -75,6 +76,32 @@
     :display-filter init-filter
     :lang           "en"
     :path-params    nil}))
+
+(defn stats-chart [stats lang]
+  (let [top     (reverse (sort-by val (dissoc (:top_licenses stats) :Inconnue)))
+        context (.getContext (.getElementById js/document "chartjs") "2d")
+        chart-data
+        {:type    "bar"
+         :options {:title      {:display true :text (i/i lang [:most-used-licenses])}
+                   :legend     {:display false}
+                   :responsive "true"
+                   :scales     {:xAxes [{:stacked true}]
+                                :yAxes [{:stacked true}]}}
+         :data    {:labels (map key top)
+                   :datasets
+                   [{:data (map val top)
+                     :backgroundColor
+                     ["#3e95cd" "#8e5ea2" "#3cba9f" "#e8c3b9" "#c45850"
+                      "#3e95cd" "#8e5ea2" "#3cba9f" "#e8c3b9" "#c45850"]}]}}]
+    (js/Chart. context (clj->js chart-data))))
+
+(defn stats-chart-class [lang]
+  (reagent/create-class
+   {:component-did-mount
+    (fn [] (GET stats-url :handler
+                #(stats-chart (walk/keywordize-keys %) lang)))
+    :display-name   "stats-chart"
+    :reagent-render (fn [] [:canvas {:id "chartjs"}])}))
 
 (re-frame/reg-event-db
  :lang!
@@ -1012,12 +1039,13 @@
      [:p.heading heading]
      [:p.title (str title)]]]])
 
-(defn stats-card [heading data]
+(defn stats-card [heading data & thead]
   [:div.column
    [:div.card
     [:h1.card-header-title.subtitle heading]
     [:div.card-content
      [:table.table.is-fullwidth
+      thead
       [:tbody
        (for [o (reverse (walk/stringify-keys (sort-by val data)))]
          ^{:key (key o)}
@@ -1073,7 +1101,10 @@
         top_languages_1
         (top-clean-up top_languages lang "language")
         top_licenses_0
-        (top-clean-up top_licenses lang "license")]
+        (take 10 (top-clean-up (-> top_licenses
+                                   (dissoc :Inconnue)
+                                   (dissoc :Other))
+                               lang "license"))]
     [:div
      [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
@@ -1082,6 +1113,22 @@
       (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)
       (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
      [:br]
+     [:div.columns
+      (deps-card (i/i lang [:deps]) deps lang)
+      (stats-card [:span (i/i lang [:most-used-languages])]
+                  top_languages_1
+                  [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+     [:div.columns
+      [:div.column [stats-chart-class lang]]]
+     [:div.columns
+      (stats-card [:span
+                   (i/i lang [:most-used-licenses-%])
+                   [:sup
+                    [:a.has-text-grey.is-size-7
+                     {:href  (str "/" lang "/glossary#license")
+                      :title (i/i lang [:go-to-glossary])}
+                     (fa "fa-question-circle")]]]
+                  top_licenses_0)]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
@@ -1099,18 +1146,7 @@
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_orgs_by_repos_0)
-      (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)
-      (stats-card [:span (i/i lang [:most-used-languages])]
-                  top_languages_1)]
-     [:div.columns
-      (stats-card [:span
-                   (i/i lang [:most-used-licenses])
-                   [:sup
-                    [:a.has-text-grey.is-size-7
-                     {:href  (str "/" lang "/glossary#license")
-                      :title (i/i lang [:go-to-glossary])}
-                     (fa "fa-question-circle")]]]
-                  top_licenses_0)]
+      (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
      [:div.columns
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
@@ -1122,9 +1158,7 @@
                   {(i/i lang [:repos-on-swh])
                    (:repos_in_archive software_heritage)
                    (i/i lang [:percent-of-repos-archived])
-                   (:ratio_in_archive software_heritage)})]
-     [:div.columns
-      (deps-card (i/i lang [:deps]) deps lang)]
+                   (:ratio_in_archive software_heritage)})]     
      [:br]]))
 
 (defn stats-page-class [lang]
@@ -1132,12 +1166,13 @@
         stats      (reagent/atom nil)
         deps-total (reagent/atom nil)]
     (reagent/create-class
-     {:component-did-mount
+     {:display-name   "stats-page-class"
+      :component-did-mount
       (fn []
         (GET "/deps-total"
              :handler #(reset! deps-total (walk/keywordize-keys %)))
         (GET "/deps-top"
-             :handler #(reset! deps (map (comp bean clj->js) %)))
+             :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
         (GET stats-url
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))

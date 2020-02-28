@@ -18,6 +18,7 @@
                  [cheshire "5.10.0"]
                  [com.draines/postal "2.0.3"]
                  [com.taoensso/timbre "4.10.0"]
+                 [cljsjs/chartjs "2.9.3-0"]
                  [markdown-to-hiccup "0.6.2"]
                  ;; FIXME: this explicit require should not be needed:
                  [org.clojure/tools.reader "1.3.2"]
