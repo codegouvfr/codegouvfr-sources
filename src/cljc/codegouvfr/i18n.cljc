@@ -25,7 +25,10 @@
     :core-dep                    "Production"
     :created-at                  "Créé le "
     :dep-of                      "dépendance identifiée pour"
-    :deps                        "Dépendances"
+    :dep                         " dépendance"
+    :deps                        " dépendances"
+    :Dep                         "Dépendance"
+    :Deps                        "Dépendances"
     :deps-expand                 "Naviguer dans les dépendances logicielles des dépôts"
     :deps-not-found              "Pas de dépendances identifiées."
     :deps-of                     "dépendances identifiées pour"
@@ -159,7 +162,10 @@
     :core-dep                    "Core"
     :created-at                  "Created on "
     :dep-of                      "identified dependency for"
-    :deps                        "Dependencies"
+    :dep                         " dependency"
+    :deps                        " dependencies"
+    :Dep                         "Dependency"
+    :Deps                        "Dependencies"
     :deps-expand                 "Browse software dependencies of repositories"
     :deps-not-found              "No identified dependencies."
     :deps-of                     "identified dependencies for"
@@ -289,7 +295,10 @@
     :core-dep                    "Core"                              ;; TODO
     :created-at                  "Creato il "
     :dep-of                      "identified dependency for"         ;; TODO
-    :deps                        "Dependencies"                      ;; TODO
+    :dep                         " dependency"                       ;; TODO
+    :deps                        " dependencies"                     ;; TODO
+    :Dep                         "Dependency"                        ;; TODO
+    :Deps                        "Dependencies"                      ;; TODO
     :deps-expand                 "Sfoglia le dipendenze software dei repository"
     :deps-not-found              "No identified dependencies."       ;; TODO
     :deps-of                     "Identified dependencies for "      ;; TODO

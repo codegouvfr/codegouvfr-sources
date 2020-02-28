@@ -584,6 +584,36 @@
         last-disabled  (= repos-pages (dec count-pages))]
     [:div
      [:div.level-left
+      [:div.dropdown.level-item.is-hoverable
+       [:div.dropdown-trigger
+        [:button.button {:aria-haspopup true :aria-controls "dropdown-menu3"}
+         [:span "Options"] (fa "fa-angle-down")]]
+       [:div.dropdown-menu {:role "menu" :id "dropdown-menu3"}
+        [:div.dropdown-content
+         [:div.dropdown-item
+          [:label.checkbox.level
+           [:input {:type      "checkbox"
+                    :on-change #(re-frame/dispatch
+                                 [:filter! {:is-fork (.-checked (.-target %))}])}]
+           (i/i lang [:only-forks])]]
+         [:div.dropdown-item
+          [:label.checkbox.level {:title (i/i lang [:no-archived-repos])}
+           [:input {:type      "checkbox"
+                    :on-change #(re-frame/dispatch
+                                 [:filter! {:is-archive (.-checked (.-target %))}])}]
+           (i/i lang [:no-archives])]]
+         [:div.dropdown-item
+          [:label.checkbox.level {:title (i/i lang [:only-with-description-repos])}
+           [:input {:type      "checkbox"
+                    :on-change #(re-frame/dispatch
+                                 [:filter! {:has-description (.-checked (.-target %))}])}]
+           (i/i lang [:with-description])]]
+         [:div.dropdown-item
+          [:label.checkbox.level {:title (i/i lang [:only-with-license])}
+           [:input {:type      "checkbox"
+                    :on-change #(re-frame/dispatch
+                                 [:filter! {:is-licensed (.-checked (.-target %))}])}]
+           (i/i lang [:with-license])]]]]]
       [:div.level-item
        [:input.input
         {:size        12
@@ -610,27 +640,7 @@
                             (async/>! display-filter-chan {:language ev})
                             (<! (async/timeout timeout))
                             (async/>! filter-chan {:language ev}))))}]]
-      [:label.checkbox.level-item
-       {:title (i/i lang [:only-forked-repos])}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch
-                             [:filter! {:is-fork (.-checked (.-target %))}])}]
-       (i/i lang [:only-forks])]
-      [:label.checkbox.level-item {:title (i/i lang [:no-archived-repos])}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch
-                             [:filter! {:is-archive (.-checked (.-target %))}])}]
-       (i/i lang [:no-archives])]
-      [:label.checkbox.level-item {:title (i/i lang [:only-with-description-repos])}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch
-                             [:filter! {:has-description (.-checked (.-target %))}])}]
-       (i/i lang [:with-description])]
-      [:label.checkbox.level-item {:title (i/i lang [:only-with-license])}
-       [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch
-                             [:filter! {:is-licensed (.-checked (.-target %))}])}]
-       (i/i lang [:with-license])]
+
       [:span.button.is-static.level-item
        (let [rps (count repos)]
          (if (< rps 2)
@@ -661,13 +671,13 @@
      [:br]]))
 
 (defn organizations-page [lang]
-  (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
-        orgas          @(re-frame/subscribe [:orgas?])
-        orgs-cnt       (count orgas)
-        orgas-pages    @(re-frame/subscribe [:orgas-page?])
-        count-pages    (count (partition-all orgas-per-page orgas))
-        first-disabled (= orgas-pages 0)
-        last-disabled  (= orgas-pages (dec count-pages))]
+(let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
+      orgas          @(re-frame/subscribe [:orgas?])
+      orgs-cnt       (count orgas)
+      orgas-pages    @(re-frame/subscribe [:orgas-page?])
+      count-pages    (count (partition-all orgas-per-page orgas))
+      first-disabled (= orgas-pages 0)
+      last-disabled  (= orgas-pages (dec count-pages))]
     [:div
      [:div.level-left
       [:label.checkbox.level-item {:title (i/i lang [:only-orga-with-code])}
@@ -763,7 +773,7 @@
                [:div.card-footer
                 (when (and (= p "GitHub") dp)
                   [:a.card-footer-item
-                   {:title (i/i lang [:deps])
+                   {:title (i/i lang [:Deps])
                     :href  (rfe/href
                             :orga-deps
                             {:lang lang
@@ -887,7 +897,7 @@
                     (when dp
                       [:span
                        [:a.has-text-grey
-                        {:title (i/i lang [:deps])
+                        {:title (i/i lang [:Deps])
                          :href  (rfe/href
                                  :repo-deps
                                  {:lang lang
@@ -987,6 +997,11 @@
          {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
           :title    "Trier par development"
           :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
+        [:span.button.is-static.level-item
+         (let [deps (count deps)]
+           (if (< deps 2)
+             (str deps (i/i lang [:dep]))
+             (str deps (i/i lang [:deps]))))]
         [:nav.level-item {:role "navigation" :aria-label "pagination"}
          [:a.pagination-previous
           {:on-click #(change-deps-page "first")
@@ -1374,7 +1389,7 @@
      [:a.button.is-warning
       {:title (i/i lang [:deps-expand])
        :href  (rfe/href :deps {:lang lang})}
-      (i/i lang [:deps])]]
+      (i/i lang [:Deps])]]
     ;; Stats
     [:p.control.level-item
      [:a.button.is-info
