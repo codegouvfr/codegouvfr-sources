@@ -923,7 +923,8 @@
 
 (defn deps-dep-page-class [lang d]
   (reagent/create-class
-   {:component-will-mount
+   {:display-name   "deps-dep-page-class"
+    :component-did-mount
     (fn []
       (GET (str "/deps/" d)
            :handler
@@ -984,7 +985,8 @@
 
 (defn repos-page-class [lang license language]
   (reagent/create-class
-   {:component-will-mount
+   {:display-name   "repos-page-class"
+    :component-did-mount
     (fn []
       (GET "/repos"
            :handler
@@ -994,7 +996,8 @@
 
 (defn deps-page-class [lang]
   (reagent/create-class
-   {:component-will-mount
+   {:display-name   "deps-page-class"
+    :component-did-mount
     (fn []
       (GET "/deps"
            :handler
@@ -1096,7 +1099,9 @@
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_orgs_by_repos_0)
-      (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
+      (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)
+      (stats-card [:span (i/i lang [:most-used-languages])]
+                  top_languages_1)]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:most-used-licenses])
@@ -1105,9 +1110,7 @@
                      {:href  (str "/" lang "/glossary#license")
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
-                  top_licenses_0)
-      (stats-card [:span (i/i lang [:most-used-languages])]
-                  top_languages_1)]
+                  top_licenses_0)]
      [:div.columns
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
@@ -1129,7 +1132,7 @@
         stats      (reagent/atom nil)
         deps-total (reagent/atom nil)]
     (reagent/create-class
-     {:component-will-mount
+     {:component-did-mount
       (fn []
         (GET "/deps-total"
              :handler #(reset! deps-total (walk/keywordize-keys %)))
@@ -1215,7 +1218,8 @@
         sort-key  (reagent/atom :c)
         sort-rev? (reagent/atom false)]
     (reagent/create-class
-     {:component-will-mount
+     {:display-name "repo-deps-page-class"
+      :component-did-mount
       (fn []
         (GET (str "/deps/repos/" repo)
              :handler #(reset! deps (walk/keywordize-keys %))))
@@ -1306,7 +1310,8 @@
         sort-key  (reagent/atom :core)
         sort-rev? (reagent/atom true)]
     (reagent/create-class
-     {:component-will-mount
+     {:display-name   "orga-deps-page-class"
+      :component-did-mount
       (fn []
         (GET (str "/deps/orgas/" orga)
              :handler
@@ -1395,7 +1400,8 @@
         license  (reagent/atom nil)
         language (reagent/atom nil)]
     (reagent/create-class
-     {:component-will-mount
+     {:display-name   "main-class"
+      :component-did-mount
       (fn []
         (GET "/orgas"
              :handler
