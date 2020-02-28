@@ -692,17 +692,19 @@
 (defn organizations-page [lang]
   (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
         orgas          @(re-frame/subscribe [:orgas?])
-orgs-cnt       (count orgas)
-      orgas-pages    @(re-frame/subscribe [:orgas-page?])
-      count-pages    (count (partition-all orgas-per-page orgas))
-      first-disabled (= orgas-pages 0)
-      last-disabled  (= orgas-pages (dec count-pages))]
+        orgs-cnt       (count orgas)
+        orgas-pages    @(re-frame/subscribe [:orgas-page?])
+        count-pages    (count (partition-all orgas-per-page orgas))
+        first-disabled (= orgas-pages 0)
+        last-disabled  (= orgas-pages (dec count-pages))]
     [:div
      [:div.level-left
       [:label.checkbox.level-item {:title (i/i lang [:only-orga-with-code])}
        [:input {:type      "checkbox"
-                :on-change #(re-frame/dispatch [:filter! {:has-at-least-one-repo
-                                                          (.-checked (.-target %))}])}]
+                :checked   (get-item :has-at-least-one-repo)
+                :on-change #(let [v (.-checked (.-target %))]
+                              (set-item! :has-at-least-one-repo v)
+                              (re-frame/dispatch [:filter! {:has-at-least-one-repo v}]))}]
        (i/i lang [:with-code])]
       [:a.button.level-item
        {:class    (str "is-" (if (= org-f :name) "info is-light" "light"))
