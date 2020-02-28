@@ -590,7 +590,7 @@
       [:div.dropdown.level-item.is-hoverable
        [:div.dropdown-trigger
         [:button.button {:aria-haspopup true :aria-controls "dropdown-menu3"}
-         [:span "Options"] (fa "fa-angle-down")]]
+         [:span (i/i lang [:options])] (fa "fa-angle-down")]]
        [:div.dropdown-menu {:role "menu" :id "dropdown-menu3"}
         [:div.dropdown-content
          [:div.dropdown-item
