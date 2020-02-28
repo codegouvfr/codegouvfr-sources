@@ -1150,10 +1150,10 @@
       (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
      [:br]
      [:div.columns
-      (deps-card (i/i lang [:deps]) deps lang)
       (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_1
-                  [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+                  [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])
+      (deps-card (i/i lang [:Deps]) deps lang)]
      [:div.columns
       [:div.column [stats-chart-class lang]]]
      [:div.columns
