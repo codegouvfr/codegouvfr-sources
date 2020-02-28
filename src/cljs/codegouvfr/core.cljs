@@ -1325,7 +1325,9 @@
       (i/i lang [:orgas-or-groups])]]
     ;; Repos
     [:p.control.level-item
-     [:a.button.is-success {:href (rfe/href :repos {:lang lang})}
+     [:a.button.is-success
+      {:title (i/i lang [:all-public-sector-repos])
+       :href  (rfe/href :repos {:lang lang})}
       (i/i lang [:repos-of-source-code])]]
     ;; Deps
     [:p.control.level-item
@@ -1335,7 +1337,9 @@
       (i/i lang [:deps])]]
     ;; Stats
     [:p.control.level-item
-     [:a.button.is-info {:href (rfe/href :stats {:lang lang})}
+     [:a.button.is-info
+      {:title (i/i lang [:stats-expand])
+       :href  (rfe/href :stats {:lang lang})}
       (i/i lang [:stats])]]
     (if (or (= view :repos) (= view :orgas) (= view :deps))
       [:p.control.level-item
