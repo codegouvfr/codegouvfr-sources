@@ -1303,7 +1303,7 @@
 (defn orga-deps-page-class [lang]
   (let [deps      (reagent/atom nil)
         orga      (:orga @(re-frame/subscribe [:path-params?]))
-        sort-key  (reagent/atom :repos)
+        sort-key  (reagent/atom :core)
         sort-rev? (reagent/atom true)]
     (reagent/create-class
      {:component-will-mount
