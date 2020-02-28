@@ -270,13 +270,16 @@
         de  (:has-description f)
         fk  (:is-fork f)
         ar  (:is-archive f)
-        li  (:is-licensed f)]
+        li  (:is-licensed f)
+        h   (:include-html-repos f)]
     (filter
      #(and (if fk (:f? %) true)
            (if ar (not (:a? %)) true)
            (if li (let [l (:li %)] (and l (not (= l "Other")))) true)
            (if lic (s-includes? (:li %) lic) true)
-           (if la (s-includes? (:l %) la) true)
+           (if la (s-includes? (:l %) la)
+               (if h true (not (s-includes? (:l %) "HTML"))))
+           (if h true (not (s-includes? (:l %) "HTML")))
            (if de (seq (:d %)) true)
            (if g (s-includes? (:r %) g) true)
            (if s (s-includes?
@@ -621,7 +624,15 @@
                     :on-change #(let [v (.-checked (.-target %))]
                                   (set-item! :is-licensed v)
                                   (re-frame/dispatch [:filter! {:is-licensed v}]))}]
-           (i/i lang [:with-license])]]]]]
+           (i/i lang [:with-license])]]
+         [:div.dropdown-item
+          [:label.checkbox.level {:title (i/i lang [:with-html])}
+           [:input {:type      "checkbox"
+                    :checked   (get-item :include-html-repos)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :include-html-repos v)
+                                  (re-frame/dispatch [:filter! {:include-html-repos v}]))}]
+           (i/i lang [:with-html])]]]]]
       [:div.level-item
        [:input.input
         {:size        12
@@ -679,9 +690,9 @@
      [:br]]))
 
 (defn organizations-page [lang]
-(let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
-      orgas          @(re-frame/subscribe [:orgas?])
-      orgs-cnt       (count orgas)
+  (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
+        orgas          @(re-frame/subscribe [:orgas?])
+orgs-cnt       (count orgas)
       orgas-pages    @(re-frame/subscribe [:orgas-page?])
       count-pages    (count (partition-all orgas-per-page orgas))
       first-disabled (= orgas-pages 0)
