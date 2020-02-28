@@ -1116,7 +1116,7 @@
     (apply merge
            (sequence
             (comp
-             (filter (fn [[k v]] (not (= k :Inconnu))))
+             (filter (fn [[k v]] (not (= k "Inconnu"))))
              (map (fn [[k v]]
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
@@ -1135,7 +1135,7 @@
                                (:count %))
                       top_orgs_by_repos))
         top_languages_1
-        (top-clean-up top_languages lang "language")
+        (top-clean-up (walk/stringify-keys top_languages) lang "language")
         top_licenses_0
         (take 10 (top-clean-up (-> top_licenses
                                    (dissoc :Inconnue)
