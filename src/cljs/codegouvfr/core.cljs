@@ -49,7 +49,7 @@
   (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val))))
 
 (defn get-item
-  "Returns value of `key` from browser's localStorage."
+  "Return the value of `key` from browser's localStorage."
   [key]
   (js->clj (.parse js/JSON (.getItem (.-localStorage js/window) key))))
 
@@ -593,26 +593,34 @@
          [:div.dropdown-item
           [:label.checkbox.level
            [:input {:type      "checkbox"
-                    :on-change #(re-frame/dispatch
-                                 [:filter! {:is-fork (.-checked (.-target %))}])}]
+                    :checked   (get-item :is-fork)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :is-fork v)
+                                  (re-frame/dispatch [:filter! {:is-fork v}]))}]
            (i/i lang [:only-forks])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:no-archived-repos])}
            [:input {:type      "checkbox"
-                    :on-change #(re-frame/dispatch
-                                 [:filter! {:is-archive (.-checked (.-target %))}])}]
+                    :checked   (get-item :is-archive)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :is-archive v)
+                                  (re-frame/dispatch [:filter! {:is-archive v}]))}]
            (i/i lang [:no-archives])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:only-with-description-repos])}
            [:input {:type      "checkbox"
-                    :on-change #(re-frame/dispatch
-                                 [:filter! {:has-description (.-checked (.-target %))}])}]
+                    :checked   (get-item :has-description)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :has-description v)
+                                  (re-frame/dispatch [:filter! {:has-description v}]))}]
            (i/i lang [:with-description])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:only-with-license])}
            [:input {:type      "checkbox"
-                    :on-change #(re-frame/dispatch
-                                 [:filter! {:is-licensed (.-checked (.-target %))}])}]
+                    :checked   (get-item :is-licensed)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :is-licensed v)
+                                  (re-frame/dispatch [:filter! {:is-licensed v}]))}]
            (i/i lang [:with-license])]]]]]
       [:div.level-item
        [:input.input
