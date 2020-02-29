@@ -67,7 +67,7 @@
     :repos-page     0
     :orgas-page     0
     :deps-page      0
-    :sort-repos-by  :date
+    :sort-repos-by  :reused
     :sort-orgas-by  :repos
     :sort-deps-by   :production
     :view           :orgas
