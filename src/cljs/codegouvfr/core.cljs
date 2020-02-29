@@ -1108,10 +1108,11 @@
          ^{:key o}
          [:tr
           [:td t]
-          [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
+          [:td [:a {:title (i/i lang [:list-repos-depending-on-dep])
+                    :href  (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
           [:td rs]])]]]]])
 
-(defn top-clean-up [top lang param]
+(defn top-clean-up [top lang param title]
   (let [total (reduce + (map val top))]
     (apply merge
            (sequence
@@ -1121,7 +1122,8 @@
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
              (map #(let [[k v] %]
-                     {[:a {:href (str "/" lang "/repos?" param "=" k)} k] v})))
+                     {[:a {:title title
+                           :href  (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
 (defn stats-page
@@ -1135,12 +1137,14 @@
                                (:count %))
                       top_orgs_by_repos))
         top_languages_1
-        (top-clean-up (walk/stringify-keys top_languages) lang "language")
+        (top-clean-up (walk/stringify-keys top_languages)
+                      lang "language" (i/i lang [:list-repos-with-language]))
         top_licenses_0
         (take 10 (top-clean-up (-> top_licenses
                                    (dissoc :Inconnue)
                                    (dissoc :Other))
-                               lang "license"))]
+                               lang "license"
+                               (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
@@ -1153,18 +1157,18 @@
       (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_1
                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])
-      (deps-card (i/i lang [:Deps]) deps lang)]
-     [:div.columns
-      [:div.column [stats-chart-class lang]]]
-     [:div.columns
+      (deps-card (i/i lang [:Deps]) deps lang)
       (stats-card [:span
-                   (i/i lang [:most-used-licenses-%])
+                   (i/i lang [:most-used-identified-licenses])
                    [:sup
                     [:a.has-text-grey.is-size-7
                      {:href  (str "/" lang "/glossary#license")
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
-                  top_licenses_0)]
+                  top_licenses_0
+                  [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
+     [:div.columns
+      [:div.column [stats-chart-class lang]]]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
