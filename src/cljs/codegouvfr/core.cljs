@@ -140,12 +140,12 @@
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
    ;; FIXME: Find a more idiomatic way?
-   (assoc db :filter (merge (:filter db) s))))
+   (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
  :display-filter!
  (fn [db [_ s]]
-   (assoc db :display-filter (merge (:display-filter db) s))))
+   (update-in db [:display-filter] merge s)))
 
 (re-frame/reg-event-db
  :repos-page!
@@ -215,7 +215,7 @@
 
 (re-frame/reg-event-db
  :reverse-sort!
- (fn [db _] (assoc db :reverse-sort (not (:reverse-sort db)))))
+ (fn [db _] (update-in db [:reverse-sort] not)))
 
 (re-frame/reg-event-db
  :sort-repos-by!
@@ -275,7 +275,7 @@
     (filter
      #(and (if fk (:f? %) true)
            (if ar (not (:a? %)) true)
-           (if li (let [l (:li %)] (and l (not (= l "Other")))) true)
+           (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
            (if la (s-includes? (:l %) la)
                (if h true (not (s-includes? (:l %) "HTML"))))
@@ -303,7 +303,7 @@
         re (:has-at-least-one-repo f)]
     (filter
      #(and (if de (seq (:d %)) true)
-           (if re (> (:r %) 0) true)
+           (if re (pos? (:r %)) true)
            (if s (s-includes?
                   (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
                   s)
@@ -434,7 +434,7 @@
       (re-frame/dispatch [:repos-page! (dec count-pages)])
       (and (< repos-page (dec count-pages)) next)
       (re-frame/dispatch [:repos-page! (inc repos-page)])
-      (and (> repos-page 0) (not next))
+      (and (pos? repos-page) (not next))
       (re-frame/dispatch [:repos-page! (dec repos-page)]))))
 
 (defn change-deps-page [next]
@@ -448,11 +448,11 @@
       (re-frame/dispatch [:deps-page! (dec count-pages)])
       (and (< deps-page (dec count-pages)) next)
       (re-frame/dispatch [:deps-page! (inc deps-page)])
-      (and (> deps-page 0) (not next))
+      (and (pos? deps-page) (not next))
       (re-frame/dispatch [:deps-page! (dec deps-page)]))))
 
 (defn repositories-page [lang repos-cnt]
-  (if (= repos-cnt 0)
+  (if (zero? repos-cnt)
     [:div [:p (i/i lang [:no-repo-found])] [:br]]
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
@@ -518,7 +518,7 @@
                 ^{:key dd}
                 (let [{:keys [a? d f i li n o r s u dp g]}
                       dd
-                      group (subs r 0 (- (count r) (+ 1 (count n))))]
+                      group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
                    ;; Favorite star
                    [:td [favorite lang n]]
@@ -576,14 +576,14 @@
       (re-frame/dispatch [:orgas-page! (dec count-pages)])
       (and (< orgas-page (dec count-pages)) next)
       (re-frame/dispatch [:orgas-page! (inc orgas-page)])
-      (and (> orgas-page 0) (not next))
+      (and (pos? orgas-page) (not next))
       (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
 
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
-        first-disabled (= repos-pages 0)
+        first-disabled (zero? repos-pages)
         last-disabled  (= repos-pages (dec count-pages))]
     [:div
      [:div.level-left
@@ -695,7 +695,7 @@
         orgs-cnt       (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
-        first-disabled (= orgas-pages 0)
+        first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div
      [:div.level-left
@@ -746,7 +746,7 @@
      [:br]
      (into
       [:div]
-      (if (= orgs-cnt 0)
+      (if (zero? orgs-cnt)
         [[:p (i/i lang [:no-orga-found])] [:br]]
         (for [dd (partition-all
                   3
@@ -890,7 +890,7 @@
                ^{:key dd}
                (let [{:keys [a? d f i li n o r s u dp g]}
                      dd
-                     group (subs r 0 (- (count r) (+ 1 (count n))))]
+                     group (subs r 0 (- (count r) (inc (count n))))]
                  [:tr
                   ;; Favorite star
                   [:td [favorite lang n]]
@@ -996,7 +996,7 @@
         deps           @(re-frame/subscribe [:deps?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
-        first-disabled (= deps-pages 0)
+        first-disabled (zero? deps-pages)
         last-disabled  (= deps-pages (dec count-pages))
         dep-f          @(re-frame/subscribe [:sort-deps-by?])]
     [:div
@@ -1116,7 +1116,7 @@
     (apply merge
            (sequence
             (comp
-             (filter (fn [[k v]] (not (= k "Inconnu"))))
+             (filter (fn [[k v]] (not= k "Inconnu")))
              (map (fn [[k v]]
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
@@ -1301,7 +1301,7 @@
   "Table with group/organization dependencies."
   [lang orga deps sort-key sort-rev?]
   (let [cdeps (count deps)
-        deps  (if (not (= @sort-key :repos))
+        deps  (if (not= (deref sort-key) :repos)
                 (sort-by @sort-key deps)
                 (sort #(compare (count (:repos %1))
                                 (count (:repos %2)))
@@ -1501,4 +1501,4 @@
   (start-display-filter-loop)
   (reagent/render
    [main-class]
-   (. js/document (getElementById "app"))))
+   (.getElementById js/document "app")))
