@@ -5,6 +5,7 @@
 (ns codegouvfr.server
   (:require [ring.util.response :as response]
             [clojure.java.io :as io]
+            [clojure.walk :as walk]
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
@@ -19,7 +20,11 @@
             [taoensso.timbre.appenders.core :as appenders]
             [taoensso.timbre.appenders (postal :as postal-appender)]
             [cheshire.core :as json]
-            [clojure.string :as s])
+            [clojure.string :as s]
+            ;; [org.httpkit.server :as server]
+            ;; [taoensso.sente :as sente]
+            ;; [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
+            )
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -38,6 +43,23 @@
                     {:from config/from
                      :to   config/admin-email})
                    {:min-level :error})}})
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Sente setup
+
+;; (let [{:keys [ch-recv send-fn connected-uids
+;;               ajax-post-fn ajax-get-or-ws-handshake-fn]}
+;;       (sente/make-channel-socket! (get-sch-adapter) {})]
+
+;;   (def ring-ajax-post                ajax-post-fn)
+;;   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
+;;   (def ch-chsk                       ch-recv)
+;;   (def chsk-send!                    send-fn)
+;;   (def connected-uids                connected-uids))
+
+;; (defn event-msg-handler [{:keys [event]}]
+;;   (doseq [uid (:any @connected-uids)]
+;;     (chsk-send! uid [:fast-push/is-fast event])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -119,6 +141,8 @@
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
+  ;; (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
+  ;; (POST "/chsk" req (ring-ajax-post                req))
   (GET "/orgas" [] (resource-json "data/orgas.json"))
   (GET "/repos" [] (resource-json "data/repos.json"))
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
@@ -147,17 +171,17 @@
   (GET "/apropos" [] (response/redirect "/fr/about"))
 
   (POST "/contact" req
-        (let [params (clojure.walk/keywordize-keys (:form-params req))]
-          (send-email (conj params {:log (str "Sent message from " (:email params)
-                                              " (" (:organization params) ")")}))
-          (response/redirect (str "/" (:lang params) "/ok"))))
-  
-  (POST "/contact" req
-        (let [params (clojure.walk/keywordize-keys (:form-params req))]
+        (let [params (walk/keywordize-keys (:form-params req))]
           (send-email (conj params {:log (str "Sent message from " (:email params)
                                               " (" (:organization params) ")")}))
           (response/redirect (str "/" (:lang params) "/ok"))))
 
+  (POST "/contact" req
+        (let [params (walk/keywordize-keys (:form-params req))]
+          (send-email (conj params {:log (str "Sent message from " (:email params)
+                                              " (" (:organization params) ")")}))
+          (response/redirect (str "/" (:lang params) "/ok"))))
+  ;; FIXME: unused bindings?
   (GET "/:lang/:p1/:p2/:p3" [lang p1 p2 p3]
        (views/default
         (if (contains? i/supported-languages lang)
@@ -175,12 +199,13 @@
           "en")))
   (GET "/:p" [p] (views/default "en"))
   (GET "/" [] (views/default "en"))
-  
   (resources "/")
   (not-found "Not Found"))
 
 (def app (-> #'routes
              (wrap-defaults site-defaults)
+             ;; ring.middleware.keyword-params/wrap-keyword-params
+             ;; ring.middleware.params/wrap-params
              ;; FIXME: Don't wrap reload in production
              ;; wrap-reload
              ))
@@ -189,6 +214,8 @@
   "Start tasks and the HTTP server."
   [& args]
   (jetty/run-jetty app {:port config/codegouvfr_port :join? false})
+  ;; (server/run-server app {:port config/codegouvfr_port :join? false})
+  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)

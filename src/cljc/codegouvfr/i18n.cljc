@@ -53,6 +53,8 @@
     :group-repo-not-found          "Groupe et dépôt non trouvés."
     :groups                        " groupes"
     :here                          "ici"
+    :index-subtitle                "Ce site vous permet de parcourir une partie des codes sources ouverts par des organismes publics."
+    :index-title                   "Codes sources du secteur public"
     :issues                        "Tickets"
     :keywords                      "Accès aux codes sources du secteur public"
     :language                      "Langage"
@@ -151,6 +153,8 @@
    ;; English translation
    :en
    {
+    :Dep                           "Dependency"
+    :Deps                          "Dependencies"
     :Repo                          "Repository"
     :Repos                         "Repositories"
     :about                         "About"
@@ -166,11 +170,9 @@
     :contact-form                  "Contact form"
     :core-dep                      "Core"
     :created-at                    "Created on "
-    :dep-of                        "identified dependency for"
     :dep                           " dependency"
+    :dep-of                        "identified dependency for"
     :deps                          " dependencies"
-    :Dep                           "Dependency"
-    :Deps                          "Dependencies"
     :deps-expand                   "Browse software dependencies of repositories"
     :deps-not-found                "No identified dependencies."
     :deps-of                       "identified dependencies for"
@@ -195,6 +197,8 @@
     :group-repo-not-found          "Group/repository not found."
     :groups                        " groups"
     :here                          "here"
+    :index-subtitle                "This website allows you to search through all french public sector published source code."
+    :index-title                   "Browse french public sector source code"
     :issues                        "Issues"
     :keywords                      "List public sector source codes"
     :language                      "Language"
@@ -202,9 +206,9 @@
     :last-repos                    "Latest public source code repositories"
     :license                       "License"
     :licenses                      "Licenses"
-    :list-repos-with-language      "List repositories mainly written in this language"
     :list-repos-depending-on-dep   "List repositories depending on this"
     :list-repos-using-license      "List repositories published under this license"
+    :list-repos-with-language      "List repositories mainly written in this language"
     :main-etalab-website           "Etalab's main website"
     :matching                      " and matching "
     :matching-s                    " and matching "
@@ -213,8 +217,8 @@
     :message-placeholder           "Your message"
     :message-received              "Message received!"
     :message-received-ok           "We will do our best to reply as soon as possible."
-    :most-used-languages           "Top 10 most used languages"
     :most-used-identified-licenses "Most used identified licenses"
+    :most-used-languages           "Top 10 most used languages"
     :most-used-licenses            "Most used licenses"
     :name                          "Name"
     :no-archived-repos             "Do not include archived repositories"
@@ -289,6 +293,8 @@
    ;; Italian translation
    :it
    {
+    :Dep                           "Dependency"                        ;; TODO
+    :Deps                          "Dependencies"                      ;; TODO
     :Repo                          "Repository"
     :Repos                         "Repositories"
     :about                         "About"
@@ -304,11 +310,9 @@
     :contact-form                  "Contatti da"
     :core-dep                      "Core"                              ;; TODO
     :created-at                    "Creato il "
-    :dep-of                        "identified dependency for"         ;; TODO
     :dep                           " dependency"                       ;; TODO
+    :dep-of                        "identified dependency for"         ;; TODO
     :deps                          " dependencies"                     ;; TODO
-    :Dep                           "Dependency"                        ;; TODO
-    :Deps                          "Dependencies"                      ;; TODO
     :deps-expand                   "Sfoglia le dipendenze software dei repository"
     :deps-not-found                "No identified dependencies."       ;; TODO
     :deps-of                       "Identified dependencies for "      ;; TODO
@@ -333,6 +337,8 @@
     :group-repo-not-found          "Group/repository not found."       ;; TODO
     :groups                        " grouppi"
     :here                          "qui"
+    :index-subtitle                "Questo sito permette di navigare in alcuni codici sorgenti aperti degli enti pubblici."
+    :index-title                   "Codici sorgenti del settore pubblico"
     :issues                        "Issue"
     :keywords                      "Accesso ai codici sorgenti del settore pubblico"
     :language                      "Lingua"
@@ -340,9 +346,9 @@
     :last-repos                    "Ultimi repository di codice sorgente pubblico"
     :license                       "Licenza"
     :licenses                      "Licenze"
-    :list-repos-with-language      "Elenca i repository scritti principalmente in questa lingua"
     :list-repos-depending-on-dep   "Elenca i repository in base a questo"
     :list-repos-using-license      "Elenca i repository pubblicati con questa licenza"
+    :list-repos-with-language      "Elenca i repository scritti principalmente in questa lingua"
     :main-etalab-website           "Sito principale di Etalab"
     :matching                      " e contenente "
     :matching-s                    " e contenente "
@@ -351,8 +357,8 @@
     :message-placeholder           "Il tuo messaggio"
     :message-received              "Messaggio ricevuto!"
     :message-received-ok           "Faremo del nostro meglio per rispondere il prima possibile."
-    :most-used-languages           "Le 10 lingue più utilizzate"
     :most-used-identified-licenses "Licenze identificate più utilizzate"
+    :most-used-languages           "Le 10 lingue più utilizzate"
     :most-used-licenses            "Licenze più utilizzate"
     :name                          "Name"                              ;; TODO
     :no-archived-repos             "Non includere i repository archiviati"
