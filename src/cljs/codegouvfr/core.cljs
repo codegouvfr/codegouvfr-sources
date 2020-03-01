@@ -644,7 +644,7 @@
                           (reset! license ev)
                           (async/go
                             (async/>! display-filter-chan {:license ev})
-                            (<! (async/timeout timeout))
+                            (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:license ev}))))}]]
       [:div.level-item
        [:input.input
@@ -657,7 +657,7 @@
                           (reset! language ev)
                           (async/go
                             (async/>! display-filter-chan {:language ev})
-                            (<! (async/timeout timeout))
+                            (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:language ev}))))}]]
 
       [:span.button.is-static.level-item
@@ -1432,7 +1432,7 @@
                           (reset! q ev)
                           (async/go
                             (async/>! display-filter-chan {:q ev})
-                            (<! (async/timeout timeout))
+                            (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}]])
     (let [flt @(re-frame/subscribe [:filter?])]
       (if (seq (:g flt))
