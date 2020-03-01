@@ -1075,7 +1075,7 @@
      [:p.heading heading]
      [:p.title (str title)]]]])
 
-(defn stats-card [heading data & thead]
+(defn stats-card [heading data & [thead]]
   [:div.column
    [:div.card
     [:h1.card-header-title.subtitle heading]
