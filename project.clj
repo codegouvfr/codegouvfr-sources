@@ -11,8 +11,8 @@
                  [compojure "1.6.1"]
                  [clj-http "3.10.0"]
                  [clj-rss "0.2.5"]
+                 [http-kit "2.3.0"]
                  [ring/ring-core "1.8.0"]
-                 [ring/ring-jetty-adapter "1.8.0"]
                  [ring/ring-devel "1.8.0"]
                  [ring/ring-defaults "0.3.2"]
                  [cheshire "5.10.0"]
@@ -23,7 +23,9 @@
                  ;; FIXME: this explicit require should not be needed:
                  [org.clojure/tools.reader "1.3.2"]
                  ;; FIXME: https://github.com/ptaoussanis/tempura/issues/29#issuecomment-557178091
-                 [com.taoensso/tempura "1.2.1"]]
+                 [com.taoensso/tempura "1.2.1"]
+                 [com.taoensso/encore "2.119.0"]
+                 [com.taoensso/sente "1.15.0"]]
   :source-paths ["src/clj" "src/cljc" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"

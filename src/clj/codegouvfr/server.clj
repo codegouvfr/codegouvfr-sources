@@ -10,7 +10,6 @@
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
             ;; [ring.middleware.reload :refer [wrap-reload]]
-            [ring.adapter.jetty :as jetty]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
             [compojure.route :refer [not-found resources]]
@@ -21,10 +20,9 @@
             [taoensso.timbre.appenders (postal :as postal-appender)]
             [cheshire.core :as json]
             [clojure.string :as s]
-            ;; [org.httpkit.server :as server]
-            ;; [taoensso.sente :as sente]
-            ;; [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-            )
+            [org.httpkit.server :as server]
+            [taoensso.sente :as sente]
+            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -47,19 +45,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sente setup
 
-;; (let [{:keys [ch-recv send-fn connected-uids
-;;               ajax-post-fn ajax-get-or-ws-handshake-fn]}
-;;       (sente/make-channel-socket! (get-sch-adapter) {})]
+(let [{:keys [ch-recv send-fn connected-uids
+              ajax-post-fn ajax-get-or-ws-handshake-fn]}
+      (sente/make-channel-socket! (get-sch-adapter) {})]
 
-;;   (def ring-ajax-post                ajax-post-fn)
-;;   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-;;   (def ch-chsk                       ch-recv)
-;;   (def chsk-send!                    send-fn)
-;;   (def connected-uids                connected-uids))
+  (def ring-ajax-post                ajax-post-fn)
+  (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
+  (def ch-chsk                       ch-recv)
+  (def chsk-send!                    send-fn)
+  (def connected-uids                connected-uids))
 
-;; (defn event-msg-handler [{:keys [event]}]
-;;   (doseq [uid (:any @connected-uids)]
-;;     (chsk-send! uid [:fast-push/is-fast event])))
+(defn event-msg-handler [{:keys [event]}]
+  (doseq [uid (:any @connected-uids)]
+    (chsk-send! uid [:fast-push/is-fast event])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -141,8 +139,8 @@
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
-  ;; (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
-  ;; (POST "/chsk" req (ring-ajax-post                req))
+  (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
+  (POST "/chsk" req (ring-ajax-post                req))
   (GET "/orgas" [] (resource-json "data/orgas.json"))
   (GET "/repos" [] (resource-json "data/repos.json"))
   (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
@@ -213,8 +211,7 @@
 (defn -main
   "Start tasks and the HTTP server."
   [& args]
-  (jetty/run-jetty app {:port config/codegouvfr_port :join? false})
-  ;; (server/run-server app {:port config/codegouvfr_port :join? false})
+  (server/run-server app {:port config/codegouvfr_port :join? false})
   ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 

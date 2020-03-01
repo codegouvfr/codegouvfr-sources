@@ -16,7 +16,22 @@
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
+            [taoensso.sente  :as sente :refer (cb-success?)]
             [cljsjs.chartjs]))
+
+(def ?csrf-token
+  (when-let [el (.getElementById js/document "sente-csrf-token")]
+    (.getAttribute el "data-csrf-token")))
+
+(let [{:keys [chsk ch-recv send-fn state]}
+      (sente/make-channel-socket! "/chsk" ?csrf-token {:type :auto})]
+  (def chsk       chsk)
+  (def ch-chsk    ch-recv)
+  (def chsk-send! send-fn)
+  (def chsk-state state))
+
+(defn event-msg-handler [{:keys [event]}]
+  (.log js/console (pr-str event)))
 
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
@@ -1505,4 +1520,6 @@
   (start-display-filter-loop)
   (reagent/render
    [main-class]
-   (.getElementById js/document "app")))
+   (.getElementById js/document "app"))
+  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
+  )
