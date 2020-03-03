@@ -31,7 +31,9 @@
   (def chsk-state state))
 
 (defn event-msg-handler [{:keys [event]}]
-  (.log js/console (pr-str event)))
+  ;; (.log js/console (pr-str event))
+  (when (= (first event) :chsk/recv)
+    (re-frame/dispatch [:levent! event])))
 
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
@@ -51,6 +53,7 @@
    ["/:lang"
     ["/repos" :repos]
     ["/groups" :orgas]
+    ["/live" :live]
     ["/stats" :stats]
     ["/deps"
      ["/:orga"
@@ -79,6 +82,7 @@
    {:repos          nil
     :orgas          nil
     :dep-repos      nil
+    :levent         nil
     :repos-page     0
     :orgas-page     0
     :deps-page      0
@@ -133,6 +137,14 @@
  (fn [db _] (:lang db)))
 
 (re-frame/reg-sub
+ :levent?
+ (fn [db _] (:levent db)))
+
+(re-frame/reg-event-db
+ :levent!
+ (fn [db [_ le]] (update-in db [:levent] conj le)))
+
+(re-frame/reg-sub
  :path-params?
  (fn [db _] (:path-params db)))
 
@@ -142,11 +154,11 @@
 
 (re-frame/reg-event-db
  :update-deps!
- (fn [db [_ repos]] (assoc db :deps repos)))
+ (fn [db [_ deps]] (assoc db :deps deps)))
 
 (re-frame/reg-event-db
  :update-dep-repos!
- (fn [db [_ repos]] (assoc db :dep-repos repos)))
+ (fn [db [_ dep-repos]] (assoc db :dep-repos dep-repos)))
 
 (re-frame/reg-event-db
  :filter!
@@ -1415,9 +1427,15 @@
     ;; Orgas
     [:p.control.level-item
      [:a.button.is-danger
-      {:title (i/i lang [:github-gitlab-etc])
-       :href  (rfe/href :orgas {:lang lang})}
+      {:title    (i/i lang [:github-gitlab-etc])
+       ;; :href  (rfe/href :orgas {:lang lang})
+       :on-click #(chsk-send! [:voila/encore "voila"])}
       (i/i lang [:orgas-or-groups])]]
+    [:p.control.level-item
+     [:a.button.is-danger
+      {:title (i/i lang [:github-gitlab-etc])
+       :href  (rfe/href :live {:lang lang})}
+      "live"]]
     ;; Repos
     [:p.control.level-item
      [:a.button.is-success
@@ -1458,6 +1476,12 @@
           [:span (:g flt)]
           (fa "fa-times")]]))]])
 
+(defn live [lang]
+  [:ul
+   (for [ee @(re-frame/subscribe [:levent?])]
+     ^{:key ee}
+     [:li (pr-str ee)])])
+
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
@@ -1472,16 +1496,18 @@
            (do (set! (.-location js/window) (str "/en/groups")) "")))
        ;; Table to display organizations
        :orgas     [organizations-page lang]
-       ;; Table to display repository
+       ;; Table to display repositories
        :repos     [repos-page-class lang license language]
-       ;; Table to display statistiques
+       ;; Table to display statistics
        :stats     [stats-page-class lang]
-       ;; Table to display statistiques
+       ;; Table to display all dependencies
        :deps      [deps-page-class lang]
        ;; Table to display a repository dependencies
        :repo-deps [repo-deps-page-class lang]
        ;; Table to display a group dependencies
        :orga-deps [orga-deps-page-class lang]
+       ;; Fall back on the organizations page
+       :live      [live lang]
        ;; Fall back on the organizations page
        :else      (rfe/push-state :orgas {:lang lang}))]))
 
@@ -1521,5 +1547,4 @@
   (reagent/render
    [main-class]
    (.getElementById js/document "app"))
-  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
-  )
+  (sente/start-chsk-router! ch-chsk event-msg-handler))

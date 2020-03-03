@@ -22,7 +22,9 @@
             [clojure.string :as s]
             [org.httpkit.server :as server]
             [taoensso.sente :as sente]
-            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)])
+            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
+            [clojure.core.async :as async]
+            [clj-http.client :as http])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,9 +57,49 @@
   (def chsk-send!                    send-fn)
   (def connected-uids                connected-uids))
 
-(defn event-msg-handler [{:keys [event]}]
+(defn event-msg-handler [{:keys [id ?data event]}]
   (doseq [uid (:any @connected-uids)]
     (chsk-send! uid [:fast-push/is-fast event])))
+
+;; (doseq [i (range 10)]
+;;   (Thread/sleep 1000)
+;;   (event-msg-handler {:event "PROUT"})))
+
+;; (def gh "https://api.github.com/events")
+
+(def gh-f "https://api.github.com/orgs/%s/events")
+;; (def my-orgs ["etalab" "betagouv" "entrepreneur-interet-general"])
+(def my-orgs ["entrepreneur-interet-general"])
+
+(def c (async/chan 1000))
+
+(async/go
+  (loop [b (async/<! c)]
+    (when (= (:type b) "PushEvent")
+      (event-msg-handler {:event b})
+      (recur (async/<! c)))))
+
+;; (async/thread
+;;   (loop [b (async/<!! c)]
+;;     (when (:type b)
+;;       ;; (println (:type b))
+;;       (event-msg-handler {:event (:type b)})
+;;       (recur (async/<!! c)))))
+
+(defn yo []
+  (http/with-connection-pool
+    {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
+    (doseq [org my-orgs]
+      (let [res (json/parse-string
+                 (:body (http/get (format gh-f org))) true)]
+        (doseq [r res]
+          ;; (async/thread (async/>!! c r))
+          (Thread/sleep 2000)
+          (event-msg-handler {:event r})
+          ;; (async/go (async/>! c r))
+          )))))
+
+;; (yo)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -180,23 +222,24 @@
                                               " (" (:organization params) ")")}))
           (response/redirect (str "/" (:lang params) "/ok"))))
   ;; FIXME: unused bindings?
+  ;; FIXME: use fr as the default language
   (GET "/:lang/:p1/:p2/:p3" [lang p1 p2 p3]
        (views/default
         (if (contains? i/supported-languages lang)
           lang
-          "en")))
+          "fr")))
   (GET "/:lang/:p1/:p2" [lang p1 p2]
        (views/default
         (if (contains? i/supported-languages lang)
           lang
-          "en")))
+          "fr")))
   (GET "/:lang/:p" [lang p]
        (views/default
         (if (contains? i/supported-languages lang)
           lang
-          "en")))
-  (GET "/:p" [p] (views/default "en"))
-  (GET "/" [] (views/default "en"))
+          "fr")))
+  (GET "/:p" [p] (views/default "fr"))
+  (GET "/" [] (views/default "fr"))
   (resources "/")
   (not-found "Not Found"))
 
@@ -212,7 +255,7 @@
   "Start tasks and the HTTP server."
   [& args]
   (server/run-server app {:port config/codegouvfr_port :join? false})
-  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
+  (sente/start-chsk-router! ch-chsk event-msg-handler)
   (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)

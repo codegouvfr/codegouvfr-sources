@@ -133,6 +133,7 @@
          [:h2 {:class "subtitle column is-8 is-offset-2 has-text-centered"} subtitle]]]]
       [:section {:class "section"}
        content]
+      ;; FIXME: don't include when content exists
       [:script {:src "/js/codegouvfr.js"}]
       [:script "codegouvfr.core.init();"]
       [:footer {:class "footer"}
