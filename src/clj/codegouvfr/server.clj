@@ -222,7 +222,6 @@
                                               " (" (:organization params) ")")}))
           (response/redirect (str "/" (:lang params) "/ok"))))
   ;; FIXME: unused bindings?
-  ;; FIXME: use fr as the default language
   (GET "/:lang/:p1/:p2/:p3" [lang p1 p2 p3]
        (views/default
         (if (contains? i/supported-languages lang)

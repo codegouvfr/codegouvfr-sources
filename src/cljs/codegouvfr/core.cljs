@@ -166,7 +166,6 @@
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
-   ;; FIXME: Find a more idiomatic way?
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
@@ -404,7 +403,6 @@
                             repos
                             (reverse repos))))))
 
-;; FIXME: what do we need more?
 (re-frame/reg-sub
  :deps?
  (fn [db _]
