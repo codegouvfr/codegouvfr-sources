@@ -25,7 +25,9 @@
                  ;; FIXME: https://github.com/ptaoussanis/tempura/issues/29#issuecomment-557178091
                  [com.taoensso/tempura "1.2.1"]
                  [com.taoensso/encore "2.119.0"]
-                 [com.taoensso/sente "1.15.0"]]
+                 [com.taoensso/sente "1.15.0"]
+                 [clojure.java-time "0.3.2"]
+                 [tea-time "1.0.1"]]
   :source-paths ["src/clj" "src/cljc" "src/cljs"]
   :main codegouvfr.server
   :uberjar-name "codegouvfr-standalone.jar"
