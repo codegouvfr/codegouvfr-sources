@@ -27,6 +27,12 @@
   (or (System/getenv "CODEGOUVFR_FROM")
       smtp-login))
 
+(def github-user
+  (System/getenv "CODEGOUVFR_GITHUB_USER"))
+
+(def github-access-token
+  (System/getenv "CODEGOUVFR_GITHUB_ACCESS_TOKEN"))
+
 (def codegouvfr_port
   (or (read-string (System/getenv "CODEGOUVFR_PORT"))
       3000))

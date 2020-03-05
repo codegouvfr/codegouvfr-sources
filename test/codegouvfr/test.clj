@@ -12,4 +12,6 @@
     (is (string? (System/getenv "SMTP_PASSWORD")))
     (is (string? (System/getenv "CODEGOUVFR_ADMIN_EMAIL")))
     (is (string? (System/getenv "CODEGOUVFR_FROM")))
-    (is (string? (System/getenv "CODEGOUVFR_PORT")))))
+    (is (string? (System/getenv "CODEGOUVFR_PORT")))
+    (is (string? (System/getenv "CODEGOUVFR_GITHUB_USER")))
+    (is (string? (System/getenv "CODEGOUVFR_GITHUB_ACCESS_TOKEN")))))
