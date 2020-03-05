@@ -77,7 +77,7 @@
          {:basic-auth
           (str config/github-user ":" config/github-access-token)}))
 
-(def last-orgs-events (atom '()))
+(def last-orgs-events (agent '()))
 
 (def events-channel (async/chan 100))
 
@@ -155,10 +155,8 @@
               (swap! new-events conj {:u user :r repo-name :n nb
                                       :d date :o org-name}))))
         ;; Only update the main events list now, trigger UI updates
-        (reset!
-         last-orgs-events
-         (take 100 (apply merge @last-orgs-events @new-events)))
-        ;; Then wait for 18 seconds
+        (send last-orgs-events #(take 100 (apply merge %1 %2)) @new-events)
+        ;; Then wait for 15 seconds
         (Thread/sleep 15000)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
