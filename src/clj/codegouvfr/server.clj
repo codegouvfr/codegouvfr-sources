@@ -5,6 +5,7 @@
 (ns codegouvfr.server
   (:require [ring.util.response :as response]
             [clojure.java.io :as io]
+            [java-time :as t]
             [clojure.walk :as walk]
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
@@ -24,7 +25,8 @@
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
             [clojure.core.async :as async]
-            [clj-http.client :as http])
+            [clj-http.client :as http]
+            [tea-time.core :as tt])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,47 +61,105 @@
 
 (defn event-msg-handler [{:keys [id ?data event]}]
   (doseq [uid (:any @connected-uids)]
-    (chsk-send! uid [:fast-push/is-fast event])))
+    (chsk-send! uid [:event/PushEvent event])))
 
-;; (doseq [i (range 10)]
-;;   (Thread/sleep 1000)
-;;   (event-msg-handler {:event "PROUT"})))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initial setup for retrieving events constantly
 
-;; (def gh "https://api.github.com/events")
+(def gh-org-events "https://api.github.com/orgs/%s/events")
 
-(def gh-f "https://api.github.com/orgs/%s/events")
-;; (def my-orgs ["etalab" "betagouv" "entrepreneur-interet-general"])
-(def my-orgs ["entrepreneur-interet-general"])
+(def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 
-(def c (async/chan 1000))
+(def http-get-params {:cookie-policy :standard})
 
-(async/go
-  (loop [b (async/<! c)]
-    (when (= (:type b) "PushEvent")
-      (event-msg-handler {:event b})
-      (recur (async/<! c)))))
+(def http-get-gh-params
+  (merge http-get-params
+         {:basic-auth
+          (str config/github-user ":" config/github-access-token)}))
 
-;; (async/thread
-;;   (loop [b (async/<!! c)]
-;;     (when (:type b)
-;;       ;; (println (:type b))
-;;       (event-msg-handler {:event (:type b)})
-;;       (recur (async/<!! c)))))
+(def last-orgs-events (atom '()))
 
-(defn yo []
+(def events-channel (async/chan 100))
+
+(defn seqs-difference [seq1 seq2]
+  (seq (clojure.set/difference (into #{} seq2) (into #{} seq1))))
+
+(defn start-events-channel! []
+  (async/go
+    (loop [e (async/<! events-channel)]
+      (when-let [{:keys [u]} e] ; Is a user defined?
+        (event-msg-handler {:event e}))
+      (recur (async/<! events-channel)))))
+
+;; (event-msg-handler {:event {:u "BLAIREAU"}})
+;; (conj ["dog" "lion" "tiger"] "ours")
+
+(defn sort-events-by-date [diff]
+  (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
+       (sort-by :d (map #(update % :d t/zoned-date-time)
+                        diff))))
+
+(add-watch last-orgs-events
+           :watcher
+           (fn [_ _ old new]
+             (when-let [diff (seqs-difference old new)]
+               (async/thread
+                 (doseq [e (sort-events-by-date diff)]
+                   (timbre/info (pr-str e))
+                   (Thread/sleep 1000)
+                   (async/>!! events-channel e))))))
+
+(def latest-updated-orgas-filter
+  (comp
+   (filter #(= (:plateforme %) "GitHub"))
+   (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
+   (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
+
+(defn latest-updated-orgas [n]
+  (let [repos (json/parse-string
+               (:body (try (http/get orgas-url http-get-params)))
+               true)]
+    (take
+     n
+     (distinct
+      (->> (reverse
+            (sort-by :derniere_mise_a_jour
+                     (sequence latest-updated-orgas-filter repos)))
+           (map :organisation_nom))))))
+
+;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
+;; GitHub orgas with recently updated repos and get the last events
+;; 240 times for these orgas every 15 seconds.
+(defn latest-orgas-events [orgas]
   (http/with-connection-pool
     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-    (doseq [org my-orgs]
-      (let [res (json/parse-string
-                 (:body (http/get (format gh-f org))) true)]
-        (doseq [r res]
-          ;; (async/thread (async/>!! c r))
-          (Thread/sleep 2000)
-          (event-msg-handler {:event r})
-          ;; (async/go (async/>! c r))
-          )))))
-
-;; (yo)
+    (dotimes [n 240]
+      (let [new-events (atom nil)]
+        ;; Fet new-events for all recently updated orgas
+        (doseq [org orgas]
+          (when-let [events (json/parse-string
+                             (:body
+                              (try (http/get (format gh-org-events org)
+                                             http-get-gh-params)
+                                   (catch Exception e
+                                     (timbre/error "Can't get events for" org))))
+                             true)]
+            (doseq [{:keys [id actor repo payload created_at org]}
+                    ;; Only take PushEvents so far
+                    (filter #(= (:type %) "PushEvent") events)
+                    :let [user (:login actor)
+                          repo-name (:name repo)
+                          nb (:distinct_size payload)
+                          date created_at
+                          org-name (:login org)]]
+              (swap! new-events conj {:u user :r repo-name :n nb
+                                      :d date :o org-name}))))
+        ;; Only update the main events list now, trigger UI updates
+        (reset!
+         last-orgs-events
+         (take 100 (apply merge @last-orgs-events @new-events)))
+        ;; Then wait for 18 seconds
+        (Thread/sleep 15000)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -250,11 +310,21 @@
              ;; wrap-reload
              ))
 
+(defn start-tasks! []
+  (tt/start!)
+  (tt/every! ;; FIXME: why the error when done?
+   36000
+   (fn []
+     ((timbre/info "Start streaming GitHub events")
+      (latest-orgas-events (latest-updated-orgas 20))))))
+
 (defn -main
   "Start tasks and the HTTP server."
   [& args]
   (server/run-server app {:port config/codegouvfr_port :join? false})
   (sente/start-chsk-router! ch-chsk event-msg-handler)
-  (println (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
+  (start-events-channel!)
+  (start-tasks!)
+  (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)

@@ -32,8 +32,11 @@
 
 (defn event-msg-handler [{:keys [event]}]
   ;; (.log js/console (pr-str event))
-  (when (= (first event) :chsk/recv)
-    (re-frame/dispatch [:levent! event])))
+  (let [recv (:chsk/recv (apply hash-map event))
+        push (:event/PushEvent (apply hash-map recv))]
+    (when (not-empty (:u push))
+      (println push)
+      (re-frame/dispatch [:levent! push]))))
 
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
@@ -1211,7 +1214,14 @@
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_orgs_by_repos_0)
-      (stats-card (i/i lang [:orgas-with-more-stars]) top_orgs_by_stars)]
+      (stats-card [:span
+                   (i/i lang [:orgas-with-more-stars])
+                   [:sup
+                    [:a.has-text-grey.is-size-7
+                     {:href  (str "/" lang "/glossary#star")
+                      :title (i/i lang [:go-to-glossary])}
+                     (fa "fa-question-circle")]]]
+                  top_orgs_by_stars)]
      [:div.columns
       (stats-card (i/i lang [:distribution-by-platform]) platforms)
       (stats-card [:span (i/i lang [:archive-on])
@@ -1425,15 +1435,9 @@
     ;; Orgas
     [:p.control.level-item
      [:a.button.is-danger
-      {:title    (i/i lang [:github-gitlab-etc])
-       ;; :href  (rfe/href :orgas {:lang lang})
-       :on-click #(chsk-send! [:voila/encore "voila"])}
-      (i/i lang [:orgas-or-groups])]]
-    [:p.control.level-item
-     [:a.button.is-danger
       {:title (i/i lang [:github-gitlab-etc])
-       :href  (rfe/href :live {:lang lang})}
-      "live"]]
+       :href  (rfe/href :orgas {:lang lang})}
+      (i/i lang [:orgas-or-groups])]]
     ;; Repos
     [:p.control.level-item
      [:a.button.is-success
@@ -1452,6 +1456,11 @@
       {:title (i/i lang [:stats-expand])
        :href  (rfe/href :stats {:lang lang})}
       (i/i lang [:stats])]]
+    [:p.control.level-item
+     [:a.button.is-danger
+      {:title (i/i lang [:github-gitlab-etc])
+       :href  (rfe/href :live {:lang lang})}
+      "Live!"]]
     (if (or (= view :repos) (= view :orgas) (= view :deps))
       [:p.control.level-item
        [:input.input
@@ -1476,9 +1485,11 @@
 
 (defn live [lang]
   [:ul
-   (for [ee @(re-frame/subscribe [:levent?])]
-     ^{:key ee}
-     [:li (pr-str ee)])])
+   (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]
+     ^{:key e}
+     [:li
+      [:p
+       (gstring/format "%s (%s) pushed %s commits to %s at %s" u o n r d)]])])
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
