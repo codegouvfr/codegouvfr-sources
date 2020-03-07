@@ -16,7 +16,8 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [taoensso.sente  :as sente :refer (cb-success?)]
-            [cljsjs.chartjs]))
+            [cljsjs.chartjs]
+            [oz.core :as oz]))
 
 (def ?csrf-token
   (when-let [el (.getElementById js/document "sente-csrf-token")]
@@ -1482,13 +1483,38 @@
           [:span (:g flt)]
           (fa "fa-times")]]))]])
 
+(defn play-data [r & names]
+  (for [n names
+        i (range r)]
+    {:time     i
+     :item     n
+     :quantity (+ (Math/pow (* i (count n)) 0.8) (rand-int (count n)))}))
+
 (defn live [lang]
-  [:ul
-   (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]
-     ^{:key e}
-     [:li
-      [:p
-       (gstring/format "%s (%s) pushed %s commits to %s at %s" u o n r d)]])])
+  (fn [lang]
+    (let [r (reagent/atom 10)]
+      [:div
+       [:input {:type      "range" :min "10" :max "50"
+                :on-change #(let [v (.-value (.-target %))]
+                              (println "Value:" v)
+                              ;; (re-frame/dispatch [:range!] v)
+                              (reset! r (js/parseInt v))
+                              )}]
+       [oz/vega-lite
+        {:data     {:values (play-data @r "monkey" "slipper" "broom")}
+         :encoding {:x     {:field "time" :type "ordinal"}
+                    :y     {:field "quantity" :type "quantitative"}
+                    :color {:field "item" :type "nominal"}}
+         :width    400
+         :height   400
+         :mark     "line"}]]))
+  ;; [:ul
+  ;;  (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]
+  ;;    ^{:key e}
+  ;;    [:li
+  ;;     [:p
+  ;;      (gstring/format "%s (%s) pushed %s commits to %s at %s" u o n r d)]])]
+  )
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])

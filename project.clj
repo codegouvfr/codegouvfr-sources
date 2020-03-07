@@ -49,4 +49,5 @@
                                       [re-frame "0.11.0"]
                                       [reagent "0.10.0"]
                                       [reagent-utils "0.3.3"]
-                                      [metosin/reitit-frontend "0.4.2"]]}})
+                                      [metosin/reitit-frontend "0.4.2"]
+                                      [metasoarous/oz "1.6.0-alpha6"]]}})
