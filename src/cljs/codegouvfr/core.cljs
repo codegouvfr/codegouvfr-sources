@@ -6,11 +6,10 @@
   (:require [cljs.core.async :as async]
             [re-frame.core :as re-frame]
             [reagent.core :as reagent]
-            [reagent.session :as session]
+            [reagent.dom]
             [cljs-bean.core :refer [bean]]
             [goog.string :as gstring]
             [ajax.core :refer [GET POST]]
-            [markdown-to-hiccup.core :as md]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
             [clojure.walk :as walk]
@@ -31,7 +30,7 @@
   (def chsk-state state))
 
 (defn event-msg-handler [{:keys [event]}]
-  ;; (.log js/console (pr-str event))
+  ;; (.log js/console (pr-str event)) ; FIXME
   (let [recv (:chsk/recv (apply hash-map event))
         push (:event/PushEvent (apply hash-map recv))]
     (when (not-empty (:u push))
@@ -1553,7 +1552,7 @@
    {:use-fragment false})
   (start-filter-loop)
   (start-display-filter-loop)
-  (reagent/render
+  (reagent.dom/render
    [main-class]
    (.getElementById js/document "app"))
   (sente/start-chsk-router! ch-chsk event-msg-handler))

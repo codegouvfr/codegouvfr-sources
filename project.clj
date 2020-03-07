@@ -18,7 +18,6 @@
                  [cheshire "5.10.0"]
                  [com.draines/postal "2.0.3"]
                  [com.taoensso/timbre "4.10.0"]
-                 [cljsjs/chartjs "2.9.3-0"]
                  [markdown-to-hiccup "0.6.2"]
                  ;; FIXME: this explicit require should not be needed:
                  [org.clojure/tools.reader "1.3.2"]
@@ -41,12 +40,13 @@
              :dev     {:source-paths ["src/cljc" "src/cljs"]
                        :dependencies [[cljs-ajax "0.8.0"]
                                       [cljs-bean "1.5.0"]
+                                      [cljsjs/chartjs "2.9.3-0"]
                                       [com.bhauman/figwheel-main "0.2.3" :exclusions [joda-time]]
                                       [com.bhauman/rebel-readline-cljs "0.1.4"]
                                       [markdown-to-hiccup "0.6.2"]
                                       [org.clojure/clojurescript "1.10.597"]
                                       [org.clojure/core.async "1.0.567"]
                                       [re-frame "0.11.0"]
-                                      [reagent "0.9.1"]
+                                      [reagent "0.10.0"]
                                       [reagent-utils "0.3.3"]
                                       [metosin/reitit-frontend "0.4.2"]]}})
