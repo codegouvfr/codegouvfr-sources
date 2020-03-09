@@ -12,8 +12,8 @@ This frontend retrives information source code [repositories](https://api-code.e
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ lein test
-    ~$ lein fig:build
+    ~$ clj -A:test
+    ~$ clj -A:fig
 
 Then check <http://locahost:9500> then hack and see changes going live.
 
@@ -31,14 +31,13 @@ You will need to configure these environment variables:
     CODEGOUVFR_PORT: the port to run the application
     CODEGOUVFR_MSGID_DOMAIN: what fqdn to use to build the message-id
 
-## Deploy with lein uberjar
+## Deploy as a jar
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ lein clean
-    ~$ lein fig:min
-    ~$ lein uberjar
-    ~$ java -jar target/codegouvfr-standalone.jar
+    ~$ clj -A:fig
+    ~$ clj -A:jar
+    ~$ java -cp codegouvfr.jar clojure.main -m codegouvfr.server
 
 Then go to <https://localhost:3000> or to your custom base URL.
 
@@ -49,8 +48,8 @@ and you want to expose the 3000 port:
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ lein fig:min
-    ~$ lein uberjar
+    ~$ clj -A:fig
+    ~$ clj -A:jar
     ~$ docker build -t codegouvfr .
     ~$ docker run -it -p 3000:3000 --env-file=~/.codegouvfr_envs codegouvfr
 
@@ -68,7 +67,6 @@ Your help is welcome.  You can contribute with bug reports, pull requests or fea
 
 If you want to help with the translation:
 
-- add a new file `resources/public/index.[yourlanguagecode].html` by copying `resources/public/index.en.html`
 - add your language to `src/cljc/codegouvfr/i18n.cljc`
 - add relevant variables to `src/clj/codegouvfr/views.clj`
 
