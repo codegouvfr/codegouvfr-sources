@@ -5,7 +5,6 @@ pom.xml
 /lib/
 /classes/
 /out/
-/target/
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
@@ -21,3 +20,4 @@ data/deps/*json
 data/deps/orgas/*json
 .eastwood
 todo.org
+.cpcache/
