@@ -26,7 +26,8 @@
             [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
             [clojure.core.async :as async]
             [clj-http.client :as http]
-            [tea-time.core :as tt])
+            [tea-time.core :as tt]
+            [clojure.set])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -59,7 +60,7 @@
   (def chsk-send!                    send-fn)
   (def connected-uids                connected-uids))
 
-(defn event-msg-handler [{:keys [id ?data event]}]
+(defn event-msg-handler [{:keys [id ?data event]}] ; FIXME: unused id ?data
   (doseq [uid (:any @connected-uids)]
     (chsk-send! uid [:event/PushEvent event])))
 
@@ -87,7 +88,7 @@
 (defn start-events-channel! []
   (async/go
     (loop [e (async/<! events-channel)]
-      (when-let [{:keys [u]} e] ; Is a user defined?
+      (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
         (event-msg-handler {:event e}))
       (recur (async/<! events-channel)))))
 
@@ -133,7 +134,7 @@
 (defn latest-orgas-events [orgas]
   (http/with-connection-pool
     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-    (dotimes [n 240]
+    (dotimes [_ 240]
       (let [new-events (atom nil)]
         ;; Fet new-events for all recently updated orgas
         (doseq [org orgas]
@@ -142,16 +143,17 @@
                               (try (http/get (format gh-org-events org)
                                              http-get-gh-params)
                                    (catch Exception e
-                                     (timbre/error "Can't get events for" org))))
+                                     (timbre/error "Can't get events for" org e))))
                              true)]
-            (doseq [{:keys [id actor repo payload created_at org]}
+            (doseq [{:keys [id actor repo payload created_at org]} ;; FIXME: use id
                     ;; Only take PushEvents so far
                     (filter #(= (:type %) "PushEvent") events)
-                    :let [user (:login actor)
-                          repo-name (:name repo)
-                          nb (:distinct_size payload)
-                          date created_at
-                          org-name (:login org)]]
+                    :let
+                    [user (:login actor)
+                     repo-name (:name repo)
+                     nb (:distinct_size payload)
+                     date created_at
+                     org-name (:login org)]]
               (swap! new-events conj {:u user :r repo-name :n nb
                                       :d date :o org-name}))))
         ;; Only update the main events list now, trigger UI updates
@@ -176,7 +178,9 @@
   (assoc
    (response/response
     (try (slurp (str "data/deps/orgas/" (s/lower-case orga) ".json"))
-         (catch Exception e (str "No file named " orga ".json"))))
+         (catch Exception e (timbre/error
+                             (str "No file named " orga ".json\n"
+                                  (.getMessage e))))))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
 (defn resource-repo-json
@@ -185,7 +189,8 @@
   (let [repos-deps (json/parse-string
                     (try (slurp "data/deps/repos-deps.json")
                          (catch Exception e
-                           (timbre/error "Can't find repos-deps.json")))
+                           (timbre/error (str "Can't find repos-deps.json\n"
+                                              (.getMessage e)))))
                     true)
         deps       (first (filter
                            #(= (s/lower-case (:n %)) (s/lower-case repo))
@@ -201,7 +206,8 @@
   (let [deps-repos (json/parse-string
                     (try (slurp "data/deps/deps-repos.json")
                          (catch Exception e
-                           (timbre/error "Can't find deps-repos.json")))
+                           (timbre/error (str "Can't find deps-repos.json\n"
+                                              (.getMessage e)))))
                     true)
         dep        (first (filter
                            #(= (s/lower-case (:n %)) (s/lower-case dep))
@@ -280,22 +286,16 @@
                                               " (" (:organization params) ")")}))
           (response/redirect (str "/" (:lang params) "/ok"))))
   ;; FIXME: unused bindings?
-  (GET "/:lang/:p1/:p2/:p3" [lang p1 p2 p3]
+  (GET "/:lang/:p1/:p2/:p3" [lang]
+       (views/default (if (contains? i/supported-languages lang) lang "fr")))
+  (GET "/:lang/:p1/:p2" [lang]
+       (views/default (if (contains? i/supported-languages lang) lang "fr")))
+  (GET "/:lang/:p" [lang]
        (views/default
         (if (contains? i/supported-languages lang)
           lang
           "fr")))
-  (GET "/:lang/:p1/:p2" [lang p1 p2]
-       (views/default
-        (if (contains? i/supported-languages lang)
-          lang
-          "fr")))
-  (GET "/:lang/:p" [lang p]
-       (views/default
-        (if (contains? i/supported-languages lang)
-          lang
-          "fr")))
-  (GET "/:p" [p] (views/default "fr"))
+  (GET "/:p" [] (views/default "fr"))
   (GET "/" [] (views/default "fr"))
   (resources "/")
   (not-found "Not Found"))
@@ -318,7 +318,7 @@
 
 (defn -main
   "Start tasks and the HTTP server."
-  [& args]
+  []
   (server/run-server app {:port config/codegouvfr_port :join? false})
   (sente/start-chsk-router! ch-chsk event-msg-handler)
   (start-events-channel!)

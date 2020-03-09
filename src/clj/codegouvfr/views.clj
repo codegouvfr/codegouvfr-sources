@@ -21,7 +21,8 @@
 
 (defn latest-repositories []
   (let [reps (try (http/get latest-repositories-url)
-                  (catch Exception e nil))]
+                  (catch Exception e
+                    (println (.getMessage e))))]
     (json/parse-string (:body reps) true)))
 
 (defn rss-feed
