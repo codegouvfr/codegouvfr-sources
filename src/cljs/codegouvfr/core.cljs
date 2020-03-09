@@ -591,6 +591,25 @@
                    ;; Reused
                    [:td.has-text-right g]])))]])))
 
+(defn navigate-pagination [type first-disabled last-disabled]
+  [:nav.level-item {:role "navigation" :aria-label "pagination"}
+   [:a.pagination-previous
+    {:on-click #(change-page type "first")
+     :disabled first-disabled}
+    (fa "fa-fast-backward")]
+   [:a.pagination-previous
+    {:on-click #(change-page type nil)
+     :disabled first-disabled}
+    (fa "fa-step-backward")]
+   [:a.pagination-next
+    {:on-click #(change-page type true)
+     :disabled last-disabled}
+    (fa "fa-step-forward")]
+   [:a.pagination-next
+    {:on-click #(change-page type "last")
+     :disabled last-disabled}
+    (fa "fa-fast-forward")]])
+
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
@@ -677,23 +696,7 @@
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
            (str rps (i/i lang [:repos]))))]
-      [:nav.level-item {:role "navigation" :aria-label "pagination"}
-       [:a.pagination-previous
-        {:on-click #(change-page :repos "first")
-         :disabled first-disabled}
-        (fa "fa-fast-backward")]
-       [:a.pagination-previous
-        {:on-click #(change-page :repos nil)
-         :disabled first-disabled}
-        (fa "fa-step-backward")]
-       [:a.pagination-next
-        {:on-click #(change-page :repos true)
-         :disabled last-disabled}
-        (fa "fa-step-forward")]
-       [:a.pagination-next
-        {:on-click #(change-page :repos "last")
-         :disabled last-disabled}
-        (fa "fa-fast-forward")]]
+      [navigate-pagination :repos first-disabled last-disabled]
       [:a.level-item {:title (i/i lang [:download])
                       :href  repos-csv-url}
        (fa "fa-file-csv")]]
@@ -735,23 +738,7 @@
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
            (str orgs (i/i lang [:groups]))))]
-      [:nav.level-item {:role "navigation" :aria-label "pagination"}
-       [:a.pagination-previous
-        {:on-click #(change-page :orgas "first")
-         :disabled first-disabled}
-        (fa "fa-fast-backward")]
-       [:a.pagination-previous
-        {:on-click #(change-page :orgas nil)
-         :disabled first-disabled}
-        (fa "fa-step-backward")]
-       [:a.pagination-next
-        {:on-click #(change-page :orgas true)
-         :disabled last-disabled}
-        (fa "fa-step-forward")]
-       [:a.pagination-next
-        {:on-click #(change-page :orgas "last")
-         :disabled last-disabled}
-        (fa "fa-fast-forward")]]
+      [navigate-pagination :orgas first-disabled last-disabled]
       [:a {:title (i/i lang [:download])
            :href  orgas-csv-url}
        (fa "fa-file-csv")]]
@@ -1035,23 +1022,7 @@
            (if (< deps 2)
              (str deps (i/i lang [:dep]))
              (str deps (i/i lang [:deps]))))]
-        [:nav.level-item {:role "navigation" :aria-label "pagination"}
-         [:a.pagination-previous
-          {:on-click #(change-page :deps "first")
-           :disabled first-disabled}
-          (fa "fa-fast-backward")]
-         [:a.pagination-previous
-          {:on-click #(change-page :deps nil)
-           :disabled first-disabled}
-          (fa "fa-step-backward")]
-         [:a.pagination-next
-          {:on-click #(change-page :deps true)
-           :disabled last-disabled}
-          (fa "fa-step-forward")]
-         [:a.pagination-next
-          {:on-click #(change-page :deps "last")
-           :disabled last-disabled}
-          (fa "fa-fast-forward")]]])
+        [navigate-pagination :deps first-disabled last-disabled]])
      [:br]
      (if single-dep
        [deps-dep-page-class lang single-dep]
