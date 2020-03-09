@@ -10,7 +10,6 @@
   clj-rss                         {:mvn/version "0.2.5"}
   cljs-ajax                       {:mvn/version "0.8.0"}
   cljs-bean                       {:mvn/version "1.5.0"}
-  cljsjs/chartjs                  {:mvn/version "2.9.3-0"}
   clojure.java-time               {:mvn/version "0.3.2"}
   com.bhauman/figwheel-main       {:mvn/version "0.2.3"}
   com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}

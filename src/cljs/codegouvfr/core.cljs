@@ -16,7 +16,6 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [taoensso.sente  :as sente :refer (cb-success?)]
-            [cljsjs.chartjs]
             [oz.core :as oz]))
 
 (def ?csrf-token
@@ -50,19 +49,6 @@
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
-
-(defonce routes
-  [["/" :home-redirect]
-   ["/:lang"
-    ["/repos" :repos]
-    ["/groups" :orgas]
-    ["/live" :live]
-    ["/stats" :stats]
-    ["/deps"
-     ["/:orga"
-      ["/:repo" :repo-deps]
-      ["" :orga-deps]]
-     ["" :deps]]]])
 
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
@@ -98,32 +84,6 @@
     :display-filter init-filter
     :lang           "en"
     :path-params    nil}))
-
-(defn stats-chart [stats lang]
-  (let [top     (reverse (sort-by val (dissoc (:top_licenses stats) :Inconnue)))
-        context (.getContext (.getElementById js/document "chartjs") "2d")
-        chart-data
-        {:type    "bar"
-         :options {:title      {:display true :text (i/i lang [:most-used-licenses])}
-                   :legend     {:display false}
-                   :responsive "true"
-                   :scales     {:xAxes [{:stacked true}]
-                                :yAxes [{:stacked true}]}}
-         :data    {:labels (map key top)
-                   :datasets
-                   [{:data (map val top)
-                     :backgroundColor
-                     ["#3e95cd" "#8e5ea2" "#3cba9f" "#e8c3b9" "#c45850"
-                      "#3e95cd" "#8e5ea2" "#3cba9f" "#e8c3b9" "#c45850"]}]}}]
-    (js/Chart. context (clj->js chart-data))))
-
-(defn stats-chart-class [lang]
-  (reagent/create-class
-   {:component-did-mount
-    (fn [] (GET stats-url :handler
-                #(stats-chart (walk/keywordize-keys %) lang)))
-    :display-name   "stats-chart"
-    :reagent-render (fn [] [:canvas {:id "chartjs"}])}))
 
 (re-frame/reg-event-db
  :lang!
@@ -1109,6 +1069,27 @@
                            :href  (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
+;; FIXME: i18n
+(defn licenses-chart [lang top_licenses]
+  (let [licenses (map #(zipmap [:License :Number] %)
+                      (walk/stringify-keys
+                       (dissoc top_licenses :Inconnue)))]
+    [oz/vega-lite
+     {:title    (i/i lang [:most-used-licenses])
+      :data     {:values licenses}
+      :encoding {:x     {:field "Number" :type "quantitative"
+                         :axis  {:title (i/i lang [:repos-number])}}
+                 :y     {:field "License" :type "ordinal" :sort "-x"
+                         :axis  {:title  (i/i lang [:licenses])
+                                 :labels false}}
+                 :color {:field  "License"
+                         :legend true
+                         :title  (i/i lang [:licenses])
+                         :scale  {:scheme "tableau20"}}}
+      :width    1100
+      :height   400
+      :mark     {:type "bar" :tooltip {:content "data"}}}]))
+
 (defn stats-page
   [lang stats deps deps-total]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
@@ -1151,7 +1132,7 @@
                   top_licenses_0
                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
      [:div.columns
-      [:div.column [stats-chart-class lang]]]
+      [:div.column [licenses-chart lang top_licenses]]]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
@@ -1438,13 +1419,6 @@
           [:span (:g flt)]
           (fa "fa-times")]]))]])
 
-(defn play-data [r & names]
-  (for [n names
-        i (range r)]
-    {:time     i
-     :item     n
-     :quantity (+ (Math/pow (* i (count n)) 0.8) (rand-int (count n)))}))
-
 (defn live [lang]
   (fn [lang]
     (let [r (reagent/atom 10)]
@@ -1455,14 +1429,8 @@
                               ;; (re-frame/dispatch [:range!] v)
                               (reset! r (js/parseInt v))
                               )}]
-       [oz/vega-lite
-        {:data     {:values (play-data @r "monkey" "slipper" "broom")}
-         :encoding {:x     {:field "time" :type "ordinal"}
-                    :y     {:field "quantity" :type "quantitative"}
-                    :color {:field "item" :type "nominal"}}
-         :width    400
-         :height   400
-         :mark     "line"}]]))
+       [oz/vega-lite {}]
+       ]))
   ;; [:ul
   ;;  (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]
   ;;    ^{:key e}
@@ -1521,6 +1489,19 @@
     (re-frame/dispatch [:view!
                         (keyword (:name (:data match)))
                         (:query-params match)])))
+
+(defonce routes
+  [["/" :home-redirect]
+   ["/:lang"
+    ["/repos" :repos]
+    ["/groups" :orgas]
+    ["/live" :live]
+    ["/stats" :stats]
+    ["/deps"
+     ["/:orga"
+      ["/:repo" :repo-deps]
+      ["" :orga-deps]]
+     ["" :deps]]]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
