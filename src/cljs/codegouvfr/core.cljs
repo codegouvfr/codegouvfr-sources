@@ -451,33 +451,31 @@
                             (reset! fav-class ""))))}
      (fa "fa-star")]))
 
-(defn change-repos-page [next]
-  (let [repos-page  @(re-frame/subscribe [:repos-page?])
+(defn change-page [type next]
+  (let [sub         (condp = type
+                      :repos :repos-page?
+                      :deps  :deps-page?
+                      :orgas :orgas-page?)
+        evt         (condp = type
+                      :repos :repos-page!
+                      :deps  :deps-page!
+                      :orgas :orgas-page!)
+        cnt         (condp = type
+                      :repos :repos?
+                      :deps  :deps?
+                      :orgas :orgas?)
+        repos-page  @(re-frame/subscribe [sub])
         count-pages (count (partition-all
-                            repos-per-page @(re-frame/subscribe [:repos?])))]
+                            repos-per-page @(re-frame/subscribe [cnt])))]
     (cond
       (= next "first")
-      (re-frame/dispatch [:repos-page! 0])
+      (re-frame/dispatch [evt 0])
       (= next "last")
-      (re-frame/dispatch [:repos-page! (dec count-pages)])
+      (re-frame/dispatch [evt (dec count-pages)])
       (and (< repos-page (dec count-pages)) next)
-      (re-frame/dispatch [:repos-page! (inc repos-page)])
+      (re-frame/dispatch [evt (inc repos-page)])
       (and (pos? repos-page) (not next))
-      (re-frame/dispatch [:repos-page! (dec repos-page)]))))
-
-(defn change-deps-page [next]
-  (let [deps-page   @(re-frame/subscribe [:deps-page?])
-        count-pages (count (partition-all
-                            deps-per-page @(re-frame/subscribe [:deps?])))]
-    (cond
-      (= next "first")
-      (re-frame/dispatch [:deps-page! 0])
-      (= next "last")
-      (re-frame/dispatch [:deps-page! (dec count-pages)])
-      (and (< deps-page (dec count-pages)) next)
-      (re-frame/dispatch [:deps-page! (inc deps-page)])
-      (and (pos? deps-page) (not next))
-      (re-frame/dispatch [:deps-page! (dec deps-page)]))))
+      (re-frame/dispatch [evt (dec repos-page)]))))
 
 (defn repositories-page [lang repos-cnt]
   (if (zero? repos-cnt)
@@ -593,20 +591,6 @@
                    ;; Reused
                    [:td.has-text-right g]])))]])))
 
-(defn change-orgas-page [next]
-  (let [orgas-page  @(re-frame/subscribe [:orgas-page?])
-        count-pages (count (partition-all
-                            orgas-per-page @(re-frame/subscribe [:orgas?])))]
-    (cond
-      (= next "first")
-      (re-frame/dispatch [:orgas-page! 0])
-      (= next "last")
-      (re-frame/dispatch [:orgas-page! (dec count-pages)])
-      (and (< orgas-page (dec count-pages)) next)
-      (re-frame/dispatch [:orgas-page! (inc orgas-page)])
-      (and (pos? orgas-page) (not next))
-      (re-frame/dispatch [:orgas-page! (dec orgas-page)]))))
-
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
@@ -695,19 +679,19 @@
            (str rps (i/i lang [:repos]))))]
       [:nav.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
-        {:on-click #(change-repos-page "first")
+        {:on-click #(change-page :repos "first")
          :disabled first-disabled}
         (fa "fa-fast-backward")]
        [:a.pagination-previous
-        {:on-click #(change-repos-page nil)
+        {:on-click #(change-page :repos nil)
          :disabled first-disabled}
         (fa "fa-step-backward")]
        [:a.pagination-next
-        {:on-click #(change-repos-page true)
+        {:on-click #(change-page :repos true)
          :disabled last-disabled}
         (fa "fa-step-forward")]
        [:a.pagination-next
-        {:on-click #(change-repos-page "last")
+        {:on-click #(change-page :repos "last")
          :disabled last-disabled}
         (fa "fa-fast-forward")]]
       [:a.level-item {:title (i/i lang [:download])
@@ -753,19 +737,19 @@
            (str orgs (i/i lang [:groups]))))]
       [:nav.level-item {:role "navigation" :aria-label "pagination"}
        [:a.pagination-previous
-        {:on-click #(change-orgas-page "first")
+        {:on-click #(change-page :orgas "first")
          :disabled first-disabled}
         (fa "fa-fast-backward")]
        [:a.pagination-previous
-        {:on-click #(change-orgas-page nil)
+        {:on-click #(change-page :orgas nil)
          :disabled first-disabled}
         (fa "fa-step-backward")]
        [:a.pagination-next
-        {:on-click #(change-orgas-page true)
+        {:on-click #(change-page :orgas true)
          :disabled last-disabled}
         (fa "fa-step-forward")]
        [:a.pagination-next
-        {:on-click #(change-orgas-page "last")
+        {:on-click #(change-page :orgas "last")
          :disabled last-disabled}
         (fa "fa-fast-forward")]]
       [:a {:title (i/i lang [:download])
@@ -1053,19 +1037,19 @@
              (str deps (i/i lang [:deps]))))]
         [:nav.level-item {:role "navigation" :aria-label "pagination"}
          [:a.pagination-previous
-          {:on-click #(change-deps-page "first")
+          {:on-click #(change-page :deps "first")
            :disabled first-disabled}
           (fa "fa-fast-backward")]
          [:a.pagination-previous
-          {:on-click #(change-deps-page nil)
+          {:on-click #(change-page :deps nil)
            :disabled first-disabled}
           (fa "fa-step-backward")]
          [:a.pagination-next
-          {:on-click #(change-deps-page true)
+          {:on-click #(change-page :deps true)
            :disabled last-disabled}
           (fa "fa-step-forward")]
          [:a.pagination-next
-          {:on-click #(change-deps-page "last")
+          {:on-click #(change-page :deps "last")
            :disabled last-disabled}
           (fa "fa-fast-forward")]]])
      [:br]
