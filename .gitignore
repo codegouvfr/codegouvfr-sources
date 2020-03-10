@@ -21,3 +21,5 @@ data/deps/orgas/*json
 .eastwood
 todo.org
 .cpcache/
+resources/public/images/logos/
+resources/public/images/charts/
