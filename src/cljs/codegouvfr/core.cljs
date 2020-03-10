@@ -1100,7 +1100,8 @@
       (stats-card [:span (i/i lang [:most-used-languages])]
                   top_languages_1
                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])
-      (deps-card (i/i lang [:Deps]) deps lang)
+      (deps-card (i/i lang [:Deps]) deps lang)]
+     [:div.columns
       (stats-card [:span
                    (i/i lang [:most-used-identified-licenses])
                    [:sup
@@ -1109,8 +1110,7 @@
                       :title (i/i lang [:go-to-glossary])}
                      (fa "fa-question-circle")]]]
                   top_licenses_0
-                  [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
-     [:div.columns
+                  [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])
       [:div.column [:img {:src "/images/charts/top_licenses.svg"}]]]
      [:div.columns
       (stats-card [:span
