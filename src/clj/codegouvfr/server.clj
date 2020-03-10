@@ -179,7 +179,8 @@
   ^{:doc "Mapping from GitHub license strings to the their license+SDPX short
   identifier version."}
   licenses-mapping
-  {"MIT License"                                                "MIT"
+  {"Other"                                                      "Other"
+   "MIT License"                                                "MIT"
    "GNU Affero General Public License v3.0"                     "AGPL-3.0"
    "GNU General Public License v3.0"                            "GPL-3.0"
    "GNU Lesser General Public License v2.1"                     "LGPL-2.1"
@@ -226,8 +227,8 @@
                         :type   "nominal"
                         :title  (i/i lang [:licenses])
                         :scale  {:scheme "tableau20"}}}
-     :width    1200
-     :height   500
+     :width    600
+     :height   600
      :mark     {:type "bar" :tooltip {:content "data"}}}))
 
 (defn temp-json-file
