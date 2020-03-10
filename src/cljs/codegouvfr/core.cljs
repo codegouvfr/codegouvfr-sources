@@ -1069,27 +1069,6 @@
                            :href  (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
-;; FIXME: i18n
-(defn licenses-chart [lang top_licenses]
-  (let [licenses (map #(zipmap [:License :Number] %)
-                      (walk/stringify-keys
-                       (dissoc top_licenses :Inconnue)))]
-    [oz/vega-lite
-     {:title    (i/i lang [:most-used-licenses])
-      :data     {:values licenses}
-      :encoding {:x     {:field "Number" :type "quantitative"
-                         :axis  {:title (i/i lang [:repos-number])}}
-                 :y     {:field "License" :type "ordinal" :sort "-x"
-                         :axis  {:title  (i/i lang [:licenses])
-                                 :labels false}}
-                 :color {:field  "License"
-                         :legend true
-                         :title  (i/i lang [:licenses])
-                         :scale  {:scheme "tableau20"}}}
-      :width    1100
-      :height   400
-      :mark     {:type "bar" :tooltip {:content "data"}}}]))
-
 (defn stats-page
   [lang stats deps deps-total]
   (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
@@ -1132,7 +1111,7 @@
                   top_licenses_0
                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
      [:div.columns
-      [:div.column [licenses-chart lang top_licenses]]]
+      [:div.column [:img {:src "/images/charts/top_licenses.svg"}]]]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
@@ -1420,8 +1399,8 @@
           (fa "fa-times")]]))]])
 
 (defn live [lang]
-  (fn [lang]
-    (let [r (reagent/atom 10)]
+  (let [r (reagent/atom 10)]
+    (fn []
       [:div
        [:input {:type      "range" :min "10" :max "50"
                 :on-change #(let [v (.-value (.-target %))]
@@ -1429,7 +1408,6 @@
                               ;; (re-frame/dispatch [:range!] v)
                               (reset! r (js/parseInt v))
                               )}]
-       [oz/vega-lite {}]
        ]))
   ;; [:ul
   ;;  (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]

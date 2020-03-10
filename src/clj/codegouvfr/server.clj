@@ -27,7 +27,9 @@
             [clojure.core.async :as async]
             [clj-http.client :as http]
             [tea-time.core :as tt]
-            [clojure.set])
+            [clojure.set]
+            [clojure.java.shell :as sh]
+            [clojure.data.json :as datajson])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -71,6 +73,8 @@
 
 (def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 
+(def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
+
 (def http-get-params {:cookie-policy :standard})
 
 (def http-get-gh-params
@@ -91,9 +95,6 @@
       (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
         (event-msg-handler {:event e}))
       (recur (async/<! events-channel)))))
-
-;; (event-msg-handler {:event {:u "BLAIREAU"}})
-;; (conj ["dog" "lion" "tiger"] "ours")
 
 (defn sort-events-by-date [diff]
   (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
@@ -131,7 +132,7 @@
 ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
 ;; GitHub orgas with recently updated repos and get the last events
 ;; 240 times for these orgas every 15 seconds.
-(defn latest-orgas-events [orgas]
+(defn latest-orgas-events! [orgas]
   (http/with-connection-pool
     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
     (dotimes [_ 240]
@@ -160,6 +161,78 @@
         (send last-orgs-events #(take 100 (apply merge %1 %2)) @new-events)
         ;; Then wait for 15 seconds
         (Thread/sleep 15000)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Export licenses data as vega images
+
+(defonce
+  ^{:doc "Mapping from GitHub license strings to the their license+SDPX short
+  identifier version."}
+  licenses-mapping
+  {"MIT License"                                                "MIT"
+   "GNU Affero General Public License v3.0"                     "AGPL-3.0"
+   "GNU General Public License v3.0"                            "GPL-3.0"
+   "GNU Lesser General Public License v2.1"                     "LGPL-2.1"
+   "Apache License 2.0"                                         "Apache-2.0"
+   "GNU General Public License v2.0"                            "GPL-2.0"
+   "GNU Lesser General Public License v3.0"                     "LGPL-3.0"
+   "Mozilla Public License 2.0"                                 "MPL-2.0"
+   "Eclipse Public License 2.0"                                 "EPL-2.0"
+   "Eclipse Public License 1.0"                                 "EPL-1.0"
+   "BSD 3-Clause \"New\" or \"Revised\" License"                "BSD-3-Clause"
+   "European Union Public License 1.2"                          "EUPL-1.2"
+   "Creative Commons Attribution Share Alike 4.0 International" "CC-BY-SA-4.0"
+   "BSD 2-Clause \"Simplified\" License"                        "BSD-2-Clause"
+   "The Unlicense"                                              "Unlicense"
+   "Do What The Fuck You Want To Public License"                "WTFPL"
+   "Creative Commons Attribution 4.0 International"             "CC-BY-4.0"})
+
+(defn set-licenses-vega-data [lang]
+  (let [l0       (:top_licenses
+                  (json/parse-string
+                   (:body (try (http/get stats-url http-get-params)
+                               (catch Exception e
+                                 (timbre/error
+                                  (str "Cannot get stats URL\n"
+                                       (.getMessage e))))))
+                   true))
+        l1       (map #(zipmap [:License :Number] %)
+                      (walk/stringify-keys
+                       (dissoc l0 :Inconnue)))
+        licenses (map #(assoc % :License (get licenses-mapping (:License %))) l1)]
+    {:title    (i/i lang [:most-used-licenses])
+     :data     {:values licenses}
+     :encoding {:x     {:field "Number" :type "quantitative"
+                        :axis  {:title (i/i lang [:repos-number])}}
+                :y     {:field "License" :type "ordinal" :sort "-x"
+                        :axis  {:title         false
+                                :labelLimit    200
+                                :offset        10
+                                :maxExtent     100
+                                :labelFontSize 15
+                                :labelAlign    "right"}}
+                :color {:field  "License"
+                        :legend false
+                        :type   "nominal"
+                        :title  (i/i lang [:licenses])
+                        :scale  {:scheme "tableau20"}}}
+     :width    1200
+     :height   500
+     :mark     {:type "bar" :tooltip {:content "data"}}}))
+
+(defn temp-json-file
+  "Convert `clj-vega-spec` to json and store it as tmp file."
+  [clj-vega-spec]
+  (let [tmp-file (java.io.File/createTempFile "vega." ".json")]
+    (.deleteOnExit tmp-file)
+    (with-open [file (io/writer tmp-file)]
+      (datajson/write clj-vega-spec file))
+    (.getAbsolutePath tmp-file)))
+
+(defn vega-licenses-chart! []
+  (sh/sh "vl2svg"
+         (temp-json-file (set-licenses-vega-data "en"))
+         "./resources/public/images/charts/top_licenses.svg"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -310,11 +383,14 @@
 
 (defn start-tasks! []
   (tt/start!)
+  (tt/every!
+   14400 (fn []
+           (timbre/info "Generating license chart")
+           (vega-licenses-chart!)))
   (tt/every! ;; FIXME: why the error when done?
-   36000
-   (fn []
-     ((timbre/info "Start streaming GitHub events")
-      (latest-orgas-events (latest-updated-orgas 20))))))
+   36000 (fn []
+           (timbre/info "Start streaming GitHub events")
+           (latest-orgas-events! (latest-updated-orgas 20)))))
 
 (defn -main
   "Start tasks and the HTTP server."
@@ -322,7 +398,7 @@
   (server/run-server app {:port config/codegouvfr_port :join? false})
   (sente/start-chsk-router! ch-chsk event-msg-handler)
   (start-events-channel!)
-  (start-tasks!)
+  ;; (start-tasks!)
   (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
