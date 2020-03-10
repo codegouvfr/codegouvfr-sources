@@ -1,9 +1,15 @@
 (ns codegouvfr.i18n
-  (:require [taoensso.tempura :refer [tr]]))
+  (:require [taoensso.tempura :refer [tr]]
+            [markdown-to-hiccup.core :as md]))
 
 (def supported-languages
   "A set of supported languages."
   #{"en" "fr" "it"})
+
+(defn md-to-hiccup
+  "Convert a markdown `s` string to hiccup structure."
+  [s]
+  (-> s (md/md->hiccup) (md/component)))
 
 (def localization
   ;; French translation
