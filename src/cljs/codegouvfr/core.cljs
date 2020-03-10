@@ -963,20 +963,20 @@
        [:div.level-left
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
-          :title    "Trier par nom" ;; FIXME i18n
-          :on-click #(re-frame/dispatch [:sort-deps-by! :name])} "Trier par nom"]
+          :title    (i/i lang [:sort-name])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :name])} (i/i lang [:name])]
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
-          :title    "Trier par type"
-          :on-click #(re-frame/dispatch [:sort-deps-by! :type])} "Trier par type"]
+          :title    (i/i lang [:sort-type])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :type])} (i/i lang [:type])]
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :production) "info is-light" "light"))
-          :title    "Trier par production"
-          :on-click #(re-frame/dispatch [:sort-deps-by! :production])} "Trier par production"]
+          :title    (i/i lang [:sort-production])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :production])} (i/i lang [:core-dep])]
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
-          :title    "Trier par development"
-          :on-click #(re-frame/dispatch [:sort-deps-by! :development])} "Trier par development"]
+          :title    (i/i lang [:sort-development])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :development])} (i/i lang [:dev-dep])]
         [:span.button.is-static.level-item
          (let [deps (count deps)]
            (if (< deps 2)
