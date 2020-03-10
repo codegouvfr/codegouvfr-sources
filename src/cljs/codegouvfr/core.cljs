@@ -9,14 +9,13 @@
             [reagent.dom]
             [cljs-bean.core :refer [bean]]
             [goog.string :as gstring]
-            [ajax.core :refer [GET POST]]
+            [ajax.core :refer [GET]]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
-            [taoensso.sente  :as sente :refer (cb-success?)]
-            [oz.core :as oz]))
+            [taoensso.sente  :as sente]))
 
 (def ?csrf-token
   (when-let [el (.getElementById js/document "sente-csrf-token")]
@@ -160,7 +159,7 @@
 
 (re-frame/reg-event-db
  :update-orgas!
- (fn [db [_ orgas]] (if orgas (assoc db :orgas orgas))))
+ (fn [db [_ orgas]] (when orgas (assoc db :orgas orgas))))
 
 (re-frame/reg-sub
  :sort-repos-by?
@@ -242,12 +241,12 @@
    [:i {:class (str "fab " s)}]])
 
 (defn to-locale-date [s]
-  (if (string? s)
+  (when (string? s)
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
 (defn s-includes? [s sub]
-  (if (and (string? s) (string? sub))
+  (when (and (string? s) (string? sub))
     (s/includes? (s/lower-case s) (s/lower-case sub))))
 
 (defn apply-repos-filters [m]
@@ -513,7 +512,7 @@
                          [:a {:href   r
                               :target "new"
                               :title  (str (i/i lang [:go-to-repo])
-                                           (if li (str (i/i lang [:under-license]) li)))}
+                                           (when li (str (i/i lang [:under-license]) li)))}
                           n]
                          " < "
                          [:a {:href  (rfe/href :repos {:lang lang} {:g group})
@@ -714,13 +713,13 @@
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
           [:div.columns
-           (for [{:keys [n l o h c d r e au p an dp] :as o} dd]
-             ^{:key o}
+           (for [{:keys [n l o h c d r e au p an dp] :as oo} dd]
+             ^{:key oo}
              [:div.column.is-4
               [:div.card
                [:div.card-content
                 [:div.media
-                 (if au
+                 (when au
                    [:div.media-left
                     [:figure.image.is-48x48
                      [:img {:src au}]]])
@@ -738,16 +737,17 @@
                            (fab "fa-gitlab"))]]]
                   [:br]
                   (let [date (to-locale-date c)]
-                    (if date
+                    (when date
                       [:p (str (i/i lang [:created-at]) date)]))
-                  (if r
+                  (when r
                     ;; FIXME: hackish, orgas-mapping should give
                     ;; the forge base on top of "plateforme".
                     [:a {:title (i/i lang [:go-to-repos])
                          :href  (rfe/href :repos {:lang lang}
                                           {:g (s/replace o "/groups/" "/")})}
                      r (if (< r 2)
-                         (i/i lang [:repo]) (i/i lang [:repos]))])]]
+                         (i/i lang [:repo])
+                         (i/i lang [:repos]))])]]
                 [:div.content
                  [:p d]]]
                [:div.card-footer
@@ -759,19 +759,19 @@
                             {:lang lang
                              :orga (s/replace o "https://github.com/" "")})}
                    (fa "fa-cubes")])
-                (if e [:a.card-footer-item
-                       {:title (i/i lang [:contact-by-email])
-                        :href  (str "mailto:" e)}
-                       (fa "fa-envelope")])
-                (if h [:a.card-footer-item
-                       {:title  (i/i lang [:go-to-website])
-                        :target "new"
-                        :href   h} (fa "fa-globe")])
-                (if an [:a.card-footer-item
-                        {:title  (i/i lang [:go-to-sig-website])
-                         :target "new"
-                         :href   (str annuaire-prefix an)}
-                        (fa "fa-link")])]]])])))]))
+                (when e [:a.card-footer-item
+                         {:title (i/i lang [:contact-by-email])
+                          :href  (str "mailto:" e)}
+                         (fa "fa-envelope")])
+                (when h [:a.card-footer-item
+                         {:title  (i/i lang [:go-to-website])
+                          :target "new"
+                          :href   h} (fa "fa-globe")])
+                (when an [:a.card-footer-item
+                          {:title  (i/i lang [:go-to-sig-website])
+                           :target "new"
+                           :href   (str annuaire-prefix an)}
+                          (fa "fa-link")])]]])])))]))
 
 (defn deps-dep-page [lang d]
   (let [rep-f @(re-frame/subscribe [:sort-repos-by?])
@@ -782,10 +782,10 @@
                          (i/i lang [:repo-depending-on])
                          (i/i lang [:repos-depending-on]))
                    (gstring/urlDecode d)
-                   (if q (str (if (= cnt 1)
-                                (i/i lang [:matching])
-                                (i/i lang [:matching-s]))
-                              "\"" q "\"")))]
+                   (when q (str (if (= cnt 1)
+                                  (i/i lang [:matching])
+                                  (i/i lang [:matching-s]))
+                                "\"" q "\"")))]
     [:div
      [:h2 title]
      [:br]
@@ -858,7 +858,7 @@
                         [:a {:href   r
                              :target "new"
                              :title  (str (i/i lang [:go-to-repo])
-                                          (if li (str (i/i lang [:under-license]) li)))}
+                                          (when li (str (i/i lang [:under-license]) li)))}
                          n]
                         " < "
                         [:a {:href  (rfe/href :repos {:lang lang} {:g group})
@@ -905,25 +905,25 @@
         [:th
          [:abbr
           [:a.button
-           {:class    (str (if (= dep-f :name) "is-light"))
+           {:class    (when (= dep-f :name) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
            (i/i lang [:name])]]]
         [:th
          [:abbr
           [:a.button
-           {:class    (str (if (= dep-f :type) "is-light"))
+           {:class    (when (= dep-f :type) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
            (i/i lang [:type])]]]
         [:th.has-text-right
          [:abbr
           [:a.button
-           {:class    (str (if (= dep-f :production) "is-light"))
+           {:class    (when (= dep-f :production) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :production])}
            (i/i lang [:core-dep])]]]
         [:th.has-text-right
          [:abbr
           [:a.button
-           {:class    (str (if (= dep-f :development) "is-light"))
+           {:class    (when (= dep-f :development) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :development])}
            (i/i lang [:dev-dep])]]]]]
       (into [:tbody]
@@ -963,7 +963,7 @@
        [:div.level-left
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
-          :title    "Trier par nom"
+          :title    "Trier par nom" ;; FIXME i18n
           :on-click #(re-frame/dispatch [:sort-deps-by! :name])} "Trier par nom"]
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
@@ -1060,7 +1060,7 @@
     (apply merge
            (sequence
             (comp
-             (filter (fn [[k v]] (not= k "Inconnu")))
+             (filter (fn [[k _]] (not= k "Inconnu")))
              (map (fn [[k v]]
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
@@ -1189,38 +1189,39 @@
               [:a {:href (rfe/href :orgas {:lang lang} {:q orga})} orga]
               ")"]]
        [:br]
-       (if-let [dps (not-empty rdeps)]
+       (if (not-empty rdeps)
          [:div.table-container
           [:table.table.is-hoverable.is-fullwidth
-           [:thead [:tr
-                    [:th
-                     [:a.button
-                      {:class    (when (= @sort-key :t) "is-light")
-                       :on-click #(do (if (= @sort-key :t)
-                                        (reset! sort-rev? (not @sort-rev?)))
-                                      (reset! sort-key :t))}
-                      (i/i lang [:type])]]
-                    [:th
-                     [:a.button
-                      {:class    (when (= @sort-key :n) "is-light")
-                       :on-click #(do (if (= @sort-key :n)
-                                        (reset! sort-rev? (not @sort-rev?)))
-                                      (reset! sort-key :n))}
-                      (i/i lang [:name])]]
-                    [:th.has-text-right
-                     [:a.button
-                      {:class    (when (= @sort-key :c) "is-light")
-                       :on-click #(do (if (= @sort-key :c)
-                                        (reset! sort-rev? (not @sort-rev?)))
-                                      (reset! sort-key :c))}
-                      (i/i lang [:core-dep])]]
-                    [:th.has-text-right
-                     [:a.button
-                      {:class    (when (= @sort-key :d) "is-light")
-                       :on-click #(do (if (= @sort-key :d)
-                                        (reset! sort-rev? (not @sort-rev?)))
-                                      (reset! sort-key :d))}
-                      (i/i lang [:dev-dep])]]]]
+           [:thead
+            [:tr
+             [:th
+              [:a.button
+               {:class    (when (= @sort-key :t) "is-light")
+                :on-click #(do (when (= @sort-key :t)
+                                 (reset! sort-rev? (not @sort-rev?)))
+                               (reset! sort-key :t))}
+               (i/i lang [:type])]]
+             [:th
+              [:a.button
+               {:class    (when (= @sort-key :n) "is-light")
+                :on-click #(do (when (= @sort-key :n)
+                                 (reset! sort-rev? (not @sort-rev?)))
+                               (reset! sort-key :n))}
+               (i/i lang [:name])]]
+             [:th.has-text-right
+              [:a.button
+               {:class    (when (= @sort-key :c) "is-light")
+                :on-click #(do (when (= @sort-key :c)
+                                 (reset! sort-rev? (not @sort-rev?)))
+                               (reset! sort-key :c))}
+               (i/i lang [:core-dep])]]
+             [:th.has-text-right
+              [:a.button
+               {:class    (when (= @sort-key :d) "is-light")
+                :on-click #(do (when (= @sort-key :d)
+                                 (reset! sort-rev? (not @sort-rev?)))
+                               (reset! sort-key :d))}
+               (i/i lang [:dev-dep])]]]]
            (into [:tbody]
                  (for [{:keys [t n c d] :as r} rdeps]
                    ^{:key r}
@@ -1239,7 +1240,6 @@
   (let [deps      (reagent/atom nil)
         params    @(re-frame/subscribe [:path-params?])
         repo      (:repo params)
-        orga      (:orga params)
         sort-key  (reagent/atom :c)
         sort-rev? (reagent/atom false)]
     (reagent/create-class
@@ -1286,21 +1286,21 @@
            [:th
             [:a.button
              {:class    (when (= @sort-key :name) "is-light")
-              :on-click #(do (if (= @sort-key :name)
+              :on-click #(do (when (= @sort-key :name)
                                (reset! sort-rev? (not @sort-rev?)))
                              (reset! sort-key :name))}
              (i/i lang [:name])]]
            [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :core) "is-light")
-              :on-click #(do (if (= @sort-key :core)
+              :on-click #(do (when (= @sort-key :core)
                                (reset! sort-rev? (not @sort-rev?)))
                              (reset! sort-key :core))}
              (i/i lang [:core-dep])]]
            [:th.has-text-right
             [:a.button
              {:class    (when (= @sort-key :dev) "is-light")
-              :on-click #(do (if (= @sort-key :dev)
+              :on-click #(do (when (= @sort-key :dev)
                                (reset! sort-rev? (not @sort-rev?)))
                              (reset! sort-key :dev))}
              (i/i lang [:dev-dep])]]
@@ -1308,7 +1308,7 @@
             [:a.button
              {:class (when (= @sort-key :repos) "is-light")
               :on-click
-              #(do (if (= @sort-key :repos)
+              #(do (when (= @sort-key :repos)
                      (reset! sort-rev? (not @sort-rev?)))
                    (reset! sort-key :repos))}
              (i/i lang [:Repos])]]]]
@@ -1376,7 +1376,7 @@
       {:title (i/i lang [:github-gitlab-etc])
        :href  (rfe/href :live {:lang lang})}
       "Live!"]]
-    (if (or (= view :repos) (= view :orgas) (= view :deps))
+    (when (or (= view :repos) (= view :orgas) (= view :deps))
       [:p.control.level-item
        [:input.input
         {:size        20
@@ -1390,7 +1390,7 @@
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}]])
     (let [flt @(re-frame/subscribe [:filter?])]
-      (if (seq (:g flt))
+      (when (seq (:g flt))
         [:p.control.level-item
          [:a.button.is-outlined.is-warning
           {:title (i/i lang [:remove-filter])
