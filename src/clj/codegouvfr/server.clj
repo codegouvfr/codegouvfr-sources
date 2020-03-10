@@ -138,6 +138,12 @@
                      (sequence latest-updated-orgas-filter repos)))
            (map :organisation_nom))))))
 
+(defn filter-old-events [events]
+  (let [yesterday (t/minus (t/instant) (t/days 1))]
+    (filter (fn [{:keys [date]}]
+              (not (t/before? (t/instant date) yesterday)))
+            events)))
+
 ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
 ;; GitHub orgas with recently updated repos and get the last events
 ;; 240 times for these orgas every 15 seconds.
@@ -167,18 +173,15 @@
               (swap! new-events conj {:u user :r repo-name :n nb
                                       :d date :o org-name}))))
         ;; Only update the main events list now, trigger UI updates
-        ;; FIXME: replace take by taking the last 24h events
-        (send last-orgs-events #(take 100 (apply merge %1 %2)) @new-events)
+        (send last-orgs-events
+              #(filter-old-events (apply merge %1 %2)) @new-events)
         ;; Then wait for 15 seconds
         (Thread/sleep (:repeat_in_connection_pool_sleep @profile))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Export licenses data as vega images
 
-(defonce
-  ^{:doc "Mapping from GitHub license strings to the their license+SDPX short
-  identifier version."}
-  licenses-mapping
+(def licenses-spdx
   {"Other"                                                      "Other"
    "MIT License"                                                "MIT"
    "GNU Affero General Public License v3.0"                     "AGPL-3.0"
@@ -210,7 +213,7 @@
         l1       (map #(zipmap [:License :Number] %)
                       (walk/stringify-keys
                        (dissoc l0 :Inconnue)))
-        licenses (map #(assoc % :License (get licenses-mapping (:License %))) l1)]
+        licenses (map #(assoc % :License (get licenses-spdx (:License %))) l1)]
     {:title    (i/i lang [:most-used-licenses])
      :data     {:values licenses}
      :encoding {:x     {:field "Number" :type "quantitative"
@@ -411,7 +414,7 @@
   (server/run-server app {:port config/codegouvfr_port :join? false})
   (sente/start-chsk-router! ch-chsk event-msg-handler)
   (start-events-channel!)
-  ;; (start-tasks!)
+  (start-tasks!)
   (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
 ;; (-main)
