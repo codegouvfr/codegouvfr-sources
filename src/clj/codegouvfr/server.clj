@@ -67,24 +67,33 @@
     (chsk-send! uid [:event/PushEvent event])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Profiles for interactive development
+
+(def profile (atom nil))
+(defn profiles [type]
+  (if (= type :production)
+    {:send_channel_sleep              1000
+     :repeat_in_connection_pool       240
+     :repeat_in_connection_pool_sleep 15000
+     :latest_updated_orgas            20}
+    {:send_channel_sleep              1000
+     :repeat_in_connection_pool       2
+     :repeat_in_connection_pool_sleep 1000
+     :latest_updated_orgas            2}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initial setup for retrieving events constantly
 
 (def gh-org-events "https://api.github.com/orgs/%s/events")
-
 (def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
-
 (def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
-
 (def http-get-params {:cookie-policy :standard})
-
+(def last-orgs-events (agent '()))
+(def events-channel (async/chan))
 (def http-get-gh-params
   (merge http-get-params
          {:basic-auth
           (str config/github-user ":" config/github-access-token)}))
-
-(def last-orgs-events (agent '()))
-
-(def events-channel (async/chan 100))
 
 (defn seqs-difference [seq1 seq2]
   (seq (clojure.set/difference (into #{} seq2) (into #{} seq1))))
@@ -108,7 +117,7 @@
                (async/thread
                  (doseq [e (sort-events-by-date diff)]
                    (timbre/info (pr-str e))
-                   (Thread/sleep 1000)
+                   (Thread/sleep (:send_channel_sleep @profile))
                    (async/>!! events-channel e))))))
 
 (def latest-updated-orgas-filter
@@ -135,7 +144,7 @@
 (defn latest-orgas-events! [orgas]
   (http/with-connection-pool
     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-    (dotimes [_ 240]
+    (dotimes [_ (:repeat_in_connection_pool profile)]
       (let [new-events (atom nil)]
         ;; Fet new-events for all recently updated orgas
         (doseq [org orgas]
@@ -158,9 +167,10 @@
               (swap! new-events conj {:u user :r repo-name :n nb
                                       :d date :o org-name}))))
         ;; Only update the main events list now, trigger UI updates
+        ;; FIXME: replace take by taking the last 24h events
         (send last-orgs-events #(take 100 (apply merge %1 %2)) @new-events)
         ;; Then wait for 15 seconds
-        (Thread/sleep 15000)))))
+        (Thread/sleep (:repeat_in_connection_pool_sleep @profile))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Export licenses data as vega images
@@ -390,11 +400,13 @@
   (tt/every! ;; FIXME: why the error when done?
    36000 (fn []
            (timbre/info "Start streaming GitHub events")
-           (latest-orgas-events! (latest-updated-orgas 20)))))
+           (latest-orgas-events!
+            (latest-updated-orgas (:latest_updated_orgas @profile))))))
 
 (defn -main
   "Start tasks and the HTTP server."
   []
+  (reset! profile (profiles :production))
   (server/run-server app {:port config/codegouvfr_port :join? false})
   (sente/start-chsk-router! ch-chsk event-msg-handler)
   (start-events-channel!)
