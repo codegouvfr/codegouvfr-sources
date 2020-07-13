@@ -1398,7 +1398,7 @@
           [:span (:g flt)]
           (fa "fa-times")]]))]])
 
-(defn live [lang]
+(defn live []
   (let [r (reagent/atom 10)]
     (fn []
       [:div
