@@ -311,7 +311,7 @@
   "Send a templated email."
   [{:keys [email name organization message log]}]
   (try
-    (if-let
+    (when-let
         [res (postal/send-message
               {:host config/smtp-host
                :port 587
