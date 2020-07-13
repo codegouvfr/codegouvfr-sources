@@ -128,7 +128,8 @@
 
 (defn latest-updated-orgas [n]
   (let [repos (json/parse-string
-               (:body (try (http/get orgas-url http-get-params)))
+               (:body (try (http/get orgas-url http-get-params)
+                           (catch Exception _ nil))) ;; FIXME: add error?
                true)]
     (take
      n
