@@ -751,7 +751,7 @@
                 [:div.content
                  [:p d]]]
                [:div.card-footer
-                (when (and (= p "GitHub") dp)
+                (when dp
                   [:a.card-footer-item
                    {:title (i/i lang [:Deps])
                     :href  (rfe/href
