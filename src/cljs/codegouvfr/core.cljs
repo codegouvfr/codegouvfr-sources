@@ -1371,11 +1371,6 @@
       {:title (i/i lang [:stats-expand])
        :href  (rfe/href :stats {:lang lang})}
       (i/i lang [:stats])]]
-    [:p.control.level-item
-     [:a.button.is-danger
-      {:title (i/i lang [:github-gitlab-etc])
-       :href  (rfe/href :live {:lang lang})}
-      "Live!"]]
     (when (or (= view :repos) (= view :orgas) (= view :deps))
       [:p.control.level-item
        [:input.input
