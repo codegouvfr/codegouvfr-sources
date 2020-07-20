@@ -1,4 +1,4 @@
-{:version     "0.9.8"
+{:version     "0.9.9"
  :description "Frontend to display public sector source code repositories"
  :url         "https://github.com/etalab/code.etalab.gouv.fr"
  :license     {:name "Eclipse Public License - v 2.0"
@@ -11,7 +11,7 @@
   cljs-ajax                       {:mvn/version "0.8.0"}
   cljs-bean                       {:mvn/version "1.5.0"}
   clojure.java-time               {:mvn/version "0.3.2"}
-  com.bhauman/figwheel-main       {:mvn/version "0.2.9"}
+  com.bhauman/figwheel-main       {:mvn/version "0.2.10"}
   com.bhauman/rebel-readline-cljs {:mvn/version "0.1.4"}
   com.draines/postal              {:mvn/version "2.0.3"}
   com.taoensso/sente              {:mvn/version "1.15.0"}
@@ -20,11 +20,11 @@
   compojure                       {:mvn/version "1.6.1"}
   http-kit                        {:mvn/version "2.3.0"}
   markdown-to-hiccup              {:mvn/version "0.6.2"}
-  metosin/reitit-frontend         {:mvn/version "0.5.4"}
+  metosin/reitit-frontend         {:mvn/version "0.5.5"}
   org.clojure/clojure             {:mvn/version "1.10.1"}
   org.clojure/clojurescript       {:mvn/version "1.10.773"}
   org.clojure/core.async          {:mvn/version "1.2.603"}
-  re-frame                        {:mvn/version "0.12.0"}
+  re-frame                        {:mvn/version "1.0.0"}
   reagent                         {:mvn/version "0.10.0"}
   reagent-utils                   {:mvn/version "0.3.3"}
   ring/ring-core                  {:mvn/version "1.8.1"}
