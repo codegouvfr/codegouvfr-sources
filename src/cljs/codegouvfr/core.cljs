@@ -531,7 +531,7 @@
                      (when dp
                        [:span
                         [:a.has-text-grey
-                         {:title (i/i lang [:deps])
+                         {:title (i/i lang [:Deps])
                           :href  (rfe/href
                                   :repo-deps
                                   {:lang lang
