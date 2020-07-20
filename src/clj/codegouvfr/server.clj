@@ -10,7 +10,7 @@
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
-            ;; [ring.middleware.reload :refer [wrap-reload]]
+            [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
             [compojure.route :refer [not-found resources]]
@@ -393,7 +393,7 @@
              ;; ring.middleware.keyword-params/wrap-keyword-params
              ;; ring.middleware.params/wrap-params
              ;; FIXME: Don't wrap reload in production
-             ;; wrap-reload
+             wrap-reload
              ))
 
 (defn start-tasks! []
@@ -402,19 +402,20 @@
    14400 (fn []
            (timbre/info "Generating license chart")
            (vega-licenses-chart!)))
-  (tt/every! ;; FIXME: why the error when done?
-   36000 (fn []
-           (timbre/info "Start streaming GitHub events")
-           (latest-orgas-events!
-            (latest-updated-orgas (:latest_updated_orgas @profile))))))
+  ;; (tt/every! ;; FIXME: why the error when done?
+  ;;  36000 (fn []
+  ;;          (timbre/info "Start streaming GitHub events")
+  ;;          (latest-orgas-events!
+  ;;           (latest-updated-orgas (:latest_updated_orgas @profile)))))
+  )
 
 (defn -main
   "Start tasks and the HTTP server."
   []
   (reset! profile (profiles :production))
   (server/run-server app {:port config/codegouvfr_port :join? false})
-  (sente/start-chsk-router! ch-chsk event-msg-handler)
-  (start-events-channel!)
+  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
+  ;; (start-events-channel!)
   (start-tasks!)
   (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
 
