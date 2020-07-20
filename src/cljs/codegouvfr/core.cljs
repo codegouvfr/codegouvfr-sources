@@ -76,7 +76,7 @@
     :deps-page      0
     :sort-repos-by  :reused
     :sort-orgas-by  :repos
-    :sort-deps-by   :production
+    :sort-deps-by   :name
     :view           :orgas
     :reverse-sort   false
     :filter         init-filter
@@ -370,10 +370,10 @@
  (fn [db _]
    (let [deps0 (:deps db)
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
-                 :name        (reverse (sort-by :n deps0))
-                 :type        (reverse (sort-by :t deps0))
-                 :production  (sort-by :c deps0)
-                 :development (sort-by :d deps0)
+                 :name        (reverse (sort-by :name deps0))
+                 :type        (reverse (sort-by :type deps0))
+                 :description (sort-by :description deps0)
+                 :repos       (sort-by #(count (:repos %)) deps0)
                  deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -757,7 +757,7 @@
                     :href  (rfe/href
                             :orga-deps
                             {:lang lang
-                             :orga (s/replace o "https://github.com/" "")})}
+                             :orga (s/replace o "https://github.com/" "")})} ;; FIXME
                    (fa "fa-cubes")])
                 (when e [:a.card-footer-item
                          {:title (i/i lang [:contact-by-email])
@@ -917,26 +917,26 @@
         [:th.has-text-right
          [:abbr
           [:a.button
-           {:class    (when (= dep-f :production) "is-light")
-            :on-click #(re-frame/dispatch [:sort-deps-by! :production])}
-           (i/i lang [:core-dep])]]]
+           {:class    (when (= dep-f :description) "is-light")
+            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
+           (i/i lang [:description])]]]
         [:th.has-text-right
          [:abbr
           [:a.button
-           {:class    (when (= dep-f :development) "is-light")
-            :on-click #(re-frame/dispatch [:sort-deps-by! :development])}
-           (i/i lang [:dev-dep])]]]]]
+           {:class    (when (= dep-f :repos) "is-light")
+            :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
+           (i/i lang [:Repos])]]]]]
       (into [:tbody]
             (for [dd (take deps-per-page
                            (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
                                  @(re-frame/subscribe [:deps?])))]
               ^{:key dd}
-              (let [{:keys [t n c d]} dd]
+              (let [{:keys [type name description link repos]} dd]
                 [:tr
-                 [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
-                 [:td t]
-                 [:td.has-text-right c]
-                 [:td.has-text-right d]])))]]))
+                 [:td [:a {:href (rfe/href :deps {:lang lang} {:d (gstring/urlEncode name)})} name]]
+                 [:td type]
+                 [:td.has-text-right description]
+                 [:td.has-text-right (count repos)]])))]]))
 
 (defn deps-dep-page-class [lang d]
   (reagent/create-class
@@ -964,19 +964,23 @@
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
           :title    (i/i lang [:sort-name])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :name])} (i/i lang [:name])]
+          :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
+         (i/i lang [:name])]
         [:a.button.level-item
          {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
           :title    (i/i lang [:sort-type])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :type])} (i/i lang [:type])]
+          :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
+         (i/i lang [:type])]
         [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :production) "info is-light" "light"))
-          :title    (i/i lang [:sort-production])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :production])} (i/i lang [:core-dep])]
+         {:class    (str "is-" (if (= dep-f :description) "info is-light" "light"))
+          :title    (i/i lang [:sort-description])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
+         (i/i lang [:description])]
         [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :development) "info is-light" "light"))
-          :title    (i/i lang [:sort-development])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :development])} (i/i lang [:dev-dep])]
+         {:class    (str "is-" (if (= dep-f :repos) "info is-light" "light"))
+          :title    (i/i lang [:sort-repos])
+          :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
+         (i/i lang [:Repos])]
         [:span.button.is-static.level-item
          (let [deps (count deps)]
            (if (< deps 2)
@@ -1045,15 +1049,15 @@
       [:thead [:tr
                [:th (i/i lang [:type])]
                [:th (i/i lang [:name])]
-               [:th (i/i lang [:number-of-repos])]]]
+               [:th (i/i lang [:description])]]]
       [:tbody
-       (for [{:keys [t n rs] :as o} deps]
+       (for [{:keys [type name description] :as o} deps]
          ^{:key o}
          [:tr
-          [:td t]
+          [:td type]
           [:td [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                    :href  (rfe/href :deps {:lang lang} {:d (gstring/urlEncode n)})} n]]
-          [:td rs]])]]]]])
+                    :href  (rfe/href :deps {:lang lang} {:d (gstring/urlEncode name)})} name]]
+          [:td description]])]]]]])
 
 (defn top-clean-up [top lang param title]
   (let [total (reduce + (map val top))]
