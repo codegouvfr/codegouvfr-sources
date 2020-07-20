@@ -21,20 +21,20 @@
   (when-let [el (.getElementById js/document "sente-csrf-token")]
     (.getAttribute el "data-csrf-token")))
 
-(let [{:keys [chsk ch-recv send-fn state]}
-      (sente/make-channel-socket! "/chsk" ?csrf-token {:type :auto})]
-  (def chsk       chsk)
-  (def ch-chsk    ch-recv)
-  (def chsk-send! send-fn)
-  (def chsk-state state))
+;; (let [{:keys [chsk ch-recv send-fn state]}
+;;       (sente/make-channel-socket! "/chsk" ?csrf-token {:type :auto})]
+;;   (def chsk       chsk)
+;;   (def ch-chsk    ch-recv)
+;;   (def chsk-send! send-fn)
+;;   (def chsk-state state))
 
-(defn event-msg-handler [{:keys [event]}]
-  ;; (.log js/console (pr-str event)) ; FIXME
-  (let [recv (:chsk/recv (apply hash-map event))
-        push (:event/PushEvent (apply hash-map recv))]
-    (when (not-empty (:u push))
-      (println push)
-      (re-frame/dispatch [:levent! push]))))
+;; (defn event-msg-handler [{:keys [event]}]
+;;   ;; (.log js/console (pr-str event)) ; FIXME
+;;   (let [recv (:chsk/recv (apply hash-map event))
+;;         push (:event/PushEvent (apply hash-map recv))]
+;;     (when (not-empty (:u push))
+;;       (println push)
+;;       (re-frame/dispatch [:levent! push]))))
 
 (defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
