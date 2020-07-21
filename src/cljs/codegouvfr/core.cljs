@@ -936,11 +936,13 @@
         (top-clean-up (walk/stringify-keys top_languages)
                       lang "language" (i/i lang [:list-repos-with-language]))
         top_licenses_0
-        (take 10 (top-clean-up (-> top_licenses
-                                   (dissoc :Inconnue)
-                                   (dissoc :Other))
-                               lang "license"
-                               (i/i lang [:list-repos-using-license])))]
+        (take 10 (top-clean-up
+                  (walk/stringify-keys
+                   (-> top_licenses
+                       (dissoc :Inconnue)
+                       (dissoc :Other)))
+                  lang "license"
+                  (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.columns
       (figure (i/i lang [:repos-of-source-code]) nb_repos)
