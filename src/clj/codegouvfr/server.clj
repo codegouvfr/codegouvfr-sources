@@ -20,10 +20,9 @@
             [taoensso.timbre.appenders.core :as appenders]
             [taoensso.timbre.appenders (postal :as postal-appender)]
             [cheshire.core :as json]
-            [clojure.string :as s]
             [org.httpkit.server :as server]
-            [taoensso.sente :as sente]
-            [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
+            ;; [taoensso.sente :as sente]
+            ;; [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
             [clojure.core.async :as async]
             [clj-http.client :as http]
             [tea-time.core :as tt]
@@ -52,19 +51,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sente setup
 
-(let [{:keys [ch-recv send-fn connected-uids
-              ajax-post-fn ajax-get-or-ws-handshake-fn]}
-      (sente/make-channel-socket! (get-sch-adapter) {})]
+;; (let [{:keys [ch-recv send-fn connected-uids
+;;               ajax-post-fn ajax-get-or-ws-handshake-fn]}
+;;       (sente/make-channel-socket! (get-sch-adapter) {})]
 
-  (def ring-ajax-post                ajax-post-fn)
-  (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-  (def ch-chsk                       ch-recv)
-  (def chsk-send!                    send-fn)
-  (def connected-uids                connected-uids))
+;;   (def ring-ajax-post                ajax-post-fn)
+;;   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
+;;   (def ch-chsk                       ch-recv)
+;;   (def chsk-send!                    send-fn)
+;;   (def connected-uids                connected-uids))
 
-(defn event-msg-handler [{:keys [id ?data event]}] ; FIXME: unused id ?data
-  (doseq [uid (:any @connected-uids)]
-    (chsk-send! uid [:event/PushEvent event])))
+;; (defn event-msg-handler [{:keys [id ?data event]}] ; FIXME: unused id ?data
+;;   (doseq [uid (:any @connected-uids)]
+;;     (chsk-send! uid [:event/PushEvent event])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Profiles for interactive development
@@ -98,12 +97,12 @@
 (defn seqs-difference [seq1 seq2]
   (seq (clojure.set/difference (into #{} seq2) (into #{} seq1))))
 
-(defn start-events-channel! []
-  (async/go
-    (loop [e (async/<! events-channel)]
-      (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
-        (event-msg-handler {:event e}))
-      (recur (async/<! events-channel)))))
+;; (defn start-events-channel! []
+;;   (async/go
+;;     (loop [e (async/<! events-channel)]
+;;       (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
+;;         (event-msg-handler {:event e}))
+;;       (recur (async/<! events-channel)))))
 
 (defn sort-events-by-date [diff]
   (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
@@ -148,36 +147,36 @@
 ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
 ;; GitHub orgas with recently updated repos and get the last events
 ;; 240 times for these orgas every 15 seconds.
-(defn latest-orgas-events! [orgas]
-  (http/with-connection-pool
-    {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-    (dotimes [_ (:repeat_in_connection_pool profile)]
-      (let [new-events (atom nil)]
-        ;; Fet new-events for all recently updated orgas
-        (doseq [org orgas]
-          (when-let [events (json/parse-string
-                             (:body
-                              (try (http/get (format gh-org-events org)
-                                             http-get-gh-params)
-                                   (catch Exception e
-                                     (timbre/error "Can't get events for" org e))))
-                             true)]
-            (doseq [{:keys [id actor repo payload created_at org]} ;; FIXME: use id
-                    ;; Only take PushEvents so far
-                    (filter #(= (:type %) "PushEvent") events)
-                    :let
-                    [user (:login actor)
-                     repo-name (:name repo)
-                     nb (:distinct_size payload)
-                     date created_at
-                     org-name (:login org)]]
-              (swap! new-events conj {:u user :r repo-name :n nb
-                                      :d date :o org-name}))))
-        ;; Only update the main events list now, trigger UI updates
-        (send last-orgs-events
-              #(filter-old-events (apply merge %1 %2)) @new-events)
-        ;; Then wait for 15 seconds
-        (Thread/sleep (:repeat_in_connection_pool_sleep @profile))))))
+;; (defn latest-orgas-events! [orgas]
+;;   (http/with-connection-pool
+;;     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
+;;     (dotimes [_ (:repeat_in_connection_pool profile)]
+;;       (let [new-events (atom nil)]
+;;         ;; Fet new-events for all recently updated orgas
+;;         (doseq [org orgas]
+;;           (when-let [events (json/parse-string
+;;                              (:body
+;;                               (try (http/get (format gh-org-events org)
+;;                                              http-get-gh-params)
+;;                                    (catch Exception e
+;;                                      (timbre/error "Can't get events for" org e))))
+;;                              true)]
+;;             (doseq [{:keys [id actor repo payload created_at org]} ;; FIXME: use id
+;;                     ;; Only take PushEvents so far
+;;                     (filter #(= (:type %) "PushEvent") events)
+;;                     :let
+;;                     [user (:login actor)
+;;                      repo-name (:name repo)
+;;                      nb (:distinct_size payload)
+;;                      date created_at
+;;                      org-name (:login org)]]
+;;               (swap! new-events conj {:u user :r repo-name :n nb
+;;                                       :d date :o org-name}))))
+;;         ;; Only update the main events list now, trigger UI updates
+;;         (send last-orgs-events
+;;               #(filter-old-events (apply merge %1 %2)) @new-events)
+;;         ;; Then wait for 15 seconds
+;;         (Thread/sleep (:repeat_in_connection_pool_sleep @profile))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Export licenses data as vega images
@@ -299,24 +298,6 @@
     (json/generate-string (get deps-repos (str [repo orga]))))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
-(defn resource-dep-json
-  "Expose the json resource corresponding to `dep`."
-  [type-dep]
-  (let [type      (last (re-find #"^(.+)::.+" type-dep))
-        name      (last (re-find #"^.+::(.+)" type-dep))
-        repos     (-> (slurp "data/repos.json")
-                      (json/parse-string true))
-        dep-repos (->> (first (filter #(and (= (:type %) type)
-                                            (= (:name %) name))
-                                      deps))
-                       :repos
-                       (into #{}))]
-    (assoc
-     (response/response
-      (json/generate-string
-       (filter #(contains? dep-repos (:r %)) repos)))
-     :headers {"Content-Type" "application/json; charset=utf-8"})))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Setup email sending
 
@@ -349,9 +330,9 @@
   ;; (POST "/chsk" req (ring-ajax-post                req))
   (GET "/orgas" [] (resource-json "data/orgas.json"))
   (GET "/repos" [] (resource-json "data/repos.json"))
+  ;; The next two are for API usage only:
   (GET "/deps/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/:orga/:repo" [orga repo] (resource-repo-json orga repo))
-  (GET "/dep/:dep" [dep] (resource-dep-json dep))
   (GET "/deps-total" [] (resource-json "data/deps-total.json"))
   (GET "/deps-top" [] (resource-json "data/deps-top.json"))
   (GET "/deps" [] (resource-json "data/deps.json"))
