@@ -15,7 +15,8 @@
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
-            [taoensso.sente  :as sente]))
+            ;; [taoensso.sente  :as sente]
+            ))
 
 (def ?csrf-token
   (when-let [el (.getElementById js/document "sente-csrf-token")]
@@ -40,7 +41,7 @@
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
 (defonce deps-per-page 100) ;; FIXME: Make customizable?
 (defonce timeout 100)
-(defonce init-filter {:q nil :g nil :d nil :language nil :license nil})
+(defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
@@ -68,7 +69,6 @@
  (fn [_ _]
    {:repos          nil
     :orgas          nil
-    :dep-repos      nil
     :levent         nil
     :repos-page     0
     :orgas-page     0
@@ -250,6 +250,7 @@
 
 (defn apply-repos-filters [m]
   (let [f   @(re-frame/subscribe [:filter?])
+        dp  (:d f)
         s   (:q f)
         g   (:g f)
         la  (:language f)
@@ -260,7 +261,15 @@
         li  (:is-licensed f)
         h   (:include-html-repos f)]
     (filter
-     #(and (if fk (:f? %) true)
+     #(and (if dp (contains?
+                   (into #{}
+                         (:repos
+                          (first
+                           (filter
+                            (fn [d] (= (:name d) dp))
+                            @(re-frame/subscribe [:deps?])))))
+                   (:r %)) true)
+           (if fk (:f? %) true)
            (if ar (not (:a? %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
@@ -279,7 +288,8 @@
   (let [f @(re-frame/subscribe [:filter?])
         s (:q f)]
     (filter
-     #(and (if s (s-includes? (s/join " " [(:n %) (:t %)]) s)
+     #(and (if s (s-includes?
+                  (s/join " " [(:name %) (:type %) (:description %)]) s)
                true))
      m)))
 
@@ -315,30 +325,6 @@
                                 (merge fs f))))
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
-
-(re-frame/reg-sub
- :dep-repos?
- (fn [db _]
-   (let [repos0 (:dep-repos db)
-         favs   (get-item :favs)
-         repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :name   (reverse (sort-by :n repos0))
-                  :forks  (sort-by :f repos0)
-                  :stars  (sort-by :s repos0)
-                  :issues (sort-by :i repos0)
-                  :reused (sort-by :g repos0)
-                  :favs   (concat (filter #(not-any? #{(:n %)} favs) repos0)
-                                  (filter #(some #{(:n %)} favs) repos0))
-                  :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                          (js/Date. (.parse js/Date (:u %2))))
-                                repos0)
-                  :desc   (sort #(compare (count (:d %1))
-                                          (count (:d %2)))
-                                repos0)
-                  repos0)]
-     (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
-                            repos
-                            (reverse repos))))))
 
 (re-frame/reg-sub
  :repos?
@@ -531,11 +517,7 @@
                        [:span
                         [:a.has-text-grey
                          {:title (i/i lang [:Deps])
-                          :href  (rfe/href
-                                  :repo-deps
-                                  {:lang lang
-                                   :orga o ;; (s/replace o "https://github.com/" "")
-                                   :repo n})}
+                          :href  (rfe/href :deps {:lang lang} {:repo n})}
                          (fa "fa-cubes")]
                         " "]) d]]
                    ;; Update
@@ -648,7 +630,6 @@
                             (async/>! display-filter-chan {:language ev})
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:language ev}))))}]]
-
       [:span.button.is-static.level-item
        (let [rps (count repos)]
          (if (< rps 2)
@@ -753,10 +734,7 @@
                 (when dp
                   [:a.card-footer-item
                    {:title (i/i lang [:Deps])
-                    :href  (rfe/href
-                            :orga-deps
-                            {:lang lang
-                             :orga (str p "::" n)})}
+                    :href  (rfe/href :deps {:lang lang} {:orga l})}
                    (fa "fa-cubes")])
                 (when e [:a.card-footer-item
                          {:title (i/i lang [:contact-by-email])
@@ -772,131 +750,11 @@
                            :href   (str annuaire-prefix an)}
                           (fa "fa-link")])]]])])))]))
 
-(defn deps-dep-page [lang d]
-  (let [rep-f @(re-frame/subscribe [:sort-repos-by?])
-        repos @(re-frame/subscribe [:dep-repos?])
-        q     (:q @(re-frame/subscribe [:filter?]))
-        cnt   (count repos)
-        title (str cnt (if (= cnt 1)
-                         (i/i lang [:repo-depending-on])
-                         (i/i lang [:repos-depending-on]))
-                   (gstring/urlDecode d)
-                   (when q (str (if (= cnt 1)
-                                  (i/i lang [:matching])
-                                  (i/i lang [:matching-s]))
-                                "\"" q "\"")))]
-    [:div
-     [:h2 title]
-     [:br]
-     [:div.table-container
-      [:table.table.is-hoverable.is-fullwidth
-       [:thead
-        [:tr
-         [:th [:abbr
-               [:a {:class    (when-not (= rep-f :favs) "has-text-grey")
-                    :title    (i/i lang [:fav-sort])
-                    :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
-                (fa "fa-star")]]]
-         [:th.has-text-left
-          [:abbr
-           [:a.button {:class    (when (= rep-f :name) "is-light")
-                       :title    (i/i lang [:sort-repos-alpha])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
-            (i/i lang [:orga-repo])]]]
-         [:th.has-text-centered
-          [:abbr
-           [:a.button.is-static {:title (i/i lang [:swh-link])}
-            (i/i lang [:archive])]]]
-         [:th.has-text-left
-          [:abbr
-           [:a.button {:class    (when (= rep-f :desc) "is-light")
-                       :title    (i/i lang [:sort-description-length])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
-            (i/i lang [:description])]]]
-         [:th.has-text-right
-          [:abbr
-           [:a.button {:class    (when (= rep-f :date) "is-light")
-                       :title    (i/i lang [:sort-update-date])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
-            (i/i lang [:update-short])]]]
-         [:th.has-text-right
-          [:abbr
-           [:a.button {:class    (when (= rep-f :forks) "is-light")
-                       :title    (i/i lang [:sort-forks])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
-            (i/i lang [:forks])]]]
-         [:th.has-text-right
-          [:abbr
-           [:a.button {:class    (when (= rep-f :stars) "is-light")
-                       :title    (i/i lang [:sort-stars])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
-            (i/i lang [:stars])]]]
-         [:th.has-text-right
-          [:abbr
-           [:a.button {:class    (when (= rep-f :issues) "is-light")
-                       :title    (i/i lang [:sort-issues])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
-            (i/i lang [:issues])]]]
-         [:th.has-text-right
-          [:abbr
-           [:a.button {:class    (when (= rep-f :reused) "is-light")
-                       :title    (i/i lang [:sort-reused])
-                       :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
-            (i/i lang [:reused])]]]]]
-       (into [:tbody]
-             (for [dd repos]
-               ^{:key dd}
-               (let [{:keys [a? d f i li n o r s u dp g]}
-                     dd
-                     group (subs r 0 (- (count r) (inc (count n))))]
-                 [:tr
-                  ;; Favorite star
-                  [:td [favorite lang n]]
-                  ;; Repo < orga
-                  [:td [:div
-                        [:a {:href   r
-                             :target "new"
-                             :title  (str (i/i lang [:go-to-repo])
-                                          (when li (str (i/i lang [:under-license]) li)))}
-                         n]
-                        " < "
-                        [:a {:href  (rfe/href :repos {:lang lang} {:g group})
-                             :title (i/i lang [:browse-repos-orga])}
-                         o]]]
-                  ;; SWH link
-                  [:td.has-text-centered
-                   [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
-                        :title  (i/i lang [:swh-link])
-                        :target "new"}
-                    [:img {:width "18px" :src "/images/swh-logo.png"}]]]
-                  ;; Description
-                  [:td {:class (when a? "has-text-grey")
-                        :title (when a? (i/i lang [:repo-archived]))}
-                   [:span
-                    (when dp
-                      [:span
-                       [:a.has-text-grey
-                        {:title (i/i lang [:Deps])
-                         :href  (rfe/href
-                                 :repo-deps
-                                 {:lang lang
-                                  :orga o
-                                  :repo n})}
-                        (fa "fa-cubes")]
-                       " "]) d]]
-                  ;; Update
-                  [:td (or (to-locale-date u) "N/A")]
-                  ;; Forks
-                  [:td.has-text-right f]
-                  ;; Stars
-                  [:td.has-text-right s]
-                  ;; Issues
-                  [:td.has-text-right i]
-                  ;; Reused
-                  [:td.has-text-right g]])))]]]))
-
 (defn deps-table [lang]
-  (let [dep-f @(re-frame/subscribe [:sort-deps-by?])]
+  (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
+        dep-f               @(re-frame/subscribe [:sort-deps-by?])
+        deps-page           @(re-frame/subscribe [:deps-page?])
+        deps                @(re-frame/subscribe [:deps?])]
     [:div.table-container
      [:table.table.is-hoverable.is-fullwidth
       [:thead
@@ -925,75 +783,59 @@
            {:class    (when (= dep-f :repos) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
            (i/i lang [:Repos])]]]]]
-      (into [:tbody]
-            (for [dd (take deps-per-page
-                           (drop (* deps-per-page @(re-frame/subscribe [:deps-page?]))
-                                 @(re-frame/subscribe [:deps?])))]
-              ^{:key dd}
-              (let [{:keys [type name description link repos]} dd]
-                [:tr
-                 [:td [:a {:href (rfe/href
-                                  :deps
-                                  {:lang lang}
-                                  {:d (gstring/urlEncode (str type "::" name))})}
-                       name]]
-                 [:td type]
-                 [:td.has-text-right description]
-                 [:td.has-text-right (count repos)]])))]]))
-
-(defn deps-dep-page-class [lang d]
-  (reagent/create-class
-   {:display-name   "deps-dep-page-class"
-    :component-did-mount
-    (fn []
-      (GET (str "/dep/" d)
-           :handler
-           #(re-frame/dispatch
-             [:update-dep-repos! (map (comp bean clj->js) %)])))
-    :reagent-render (fn [] (deps-dep-page lang d))}))
+      (let [fdeps (if-let [s (or repo orga)]
+                    (filter #(s-includes? (s/join " " (:repos %)) s) deps)
+                    deps)]
+        (into [:tbody]
+              (for [dd (take deps-per-page
+                             (drop (* deps-per-page deps-page) fdeps))]
+                ^{:key dd}
+                (let [{:keys [type name description link repos]} dd]
+                  [:tr
+                   [:td [:a {:href link :target "new"} name]]
+                   [:td type]
+                   [:td.has-text-right description]
+                   [:td.has-text-right
+                    [:a {:href (rfe/href :repos {:lang lang} {:d name})}
+                     (count repos)]]]))))]]))
 
 (defn deps-page [lang]
-  (let [flt            @(re-frame/subscribe [:filter?])
-        single-dep     (:d flt)
-        deps           @(re-frame/subscribe [:deps?])
+  (let [deps           @(re-frame/subscribe [:deps?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (zero? deps-pages)
         last-disabled  (= deps-pages (dec count-pages))
         dep-f          @(re-frame/subscribe [:sort-deps-by?])]
     [:div
-     (when-not single-dep
-       [:div.level-left
-        [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
-          :title    (i/i lang [:sort-name])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
-         (i/i lang [:name])]
-        [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
-          :title    (i/i lang [:sort-type])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
-         (i/i lang [:type])]
-        [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :description) "info is-light" "light"))
-          :title    (i/i lang [:sort-description])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
-         (i/i lang [:description])]
-        [:a.button.level-item
-         {:class    (str "is-" (if (= dep-f :repos) "info is-light" "light"))
-          :title    (i/i lang [:sort-repos])
-          :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
-         (i/i lang [:Repos])]
-        [:span.button.is-static.level-item
-         (let [deps (count deps)]
-           (if (< deps 2)
-             (str deps (i/i lang [:dep]))
-             (str deps (i/i lang [:deps]))))]
-        [navigate-pagination :deps first-disabled last-disabled]])
+     [:div.level-left
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :name) "info is-light" "light"))
+        :title    (i/i lang [:sort-name])
+        :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
+       (i/i lang [:name])]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :type) "info is-light" "light"))
+        :title    (i/i lang [:sort-type])
+        :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
+       (i/i lang [:type])]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :description) "info is-light" "light"))
+        :title    (i/i lang [:sort-description])
+        :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
+       (i/i lang [:description])]
+      [:a.button.level-item
+       {:class    (str "is-" (if (= dep-f :repos) "info is-light" "light"))
+        :title    (i/i lang [:sort-repos])
+        :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
+       (i/i lang [:Repos])]
+      [:span.button.is-static.level-item
+       (let [deps (count deps)]
+         (if (< deps 2)
+           (str deps (i/i lang [:dep]))
+           (str deps (i/i lang [:deps]))))]
+      [navigate-pagination :deps first-disabled last-disabled]]
      [:br]
-     (if single-dep
-       [deps-dep-page-class lang single-dep]
-       [deps-table lang])
+     [deps-table lang]
      [:br]]))
 
 (defn repos-page-class [lang license language]
@@ -1052,18 +894,19 @@
       [:thead [:tr
                [:th (i/i lang [:name])]
                [:th (i/i lang [:type])]
-               [:th (i/i lang [:description])]]]
+               [:th (i/i lang [:description])]
+               [:th (i/i lang [:Repos])]]]
       [:tbody
-       (for [{:keys [type name description] :as o} deps]
+       (for [{:keys [name type description link repos] :as o} deps]
          ^{:key o}
          [:tr
-          [:td [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                    :href  (rfe/href :deps
-                                     {:lang lang}
-                                     {:d (gstring/urlEncode
-                                          (str type "::" name))})} name]]
+          [:td [:a {:href link :target "new"} name]]
           [:td type]
-          [:td description]])]]]]])
+          [:td description]
+          [:td
+           [:a {:title (i/i lang [:list-repos-depending-on-dep])
+                :href  (rfe/href :repos {:lang lang} {:d name})}
+            (count repos)]]])]]]]])
 
 (defn top-clean-up [top lang param title]
   (let [total (reduce + (map val top))]
@@ -1177,162 +1020,6 @@
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
-(defn repo-deps-page
-  "Table with repository dependencies."
-  [lang orga repo deps sort-key sort-rev?]
-  (let [rdeps0 (:d deps)
-        rdeps  (sort-by @sort-key rdeps0)
-        rdeps  (if @sort-rev? (reverse rdeps) rdeps)
-        cdeps  (count rdeps)]
-    [:div
-     [:div [:h1 (str cdeps " " (if (< cdeps 2)
-                                 (i/i lang [:dep-of])
-                                 (i/i lang [:deps-of])) " ")
-            [:a {:href (rfe/href :repos {:lang lang} {:q repo})} repo]
-            [:sup
-             [:a.has-text-grey.is-size-6
-              {:href  (str "/" lang "/glossary#dependencies")
-               :title (i/i lang [:go-to-glossary])}
-              (fa "fa-question-circle")]]]]
-     [:br]
-     (if (not-empty rdeps)
-       [:div.table-container
-        [:table.table.is-hoverable.is-fullwidth
-         [:thead
-          [:tr
-           [:th
-            [:a.button
-             {:class    (when (= @sort-key :name) "is-light")
-              :on-click #(do (when (= @sort-key :name)
-                               (reset! sort-rev? (not @sort-rev?)))
-                             (reset! sort-key :name))}
-             (i/i lang [:name])]]
-           [:th
-            [:a.button
-             {:class    (when (= @sort-key :type) "is-light")
-              :on-click #(do (when (= @sort-key :type)
-                               (reset! sort-rev? (not @sort-rev?)))
-                             (reset! sort-key :type))}
-             (i/i lang [:type])]]
-           [:th.has-text-right
-            [:a.button
-             {:class    (when (= @sort-key :description) "is-light")
-              :on-click #(do (when (= @sort-key :description)
-                               (reset! sort-rev? (not @sort-rev?)))
-                             (reset! sort-key :description))}
-             (i/i lang [:description])]]]]
-         (into [:tbody]
-               (for [{:keys [type name description] :as r} rdeps]
-                 ^{:key r}
-                 [:tr
-                  [:td [:a {:href (rfe/href :deps
-                                            {:lang lang}
-                                            {:d (gstring/urlEncode
-                                                 (str type "::" name))})} name]]
-                  [:td type]
-                  [:td.has-text-right description]]))]
-        [:br]]
-       [:div
-        [:p (i/i lang [:deps-not-found])]
-        [:br]])]))
-
-(defn repo-deps-page-class [lang]
-  (let [deps      (reagent/atom nil)
-        params    @(re-frame/subscribe [:path-params?])
-        orga      (:orga params)
-        repo      (:repo params)
-        sort-key  (reagent/atom :c)
-        sort-rev? (reagent/atom false)]
-    (reagent/create-class
-     {:display-name "repo-deps-page-class"
-      :component-did-mount
-      (fn []
-        (GET (str "/deps/" orga "/" repo)
-             :handler #(reset! deps (walk/keywordize-keys %))))
-      :reagent-render
-      (fn [] (repo-deps-page lang orga repo @deps sort-key sort-rev?))})))
-
-(defn orga-deps-page
-  "Table with group/organization dependencies."
-  [lang orga deps sort-key sort-rev?]
-  (let [cdeps (count deps)
-        orga0 (last (re-find #"^(?:GitHub|GitLab)::(.+)" orga))
-        deps  (if (not= (deref sort-key) :repos)
-                (sort-by @sort-key deps)
-                (sort #(compare (count (:repos %1))
-                                (count (:repos %2)))
-                      deps))
-        deps  (if @sort-rev? (reverse deps) deps)]
-    [:div
-     [:div [:h1 (str cdeps " " (if (< cdeps 2)
-                                 (i/i lang [:dep-of])
-                                 (i/i lang [:deps-of])) " ")
-            [:a {:href (rfe/href
-                        :orgas
-                        {:lang lang}
-                        {:q orga0})}
-             orga0]
-            [:sup
-             [:a.has-text-grey.is-size-6
-              {:href  (str "/" lang "/glossary#dependencies")
-               :title (i/i lang [:go-to-glossary])}
-              (fa "fa-question-circle")]]]]
-     [:br]
-     (if (not-empty deps)
-       [:div.table-container
-        [:table.table.is-hoverable.is-fullwidth
-         [:thead
-          [:tr
-           [:th
-            [:a.button
-             {:class    (when (= @sort-key :name) "is-light")
-              :on-click #(do (when (= @sort-key :name)
-                               (reset! sort-rev? (not @sort-rev?)))
-                             (reset! sort-key :name))}
-             (i/i lang [:name])]]
-           [:th
-            [:a.button
-             {:class    (when (= @sort-key :type) "is-light")
-              :on-click #(do (reset! sort-rev? (not @sort-rev?))
-                             (reset! sort-key :type))}
-             (i/i lang [:type])]]
-           [:th.has-text-right
-            [:a.button
-             {:class    (when (= @sort-key :description) "is-light")
-              :on-click #(do (when (= @sort-key :description)
-                               (reset! sort-rev? (not @sort-rev?)))
-                             (reset! sort-key :description))}
-             (i/i lang [:description])]]]]
-         (into [:tbody]
-               (for [{:keys [type name description] :as d} deps]
-                 ^{:key d}
-                 [:tr
-                  [:td [:a {:href (rfe/href
-                                   :deps
-                                   {:lang lang}
-                                   {:d (gstring/urlEncode (str type "::" name))})}
-                        name]]
-                  [:td type]
-                  [:td.has-text-right description]]))]
-        [:br]]
-       [:div
-        [:h2 (i/i lang [:deps-not-found])]
-        [:br]])]))
-
-(defn orga-deps-page-class [lang]
-  (let [deps      (reagent/atom nil)
-        orga      (:orga @(re-frame/subscribe [:path-params?]))
-        sort-key  (reagent/atom :name)
-        sort-rev? (reagent/atom true)]
-    (reagent/create-class
-     {:display-name   "orga-deps-page-class"
-      :component-did-mount
-      (fn []
-        (GET (str "/deps/" orga)
-             :handler
-             #(reset! deps (walk/keywordize-keys %))))
-      :reagent-render (fn [] (orga-deps-page lang orga @deps sort-key sort-rev?))})))
-
 (defn main-menu [q lang view]
   [:div.level
    [:div.level-left
@@ -1375,13 +1062,23 @@
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}]])
     (let [flt @(re-frame/subscribe [:filter?])]
-      (when (seq (:g flt))
-        [:p.control.level-item
-         [:a.button.is-outlined.is-warning
-          {:title (i/i lang [:remove-filter])
-           :href  (rfe/href :repos {:lang lang})}
-          [:span (:g flt)]
-          (fa "fa-times")]]))]])
+      [:div
+       (when-let [ff (or (not-empty (:g flt))
+                         (not-empty (:d flt)))]
+         [:p.control.level-item
+          [:a.button.is-outlined.is-warning
+           {:title (i/i lang [:remove-filter])
+            :href  (rfe/href :repos {:lang lang})}
+           [:span ff]
+           (fa "fa-times")]])
+       (when-let [dd (or (not-empty (:repo flt))
+                         (not-empty (:orga flt)))]
+         [:p.control.level-item
+          [:a.button.is-outlined.is-warning
+           {:title (i/i lang [:remove-filter])
+            :href  (rfe/href :deps {:lang lang})}
+           [:span dd]
+           (fa "fa-times")]])])]])
 
 ;; (defn live []
 ;;   (let [r (reagent/atom 10)]
@@ -1413,20 +1110,16 @@
          (do (set! (.-location js/window) (str "/" lang "/groups")) "")
          (do (set! (.-location js/window) (str "/en/groups")) ""))
        ;; Table to display organizations
-       :orgas     [organizations-page lang]
+       :orgas [organizations-page lang]
        ;; Table to display repositories
-       :repos     [repos-page-class lang license language]
+       :repos [repos-page-class lang license language]
        ;; Table to display statistics
-       :stats     [stats-page-class lang]
+       :stats [stats-page-class lang]
        ;; Table to display all dependencies
-       :deps      [deps-page-class lang]
-       ;; Table to display a repository dependencies
-       :repo-deps [repo-deps-page-class lang]
-       ;; Table to display a group dependencies
-       :orga-deps [orga-deps-page-class lang]
+       :deps  [deps-page-class lang]
        ;; :live      [live lang]
        ;; Fall back on the organizations page
-       :else      (rfe/push-state :orgas {:lang lang}))]))
+       :else  (rfe/push-state :orgas {:lang lang}))]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
@@ -1457,11 +1150,7 @@
     ["/groups" :orgas]
     ;; ["/live" :live]
     ["/stats" :stats]
-    ["/deps"
-     ["/:orga"
-      ["/:repo" :repo-deps]
-      ["" :orga-deps]]
-     ["" :deps]]]])
+    ["/deps" :deps]]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
