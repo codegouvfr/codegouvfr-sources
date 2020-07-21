@@ -10,7 +10,7 @@
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
-            [ring.middleware.reload :refer [wrap-reload]]
+            ;; [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
             [compojure.route :refer [not-found resources]]
@@ -260,49 +260,61 @@
     (io/input-stream f))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
+(defonce deps
+  (-> (try (slurp "data/deps.json")
+           (catch Exception e (timbre/error
+                               (str "No file named data/deps.json"
+                                    (.getMessage e)))))
+      (json/parse-string true)))
+
+(defonce deps-orgas
+  (-> (try (slurp "data/deps-orgas.json")
+           (catch Exception e (timbre/error
+                               (str "No file named data/deps-orgas.json"
+                                    (.getMessage e)))))
+      json/parse-string))
+
+(defonce deps-repos
+  (-> (try (slurp "data/deps-repos.json")
+           (catch Exception e (timbre/error
+                               (str "No file named data/deps-repos.json"
+                                    (.getMessage e)))))
+      json/parse-string))
+
 (defn resource-orga-json
   "Expose [orga].json as a json resource."
-  [orga]
-  (assoc
-   (response/response
-    (try (slurp (str "data/deps/orgas/" (s/lower-case orga) ".json"))
-         (catch Exception e (timbre/error
-                             (str "No file named " orga ".json\n"
-                                  (.getMessage e))))))
-   :headers {"Content-Type" "application/json; charset=utf-8"}))
+  [platform-orga]
+  (when-let [platform (last (re-find #"^(GitHub|GitLab)::*" platform-orga))]
+    (let [orga (last (re-find #"^(?:GitHub|GitLab)::(.+)$" platform-orga))]
+      (assoc
+       (response/response
+        (json/generate-string (get deps-orgas (str [orga platform]))))
+       :headers {"Content-Type" "application/json; charset=utf-8"}))))
 
 (defn resource-repo-json
   "Expose the json resource corresponding to `repo`."
-  [repo]
-  (let [repos-deps (json/parse-string
-                    (try (slurp "data/deps/repos-deps.json")
-                         (catch Exception e
-                           (timbre/error (str "Can't find repos-deps.json\n"
-                                              (.getMessage e)))))
-                    true)
-        deps       (first (filter
-                           #(= (s/lower-case (:n %)) (s/lower-case repo))
-                           repos-deps))]
-    (assoc
-     (response/response
-      (json/generate-string {:g (:g deps) :d (:d deps)}))
-     :headers {"Content-Type" "application/json; charset=utf-8"})))
+  [orga repo]
+  (assoc
+   (response/response
+    (json/generate-string (get deps-repos (str [repo orga]))))
+   :headers {"Content-Type" "application/json; charset=utf-8"}))
 
 (defn resource-dep-json
   "Expose the json resource corresponding to `dep`."
-  [dep]
-  (let [deps-repos (json/parse-string
-                    (try (slurp "data/deps/deps-repos.json")
-                         (catch Exception e
-                           (timbre/error (str "Can't find deps-repos.json\n"
-                                              (.getMessage e)))))
-                    true)
-        dep        (first (filter
-                           #(= (s/lower-case (:n %)) (s/lower-case dep))
-                           deps-repos))]
+  [type-dep]
+  (let [type      (last (re-find #"^(.+)::.+" type-dep))
+        name      (last (re-find #"^.+::(.+)" type-dep))
+        repos     (-> (slurp "data/repos.json")
+                      (json/parse-string true))
+        dep-repos (->> (first (filter #(and (= (:type %) type)
+                                            (= (:name %) name))
+                                      deps))
+                       :repos
+                       (into #{}))]
     (assoc
      (response/response
-      (json/generate-string (:rs dep)))
+      (json/generate-string
+       (filter #(contains? dep-repos (:r %)) repos)))
      :headers {"Content-Type" "application/json; charset=utf-8"})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -333,16 +345,16 @@
 
 (defroutes routes
   (GET "/latest.xml" [] (views/rss))
-  (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
-  (POST "/chsk" req (ring-ajax-post                req))
+  ;; (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
+  ;; (POST "/chsk" req (ring-ajax-post                req))
   (GET "/orgas" [] (resource-json "data/orgas.json"))
   (GET "/repos" [] (resource-json "data/repos.json"))
-  (GET "/deps/orgas/:orga" [orga] (resource-orga-json orga))
-  (GET "/deps/repos/:repo" [repo] (resource-repo-json repo))
-  (GET "/deps/:dep" [dep] (resource-dep-json dep))
-  (GET "/deps-total" [] (resource-json "data/deps/deps-total.json"))
-  (GET "/deps-top" [] (resource-json "data/deps/deps-top.json"))
-  (GET "/deps" [] (resource-json "data/deps/deps.json"))
+  (GET "/deps/:orga" [orga] (resource-orga-json orga))
+  (GET "/deps/:orga/:repo" [orga repo] (resource-repo-json orga repo))
+  (GET "/dep/:dep" [dep] (resource-dep-json dep))
+  (GET "/deps-total" [] (resource-json "data/deps-total.json"))
+  (GET "/deps-top" [] (resource-json "data/deps-top.json"))
+  (GET "/deps" [] (resource-json "data/deps.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
@@ -393,7 +405,7 @@
              ;; ring.middleware.keyword-params/wrap-keyword-params
              ;; ring.middleware.params/wrap-params
              ;; FIXME: Don't wrap reload in production
-             wrap-reload
+             ;; wrap-reload
              ))
 
 (defn start-tasks! []
@@ -418,5 +430,3 @@
   ;; (start-events-channel!)
   (start-tasks!)
   (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
-
-;; (-main)
