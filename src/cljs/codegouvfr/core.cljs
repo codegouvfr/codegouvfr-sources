@@ -793,11 +793,13 @@
                 ^{:key dd}
                 (let [{:keys [type name description link repos]} dd]
                   [:tr
-                   [:td [:a {:href link :target "new"} name]]
+                   [:td [:a {:href  link :target "new"
+                             :title (i/i lang [:more-info])} name]]
                    [:td type]
                    [:td.has-text-right description]
                    [:td.has-text-right
-                    [:a {:href (rfe/href :repos {:lang lang} {:d name})}
+                    [:a {:title (i/i lang [:list-repos-depending-on-dep])
+                         :href  (rfe/href :repos {:lang lang} {:d name})}
                      (count repos)]]]))))]]))
 
 (defn deps-page [lang]
@@ -901,7 +903,8 @@
        (for [{:keys [name type description link repos] :as o} deps]
          ^{:key o}
          [:tr
-          [:td [:a {:href link :target "new"} name]]
+          [:td [:a {:href  link :target "new"
+                    :title (i/i lang [:more-info])} name]]
           [:td type]
           [:td description]
           [:td
