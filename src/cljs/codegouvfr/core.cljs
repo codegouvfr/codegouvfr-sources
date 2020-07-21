@@ -499,10 +499,11 @@
                               :title  (str (i/i lang [:go-to-repo])
                                            (when li (str (i/i lang [:under-license]) li)))}
                           n]
-                         " < "
+                         " ("
                          [:a {:href  (rfe/href :repos {:lang lang} {:g group})
                               :title (i/i lang [:browse-repos-orga])}
-                          o]]]
+                          o]
+                         ")"]]
                    ;; SWH link
                    [:td.has-text-centered
                     [:a {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
