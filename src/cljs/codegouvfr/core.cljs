@@ -75,7 +75,7 @@
     :deps-page      0
     :sort-repos-by  :reused
     :sort-orgas-by  :repos
-    :sort-deps-by   :name
+    :sort-deps-by   :repos
     :view           :orgas
     :reverse-sort   false
     :filter         init-filter
