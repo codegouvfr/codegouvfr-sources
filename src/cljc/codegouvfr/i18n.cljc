@@ -13,6 +13,7 @@
   ;; French translation
   {:fr
    {
+    :more-info                     "Plus d'informations"
     :Dep                           "Dépendance"
     :Deps                          "Dépendances"
     :Repo                          "Dépôt"
@@ -28,7 +29,6 @@
     :contact-baseline              "Un compte d'organisation à signaler ? Un dépôt de code à ouvrir ? Sollicitez-nous !"
     :contact-by-email              "Contacter par email"
     :contact-form                  "Formulaire de contact"
-    :core-dep                      "Production"
     :created-at                    "Créé le "
     :dep                           " dépendance"
     :dep-of                        "dépendance identifiée pour"
@@ -38,12 +38,11 @@
     :deps-of                       "dépendances identifiées pour"
     :deps-stats                    "Nombre de dépendances identifiées"
     :description                   "Description"
-    :dev-dep                       "Développement"
     :distribution-by-platform      "Répartition par plateforme"
     :download                      "Télécharger"
     :email-placeholder             "Par ex. toto@modernisation.gouv.fr"
     :fav-add                       "Ajouter aux favoris"
-    :fav-sort                      "Trier par favoris"                        
+    :fav-sort                      "Trier par favoris"
     :forks                         "Fourches"
     :free-search                   "Recherche libre"
     :github-gitlab-etc             "Sur GitHub ou sur des instances GitLab"
@@ -103,7 +102,6 @@
     :repo-depending-on             " dépôt dépendant de "
     :report-new-source-code        "Signalez-nous vos ouvertures de codes sources"
     :repos                         " dépôts"
-    :repos-depending-on            " dépôts dépendants de "
     :repos-number                  "Nombre de dépôts"
     :repos-of-source-code          "Dépôts de code source"
     :repos-on-swh                  "Dépôts dans Software Heritage"
@@ -157,6 +155,7 @@
    ;; English translation
    :en
    {
+    :more-info                     "More informations"
     :Dep                           "Dependency"
     :Deps                          "Dependencies"
     :Repo                          "Repository"
@@ -172,7 +171,6 @@
     :contact-baseline              "Want to share an organization? A repository? Let us know!"
     :contact-by-email              "Contact by email"
     :contact-form                  "Contact form"
-    :core-dep                      "Core"
     :created-at                    "Created on "
     :dep                           " dependency"
     :dep-of                        "identified dependency for"
@@ -182,12 +180,11 @@
     :deps-of                       "identified dependencies for"
     :deps-stats                    "Number of identified dependencies"
     :description                   "Description"
-    :dev-dep                       "Development"
     :distribution-by-platform      "Distribution per platform"
     :download                      "Download"
     :email-placeholder             "E.g. toto@modernisation.gouv.fr"
     :fav-add                       "Add to favorites"
-    :fav-sort                      "Sort by favorites"                        
+    :fav-sort                      "Sort by favorites"
     :forks                         "Forks"
     :free-search                   "Free search"
     :github-gitlab-etc             "On GitHub or on GitLab instances"
@@ -247,7 +244,6 @@
     :repo-depending-on             " repository depending on "
     :report-new-source-code        "Let us know when you open a source code"
     :repos                         " repositories"
-    :repos-depending-on            " repositories depending on "
     :repos-number                  "Number of repositories"
     :repos-of-source-code          "Source code repositories"
     :repos-on-swh                  "Repositories in Software Heritage"
@@ -297,8 +293,9 @@
    ;; Italian translation
    :it
    {
-    :Dep                           "Dependency"                        ;; TODO
-    :Deps                          "Dependencies"                      ;; TODO
+    :more-info                     "Maggiori informazioni"
+    :Dep                           "Dipendenza"
+    :Deps                          "Dipendenze"
     :Repo                          "Repository"
     :Repos                         "Repositories"
     :about                         "About"
@@ -312,7 +309,6 @@
     :contact-baseline              "Hai un account organizzativo da segnalare? Un repository di codice da aprire? Scrivici!"
     :contact-by-email              "Contatta per email"
     :contact-form                  "Contatti da"
-    :core-dep                      "Core"                              ;; TODO
     :created-at                    "Creato il "
     :dep                           " dependency"                       ;; TODO
     :dep-of                        "identified dependency for"         ;; TODO
@@ -322,12 +318,11 @@
     :deps-of                       "Identified dependencies for "      ;; TODO
     :deps-stats                    "Number of identified dependencies" ;; TODO
     :description                   "Descrizione"
-    :dev-dep                       "Development"                       ;; TODO
     :distribution-by-platform      "Distribuzione per piattaforma"
     :download                      "Scaricare"
     :email-placeholder             "Es toto@modernisation.gouv.fr"
     :fav-add                       "Add to favorites"                  ;; TODO
-    :fav-sort                      "Sort by favorites"                 ;; TODO                 
+    :fav-sort                      "Sort by favorites"                 ;; TODO
     :forks                         "Fork"
     :free-search                   "Ricerca libera"
     :github-gitlab-etc             "Su GitHub o su istanze di GitLab"
@@ -388,7 +383,6 @@
     :repo-depending-on             " repository dipendente da "
     :report-new-source-code        "Facci sapere quando hai rilascito del codice sorgente"
     :repos                         " repositories"
-    :repos-depending-on            " repositories dipendente da "
     :repos-number                  "Numero di repository"
     :repos-of-source-code          "Repository del codice sorgente"
     :repos-on-swh                  "Repository di Software Heritage"
