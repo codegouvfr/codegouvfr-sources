@@ -36,7 +36,6 @@
 ;;       (println push)
 ;;       (re-frame/dispatch [:levent! push]))))
 
-(defonce dev? false)
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
 (defonce deps-per-page 100) ;; FIXME: Make customizable?
@@ -1410,11 +1409,9 @@
      [main-menu q lang view]
      (condp = view
        :home-redirect
-       (if dev?
-         [:p "Testing."]
-         (if (contains? i/supported-languages lang)
-           (do (set! (.-location js/window) (str "/" lang "/groups")) "")
-           (do (set! (.-location js/window) (str "/en/groups")) "")))
+       (if (contains? i/supported-languages lang)
+         (do (set! (.-location js/window) (str "/" lang "/groups")) "")
+         (do (set! (.-location js/window) (str "/en/groups")) ""))
        ;; Table to display organizations
        :orgas     [organizations-page lang]
        ;; Table to display repositories
