@@ -273,7 +273,8 @@
            (if ar (not (:a? %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
-           (if la (= (:l %) la)
+           (if la (= (s/lower-case (or (:l %) ""))
+                     (s/lower-case la))
                (if h true (not (= (:l %) "HTML"))))
            (if h true (not (s-includes? (:l %) "HTML")))
            (if de (seq (:d %)) true)
@@ -751,11 +752,12 @@
                            :href   (str annuaire-prefix an)}
                           (fa "fa-link")])]]])])))]))
 
-(defn deps-table [lang]
+(defn deps-table [lang deps]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
         dep-f               @(re-frame/subscribe [:sort-deps-by?])
         deps-page           @(re-frame/subscribe [:deps-page?])
-        deps                @(re-frame/subscribe [:deps?])]
+        ;; deps                @(re-frame/subscribe [:deps?])
+        ]
     [:div.table-container
      [:table.table.is-hoverable.is-fullwidth
       [:thead
@@ -838,7 +840,7 @@
            (str deps (i/i lang [:deps]))))]
       [navigate-pagination :deps first-disabled last-disabled]]
      [:br]
-     [deps-table lang]
+     [deps-table lang deps]
      [:br]]))
 
 (defn repos-page-class [lang license language]
