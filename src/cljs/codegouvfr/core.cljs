@@ -1066,23 +1066,22 @@
                             (async/>! display-filter-chan {:q ev})
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}]])
-    (let [flt @(re-frame/subscribe [:filter?])]
+    (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
       [:div
-       (when-let [ff (or (not-empty (:g flt))
-                         (not-empty (:d flt)))]
+       (when-let
+           [[ff k t]
+            (cond
+              (not-empty (:g flt))    [(:g flt) :is-danger :repos]
+              (not-empty (:d flt))    [(:d flt) :is-warning :repos]
+              (not-empty (:orga flt)) [(:orga flt) :is-danger :deps]
+              (not-empty (:repo flt)) [(:repo flt) :is-success :deps]
+              :else                   nil)]
          [:p.control.level-item
-          [:a.button.is-outlined.is-warning
-           {:title (i/i lang [:remove-filter])
-            :href  (rfe/href :repos {:lang lang})}
+          [:a.button.is-outlined
+           {:class k
+            :title (i/i lang [:remove-filter])
+            :href  (rfe/href t {:lang lang})}
            [:span ff]
-           (fa "fa-times")]])
-       (when-let [dd (or (not-empty (:repo flt))
-                         (not-empty (:orga flt)))]
-         [:p.control.level-item
-          [:a.button.is-outlined.is-warning
-           {:title (i/i lang [:remove-filter])
-            :href  (rfe/href :deps {:lang lang})}
-           [:span dd]
            (fa "fa-times")]])])]])
 
 ;; (defn live []
