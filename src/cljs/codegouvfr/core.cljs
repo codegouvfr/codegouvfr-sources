@@ -118,6 +118,10 @@
  (fn [db [_ deps]] (assoc db :deps deps)))
 
 (re-frame/reg-event-db
+ :update-deps-raw!
+ (fn [db [_ deps-raw]] (assoc db :deps-raw deps-raw)))
+
+(re-frame/reg-event-db
  :update-dep-repos!
  (fn [db [_ dep-repos]] (assoc db :dep-repos dep-repos)))
 
@@ -248,26 +252,28 @@
   (when (and (string? s) (string? sub))
     (s/includes? (s/lower-case s) (s/lower-case sub))))
 
+(defn- get-first-match-s-for-k-in-m [s k m]
+  (reduce #(when (= (k %2) s) (reduced %2)) nil m))
+
 (defn apply-repos-filters [m]
-  (let [f   @(re-frame/subscribe [:filter?])
-        dp  (:d f)
-        s   (:q f)
-        g   (:g f)
-        la  (:language f)
-        lic (:license f)
-        de  (:has-description f)
-        fk  (:is-fork f)
-        ar  (:is-archive f)
-        li  (:is-licensed f)
-        h   (:include-html-repos f)]
+  (let [f        @(re-frame/subscribe [:filter?])
+        deps-raw @(re-frame/subscribe [:deps-raw?])
+        dp       (:d f)
+        s        (:q f)
+        g        (:g f)
+        la       (:language f)
+        lic      (:license f)
+        de       (:has-description f)
+        fk       (:is-fork f)
+        ar       (:is-archive f)
+        li       (:is-licensed f)
+        h        (:include-html-repos f)]
     (filter
      #(and (if dp (contains?
                    (into #{}
-                         (:r
-                          (first
-                           (filter
-                            (fn [d] (= (:n d) dp))
-                            @(re-frame/subscribe [:deps?])))))
+                         (:r (get-first-match-s-for-k-in-m
+                              dp :n
+                              deps-raw)))
                    (:r %)) true)
            (if fk (:f? %) true)
            (if ar (not (:a? %)) true)
@@ -364,6 +370,10 @@
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
         deps (reverse deps))))))
+
+(re-frame/reg-sub
+ :deps-raw?
+ (fn [db _] (:deps-raw db)))
 
 (re-frame/reg-sub
  :orgas?
@@ -755,9 +765,7 @@
 (defn deps-table [lang deps]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
         dep-f               @(re-frame/subscribe [:sort-deps-by?])
-        deps-page           @(re-frame/subscribe [:deps-page?])
-        ;; deps                @(re-frame/subscribe [:deps?])
-        ]
+        deps-page           @(re-frame/subscribe [:deps-page?])]
     [:div.table-container
      [:table.table.is-hoverable.is-fullwidth
       [:thead
@@ -1128,8 +1136,15 @@
       (fn []
         (GET "/deps"
              :handler
-             #(re-frame/dispatch
-               [:update-deps! (map (comp bean clj->js) %)]))
+             #(do
+                (re-frame/dispatch
+                 [:update-deps! (map (comp bean clj->js) %)])
+                (re-frame/dispatch
+                 [:update-deps-raw!
+                  (map (comp bean
+                             clj->js
+                             (fn [e] (dissoc e :d :l)))
+                       %)])))
         (GET "/orgas"
              :handler
              #(re-frame/dispatch
