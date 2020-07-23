@@ -362,10 +362,10 @@
  (fn [db _]
    (let [deps0 (:deps db)
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
-                 :name        (reverse (sort-by :name deps0))
-                 :type        (reverse (sort-by :type deps0))
-                 :description (sort-by :description deps0)
-                 :repos       (sort-by #(count (:repos %)) deps0)
+                 :name        (reverse (sort-by :n deps0))
+                 :type        (reverse (sort-by :t deps0))
+                 :description (sort-by :d deps0)
+                 :repos       (sort-by #(count (:r %)) deps0)
                  deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
