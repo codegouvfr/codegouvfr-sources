@@ -259,13 +259,6 @@
     (io/input-stream f))
    :headers {"Content-Type" "application/json; charset=utf-8"}))
 
-(defonce deps
-  (-> (try (slurp "data/deps.json")
-           (catch Exception e (timbre/error
-                               (str "No file named data/deps.json"
-                                    (.getMessage e)))))
-      (json/parse-string true)))
-
 (defonce deps-orgas
   (-> (try (slurp "data/deps-orgas.json")
            (catch Exception e (timbre/error
