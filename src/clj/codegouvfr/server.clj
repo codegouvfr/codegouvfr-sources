@@ -246,7 +246,7 @@
 (defn vega-licenses-chart! []
   (sh/sh "vl2svg"
          (temp-json-file (set-licenses-vega-data "en"))
-         "./images/top_licenses.svg"))
+         "./resources/public/images/charts/top_licenses.svg"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
