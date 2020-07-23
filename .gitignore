@@ -18,6 +18,7 @@ pom.xml
 data/*json
 data/deps/*json
 data/deps/orgas/*json
+images/*
 .eastwood
 todo.org
 .cpcache/
