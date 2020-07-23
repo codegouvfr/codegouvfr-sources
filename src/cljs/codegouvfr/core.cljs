@@ -69,7 +69,7 @@
  (fn [_ _]
    {:repos          nil
     :orgas          nil
-    :levent         nil
+    ;; :levent         nil
     :repos-page     0
     :orgas-page     0
     :deps-page      0
@@ -97,13 +97,13 @@
  :lang?
  (fn [db _] (:lang db)))
 
-(re-frame/reg-sub
- :levent?
- (fn [db _] (:levent db)))
+;; (re-frame/reg-sub
+;;  :levent?
+;;  (fn [db _] (:levent db)))
 
-(re-frame/reg-event-db
- :levent!
- (fn [db [_ le]] (update-in db [:levent] conj le)))
+;; (re-frame/reg-event-db
+;;  :levent!
+;;  (fn [db [_ le]] (update-in db [:levent] conj le)))
 
 (re-frame/reg-sub
  :path-params?
