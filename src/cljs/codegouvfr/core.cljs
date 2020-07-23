@@ -263,10 +263,10 @@
     (filter
      #(and (if dp (contains?
                    (into #{}
-                         (:repos
+                         (:r
                           (first
                            (filter
-                            (fn [d] (= (:name d) dp))
+                            (fn [d] (= (:n d) dp))
                             @(re-frame/subscribe [:deps?])))))
                    (:r %)) true)
            (if fk (:f? %) true)
@@ -290,7 +290,7 @@
         s (:q f)]
     (filter
      #(and (if s (s-includes?
-                  (s/join " " [(:name %) (:type %) (:description %)]) s)
+                  (s/join " " [(:n %) (:t %) (:d %)]) s)
                true))
      m)))
 
@@ -787,22 +787,22 @@
             :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
            (i/i lang [:Repos])]]]]]
       (let [fdeps (if-let [s (or repo orga)]
-                    (filter #(s-includes? (s/join " " (:repos %)) s) deps)
+                    (filter #(s-includes? (s/join " " (:r %)) s) deps)
                     deps)]
         (into [:tbody]
               (for [dd (take deps-per-page
                              (drop (* deps-per-page deps-page) fdeps))]
                 ^{:key dd}
-                (let [{:keys [type name description link repos]} dd]
+                (let [{:keys [t n d l r]} dd]
                   [:tr
-                   [:td [:a {:href  link :target "new"
-                             :title (i/i lang [:more-info])} name]]
-                   [:td type]
-                   [:td.has-text-right description]
+                   [:td [:a {:href  l :target "new"
+                             :title (i/i lang [:more-info])} n]]
+                   [:td t]
+                   [:td.has-text-right d]
                    [:td.has-text-right
                     [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                         :href  (rfe/href :repos {:lang lang} {:d name})}
-                     (count repos)]]]))))]]))
+                         :href  (rfe/href :repos {:lang lang} {:d n})}
+                     (count r)]]]))))]]))
 
 (defn deps-page [lang]
   (let [deps           @(re-frame/subscribe [:deps?])
@@ -902,17 +902,17 @@
                [:th (i/i lang [:description])]
                [:th (i/i lang [:Repos])]]]
       [:tbody
-       (for [{:keys [name type description link repos] :as o} deps]
+       (for [{:keys [n t d l r] :as o} deps]
          ^{:key o}
          [:tr
-          [:td [:a {:href  link :target "new"
-                    :title (i/i lang [:more-info])} name]]
-          [:td type]
-          [:td description]
+          [:td [:a {:href  l :target "new"
+                    :title (i/i lang [:more-info])} n]]
+          [:td t]
+          [:td d]
           [:td
            [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                :href  (rfe/href :repos {:lang lang} {:d name})}
-            (count repos)]]])]]]]])
+                :href  (rfe/href :repos {:lang lang} {:d n})}
+            (count r)]]])]]]]])
 
 (defn top-clean-up [top lang param title]
   (let [total (reduce + (map val top))]
