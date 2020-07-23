@@ -854,17 +854,6 @@
              [:update-repos! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (repos-page lang license language))}))
 
-(defn deps-page-class [lang]
-  (reagent/create-class
-   {:display-name   "deps-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/deps"
-           :handler
-           #(re-frame/dispatch
-             [:update-deps! (map (comp bean clj->js) %)])))
-    :reagent-render (fn [] (deps-page lang))}))
-
 (defn figure [heading title]
   [:div.column
    [:div.has-text-centered
@@ -1124,7 +1113,7 @@
        ;; Table to display statistics
        :stats [stats-page-class lang]
        ;; Table to display all dependencies
-       :deps  [deps-page-class lang]
+       :deps  [deps-page lang]
        ;; :live      [live lang]
        ;; Fall back on the organizations page
        :else  (rfe/push-state :orgas {:lang lang}))]))
@@ -1137,6 +1126,10 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
+        (GET "/deps"
+             :handler
+             #(re-frame/dispatch
+               [:update-deps! (map (comp bean clj->js) %)]))
         (GET "/orgas"
              :handler
              #(re-frame/dispatch
