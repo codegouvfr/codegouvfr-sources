@@ -1143,7 +1143,7 @@
                  [:update-deps-raw!
                   (map (comp bean
                              clj->js
-                             (fn [e] (dissoc e :d :l)))
+                             (fn [e] (dissoc e :t :d :l :r)))
                        %)])))
         (GET "/orgas"
              :handler
