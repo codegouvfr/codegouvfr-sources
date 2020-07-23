@@ -763,9 +763,8 @@
                           (fa "fa-link")])]]])])))]))
 
 (defn deps-table [lang deps]
-  (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
-        dep-f               @(re-frame/subscribe [:sort-deps-by?])
-        deps-page           @(re-frame/subscribe [:deps-page?])]
+  (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
+        deps-page @(re-frame/subscribe [:deps-page?])]
     [:div.table-container
      [:table.table.is-hoverable.is-fullwidth
       [:thead
@@ -794,31 +793,32 @@
            {:class    (when (= dep-f :repos) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
            (i/i lang [:Repos])]]]]]
-      (let [fdeps (if-let [s (or repo orga)]
-                    (filter #(s-includes? (s/join " " (:r %)) s) deps)
-                    deps)]
-        (into [:tbody]
-              (for [dd (take deps-per-page
-                             (drop (* deps-per-page deps-page) fdeps))]
-                ^{:key dd}
-                (let [{:keys [t n d l r]} dd]
-                  [:tr
-                   [:td [:a {:href  l :target "new"
-                             :title (i/i lang [:more-info])} n]]
-                   [:td t]
-                   [:td.has-text-right d]
-                   [:td.has-text-right
-                    [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                         :href  (rfe/href :repos {:lang lang} {:d n})}
-                     (count r)]]]))))]]))
+      (into [:tbody]
+            (for [dd (take deps-per-page
+                           (drop (* deps-per-page deps-page) deps))]
+              ^{:key dd}
+              (let [{:keys [t n d l r]} dd]
+                [:tr
+                 [:td [:a {:href  l :target "new"
+                           :title (i/i lang [:more-info])} n]]
+                 [:td t]
+                 [:td.has-text-right d]
+                 [:td.has-text-right
+                  [:a {:title (i/i lang [:list-repos-depending-on-dep])
+                       :href  (rfe/href :repos {:lang lang} {:d n})}
+                   (count r)]]])))]]))
 
 (defn deps-page [lang]
-  (let [deps           @(re-frame/subscribe [:deps?])
-        deps-pages     @(re-frame/subscribe [:deps-page?])
-        count-pages    (count (partition-all deps-per-page deps))
-        first-disabled (zero? deps-pages)
-        last-disabled  (= deps-pages (dec count-pages))
-        dep-f          @(re-frame/subscribe [:sort-deps-by?])]
+  (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
+        deps0               @(re-frame/subscribe [:deps?])
+        deps                (if-let [s (or repo orga)]
+                              (filter #(s-includes? (s/join " " (:r %)) s) deps0)
+                              deps0)
+        deps-pages          @(re-frame/subscribe [:deps-page?])
+        count-pages         (count (partition-all deps-per-page deps))
+        first-disabled      (zero? deps-pages)
+        last-disabled       (= deps-pages (dec count-pages))
+        dep-f               @(re-frame/subscribe [:sort-deps-by?])]
     [:div
      [:div.level-left
       [:a.button.level-item
