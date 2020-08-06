@@ -544,7 +544,10 @@
                    ;; Issues
                    [:td.has-text-right i]
                    ;; Reused
-                   [:td.has-text-right g]])))]])))
+                   [:td.has-text-right
+                    [:a {:title (i/i lang [:reuses-expand])
+                         :href  (str r "/network/dependents")}
+                     g]]])))]])))
 
 (defn navigate-pagination [type first-disabled last-disabled]
   [:nav.level-item {:role "navigation" :aria-label "pagination"}
