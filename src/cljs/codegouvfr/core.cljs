@@ -1096,7 +1096,7 @@
        (when-let [ff (not-empty (:orga flt))]
          (close-filter-button lang ff  :is-danger :deps (merge flt {:orga nil})))
        (when-let [ff (not-empty (:repo flt))]
-         (close-filter-button lang ff :is-success :deps (merge flt {:repos nil})))])]])
+         (close-filter-button lang ff :is-success :deps (merge flt {:repo nil})))])]])
 
 ;; (defn live []
 ;;   (let [r (reagent/atom 10)]
