@@ -84,6 +84,7 @@
     :name                          "Nom"
     :no-archived-repos             "Ne pas inclure les dépôts archivés"
     :no-archives                   " Sauf archives"
+    :no-dep-found                  "Pas de dépendance trouvée : une autre idée de requête ?"
     :no-orga-found                 "Pas d'organisation ou de groupe trouvé : une autre idée de requête ?"
     :no-repo-found                 "Pas de dépôt trouvé : une autre idée de requête ?"
     :number-of-repos               "Nombre de dépôts"
@@ -226,8 +227,9 @@
     :name                          "Name"
     :no-archived-repos             "Do not include archived repositories"
     :no-archives                   " Hide archives"
+    :no-dep-found                  "No dependency found: would you like to make a new request?"
     :no-orga-found                 "Organization or group not found: would you like to make a new request?"
-    :no-repo-found                 "Repository not found : would you like to make a new request?"
+    :no-repo-found                 "Repository not found: would you like to make a new request?"
     :number-of-repos               "Number of repositories"
     :one-group                     " group"
     :only-forked-repos             "Forked repositories only"
@@ -364,6 +366,7 @@
     :name                          "Name"                              ;; TODO
     :no-archived-repos             "Non includere i repository archiviati"
     :no-archives                   " Rimuovi archivi"
+    :no-dep-found                  "Nessuna dipendenza trovata: volete fare una nuova richiesta?"
     :no-orga-found                 "Nessuna organizzazione o gruppo trovato: vuoi provare con un'altra richiesta?"
     :no-repo-found                 "Repository non trovato: vuoi provre a fare una nuova ricerca?"
     :number-of-repos               "Number of repositories"            ;; TODO

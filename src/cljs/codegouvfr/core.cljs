@@ -853,7 +853,9 @@
                (cond repo (str (i/i lang [:for-repo]) repo)
                      orga (str (i/i lang [:for-orga]) orga)))]
      [:br]
-     [deps-table lang deps repo orga]
+     (if (pos? (count deps))
+       [deps-table lang deps repo orga]
+       [:p (i/i lang [:no-dep-found])])
      [:br]]))
 
 (defn repos-page-class [lang license language]
