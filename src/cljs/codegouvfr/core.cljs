@@ -358,12 +358,17 @@
 (re-frame/reg-sub
  :deps?
  (fn [db _]
-   (let [deps0 (:deps db)
+   (let [orga  (:orga @(re-frame/subscribe [:filter?]))
+         deps0 (:deps db)
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
                  :name        (reverse (sort-by :n deps0))
                  :type        (reverse (sort-by :t deps0))
                  :description (sort-by :d deps0)
-                 :repos       (sort-by #(count (:r %)) deps0)
+                 :repos       (sort-by
+                               #(if orga
+                                  (count (filter (fn [a] (re-find (re-pattern orga) a)) (:r %)))
+                                  (count (:r %)))
+                               deps0)
                  deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -753,7 +758,7 @@
                            :href   (str annuaire-prefix an)}
                           (fa "fa-link")])]]])])))]))
 
-(defn deps-table [lang deps]
+(defn deps-table [lang deps repo orga]
   (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
         deps-page @(re-frame/subscribe [:deps-page?])]
     [:div.table-container
@@ -778,26 +783,31 @@
            {:class    (when (= dep-f :description) "is-light")
             :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
            (i/i lang [:description])]]]
-        [:th.has-text-right
-         [:abbr
-          [:a.button
-           {:class    (when (= dep-f :repos) "is-light")
-            :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
-           (i/i lang [:Repos])]]]]]
-      (into [:tbody]
-            (for [dd (take deps-per-page
-                           (drop (* deps-per-page deps-page) deps))]
-              ^{:key dd}
-              (let [{:keys [t n d l r]} dd]
-                [:tr
-                 [:td [:a {:href  l :target "new"
-                           :title (i/i lang [:more-info])} n]]
-                 [:td t]
-                 [:td.has-text-right d]
-                 [:td.has-text-right
-                  [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                       :href  (rfe/href :repos {:lang lang} {:d n})}
-                   (count r)]]])))]]))
+        (when-not repo
+          [:th.has-text-right
+           [:abbr
+            [:a.button
+             {:class    (when (= dep-f :repos) "is-light")
+              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
+             (i/i lang [:Repos])]]])]]
+      (into
+       [:tbody]
+       (for [dd (take deps-per-page
+                      (drop (* deps-per-page deps-page) deps))]
+         ^{:key dd}
+         (let [{:keys [t n d l r]} dd]
+           [:tr
+            [:td [:a {:href  l :target "new"
+                      :title (i/i lang [:more-info])} n]]
+            [:td t]
+            [:td.has-text-right d]
+            (when-not repo
+              [:td.has-text-right
+               [:a {:title (i/i lang [:list-repos-depending-on-dep])
+                    :href  (rfe/href :repos {:lang lang} {:d n})}
+                (if-not orga
+                  (count r)
+                  (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
 
 (defn deps-page [lang]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
@@ -839,7 +849,11 @@
            (str deps (i/i lang [:deps]))))]
       [navigate-pagination :deps first-disabled last-disabled]]
      [:br]
-     [deps-table lang deps]
+     [:h2 (str (i/i lang [:Deps])
+               (cond repo (str (i/i lang [:for-repo]) repo)
+                     orga (str (i/i lang [:for-orga]) orga)))]
+     [:br]
+     [deps-table lang deps repo orga]
      [:br]]))
 
 (defn repos-page-class [lang license language]
