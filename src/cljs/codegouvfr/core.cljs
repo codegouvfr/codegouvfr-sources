@@ -808,7 +808,8 @@
             (when-not repo
               [:td.has-text-right
                [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                    :href  (rfe/href :repos {:lang lang} {:d n})}
+                    :href  (rfe/href :repos {:lang lang}
+                                     (if orga {:d n :g orga} {:d n}))}
                 (if-not orga
                   (count r)
                   (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
