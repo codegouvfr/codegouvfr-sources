@@ -303,11 +303,9 @@
 (defn apply-orgas-filters [m]
   (let [f  @(re-frame/subscribe [:filter?])
         s  (:q f)
-        de (:has-description f)
-        re (:has-at-least-one-repo f)]
+        de (:has-description f)]
     (filter
      #(and (if de (seq (:d %)) true)
-           (if re (pos? (:r %)) true)
            (if s (s-includes?
                   (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
                   s)
@@ -665,13 +663,6 @@
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div
      [:div.level-left
-      [:label.checkbox.level-item {:title (i/i lang [:only-orga-with-code])}
-       [:input {:type      "checkbox"
-                :checked   (get-item :has-at-least-one-repo)
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :has-at-least-one-repo v)
-                              (re-frame/dispatch [:filter! {:has-at-least-one-repo v}]))}]
-       (i/i lang [:with-code])]
       [:a.button.level-item
        {:class    (str "is-" (if (= org-f :name) "info is-light" "light"))
         :title    (i/i lang [:sort-orgas-alpha])
