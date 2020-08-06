@@ -15,6 +15,7 @@ figwheel_server.log
 *txt
 .lsp/*
 data/*json
+data/*svg
 data/deps/*json
 data/deps/orgas/*json
 images/*
