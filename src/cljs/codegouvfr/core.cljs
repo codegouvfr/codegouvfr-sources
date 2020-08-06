@@ -1037,6 +1037,15 @@
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
+(defn close-filter-button [lang ff k t reinit]
+  [:p.control.level-item
+   [:a.button.is-outlined
+    {:class k
+     :title (i/i lang [:remove-filter])
+     :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
+    [:span ff]
+    (fa "fa-times")]])
+
 (defn main-menu [q lang view]
   [:div.level
    [:div.level-left
@@ -1079,22 +1088,15 @@
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}]])
     (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
-      [:div
-       (when-let
-           [[ff k t]
-            (cond
-              (not-empty (:g flt))    [(:g flt) :is-danger :repos]
-              (not-empty (:d flt))    [(:d flt) :is-warning :repos]
-              (not-empty (:orga flt)) [(:orga flt) :is-danger :deps]
-              (not-empty (:repo flt)) [(:repo flt) :is-success :deps]
-              :else                   nil)]
-         [:p.control.level-item
-          [:a.button.is-outlined
-           {:class k
-            :title (i/i lang [:remove-filter])
-            :href  (rfe/href t {:lang lang})}
-           [:span ff]
-           (fa "fa-times")]])])]])
+      [:div.level
+       (when-let [ff (not-empty (:g flt))]
+         (close-filter-button lang ff :is-danger :repos (merge flt {:g nil})))
+       (when-let [ff (not-empty (:d flt))]
+         (close-filter-button lang ff :is-warning :repos (merge flt {:d nil})))
+       (when-let [ff (not-empty (:orga flt))]
+         (close-filter-button lang ff  :is-danger :deps (merge flt {:orga nil})))
+       (when-let [ff (not-empty (:repo flt))]
+         (close-filter-button lang ff :is-success :deps (merge flt {:repos nil})))])]])
 
 ;; (defn live []
 ;;   (let [r (reagent/atom 10)]
