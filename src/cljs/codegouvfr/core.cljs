@@ -869,9 +869,15 @@
            (str deps (i/i lang [:deps]))))]
       [navigate-pagination :deps first-disabled last-disabled]]
      [:br]
-     [:h2 (str (i/i lang [:Deps])
-               (cond repo (str (i/i lang [:for-repo]) repo)
-                     orga (str (i/i lang [:for-orga]) orga)))]
+     [:h2
+      [:span (i/i lang [:Deps])
+       [:sup
+        [:a.has-text-grey.is-size-7
+         {:href  (str "/" lang "/glossary#dependencies")
+          :title (i/i lang [:go-to-glossary])}
+         (fa "fa-question-circle")]]
+       (cond repo (str (i/i lang [:for-repo]) repo)
+             orga (str (i/i lang [:for-orga]) orga))]]
      [:br]
      (if (pos? (count deps))
        [deps-table lang deps repo orga]
