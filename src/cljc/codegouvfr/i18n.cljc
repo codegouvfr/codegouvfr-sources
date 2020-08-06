@@ -13,7 +13,6 @@
   ;; French translation
   {:fr
    {
-    :more-info                     "Plus d'informations"
     :Dep                           "Dépendance"
     :Deps                          "Dépendances"
     :Repo                          "Dépôt"
@@ -43,6 +42,8 @@
     :email-placeholder             "Par ex. toto@modernisation.gouv.fr"
     :fav-add                       "Ajouter aux favoris"
     :fav-sort                      "Trier par favoris"
+    :for-orga                      " pour l'organisation "
+    :for-repo                      " pour le dépôt "
     :forks                         "Fourches"
     :free-search                   "Recherche libre"
     :github-gitlab-etc             "Sur GitHub ou sur des instances GitLab"
@@ -76,6 +77,7 @@
     :message-placeholder           "Votre message"
     :message-received              "Message reçu !"
     :message-received-ok           "Nous nous efforçons de répondre au plus vite."
+    :more-info                     "Plus d'informations"
     :most-used-identified-licenses "Licences identifiées les plus utilisées"
     :most-used-languages           "Les 10 languages les plus utilisés"
     :most-used-licenses            "Licences les plus utilisées"
@@ -153,7 +155,6 @@
    ;; English translation
    :en
    {
-    :more-info                     "More informations"
     :Dep                           "Dependency"
     :Deps                          "Dependencies"
     :Repo                          "Repository"
@@ -183,6 +184,8 @@
     :email-placeholder             "E.g. toto@modernisation.gouv.fr"
     :fav-add                       "Add to favorites"
     :fav-sort                      "Sort by favorites"
+    :for-orga                      " for organization "
+    :for-repo                      " for repository "
     :forks                         "Forks"
     :free-search                   "Free search"
     :github-gitlab-etc             "On GitHub or on GitLab instances"
@@ -216,6 +219,7 @@
     :message-placeholder           "Your message"
     :message-received              "Message received!"
     :message-received-ok           "We will do our best to reply as soon as possible."
+    :more-info                     "More informations"
     :most-used-identified-licenses "Most used identified licenses"
     :most-used-languages           "Top 10 most used languages"
     :most-used-licenses            "Most used licenses"
@@ -289,7 +293,6 @@
    ;; Italian translation
    :it
    {
-    :more-info                     "Maggiori informazioni"
     :Dep                           "Dipendenza"
     :Deps                          "Dipendenze"
     :Repo                          "Repository"
@@ -319,6 +322,8 @@
     :email-placeholder             "Es toto@modernisation.gouv.fr"
     :fav-add                       "Add to favorites"                  ;; TODO
     :fav-sort                      "Sort by favorites"                 ;; TODO
+    :for-orga                      " per l'organizzazione "
+    :for-repo                      " per il repository "
     :forks                         "Fork"
     :free-search                   "Ricerca libera"
     :github-gitlab-etc             "Su GitHub o su istanze di GitLab"
@@ -352,6 +357,7 @@
     :message-placeholder           "Il tuo messaggio"
     :message-received              "Messaggio ricevuto!"
     :message-received-ok           "Faremo del nostro meglio per rispondere il prima possibile."
+    :more-info                     "Maggiori informazioni"
     :most-used-identified-licenses "Licenze identificate più utilizzate"
     :most-used-languages           "Le 10 lingue più utilizzate"
     :most-used-licenses            "Licenze più utilizzate"
