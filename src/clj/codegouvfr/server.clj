@@ -10,6 +10,9 @@
             [codegouvfr.config :as config]
             [codegouvfr.views :as views]
             [codegouvfr.i18n :as i]
+            [ring.middleware.file :refer [wrap-file]]
+            [ring.middleware.content-type :refer [wrap-content-type]]
+            [ring.middleware.not-modified :refer [wrap-not-modified]]
             ;; [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
@@ -246,7 +249,7 @@
 (defn vega-licenses-chart! []
   (sh/sh "vl2svg"
          (temp-json-file (set-licenses-vega-data "en"))
-         "./resources/public/images/charts/top_licenses.svg"))
+         "data/top_licenses.svg"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
@@ -321,14 +324,9 @@
   (GET "/latest.xml" [] (views/rss))
   ;; (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
   ;; (POST "/chsk" req (ring-ajax-post                req))
-  (GET "/orgas" [] (resource-json "data/orgas.json"))
-  (GET "/repos" [] (resource-json "data/repos.json"))
   ;; The next two are for API usage only:
   (GET "/deps/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/:orga/:repo" [orga repo] (resource-repo-json orga repo))
-  (GET "/deps-total" [] (resource-json "data/deps-total.json"))
-  (GET "/deps-top" [] (resource-json "data/deps-top.json"))
-  (GET "/deps" [] (resource-json "data/deps.json"))
 
   (GET "/en/about" [] (views/en-about "en"))
   (GET "/en/contact" [] (views/contact "en"))
@@ -379,6 +377,9 @@
              ;; ring.middleware.keyword-params/wrap-keyword-params
              ;; ring.middleware.params/wrap-params
              ;; FIXME: Don't wrap reload in production
+             (wrap-file "data/")
+             wrap-content-type
+             wrap-not-modified
              ;; wrap-reload
              ))
 

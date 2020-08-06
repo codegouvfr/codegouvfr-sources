@@ -868,7 +868,7 @@
    {:display-name   "repos-page-class"
     :component-did-mount
     (fn []
-      (GET "/repos"
+      (GET "/repos.json"
            :handler
            #(re-frame/dispatch
              [:update-repos! (map (comp bean clj->js) %)])))
@@ -981,7 +981,7 @@
                      (fa "fa-question-circle")]]]
                   top_licenses_0
                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])
-      [:div.column [:img {:src "/images/charts/top_licenses.svg"}]]]
+      [:div.column [:img {:src "/top_licenses.svg"}]]]
      [:div.columns
       (stats-card [:span
                    (i/i lang [:orgas-or-groups])
@@ -1029,9 +1029,9 @@
      {:display-name   "stats-page-class"
       :component-did-mount
       (fn []
-        (GET "/deps-total"
+        (GET "/deps-total.json"
              :handler #(reset! deps-total (walk/keywordize-keys %)))
-        (GET "/deps-top"
+        (GET "/deps-top.json"
              :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
         (GET stats-url
              :handler #(reset! stats (walk/keywordize-keys %))))
@@ -1147,7 +1147,7 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
-        (GET "/deps"
+        (GET "/deps.json"
              :handler
              #(do
                 (re-frame/dispatch
@@ -1158,7 +1158,7 @@
                              clj->js
                              (fn [e] (dissoc e :t :d :l :r)))
                        %)])))
-        (GET "/orgas"
+        (GET "/orgas.json"
              :handler
              #(re-frame/dispatch
                [:update-orgas! (map (comp bean clj->js) %)])))
