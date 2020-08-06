@@ -118,7 +118,7 @@
                 :alt    "Logo Marianne"
                 :width  "120"
                 :height "100"}
-          "code.etalab.gouv.fr (alpha)"]]]
+          "code.etalab.gouv.fr (beta)"]]]
        [:div.navbar-menu
         [:div.navbar-end
          [:a.navbar-item
@@ -130,7 +130,7 @@
          [:a.navbar-item {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?])}
           (i/i lang [:about])]
          [:a.navbar-item {:href  "https://www.etalab.gouv.fr"
-              :title (i/i lang [:main-etalab-website])} "Etalab"]
+                          :title (i/i lang [:main-etalab-website])} "Etalab"]
          [:a.navbar-item.button
           {:href  "/latest.xml" :target "new"
            :title (i/i lang [:subscribe-rss-flux])}
@@ -198,7 +198,7 @@
    (i/i lang [:message-received])
    (i/i lang [:message-received-ok])
    [:div.has-text-centered
-    [:a.button.is-large.is-primary {:href  (str "/" lang "/repos")}
+    [:a.button.is-large.is-primary {:href (str "/" lang "/repos")}
      (i/i lang [:back-to-repos])]]))
 
 (defn fr-about [lang]
