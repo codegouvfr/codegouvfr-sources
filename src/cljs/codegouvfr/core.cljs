@@ -263,6 +263,7 @@
         g        (:g f)
         la       (:language f)
         lic      (:license f)
+        e        (:is-esr f)
         de       (:has-description f)
         fk       (:is-fork f)
         ar       (:is-archive f)
@@ -275,6 +276,7 @@
                               dp :n
                               deps-raw)))
                    (:r %)) true)
+           (if e (:e %) true)
            (if fk (:f? %) true)
            (if ar (not (:a? %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
@@ -616,6 +618,14 @@
                                   (re-frame/dispatch [:filter! {:is-licensed v}]))}]
            (i/i lang [:with-license])]]
          [:div.dropdown-item
+          [:label.checkbox.level
+           [:input {:type      "checkbox"
+                    :checked   (get-item :is-esr)
+                    :on-change #(let [v (.-checked (.-target %))]
+                                  (set-item! :is-esr v)
+                                  (re-frame/dispatch [:filter! {:is-esr v}]))}]
+           (i/i lang [:only-her])]]
+         [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:with-html])}
            [:input {:type      "checkbox"
                     :checked   (get-item :include-html-repos)
@@ -705,7 +715,7 @@
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
           [:div.columns
-           (for [{:keys [n l o h c d r e au p an dp] :as oo} dd]
+           (for [{:keys [n l o h c d r e au p an dp fp] :as oo} dd]
              ^{:key oo}
              [:div.column.is-4
               [:div.card
@@ -741,7 +751,12 @@
                          (i/i lang [:repo])
                          (i/i lang [:repos]))])]]
                 [:div.content
-                 [:p d]]]
+                 [:p d]
+                 (when-let [fp (not-empty fp)]
+                   [:a {:href   fp
+                        :target "new"
+                        :title  (i/i lang [:publication-policy])}
+                    [:p "Politique de publication open source"]])]]
                [:div.card-footer
                 (when dp
                   [:a.card-footer-item
@@ -1018,7 +1033,7 @@
                   {(i/i lang [:repos-on-swh])
                    (:repos_in_archive software_heritage)
                    (i/i lang [:percent-of-repos-archived])
-                   (:ratio_in_archive software_heritage)})]     
+                   (:ratio_in_archive software_heritage)})]
      [:br]]))
 
 (defn stats-page-class [lang]
