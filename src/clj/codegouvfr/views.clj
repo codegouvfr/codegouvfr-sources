@@ -355,7 +355,7 @@
 
      [:a {:name "dependencies"} [:h2.subtitle "Dépendances"]]
      [:br]
-     (md/to-hiccup "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet de parcourir la liste des dépendances de *mise en production*, non les dépendances de *développement* ; d'autre part, seules sont comprises les dépendances sollicitées par au moins deux dépôts.")
+     (md/to-hiccup "Un logiciel intègre souvent des briques logicielles publiées sous licence libre.  Celles-ci sont appelées « dépendances ».  Ce site permet de parcourir la liste des dépendances de *mise en production*, non les dépendances de *développement* ; d'autre part, seules sont comprises les dépendances sollicitées par au moins deux dépôts.  Voir aussi [\"Réutilisations\"](#reuses).")
      [:br]
 
      [:a {:name "etoile"} [:h2.subtitle "Étoiles"]]
@@ -378,6 +378,11 @@
      (md/to-hiccup "GitHub permet d'avoir des comptes personnels pour y héberger du code et des « comptes d'organisation ».  Un « groupe » est la notion plus ou moins équivalent sur les instance de GitLab.  Un organisme remplissant une mission de service public peut avoir un ou plusieurs organisations et/ou groupes sur une ou plusieurs forges.")
      [:br]
 
+     [:a {:name "reuses"} [:h2.subtitle "Réutilisations"]]
+     [:br]
+     (md/to-hiccup "GitHub permet de connaître le nombre de dépôts qui en utilisent un autre: le nombre de ces dépôts est présenté ici dans la colonne \"Réutilisations\" de la liste des dépôts.  Voir aussi [\"Dépendances\"](#dependencies).")
+     [:br]
+
      [:a {:name "secteur-public"} [:h2.subtitle "Secteur public"]]
      [:br]
      (md/to-hiccup "Les codes sources développés dans le cadre de missions de service public ont vocation à être publiés, dans certains conditions. Ce site propose de chercher dans l'ensemble des codes sources aujourd'hui identifiés comme provenant d'un organisme remplissant une mission de service public. Il a été développé par [la mission Etalab](https://www.etalab.gouv.fr/).")
@@ -397,7 +402,7 @@
 
      [:a {:name "dependencies"} [:h2.subtitle "Dependencies"]]
      [:br]
-     (md/to-hiccup "A software often use open source libraries. These libraries are called \"dependencies\". This website allows you to browse dependencies.  Only *production* dependencies are considered, and only those who are required by two or more repositories.")
+     (md/to-hiccup "A software often use open source libraries. These libraries are called \"dependencies\". This website allows you to browse dependencies.  Only *production* dependencies are considered, and only those who are required by two or more repositories.  See also [\"Reuses\"](#reuses).")
      [:br]
 
      [:a {:name "fourche"} [:h2.subtitle "Fork"]]
@@ -413,6 +418,11 @@
      [:a {:name "organization-group"} [:h2.subtitle "Organisation & Group"]]
      [:br]
      (md/to-hiccup "GitHub allows to have personal accounts or \"organizations accounts\" to store source code.  A \"group\" is the more or less equivalent notion used on GitLab instances.  A public sector organization may have one or more organization accounts and/or groups on one or several software forges.")
+     [:br]
+
+     [:a {:name "reuses"} [:h2.subtitle "Reuses"]]
+     [:br]
+     (md/to-hiccup "GitHub allows to get the number of repositories that depend on another repository: the number of \"dependants\" is listed here in the \"Reuse\" column of the list of repositories.  See also [\"Dependencies\"](#dependencies).")
      [:br]
 
      [:a {:name "secteur-public"} [:h2.subtitle "Public Sector"]]
@@ -455,9 +465,9 @@
      [:br]
 
      ;; TODO: i18n
-     [:a {:name "dependencies"} [:h2.subtitle "Dependencies"]]
+     [:a {:name "dependencies"} [:h2.subtitle "Dipendenze"]]
      [:br]
-     (md/to-hiccup "A software often use open source libraries. These libraries are called \"dependencies\". This website allows you to browse dependencies.  Only *production* dependencies are considered, and only those who are required by two or more repositories.")
+     (md/to-hiccup "Un software spesso utilizza librerie open source. Queste librerie sono chiamate \"dipendenze\". Questo sito web permette di navigare tra le dipendenze.  Sono considerate solo le dipendenze di *produzione* e solo quelle richieste da due o più repository.  Vedi anche [\"Riutilizzazioni\"](#reuses).")
      [:br]
 
      [:a {:name "fourche"} [:h2.subtitle "Fork"]]
@@ -478,6 +488,11 @@
      [:a {:name "repository"} [:h2.subtitle "Repository"]]
      [:br]
      (md/to-hiccup "Un repository è uno spazio dentro il quale vengono pubblicati i file di codice sorgente. Questo è ciò che si vede quando si visita un link al codice sorgente ospitato su un repository. &Egrave; anche quello che puoi copiare sul tuo computer per esplorarlo localmente.")
+     [:br]
+
+     [:a {:name "reuses"} [:h2.subtitle "Riutilizza"]]
+     [:br]
+     (md/to-hiccup "GitHub permette di ottenere il numero di repository che dipendono da un altro repository: il numero di \"dipendenti\" è elencato qui nella colonna \"Riutilizzo\" della lista dei repository.  Vedi anche [\"Dipendenze\"](#dependencies).")
      [:br]
 
      [:a {:name "secteur-public"} [:h2.subtitle "Settore pubblico"]]
