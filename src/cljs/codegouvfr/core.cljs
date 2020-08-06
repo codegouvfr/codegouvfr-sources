@@ -545,8 +545,9 @@
                    [:td.has-text-right i]
                    ;; Reused
                    [:td.has-text-right
-                    [:a {:title (i/i lang [:reuses-expand])
-                         :href  (str r "/network/dependents")}
+                    [:a {:title  (i/i lang [:reuses-expand])
+                         :target "new"
+                         :href   (str r "/network/dependents")}
                      g]]])))]])))
 
 (defn navigate-pagination [type first-disabled last-disabled]
