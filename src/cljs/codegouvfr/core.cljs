@@ -534,7 +534,7 @@
                        [:span
                         [:a.has-text-grey
                          {:title (i/i lang [:Deps])
-                          :href  (rfe/href :deps {:lang lang} {:repo n})}
+                          :href  (rfe/href :deps {:lang lang} {:repo r})}
                          (fa "fa-cubes")]
                         " "]) d]]
                    ;; Update
@@ -761,7 +761,7 @@
                 (when dp
                   [:a.card-footer-item
                    {:title (i/i lang [:Deps])
-                    :href  (rfe/href :deps {:lang lang} {:orga l})}
+                    :href  (rfe/href :deps {:lang lang} {:orga o})}
                    (fa "fa-cubes")])
                 (when e [:a.card-footer-item
                          {:title (i/i lang [:contact-by-email])
@@ -829,7 +829,7 @@
                   (count r)
                   (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
 
-(defn deps-page [lang]
+(defn deps-page [lang repos-sim]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
         deps0               @(re-frame/subscribe [:deps?])
         deps                (if-let [s (or repo orga)]
@@ -876,12 +876,24 @@
          {:href  (str "/" lang "/glossary#dependencies")
           :title (i/i lang [:go-to-glossary])}
          (fa "fa-question-circle")]]
-       (cond repo (str (i/i lang [:for-repo]) repo)
-             orga (str (i/i lang [:for-orga]) orga))]]
+       (cond repo [:span
+                   (i/i lang [:for-repo])
+                   [:a {:href repo :target "new"} repo]]
+             orga [:span (i/i lang [:for-orga])
+                   [:a {:href orga :target "new"} orga]])]]
      [:br]
      (if (pos? (count deps))
        [deps-table lang deps repo orga]
        [:p (i/i lang [:no-dep-found])])
+     (when-let [sims (get repos-sim repo)]
+       [:div
+        [:h2 (i/i lang [:Repos-deps-sim])]
+        [:br]
+        [:ul
+         (for [s sims]
+           ^{:key s}
+           [:li [:a {:href (rfe/href :deps {:lang lang} {:repo s})} s]])]
+        [:br]])
      [:br]]))
 
 (defn repos-page-class [lang license language]
@@ -1042,6 +1054,16 @@
                    (:ratio_in_archive software_heritage)})]
      [:br]]))
 
+(defn deps-page-class [lang]
+  (let [deps-repos-sim (reagent/atom nil)]
+    (reagent/create-class
+     {:display-name   "deps-page-class"
+      :component-did-mount
+      (fn []
+        (GET "/deps-repos-sim.json"
+             :handler #(reset! deps-repos-sim %)))
+      :reagent-render (fn [] (deps-page lang @deps-repos-sim))})))
+
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
         stats      (reagent/atom nil)
@@ -1155,7 +1177,7 @@
        ;; Table to display statistics
        :stats [stats-page-class lang]
        ;; Table to display all dependencies
-       :deps  [deps-page lang]
+       :deps  [deps-page-class lang]
        ;; :live      [live lang]
        ;; Fall back on the organizations page
        :else  (rfe/push-state :orgas {:lang lang}))]))
