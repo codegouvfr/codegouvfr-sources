@@ -267,8 +267,7 @@
         de       (:has-description f)
         fk       (:is-fork f)
         ar       (:is-archive f)
-        li       (:is-licensed f)
-        h        (:include-html-repos f)]
+        li       (:is-licensed f)]
     (filter
      #(and (if dp (contains?
                    (into #{}
@@ -283,8 +282,7 @@
            (if lic (s-includes? (:li %) lic) true)
            (if la (= (s/lower-case (or (:l %) ""))
                      (s/lower-case la))
-               (if h true (not (= (:l %) "HTML"))))
-           (if h true (not (s-includes? (:l %) "HTML")))
+               true)
            (if de (seq (:d %)) true)
            (if g (s-includes? (:r %) g) true)
            (if s (s-includes?
@@ -624,15 +622,7 @@
                     :on-change #(let [v (.-checked (.-target %))]
                                   (set-item! :is-esr v)
                                   (re-frame/dispatch [:filter! {:is-esr v}]))}]
-           (i/i lang [:only-her])]]
-         [:div.dropdown-item
-          [:label.checkbox.level {:title (i/i lang [:with-html])}
-           [:input {:type      "checkbox"
-                    :checked   (get-item :include-html-repos)
-                    :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :include-html-repos v)
-                                  (re-frame/dispatch [:filter! {:include-html-repos v}]))}]
-           (i/i lang [:with-html])]]]]]
+           (i/i lang [:only-her])]]]]]
       [:div.level-item
        [:input.input
         {:size        12
