@@ -347,16 +347,15 @@
   (GET "/apropos" [] (response/redirect "/fr/about"))
 
   (POST "/contact" req
-        (let [params (walk/keywordize-keys (:form-params req))]
-          (send-email (conj params {:log (str "Sent message from " (:email params)
-                                              " (" (:organization params) ")")}))
+        (let [params       (walk/keywordize-keys (:form-params req))
+              contact-name (:name params)
+              organization (:organization params)]
+          (when (not (= contact-name organization))
+            (send-email
+             (conj params {:log (str "Sent message from " (:email params)
+                                     " (" organization ")")})))
           (response/redirect (str "/" (:lang params) "/ok"))))
 
-  (POST "/contact" req
-        (let [params (walk/keywordize-keys (:form-params req))]
-          (send-email (conj params {:log (str "Sent message from " (:email params)
-                                              " (" (:organization params) ")")}))
-          (response/redirect (str "/" (:lang params) "/ok"))))
   ;; FIXME: unused bindings?
   (GET "/:lang/:p1/:p2/:p3" [lang]
        (views/default (if (contains? i/supported-languages lang) lang "fr")))
