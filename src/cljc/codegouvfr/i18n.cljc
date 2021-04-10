@@ -13,6 +13,7 @@
   ;; French translation
   {:fr
    {
+    :all-forges                    "Toutes les forges"
     :Dep                           "Dépendance"
     :Deps                          "Dépendances"
     :Repo                          "Dépôt"
@@ -158,6 +159,7 @@
    ;; English translation
    :en
    {
+    :all-forges                    "All forges"
     :Dep                           "Dependency"
     :Deps                          "Dependencies"
     :Repo                          "Repository"
@@ -299,6 +301,7 @@
    ;; Italian translation
    :it
    {
+    :all-forges                    "All forges"                        ;; FIXME
     :Dep                           "Dipendenza"
     :Deps                          "Dipendenze"
     :Repo                          "Repository"

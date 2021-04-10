@@ -15,6 +15,7 @@
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
+            [goog.labs.format.csv :as csv]
             ;; [taoensso.sente  :as sente]
             ))
 
@@ -45,6 +46,7 @@
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
+(defonce platforms-csv-url "https://raw.githubusercontent.com/etalab/data-codes-sources-fr/master/platforms.csv")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
@@ -108,6 +110,14 @@
 (re-frame/reg-sub
  :path-params?
  (fn [db _] (:path-params db)))
+
+(re-frame/reg-event-db
+ :update-platforms!
+ (fn [db [_ platforms]] (assoc db :platforms platforms)))
+
+(re-frame/reg-sub
+ :platforms?
+ (fn [db _] (:platforms db)))
 
 (re-frame/reg-event-db
  :update-repos!
@@ -262,6 +272,7 @@
         s        (:q f)
         g        (:g f)
         la       (:language f)
+        pl       (:platform f)
         lic      (:license f)
         e        (:is-esr f)
         de       (:has-description f)
@@ -283,6 +294,7 @@
            (if la (= (s/lower-case (or (:l %) ""))
                      (s/lower-case la))
                true)
+           (if (= pl "all") true (s-includes? (:r %) pl))
            (if de (seq (:d %)) true)
            (if g (s-includes? (:r %) g) true)
            (if s (s-includes?
@@ -569,7 +581,7 @@
      :disabled last-disabled}
     (fa "fa-fast-forward")]])
 
-(defn repos-page [lang license language]
+(defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
@@ -649,6 +661,21 @@
                             (async/>! display-filter-chan {:language ev})
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:language ev}))))}]]
+      [:div.level-item
+       [:div.select
+        [:select {:value @platform
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-value (.-target e))]
+                      (reset! platform ev)
+                      (async/go
+                        (async/>! display-filter-chan {:platform ev})
+                        (async/<! (async/timeout timeout))
+                        (async/>! filter-chan {:platform ev}))))}
+         [:option {:value "all"} (i/i lang [:all-forges])]
+         (for [x @(re-frame/subscribe [:platforms?])]
+           ^{:key x}
+           [:option {:value x} x])]]]
       [:span.button.is-static.level-item
        (let [rps (count repos)]
          (if (< rps 2)
@@ -886,7 +913,7 @@
         [:br]])
      [:br]]))
 
-(defn repos-page-class [lang license language]
+(defn repos-page-class [lang license language platform]
   (reagent/create-class
    {:display-name   "repos-page-class"
     :component-did-mount
@@ -895,7 +922,7 @@
            :handler
            #(re-frame/dispatch
              [:update-repos! (map (comp bean clj->js) %)])))
-    :reagent-render (fn [] (repos-page lang license language))}))
+    :reagent-render (fn [] (repos-page lang license language platform))}))
 
 (defn figure [heading title]
   [:div.column
@@ -1150,7 +1177,7 @@
 ;;   ;;      (gstring/format "%s (%s) pushed %s commits to %s at %s" u o n r d)]])]
 ;;   )
 
-(defn main-page [q license language]
+(defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
@@ -1163,7 +1190,7 @@
        ;; Table to display organizations
        :orgas [organizations-page lang]
        ;; Table to display repositories
-       :repos [repos-page-class lang license language]
+       :repos [repos-page-class lang license language platform]
        ;; Table to display statistics
        :stats [stats-page-class lang]
        ;; Table to display all dependencies
@@ -1175,11 +1202,16 @@
 (defn main-class []
   (let [q        (reagent/atom nil)
         license  (reagent/atom nil)
-        language (reagent/atom nil)]
+        language (reagent/atom nil)
+        platform (reagent/atom nil)]
     (reagent/create-class
      {:display-name   "main-class"
       :component-did-mount
       (fn []
+        (GET platforms-csv-url
+             :handler
+             #(re-frame/dispatch
+               [:update-platforms! (map first (next (js->clj (csv/parse %))))]))
         (GET "/deps.json"
              :handler
              #(do
@@ -1195,7 +1227,7 @@
              :handler
              #(re-frame/dispatch
                [:update-orgas! (map (comp bean clj->js) %)])))
-      :reagent-render (fn [] (main-page q license language))})))
+      :reagent-render (fn [] (main-page q license language platform))})))
 
 (defn on-navigate [match]
   (let [lang (:lang (:path-params match))]
