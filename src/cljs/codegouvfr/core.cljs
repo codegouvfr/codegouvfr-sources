@@ -42,7 +42,7 @@
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
 (defonce deps-per-page 100) ;; FIXME: Make customizable?
 (defonce timeout 100)
-(defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil})
+(defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
@@ -663,7 +663,7 @@
                             (async/>! filter-chan {:language ev}))))}]]
       [:div.level-item
        [:div.select
-        [:select {:value @platform
+        [:select {:value (or @platform "all")
                   :on-change
                   (fn [e]
                     (let [ev (.-value (.-target e))]
