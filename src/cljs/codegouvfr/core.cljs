@@ -50,21 +50,25 @@
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
+(defonce options-chan (async/chan 100))
 
-(defn set-item!
-  "Set `key` in browser's localStorage to `val`."
-  [key val]
-  (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val))))
+;; Set `key` in browser's localStorage to `val`.
+(re-frame/reg-event-db
+ :set-item!
+ (fn [_ [key val]]
+   (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val)))))
 
-(defn get-item
-  "Return the value of `key` from browser's localStorage."
-  [key]
-  (js->clj (.parse js/JSON (.getItem (.-localStorage js/window) key))))
+;; Return the value of `key` from browser's localStorage.
+(re-frame/reg-sub
+ :get-item
+ (fn [_ [key]]
+   (js->clj (.parse js/JSON (.getItem (.-localStorage js/window) key)))))
 
-(defn remove-item!
-  "Remove the browser's localStorage value for the given `key`."
-  [key]
-  (.removeItem (.-localStorage js/window) key))
+;; Remove the browser's localStorage value for the given `key`.
+;; (re-frame/reg-event-db
+;;  :remove-item!
+;;  (fn [_ [key]]
+;;    (.removeItem (.-localStorage js/window) key)))
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -343,11 +347,18 @@
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
 
+(defn start-options-loop []
+  (async/go
+    (loop [v (async/<! options-chan)]
+      (re-frame/dispatch [:set-item! :is-fork v])
+      (re-frame/dispatch [:filter! {:is-fork v}])
+      (recur (async/<! options-chan)))))
+
 (re-frame/reg-sub
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
-         favs   (get-item :favs)
+         favs   @(re-frame/subscribe [:get-item :favs])
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
@@ -410,14 +421,14 @@
 
 (defn favorite [lang n]
   (let [fav-class
-        (reagent/atom (if (some #{n} (get-item :favs)) "" "has-text-grey"))]
+        (reagent/atom (if (some #{n} @(re-frame/subscribe [:get-item :favs])) "" "has-text-grey"))]
     [:a {:class    @fav-class
          :title    (i/i lang [:fav-add])
-         :on-click #(let [favs (get-item :favs)]
+         :on-click #(let [favs @(re-frame/subscribe [:get-item :favs])]
                       (if (some #{n} favs)
-                        (do (set-item! :favs (remove (fn [x] (= n x)) favs))
+                        (do (re-frame/dispatch [:set-item! :favs (remove (fn [x] (= n x)) favs)])
                             (reset! fav-class "has-text-grey"))
-                        (do (set-item! :favs (distinct (conj favs n)))
+                        (do (re-frame/dispatch [:set-item! :favs (distinct (conj favs n))])
                             (reset! fav-class ""))))}
      (fa "fa-star")]))
 
@@ -598,42 +609,47 @@
          [:div.dropdown-item
           [:label.checkbox.level
            [:input {:type      "checkbox"
-                    :checked   (get-item :is-fork)
+                    :checked   @(re-frame/subscribe [:get-item :is-fork])
                     :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :is-fork v)
-                                  (re-frame/dispatch [:filter! {:is-fork v}]))}]
+                                  (async/go
+                                    (async/>! options-chan v)
+                                    (async/<! (async/timeout timeout))))}]
            (i/i lang [:only-forks])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:no-archived-repos])}
            [:input {:type      "checkbox"
-                    :checked   (get-item :is-archive)
+                    :checked   @(re-frame/subscribe [:get-item :is-archive])
                     :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :is-archive v)
-                                  (re-frame/dispatch [:filter! {:is-archive v}]))}]
+                                  (async/go
+                                    (async/>! options-chan v)
+                                    (async/<! (async/timeout timeout))))}]
            (i/i lang [:no-archives])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:only-with-description-repos])}
            [:input {:type      "checkbox"
-                    :checked   (get-item :has-description)
+                    :checked   @(re-frame/subscribe [:get-item :has-description])
                     :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :has-description v)
-                                  (re-frame/dispatch [:filter! {:has-description v}]))}]
+                                  (async/go
+                                    (async/>! options-chan v)
+                                    (async/<! (async/timeout timeout))))}]
            (i/i lang [:with-description])]]
          [:div.dropdown-item
           [:label.checkbox.level {:title (i/i lang [:only-with-license])}
            [:input {:type      "checkbox"
-                    :checked   (get-item :is-licensed)
+                    :checked   @(re-frame/subscribe [:get-item :is-licensed])
                     :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :is-licensed v)
-                                  (re-frame/dispatch [:filter! {:is-licensed v}]))}]
+                                  (async/go
+                                    (async/>! options-chan v)
+                                    (async/<! (async/timeout timeout))))}]
            (i/i lang [:with-license])]]
          [:div.dropdown-item
           [:label.checkbox.level
            [:input {:type      "checkbox"
-                    :checked   (get-item :is-esr)
+                    :checked   @(re-frame/subscribe [:get-item :is-esr])
                     :on-change #(let [v (.-checked (.-target %))]
-                                  (set-item! :is-esr v)
-                                  (re-frame/dispatch [:filter! {:is-esr v}]))}]
+                                  (async/go
+                                    (async/>! options-chan v)
+                                    (async/<! (async/timeout timeout))))}]
            (i/i lang [:only-her])]]]]]
       [:div.level-item
        [:input.input
@@ -1256,6 +1272,7 @@
    on-navigate
    {:use-fragment false})
   (start-filter-loop)
+  (start-options-loop)
   (start-display-filter-loop)
   (reagent.dom/render
    [main-class]
