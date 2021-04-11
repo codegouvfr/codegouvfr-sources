@@ -50,6 +50,8 @@
          :main-opts   ["-m" "cognitect.test-runner"
                        "-d" "test" "-n" "codegouvfr.test"]}
 
-  :jar {:extra-deps {seancorfield/depstar {:mvn/version "RELEASE"}}
-        :main-opts  ["-m" "hf.depstar.uberjar" "codegouvfr.jar"
-                     "-C" "-m" "codegouvfr.server"]}}}
+  :uberdeps {:replace-deps  {uberdeps/uberdeps {:mvn/version "1.0.4"}}
+             :replace-paths []
+             :main-opts     ["-m" "uberdeps.uberjar"]
+             }
+  }}
