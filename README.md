@@ -18,8 +18,8 @@ You also need `vega-cli` to store charts, install it globally with `npm install 
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ clj -A:test
-    ~$ clj -A:fig
+    ~$ clj -Mtest
+    ~$ clj -Mfig
 
 Then check <http://locahost:9500> then hack and see changes going live.
 
@@ -43,8 +43,8 @@ You will need to configure these environment variables:
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ clj -A:js
-    ~$ clj -A:jar
+    ~$ clj -Mjs
+    ~$ clj -Mjar
     ~$ java -cp codegouvfr.jar clojure.main -m codegouvfr.server
 
 Then go to <https://localhost:3000> or to your custom base URL.
@@ -56,8 +56,8 @@ and you want to expose the 3000 port:
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ clj -A:js
-    ~$ clj -A:jar
+    ~$ clj -Mjs
+    ~$ clj -Mjar
     ~$ docker build -t codegouvfr .
     ~$ docker run -it -p 3000:3000 --env-file=~/.codegouvfr_envs codegouvfr
 
