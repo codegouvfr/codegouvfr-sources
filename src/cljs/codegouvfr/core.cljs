@@ -291,9 +291,10 @@
            (if ar (not (:a? %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
-           (if la (= (s/lower-case (or (:l %) ""))
-                     (s/lower-case la))
-               true)
+           (if la
+             (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                   (s/split (s/lower-case la) #" +"))
+             true)
            (if (= pl "all") true (s-includes? (:r %) pl))
            (if de (seq (:d %)) true)
            (if g (s-includes? (:r %) g) true)
