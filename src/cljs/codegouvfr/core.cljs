@@ -584,6 +584,7 @@
 
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
+        filter?        @(re-frame/subscribe [:filter?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
         first-disabled (zero? repos-pages)
@@ -684,8 +685,14 @@
            (str rps (i/i lang [:repos]))))]
       [navigate-pagination :repos first-disabled last-disabled]
       [:a.level-item {:title (i/i lang [:download])
-                      :href  repos-csv-url}
-       (fa "fa-file-csv")]]
+                      :href  (->>
+                              (map (fn [[k v]]
+                                     (when (not-empty v)
+                                       (str (name k) "=" v)))
+                                   filter?)
+                              (s/join "&")
+                              (str "/csv?"))}
+       (fa "fa-download")]]
      [:br]
      [repositories-page lang (count repos)]
      [:br]]))

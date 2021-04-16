@@ -31,7 +31,10 @@
             [tea-time.core :as tt]
             [clojure.set]
             [clojure.java.shell :as sh]
-            [clojure.data.json :as datajson])
+            [clojure.data.json :as datajson]
+            [clojure.string :as s]
+            [clojure.data.csv :as csv]
+            [semantic-csv.core :as s-csv])
   (:gen-class))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,7 +90,9 @@
 ;; Initial setup for retrieving events constantly
 
 (def gh-org-events "https://api.github.com/orgs/%s/events")
-(def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
+(def repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
+(def repos-full-uri "data/repos.json")
+(def deps-raw-uri "data/deps.json")
 (def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def http-get-params {:cookie-policy :standard})
 (def last-orgs-events (agent '()))
@@ -97,8 +102,26 @@
          {:basic-auth
           (str config/github-user ":" config/github-access-token)}))
 
+;;; Utility functions
+
 (defn seqs-difference [seq1 seq2]
   (seq (clojure.set/difference (into #{} seq2) (into #{} seq1))))
+
+(defn get-repos-full []
+  (json/parse-string (slurp repos-full-uri) true))
+
+(defn get-deps-raw []
+  (map (fn [e] (dissoc e :t :d :l :r))
+       (json/parse-string (slurp deps-raw-uri) true)))
+
+;; FIXME: Duplicate in core.cljs
+(defn s-includes? [s sub]
+  (when (and (string? s) (string? sub))
+    (s/includes? (s/lower-case s) (s/lower-case sub))))
+
+;; FIXME: Duplicate in core.cljs
+(defn- get-first-match-s-for-k-in-m [s k m]
+  (reduce #(when (= (k %2) s) (reduced %2)) nil m))
 
 ;; (defn start-events-channel! []
 ;;   (async/go
@@ -129,10 +152,7 @@
    (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
 
 (defn latest-updated-orgas [n]
-  (let [repos (json/parse-string
-               (:body (try (http/get orgas-url http-get-params)
-                           (catch Exception _ nil))) ;; FIXME: add error?
-               true)]
+  (let [repos (get-repos-full)]
     (take
      n
      (distinct
@@ -140,6 +160,46 @@
             (sort-by :derniere_mise_a_jour
                      (sequence latest-updated-orgas-filter repos)))
            (map :organisation_nom))))))
+
+;; FIXME: Near duplicate in core.cljs
+(defn repos-filtered [f]
+  (let [repos    (get-repos-full)
+        deps-raw (get-deps-raw)
+        dp       (:d f)
+        s        (:q f)
+        g        (:g f)
+        la       (:language f)
+        pl       (:platform f)
+        lic      (:license f)
+        e        (:is-esr f)
+        de       (:has-description f)
+        fk       (:is-fork f)
+        ar       (:is-archive f)
+        li       (:is-licensed f)]
+    (filter
+     #(and (if dp (contains?
+                   (into #{}
+                         (:r (get-first-match-s-for-k-in-m
+                              dp :n
+                              deps-raw)))
+                   (:r %)) true)
+           (if e (:e %) true)
+           (if fk (:f? %) true)
+           (if ar (not (:a? %)) true)
+           (if li (let [l (:li %)] (and l (not= l "Other"))) true)
+           (if lic (s-includes? (:li %) lic) true)
+           (if la
+             (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                   (s/split (s/lower-case la) #" +"))
+             true)
+           (if (or (= pl "all") (= pl nil)) true (s-includes? (:r %) pl))
+           (if de (seq (:d %)) true)
+           (if g (s-includes? (:r %) g) true)
+           (if s (s-includes?
+                  (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)])
+                  s)
+               true))
+     repos)))
 
 (defn filter-old-events [events]
   (let [yesterday (t/minus (t/instant) (t/days 1))]
@@ -254,14 +314,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Expose json resources
 
-(defn resource-json
-  "Expose a json resource."
-  [f]
-  (assoc
-   (response/response
-    (io/input-stream f))
-   :headers {"Content-Type" "application/json; charset=utf-8"}))
-
 (defonce deps-orgas
   (-> (try (slurp "data/deps-orgas.json")
            (catch Exception e (timbre/error
@@ -346,6 +398,25 @@
   (GET "/contact" [] (response/redirect "/fr/contact"))
   (GET "/apropos" [] (response/redirect "/fr/about"))
 
+  (GET "/csv" req
+       (->
+        (assoc
+         (->>
+          (reduce-kv
+           (fn [m k v]
+             (assoc m k (when-not (= v "null") v)))
+           {}
+           (walk/keywordize-keys (:query-params req)))
+          repos-filtered
+          s-csv/vectorize
+          rest
+          (csv/write-csv *out*)
+          with-out-str
+          response/response)
+         :headers
+         {"Content-Type"        "text/csv; application/octet-stream"
+          "Content-Disposition" "attachment; filename=codegouvfr.csv"})))
+
   (POST "/contact" req
         (let [params       (walk/keywordize-keys (:form-params req))
               contact-name (:name params)
@@ -373,12 +444,10 @@
 
 (def app (-> #'routes
              (wrap-defaults site-defaults)
-             ;; ring.middleware.keyword-params/wrap-keyword-params
-             ;; ring.middleware.params/wrap-params
-             ;; FIXME: Don't wrap reload in production
              (wrap-file "data/")
              wrap-content-type
              wrap-not-modified
+             ;; FIXME: Don't wrap reload in production
              ;; wrap-reload
              ))
 

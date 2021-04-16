@@ -30,7 +30,9 @@
   ring/ring-core                        {:mvn/version "1.9.2"}
   ring/ring-defaults                    {:mvn/version "0.3.2"}
   ring/ring-devel                       {:mvn/version "1.9.2"}
-  tea-time/tea-time                     {:mvn/version "1.0.1"}}
+  tea-time/tea-time                     {:mvn/version "1.0.1"}
+  semantic-csv/semantic-csv             {:mvn/version "0.2.1-alpha1"}
+  org.clojure/data.csv                  {:mvn/version "1.0.0"}}
 
  :paths ["src" "src/clj" "src/cljc" "resources"]
 
