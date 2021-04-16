@@ -727,7 +727,7 @@
       [navigate-pagination :orgas first-disabled last-disabled]
       [:a {:title (i/i lang [:download])
            :href  orgas-csv-url}
-       (fa "fa-file-csv")]]
+       (fa "fa-download")]]
      [:br]
      (into
       [:div]
