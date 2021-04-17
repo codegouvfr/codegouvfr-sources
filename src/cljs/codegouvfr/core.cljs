@@ -691,7 +691,7 @@
                                        (str (name k) "=" v)))
                                    filter?)
                               (s/join "&")
-                              (str "/csv?"))}
+                              (str "/repos-csv?"))}
        (fa "fa-download")]]
      [:br]
      [repositories-page lang (count repos)]
@@ -700,6 +700,7 @@
 (defn organizations-page [lang]
   (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
         orgas          @(re-frame/subscribe [:orgas?])
+        filter?        @(re-frame/subscribe [:filter?])
         orgs-cnt       (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
@@ -726,7 +727,13 @@
            (str orgs (i/i lang [:groups]))))]
       [navigate-pagination :orgas first-disabled last-disabled]
       [:a {:title (i/i lang [:download])
-           :href  orgas-csv-url}
+           :href  (->>
+                   (map (fn [[k v]]
+                          (when (not-empty v)
+                            (str (name k) "=" v)))
+                        filter?)
+                   (s/join "&")
+                   (str "/orgas-csv?"))}
        (fa "fa-download")]]
      [:br]
      (into

@@ -29,7 +29,7 @@
             [clojure.core.async :as async]
             [clj-http.client :as http]
             [tea-time.core :as tt]
-            [clojure.set]
+            [clojure.set :as set]
             [clojure.java.shell :as sh]
             [clojure.data.json :as datajson]
             [clojure.string :as s]
@@ -87,28 +87,33 @@
      :latest_updated_orgas            2}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initial setup for retrieving events constantly
+;; General setup
 
-(def gh-org-events "https://api.github.com/orgs/%s/events")
 (def repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 (def repos-full-uri "data/repos.json")
+(def orgas-full-uri "data/orgas.json")
 (def deps-raw-uri "data/deps.json")
 (def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def http-get-params {:cookie-policy :standard})
-(def last-orgs-events (agent '()))
-(def events-channel (async/chan))
-(def http-get-gh-params
-  (merge http-get-params
-         {:basic-auth
-          (str config/github-user ":" config/github-access-token)}))
+(defn csv-headers [type]
+  (let [d (t/format "YYYYMMdd" (t/zoned-date-time))]
+    {"Content-Type"        "text/csv; application/octet-stream"
+     "Content-Disposition" (str "attachment; filename=codegouvfr-"
+                                (if (= type :repos)
+                                  (str "repos-" d ".csv")
+                                  (str "orgas-" d ".csv")))}))
 
-;;; Utility functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utility functions
 
 (defn seqs-difference [seq1 seq2]
-  (seq (clojure.set/difference (into #{} seq2) (into #{} seq1))))
+  (seq (set/difference (into #{} seq2) (into #{} seq1))))
 
 (defn get-repos-full []
   (json/parse-string (slurp repos-full-uri) true))
+
+(defn get-orgas-full []
+  (json/parse-string (slurp orgas-full-uri) true))
 
 (defn get-deps-raw []
   (map (fn [e] (dissoc e :t :d :l :r))
@@ -123,43 +128,42 @@
 (defn- get-first-match-s-for-k-in-m [s k m]
   (reduce #(when (= (k %2) s) (reduced %2)) nil m))
 
-;; (defn start-events-channel! []
-;;   (async/go
-;;     (loop [e (async/<! events-channel)]
-;;       (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
-;;         (event-msg-handler {:event e}))
-;;       (recur (async/<! events-channel)))))
+;; Ignore these keywords
+;; :software_heritage_url :software_heritage_exists :derniere_modification
+;; :page_accueil :date_creation :plateforme
+(def repos-mapping
+  "Mapping from repositories keywords to local short versions."
+  {:u  :derniere_mise_a_jour
+   :d  :description
+   :a? :est_archive
+   :f? :est_fork
+   :l  :langage
+   :li :licence
+   :n  :nom
+   :f  :nombre_forks
+   :i  :nombre_issues_ouvertes
+   :s  :nombre_stars
+   :o  :organisation_nom
+   :p  :plateforme
+   :r  :repertoire_url
+   :t  :topics})
 
-(defn sort-events-by-date [diff]
-  (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
-       (sort-by :d (map #(update % :d t/zoned-date-time)
-                        diff))))
-
-(add-watch last-orgs-events
-           :watcher
-           (fn [_ _ old new]
-             (when-let [diff (seqs-difference old new)]
-               (async/thread
-                 (doseq [e (sort-events-by-date diff)]
-                   (timbre/info (pr-str e))
-                   (Thread/sleep (:send_channel_sleep @profile))
-                   (async/>!! events-channel e))))))
-
-(def latest-updated-orgas-filter
-  (comp
-   (filter #(= (:plateforme %) "GitHub"))
-   (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
-   (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
-
-(defn latest-updated-orgas [n]
-  (let [repos (get-repos-full)]
-    (take
-     n
-     (distinct
-      (->> (reverse
-            (sort-by :derniere_mise_a_jour
-                     (sequence latest-updated-orgas-filter repos)))
-           (map :organisation_nom))))))
+;; Ignore these keywords
+;; :private :default_branch :language :id :checked :owner :full_name
+(def orgas-mapping
+  "Mapping from groups/organizations keywords to local short versions."
+  {:d  :description
+   :a  :adresse
+   :e  :email
+   :n  :nom
+   :p  :plateforme
+   :h  :site_web
+   :v? :est_verifiee
+   :l  :login
+   :c  :date_creation
+   :r  :nombre_repertoires
+   :o  :organisation_url
+   :au :avatar_url})
 
 ;; FIXME: Near duplicate in core.cljs
 (defn repos-filtered [f]
@@ -200,6 +204,89 @@
                   s)
                true))
      repos)))
+
+(defn orgas-filtered [f]
+  (let [orgas (get-orgas-full)
+        s     (:q f)
+        de    (:has-description f)]
+    (filter
+     #(and (if de (seq (:d %)) true)
+           (if s (s-includes?
+                  (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
+                  s)
+               true))
+     orgas)))
+
+(defn get-resource-as-csv [type params]
+  (->
+   (assoc
+    (response/response
+     (with-out-str
+       (csv/write-csv
+        *out*
+        (s-csv/vectorize
+         (let [p       (reduce-kv
+                        (fn [m k v]
+                          (assoc m k (when-not (= v "null") v)))
+                        {}
+                        (walk/keywordize-keys params))
+               repos?  (= type :repos)
+               mapping (if repos? repos-mapping orgas-mapping)]
+           (map #(set/rename-keys
+                  (select-keys % (keys mapping)) repos-mapping)
+                (if repos?
+                  (repos-filtered p)
+                  (orgas-filtered p))))))))
+    :headers (csv-headers type))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initial setup for retrieving events constantly
+
+(def gh-org-events "https://api.github.com/orgs/%s/events")
+(def last-orgs-events (agent '()))
+(def events-channel (async/chan))
+(def http-get-gh-params
+  (merge http-get-params
+         {:basic-auth
+          (str config/github-user ":" config/github-access-token)}))
+
+;; (defn start-events-channel! []
+;;   (async/go
+;;     (loop [e (async/<! events-channel)]
+;;       (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
+;;         (event-msg-handler {:event e}))
+;;       (recur (async/<! events-channel)))))
+
+(defn sort-events-by-date [diff]
+  (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
+       (sort-by :d (map #(update % :d t/zoned-date-time)
+                        diff))))
+
+(add-watch last-orgs-events
+           :watcher
+           (fn [_ _ old new]
+             (when-let [diff (seqs-difference old new)]
+               (async/thread
+                 (doseq [e (sort-events-by-date diff)]
+                   (timbre/info (pr-str e))
+                   (Thread/sleep (:send_channel_sleep @profile))
+                   (async/>!! events-channel e))))))
+
+(def latest-updated-orgas-filter
+  (comp
+   (filter #(= (:plateforme %) "GitHub"))
+   (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
+   (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
+
+(defn latest-updated-orgas [n]
+  (let [repos (get-repos-full)]
+    (take
+     n
+     (distinct
+      (->> (reverse
+            (sort-by :derniere_mise_a_jour
+                     (sequence latest-updated-orgas-filter repos)))
+           (map :organisation_nom))))))
 
 (defn filter-old-events [events]
   (let [yesterday (t/minus (t/instant) (t/days 1))]
@@ -398,24 +485,8 @@
   (GET "/contact" [] (response/redirect "/fr/contact"))
   (GET "/apropos" [] (response/redirect "/fr/about"))
 
-  (GET "/csv" req
-       (->
-        (assoc
-         (->>
-          (reduce-kv
-           (fn [m k v]
-             (assoc m k (when-not (= v "null") v)))
-           {}
-           (walk/keywordize-keys (:query-params req)))
-          repos-filtered
-          s-csv/vectorize
-          rest
-          (csv/write-csv *out*)
-          with-out-str
-          response/response)
-         :headers
-         {"Content-Type"        "text/csv; application/octet-stream"
-          "Content-Disposition" "attachment; filename=codegouvfr.csv"})))
+  (GET "/repos-csv" req (get-resource-as-csv :repos (:query-params req)))
+  (GET "/orgas-csv" req (get-resource-as-csv :orgas (:query-params req)))
 
   (POST "/contact" req
         (let [params       (walk/keywordize-keys (:form-params req))
