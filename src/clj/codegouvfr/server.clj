@@ -92,6 +92,7 @@
 (def repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 (def repos-full-uri "data/repos.json")
 (def orgas-full-uri "data/orgas.json")
+(def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
 (def deps-raw-uri "data/deps.json")
 (def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def http-get-params {:cookie-policy :standard})
@@ -279,13 +280,16 @@
    (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
 
 (defn latest-updated-orgas [n]
-  (let [repos (get-repos-full)]
+  (let [orgas (json/parse-string
+               (:body (try (http/get orgas-url http-get-params)
+                           (catch Exception _ nil))) ;; FIXME: add error?
+               true)]
     (take
      n
      (distinct
       (->> (reverse
             (sort-by :derniere_mise_a_jour
-                     (sequence latest-updated-orgas-filter repos)))
+                     (sequence latest-updated-orgas-filter orgas)))
            (map :organisation_nom))))))
 
 (defn filter-old-events [events]
@@ -294,13 +298,13 @@
               (not (t/before? (t/instant date) yesterday)))
             events)))
 
-;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
-;; GitHub orgas with recently updated repos and get the last events
-;; 240 times for these orgas every 15 seconds.
+;; ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
+;; ;; GitHub orgas with recently updated repos and get the last events
+;; ;; 240 times for these orgas every 15 seconds.
 ;; (defn latest-orgas-events! [orgas]
 ;;   (http/with-connection-pool
 ;;     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-;;     (dotimes [_ (:repeat_in_connection_pool profile)]
+;;     (dotimes [_ (:repeat_in_connection_pool @profile)]
 ;;       (let [new-events (atom nil)]
 ;;         ;; Fet new-events for all recently updated orgas
 ;;         (doseq [org orgas]
