@@ -138,8 +138,8 @@
       [:section.hero
        [:div.hero-body
         [:div.container
-         [:h1.title.has-text-centered title]
-         [:h2.subtitle.column.is-8.is-offset-2.has-text-centered subtitle]]]]
+         [:h1.title title]
+         [:h2.subtitle subtitle]]]]
       [:section.section content0]
       (when-not content
         [:div
