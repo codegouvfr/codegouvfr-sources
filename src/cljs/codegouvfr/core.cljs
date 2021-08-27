@@ -686,8 +686,8 @@
       [navigate-pagination :repos first-disabled last-disabled]
       [:a.level-item {:title (i/i lang [:download])
                       :href  (->>
-                              (map (fn [[k v]]
-                                     (when (not-empty v)
+                              (map (fn [[k v :as kv]]
+                                     (when (not-empty kv)
                                        (str (name k) "=" v)))
                                    filter?)
                               (s/join "&")
@@ -728,8 +728,8 @@
       [navigate-pagination :orgas first-disabled last-disabled]
       [:a {:title (i/i lang [:download])
            :href  (->>
-                   (map (fn [[k v]]
-                          (when (not-empty v)
+                   (map (fn [[k v :as kv]]
+                          (when (not-empty kv)
                             (str (name k) "=" v)))
                         filter?)
                    (s/join "&")
