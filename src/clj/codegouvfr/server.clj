@@ -228,7 +228,7 @@
         (s-csv/vectorize
          (let [p       (reduce-kv
                         (fn [m k v]
-                          (assoc m k (when-not (= v "null") v)))
+                          (assoc m k (when-not (some #{v} '("" "null")) v)))
                         {}
                         (walk/keywordize-keys params))
                repos?  (= type :repos)
