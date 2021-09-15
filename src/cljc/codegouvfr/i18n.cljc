@@ -225,7 +225,7 @@
     :message-placeholder           "Your message"
     :message-received              "Message received!"
     :message-received-ok           "We will do our best to reply as soon as possible."
-    :more-info                     "More informations"
+    :more-info                     "More information"
     :most-used-identified-licenses "Most used identified licenses"
     :most-used-languages           "Top 10 most used languages"
     :most-used-licenses            "Most used licenses"

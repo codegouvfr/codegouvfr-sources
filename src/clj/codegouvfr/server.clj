@@ -547,4 +547,4 @@
   ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
   ;; (start-events-channel!)
   (start-tasks!)
-  (timbre/info (str "codegouvfr application started on locahost:" config/codegouvfr_port)))
+  (timbre/info (str "codegouvfr application started on localhost:" config/codegouvfr_port)))
