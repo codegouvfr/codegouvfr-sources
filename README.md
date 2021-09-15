@@ -6,7 +6,7 @@ Browse public sector source code repositories.
 
 ![img](codegouvfr.png)
 
-This frontend retrives information source code [repositories](https://api-code.etalab.gouv.fr/api/repertoires/all) and [organizations](https://api-code.etalab.gouv.fr/api/organisations/all) from the french public sector.  The source code for creating these endpoints can be found [here](https://github.com/etalab/data-codes-sources-fr).
+This frontend retrieves information source code [repositories](https://api-code.etalab.gouv.fr/api/repertoires/all) and [organizations](https://api-code.etalab.gouv.fr/api/organisations/all) from the french public sector.  The source code for creating these endpoints can be found [here](https://github.com/etalab/data-codes-sources-fr).
 
 # Install dependencies
 
@@ -21,7 +21,7 @@ You also need `vega-cli` to store charts, install it globally with `npm install 
     ~$ clj -Mtest
     ~$ clj -Mfig
 
-Then check <http://locahost:9500> then hack and see changes going live.
+Then check <http://localhost:9500> then hack and see changes going live.
 
 # Deploy
 

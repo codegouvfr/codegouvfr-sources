@@ -306,7 +306,7 @@
      [:h1.title "Non vedo i miei sorgenti di codice!"]
      (md/to-hiccup "&Egrave; sicuramente perchè il vostro repository, il vostro account d'organizzazione o il vostro gruppo non è <a target=\"new\" href=\"https://github.com/DISIC/politique-de-contribution-open-source/blob/master/comptes-organismes-publics\">registrato qui</a>.")
      [:br]
-     (md/to-hiccup "<a href=\"/contact\">Scrivici</a> e noi aggiungeremo il vostor repository o il vostro acocunt d'organizzazione.")
+     (md/to-hiccup "<a href=\"/contact\">Scrivici</a> e noi aggiungeremo il vostor repository o il vostro accounti d'organizzazione.")
      [:br]]
     [:div.container
      [:h1.title "Come questa lista mi può essere utile?"]
