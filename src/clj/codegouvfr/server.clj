@@ -89,10 +89,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; General setup
 
-(def repos-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
+(def repos-url "https://api-code.etalab.gouv.fr/api/repositories/all")
 (def repos-full-uri "data/repos.json")
 (def orgas-full-uri "data/orgas.json")
-(def orgas-url "https://api-code.etalab.gouv.fr/api/repertoires/all")
+(def orgas-url "https://api-code.etalab.gouv.fr/api/repositories/all")
 (def deps-raw-uri "data/deps.json")
 (def stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (def http-get-params {:cookie-policy :standard})
@@ -134,19 +134,19 @@
 ;; :page_accueil :date_creation :plateforme
 (def repos-mapping
   "Mapping from repositories keywords to local short versions."
-  {:u  :derniere_mise_a_jour
+  {:u  :last_update
    :d  :description
-   :a? :est_archive
-   :f? :est_fork
-   :l  :langage
-   :li :licence
-   :n  :nom
-   :f  :nombre_forks
-   :i  :nombre_issues_ouvertes
-   :s  :nombre_stars
-   :o  :organisation_nom
-   :p  :plateforme
-   :r  :repertoire_url
+   :a? :is_archived
+   :f? :is_fork
+   :l  :language
+   :li :license
+   :n  :name
+   :f  :forks_count
+   :i  :open_issues_count
+   :s  :stars_count
+   :o  :organization_name
+   :p  :platform
+   :r  :repository_url
    :t  :topics})
 
 ;; Ignore these keywords
@@ -154,16 +154,16 @@
 (def orgas-mapping
   "Mapping from groups/organizations keywords to local short versions."
   {:d  :description
-   :a  :adresse
+   :a  :location
    :e  :email
-   :n  :nom
-   :p  :plateforme
-   :h  :site_web
-   :v? :est_verifiee
+   :n  :name
+   :p  :platform
+   :h  :website
+   :v? :is_verified
    :l  :login
-   :c  :date_creation
-   :r  :nombre_repertoires
-   :o  :organisation_url
+   :c  :creation_date
+   :r  :repositories_count
+   :o  :organization_url
    :au :avatar_url})
 
 ;; FIXME: Near duplicate in core.cljs
