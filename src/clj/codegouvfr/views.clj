@@ -12,6 +12,7 @@
             [ring.util.anti-forgery :as afu]
             [ring.util.response :as response]
             [codegouvfr.i18n :as i]
+            [codegouvfr.config :as config]
             [codegouvfr.md :as md]))
 
 (defonce ^{:doc "The URL for the latest repositories."}
@@ -69,7 +70,7 @@
    [:link {:rel   "alternate" :type "application/rss+xml"
            :title "RSS feed"  :href "https://code.etalab.gouv.fr/latest.xml"}]
    (h/include-css "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css")
-   (h/include-css "/css/style.css")
+   (h/include-css (str config/codegouvfr_base_url "/css/style.css"))
    [:script {:type "text/javascript" :async true} "var _paq = window._paq || [];_paq.push(['trackPageView']);_paq.push(['enableLinkTracking']);(function(){var u=\"//stats.data.gouv.fr/\";_paq.push(['setTrackerUrl', u+'piwik.php']);_paq.push(['setSiteId', '95']);var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);})();"]
    [:noscript [:p [:img {:src "//stats.data.gouv.fr/piwik.php?idsite=95&rec=1" :style "border:0;" :alt ""}]]]])
 
@@ -143,7 +144,7 @@
       [:section.section content0]
       (when-not content
         [:div
-         [:script {:src "/js/codegouvfr.js"}]
+         [:script {:src (str config/codegouvfr_base_url "/js/codegouvfr.js")}]
          [:script "codegouvfr.core.init();"]])
       (footer lang)])))
 
