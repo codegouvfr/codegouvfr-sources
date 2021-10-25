@@ -37,6 +37,10 @@
   (or (read-string (System/getenv "CODEGOUVFR_PORT"))
       3000))
 
+(def codegouvfr_base_url
+  (or (read-string (System/getenv "CODEGOUVFR_BASE_URL"))
+      "http://localhost:3000"))
+
 (def log-file
   "Where to store the application logs."
   "log.txt")
