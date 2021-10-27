@@ -2,7 +2,7 @@
 
 # code.etalab.gouv.fr
 
-Browse public sector source code repositories.
+Browse sector source code repositories from the french public sector.
 
 ![img](codegouvfr.png)
 
@@ -18,8 +18,9 @@ You also need `vega-cli` to store charts, install it globally with `npm install 
 
     ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
     ~$ cd code.etalab.gouv.fr/
-    ~$ clj -Mtest
-    ~$ clj -Mfig
+    ~$ clj -M:test
+	~$ clj -M:run
+    ~$ clj -M:fig
 
 Then check <http://localhost:9500> then hack and see changes going live.
 
