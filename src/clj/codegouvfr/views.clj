@@ -73,28 +73,27 @@
    [:noscript [:p [:img {:src "//stats.data.gouv.fr/piwik.php?idsite=95&rec=1" :style "border:0;" :alt ""}]]]])
 
 (defn footer [lang]
-  [:footer.footer
-   [:div.content
-    [:div.columns
-     [:div.column.is-offset-2.is-4
-      [:img {:src "/images/etalab.svg", :width "240px"}]
-      [:ul.footer__social
-       [:li [:a {:href "https://twitter.com/etalab", :title "Twitter"}
-             [:svg.icon.icon-twitter
-              [:use {:xlink:href "#twitter"}]]]]
-       [:li [:a {:href "https://github.com/etalab", :title "Github"}
-             [:svg.icon.icon-github
-              [:use {:xlink:href "#github"}]]]]
-       [:li [:a {:href "https://www.facebook.com/etalab", :title "Facebook"}
-             [:svg.icon.icon-fb [:use {:xlink:href "#facebook"}]]]]
-       [:li [:a {:href "mailto:info@data.gouv.fr", :title "Nous écrire un mail"}
-             [:svg.icon.icon-mail [:use {:xlink:href "#envelope"}]]]]]]
-     [:div.column.is-offset-1.is-4
-      [:h1 "code.etalab.gouv.fr"]
-      [:p (i/i lang [:website-developed-by])
-       [:a {:href "https://www.etalab.gouv.fr"} "Etalab"]
-       [:a {:href "https://github.com/etalab/code.etalab.gouv.fr"}
-        (str (i/i lang [:source-code-available]) " " (i/i lang [:here]) ".")]]]]]])
+  [:footer.fr-footer {:role "contentinfo"}
+   [:div.fr-container
+    [:div.fr-footer__body
+     [:div.fr_footer__brand.fr-enlarge-link
+      [:a {:href "/" :title "Retour à l'accueil"}
+       [:p.fr-logo "République Française"]]]
+     [:div.fr-footer__content
+      [:p.fr-footer__content-desc "Codes sources du secteur public"]
+      [:ul.fr-footer__content-list
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://data.gouv.fr"} "data.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://etalab.gouv.fr"} "etalab.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://numerique.gouv.fr"} "numerique.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]]])
 
 (defn default [lang & [title subtitle content]]
   (let [title    (or title (i/i lang [:index-title]))
