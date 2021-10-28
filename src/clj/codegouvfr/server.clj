@@ -13,7 +13,7 @@
             [ring.middleware.file :refer [wrap-file]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.not-modified :refer [wrap-not-modified]]
-            ;; [ring.middleware.reload :refer [wrap-reload]]
+            [ring.middleware.reload :refer [wrap-reload]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
             [compojure.core :refer [GET POST defroutes]]
             [compojure.route :refer [not-found resources]]
@@ -523,7 +523,7 @@
              wrap-content-type
              wrap-not-modified
              ;; FIXME: Don't wrap reload in production
-             ;; wrap-reload
+             wrap-reload
              ))
 
 (defn start-tasks! []
