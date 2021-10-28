@@ -78,7 +78,7 @@
     [:div.fr-footer__body
      [:div.fr_footer__brand.fr-enlarge-link
       [:a {:href "/" :title "Retour à l'accueil"}
-       [:p.fr-logo "République Française"]]]
+       [:p.fr-logo "République<br>Française"]]]
      [:div.fr-footer__content
       [:p.fr-footer__content-desc "Codes sources du secteur public"]
       [:ul.fr-footer__content-list
@@ -95,6 +95,59 @@
         [:a.fr-footer__content-link
          {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]]])
 
+;; (def navbar
+;;   [:nav.navbar {:role "navigation" :aria-label "main navigation"}
+;;    [:div.navbar-brand
+;;     [:a.navbar-item {:href "https://code.etalab.gouv.fr"}
+;;      [:img {:src    "/images/logo-marianne.svg"
+;;             :alt    "Logo Marianne"
+;;             :width  "120"
+;;             :height "100"}
+;;       "code.etalab.gouv.fr (beta)"]]]
+;;    [:div.navbar-menu
+;;     [:div.navbar-end
+;;      [:a.navbar-item
+;;       {:href (str "/" lang "/contact") :title (i/i lang [:report-new-source-code])}
+;;       (i/i lang [:contact])]
+;;      [:a.navbar-item
+;;       {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms])}
+;;       (i/i lang [:glossary])]
+;;      [:a.navbar-item {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?])}
+;;       (i/i lang [:about])]
+;;      [:a.navbar-item {:href  "https://www.etalab.gouv.fr"
+;;                       :title (i/i lang [:main-etalab-website])} "Etalab"]
+;;      [:a.navbar-item.button
+;;       {:href  "/latest.xml" :target "new"
+;;        :title (i/i lang [:subscribe-rss-flux])}
+;;       [:span.icon [:i.fas.fa-rss]]]]]])
+
+(defn banner [title subtitle]
+  [:header.fr-header {:role "banner"}
+   [:div.fr-header__body
+    [:div.fr-container
+     [:div.fr-header__body-row
+      [:div.fr-header__brand.fr-enlarge-link
+       [:div.fr-header__brand-top
+        [:div.fr-header__logo
+         [:p.fr-logo "République<br>Française"]]
+        [:div.fr-header__navbar
+         [:button.fr-btn--menu.fr-btn
+          {:data-fr-opened false
+           :aria-controls  "header-navigation"
+           :aria-haspopup  "menu"
+           :title          "menu"}
+          "Menu"]]]
+       [:div.fr-header__service
+        [:a {:href "/" :title title}
+         [:p.fr-header__service-title title]]
+        [:p.fr-header__service-tagline subtitle]]]
+      [:div.fr-header__tools
+       [:div.fr-header__tools-links
+        [:ul.fr-links-group
+         [:li
+          [:a.fr-link.fr-fi-mail-line {:href "/contact"}
+           "Contact"]]]]]]]]])
+
 (defn default [lang & [title subtitle content]]
   (let [title    (or title (i/i lang [:index-title]))
         subtitle (or subtitle (i/i lang [:index-subtitle]))
@@ -108,35 +161,7 @@
      [:body
       (let [csrf-token (force anti-forgery/*anti-forgery-token*)]
         [:div#sente-csrf-token {:data-csrf-token csrf-token}])
-      [:nav.navbar {:role "navigation" :aria-label "main navigation"}
-       [:div.navbar-brand
-        [:a.navbar-item {:href "https://code.etalab.gouv.fr"}
-         [:img {:src    "/images/logo-marianne.svg"
-                :alt    "Logo Marianne"
-                :width  "120"
-                :height "100"}
-          "code.etalab.gouv.fr (beta)"]]]
-       [:div.navbar-menu
-        [:div.navbar-end
-         [:a.navbar-item
-          {:href (str "/" lang "/contact") :title (i/i lang [:report-new-source-code])}
-          (i/i lang [:contact])]
-         [:a.navbar-item
-          {:href (str "/" lang "/glossary") :title (i/i lang [:understand-tech-terms])}
-          (i/i lang [:glossary])]
-         [:a.navbar-item {:href (str "/" lang "/about") :title (i/i lang [:why-this-website?])}
-          (i/i lang [:about])]
-         [:a.navbar-item {:href  "https://www.etalab.gouv.fr"
-                          :title (i/i lang [:main-etalab-website])} "Etalab"]
-         [:a.navbar-item.button
-          {:href  "/latest.xml" :target "new"
-           :title (i/i lang [:subscribe-rss-flux])}
-          [:span.icon [:i.fas.fa-rss]]]]]]
-      [:section.hero
-       [:div.hero-body
-        [:div.container
-         [:h1.title title]
-         [:h2.subtitle subtitle]]]]
+      (banner title subtitle)
       [:section.section content0]
       (when-not content
         [:div
