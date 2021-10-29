@@ -1162,8 +1162,8 @@
      (condp = view
        :home-redirect
        (if (contains? i/supported-languages lang)
-         (do (set! (.-location js/window) (str "/" lang "/groups")) "")
-         (do (set! (.-location js/window) (str "/en/groups")) ""))
+         (do (set! (.-location js/window) (str "/" lang "/repos")) "")
+         (do (set! (.-location js/window) (str "/en/repos")) ""))
        ;; Table to display organizations
        :orgas [organizations-page lang]
        ;; Table to display repositories
@@ -1218,10 +1218,11 @@
   [["/" :home-redirect]
    ["/:lang"
     ["/repos" :repos]
-    ["/groups" :orgas]
+    ;; ["/groups" :orgas]
     ;; ["/live" :live]
-    ["/stats" :stats]
-    ["/deps" :deps]]])
+    ;; ["/stats" :stats]
+    ;; ["/deps" :deps]
+    ]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
