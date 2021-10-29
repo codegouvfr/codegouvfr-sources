@@ -471,36 +471,36 @@
   (GET "/deps/:orga" [orga] (resource-orga-json orga))
   (GET "/deps/:orga/:repo" [orga repo] (resource-repo-json orga repo))
 
-  (GET "/en/about" [] (views/en-about "en"))
-  (GET "/en/contact" [] (views/contact "en"))
-  (GET "/en/glossary" [] (views/en-glossary "en"))
-  (GET "/en/ok" [] (views/ok "en"))
-  (GET "/it/about" [] (views/it-about "it"))
-  (GET "/it/contact" [] (views/contact "it"))
-  (GET "/it/glossary" [] (views/it-glossary "it"))
-  (GET "/it/ok" [] (views/ok "it"))
-  (GET "/fr/about" [] (views/fr-about "fr"))
-  (GET "/fr/contact" [] (views/contact "fr"))
-  (GET "/fr/glossary" [] (views/fr-glossary "fr"))
-  (GET "/fr/ok" [] (views/ok "fr"))
+  ;; (GET "/en/about" [] (views/en-about "en"))
+  ;; (GET "/en/contact" [] (views/contact "en"))
+  ;; (GET "/en/glossary" [] (views/en-glossary "en"))
+  ;; (GET "/en/ok" [] (views/ok "en"))
+  ;; (GET "/it/about" [] (views/it-about "it"))
+  ;; (GET "/it/contact" [] (views/contact "it"))
+  ;; (GET "/it/glossary" [] (views/it-glossary "it"))
+  ;; (GET "/it/ok" [] (views/ok "it"))
+  ;; (GET "/fr/about" [] (views/fr-about "fr"))
+  ;; (GET "/fr/contact" [] (views/contact "fr"))
+  ;; (GET "/fr/glossary" [] (views/fr-glossary "fr"))
+  ;; (GET "/fr/ok" [] (views/ok "fr"))
 
   ;; Backward compatibility
-  (GET "/glossaire" [] (response/redirect "/fr/glossary"))
-  (GET "/contact" [] (response/redirect "/fr/contact"))
-  (GET "/apropos" [] (response/redirect "/fr/about"))
+  ;; (GET "/glossaire" [] (response/redirect "/fr/glossary"))
+  ;; (GET "/contact" [] (response/redirect "/fr/contact"))
+  ;; (GET "/apropos" [] (response/redirect "/fr/about"))
 
   (GET "/repos-csv" req (get-resource-as-csv :repos (:query-params req)))
   (GET "/orgas-csv" req (get-resource-as-csv :orgas (:query-params req)))
 
-  (POST "/contact" req
-        (let [params       (walk/keywordize-keys (:form-params req))
-              contact-name (:name params)
-              organization (:organization params)]
-          (when (not (= contact-name organization))
-            (send-email
-             (conj params {:log (str "Sent message from " (:email params)
-                                     " (" organization ")")})))
-          (response/redirect (str "/" (:lang params) "/ok"))))
+  ;; (POST "/contact" req
+  ;;       (let [params       (walk/keywordize-keys (:form-params req))
+  ;;             contact-name (:name params)
+  ;;             organization (:organization params)]
+  ;;         (when (not (= contact-name organization))
+  ;;           (send-email
+  ;;            (conj params {:log (str "Sent message from " (:email params)
+  ;;                                    " (" organization ")")})))
+  ;;         (response/redirect (str "/" (:lang params) "/ok"))))
 
   ;; FIXME: unused bindings?
   (GET "/:lang/:p1/:p2/:p3" [lang]
