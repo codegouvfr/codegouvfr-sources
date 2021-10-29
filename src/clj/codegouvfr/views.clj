@@ -69,6 +69,8 @@
    (h/include-css "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css")
    (h/include-css (str config/codegouvfr_base_url "/css/style.css"))
    (h/include-css (str config/codegouvfr_base_url "/css/dsfr.min.css"))
+   [:script {:src "https://tag.aticdn.net/611901/smarttag.js"}]
+   [:script "var ATTag = new ATInternet.Tracker.Tag(); ATTag.page.send({name:'Page_Name'});"]
    [:script {:type "text/javascript" :async true} "var _paq = window._paq || [];_paq.push(['trackPageView']);_paq.push(['enableLinkTracking']);(function(){var u=\"//stats.data.gouv.fr/\";_paq.push(['setTrackerUrl', u+'piwik.php']);_paq.push(['setSiteId', '95']);var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);})();"]
    [:noscript [:p [:img {:src "//stats.data.gouv.fr/piwik.php?idsite=95&rec=1" :style "border:0;" :alt ""}]]]])
 
