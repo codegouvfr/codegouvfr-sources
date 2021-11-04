@@ -72,7 +72,7 @@ There is no real roadmap but you can check [our issues](https://github.com/etala
 
 The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.etalab.gouv.fr).  The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
 
-Your help is welcome.  You can contribute with bug reports, patches, feature requests or general questions by sending an email to `~etalab@lists.sr.ht`.
+Your help is welcome.  You can contribute with bug reports, patches, feature requests or general questions by sending an email to [~etalab/logiciels-libres@lists.sr.ht](mailto:~etalab/logiciels-libres@lists.sr.ht).
 
 ## Translation
 
