@@ -95,7 +95,15 @@
          {:href "https://numerique.gouv.fr"} "numerique.gouv.fr"]]
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
-         {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]]])
+         {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]
+    [:div.fr-footer__bottom
+     [:ul.fr-footer__bottom-list
+      [:li.fr-footer__bottom-item
+       [:a {:href "mailto:logiciels-libres@data.gouv.fr"} "Contact"]]
+      [:li.fr-footer__bottom-item
+       [:p "Accessibilité: conforme à 75%"]]
+      [:li.fr-footer__bottom-item
+       [:p "Mentions légales"]]]]]])
 
 ;; (def navbar
 ;;   [:nav.navbar {:role "navigation" :aria-label "main navigation"}
