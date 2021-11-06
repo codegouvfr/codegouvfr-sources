@@ -107,8 +107,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
 
-(defn seqs-difference [seq1 seq2]
-  (seq (set/difference (into #{} seq2) (into #{} seq1))))
+;; (defn seqs-difference [seq1 seq2]
+;;   (seq (set/difference (into #{} seq2) (into #{} seq1))))
 
 (defn get-repos-full []
   (json/parse-string (slurp repos-full-uri) true))
@@ -243,13 +243,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Initial setup for retrieving events constantly
 
-(def gh-org-events "https://api.github.com/orgs/%s/events")
-(def last-orgs-events (agent '()))
-(def events-channel (async/chan))
-(def http-get-gh-params
-  (merge http-get-params
-         {:basic-auth
-          (str config/github-user ":" config/github-access-token)}))
+;; (def gh-org-events "https://api.github.com/orgs/%s/events")
+;; (def last-orgs-events (agent '()))
+;; (def events-channel (async/chan))
+;; (def http-get-gh-params
+;;   (merge http-get-params
+;;          {:basic-auth
+;;           (str config/github-user ":" config/github-access-token)}))
 
 ;; (defn start-events-channel! []
 ;;   (async/go
@@ -258,45 +258,45 @@
 ;;         (event-msg-handler {:event e}))
 ;;       (recur (async/<! events-channel)))))
 
-(defn sort-events-by-date [diff]
-  (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
-       (sort-by :d (map #(update % :d t/zoned-date-time)
-                        diff))))
+;; (defn sort-events-by-date [diff]
+;;   (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
+;;        (sort-by :d (map #(update % :d t/zoned-date-time)
+;;                         diff))))
 
-(add-watch last-orgs-events
-           :watcher
-           (fn [_ _ old new]
-             (when-let [diff (seqs-difference old new)]
-               (async/thread
-                 (doseq [e (sort-events-by-date diff)]
-                   (timbre/info (pr-str e))
-                   (Thread/sleep (:send_channel_sleep @profile))
-                   (async/>!! events-channel e))))))
+;; (add-watch last-orgs-events
+;;            :watcher
+;;            (fn [_ _ old new]
+;;              (when-let [diff (seqs-difference old new)]
+;;                (async/thread
+;;                  (doseq [e (sort-events-by-date diff)]
+;;                    (timbre/info (pr-str e))
+;;                    (Thread/sleep (:send_channel_sleep @profile))
+;;                    (async/>!! events-channel e))))))
 
-(def latest-updated-orgas-filter
-  (comp
-   (filter #(= (:plateforme %) "GitHub"))
-   (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
-   (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
+;; (def latest-updated-orgas-filter
+;;   (comp
+;;    (filter #(= (:plateforme %) "GitHub"))
+;;    (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
+;;    (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
 
-(defn latest-updated-orgas [n]
-  (let [orgas (json/parse-string
-               (:body (try (http/get orgas-url http-get-params)
-                           (catch Exception _ nil))) ;; FIXME: add error?
-               true)]
-    (take
-     n
-     (distinct
-      (->> (reverse
-            (sort-by :derniere_mise_a_jour
-                     (sequence latest-updated-orgas-filter orgas)))
-           (map :organisation_nom))))))
+;; (defn latest-updated-orgas [n]
+;;   (let [orgas (json/parse-string
+;;                (:body (try (http/get orgas-url http-get-params)
+;;                            (catch Exception _ nil))) ;; FIXME: add error?
+;;                true)]
+;;     (take
+;;      n
+;;      (distinct
+;;       (->> (reverse
+;;             (sort-by :derniere_mise_a_jour
+;;                      (sequence latest-updated-orgas-filter orgas)))
+;;            (map :organisation_nom))))))
 
-(defn filter-old-events [events]
-  (let [yesterday (t/minus (t/instant) (t/days 1))]
-    (filter (fn [{:keys [date]}]
-              (not (t/before? (t/instant date) yesterday)))
-            events)))
+;; (defn filter-old-events [events]
+;;   (let [yesterday (t/minus (t/instant) (t/days 1))]
+;;     (filter (fn [{:keys [date]}]
+;;               (not (t/before? (t/instant date) yesterday)))
+;;             events)))
 
 ;; ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
 ;; ;; GitHub orgas with recently updated repos and get the last events
