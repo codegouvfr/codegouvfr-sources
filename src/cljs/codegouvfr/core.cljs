@@ -17,16 +17,12 @@
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]))
 
-(defonce repos-per-page 50) ;; FIXME: Make customizable?
-(defonce orgas-per-page 50) ;; FIXME: Make customizable?
-(defonce deps-per-page 50) ;; FIXME: Make customizable?
+(defonce repos-per-page 100)
+(defonce orgas-per-page 20)
+(defonce deps-per-page 100)
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
-(defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
-(defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
-(defonce platforms-csv-url "https://raw.githubusercontent.com/etalab/data-codes-sources-fr/master/platforms.csv")
-;; (defonce platforms-csv-url "https://git.sr.ht/~etalab/codegouvfr-fetch-data/blob/master/platforms.csv")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
@@ -528,20 +524,24 @@
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
 
-(defn navigate-pagination [type first-disabled last-disabled]
+(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
   [:div.fr-grid-row.fr-grid-row--center
    [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
     [:ul.fr-pagination__list
      [:li
       [:button.fr-pagination__link.fr-pagination__link--first
        {:on-click #(change-page type "first")
-        :href     ""
         :disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--prev
        {:on-click #(change-page type nil)
-        :href     ""
         :disabled first-disabled}]]
+
+     [:li
+      [:button.fr-pagination__link.fr
+       {:disabled true} (str (inc current-page) "/"
+                             (if (> total-pages 0) total-pages 1))]]
+
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
        {:on-click #(change-page type true)
@@ -665,10 +665,10 @@
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
            (str rps (i/i lang [:repos]))))]
-      [navigate-pagination :repos first-disabled last-disabled]]
+      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
 
      [repos-table lang (count repos)]
-     [navigate-pagination :repos first-disabled last-disabled]]))
+     [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
@@ -716,7 +716,7 @@
                   [:tr
                    [:td
                     (if (or h an)
-                      (let [w (if h h (str "https://lannuaire.service-public.fr/" an))]
+                      (let [w (if h h (str annuaire-prefix an))]
                         [:a.fr-link
                          {:title  (i/i lang [:go-to-website])
                           :target "new"
@@ -752,15 +752,16 @@
                 (s/join "&")
                 (str "/orgas-csv?"))}
        [:span.fr-fi-download-line {:aria-hidden true}]]
+
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
            (str orgs (i/i lang [:groups]))))]
-      [navigate-pagination :orgas first-disabled last-disabled]]
+      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
 
      [orgas-table lang orgas-cnt]
-     [navigate-pagination :orgas first-disabled last-disabled]]))
+     [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
 (defn deps-table [lang deps repo orga]
   (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
@@ -832,13 +833,13 @@
          (if (< deps 2)
            (str deps (i/i lang [:dep]))
            (str deps (i/i lang [:deps]))))]
-      [navigate-pagination :deps first-disabled last-disabled]]
+      [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
 
      (if (pos? (count deps))
        [deps-table lang deps repo orga]
        [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
 
-     [navigate-pagination :deps first-disabled last-disabled]
+     [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]
 
      (when-let [sims (get repos-sim repo)]
        [:div.fr-grid
@@ -1103,7 +1104,7 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
-        (GET platforms-csv-url
+        (GET "/platforms.csv"
              :handler
              #(re-frame/dispatch
                [:update-platforms! (map first (next (js->clj (csv/parse %))))]))
