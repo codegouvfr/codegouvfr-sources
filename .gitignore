@@ -27,3 +27,4 @@ resources/public/images/charts/
 .envrc
 *xml
 *csv
+resources/public/data/
