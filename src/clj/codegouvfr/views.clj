@@ -62,7 +62,13 @@
    [:meta {:property "twitter:title" :content title}]
    [:meta {:property "twitter:site" :content "@codegouvfr"}]
    [:meta {:property "twitter:creator" :content "@codegouvfr"}]
-   [:link {:rel "canonical" :href "https://code.etalab.gouv.fr"}]
+
+   [:link {:rel "apple-touch-icon" :href "/favicons/apple-touch-icon.png"}]
+   [:link {:rel "icon" :href "/favicons/favicon.svg" :type "image/svg+xml"}]
+   [:link {:rel "shortcut icon" :href "/favicons/favicon.ico" :type "image/x-icon"}]
+   [:link {:rel "manifest" :href "/manifest.webmanifest" :crossorigin "use-credentials"}]
+   
+   [:link {:rel "canonical" :href "https://code.gouv.fr"}]
    [:link {:rel   "alternate" :type "application/rss+xml"
            :title "RSS feed"  :href "https://code.gouv.fr/latest.xml"}]
    (h/include-css (str config/codegouvfr_base_url "/css/dsfr.min.css"))
