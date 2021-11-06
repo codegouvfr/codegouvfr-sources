@@ -457,7 +457,7 @@
              :title    (i/i lang [:sort-stars])
              :href     "#"
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
-            (i/i lang [:stars])]]
+            (i/i lang [:Stars])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :issues) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -723,10 +723,11 @@
                    [:td [:img {:src au :width "60%"}]]
                    [:td
                     (when-let [website (or h an)]
-                      [:a.fr-link
-                       {:title  (i/i lang [:go-to-website])
-                        :target "new"
-                        :href   h} (fa "fa-globe")])
+                      (let [w (if h h (str "https://lannuaire.service-public.fr/" an))]
+                        [:a.fr-link
+                         {:title  (i/i lang [:go-to-website])
+                          :target "new"
+                          :href   w} (fa "fa-globe")]))
                     [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
                    [:td r]
@@ -739,7 +740,7 @@
     ;;                 (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
     ;;                       @(re-frame/subscribe [:orgas?]))))]
     ;;   ^{:key dd}
-    
+
     ;;   [:div.fr-grid-row.fr-m-4w
     ;;    (for [{:keys [n l o h c d r e au p an dp fp] :as oo} dd]
     ;;      ^{:key oo}
@@ -983,13 +984,13 @@
         [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
         [:div.fr-tile__desc
          [:h3 avg_repos_cnt]]]]
-      
+
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
         [:div.fr-tile__desc
          [:h3 median_repos_cnt]]]]
-      
+
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:deps-stats])]
@@ -1010,16 +1011,19 @@
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-card [:span
-                    (i/i lang [:orgas-or-groups])
-                    " "
+                    (i/i lang [:orgas])
                     (i/i lang [:with-more-of])
                     (i/i lang [:repos])]
-                   top_orgs_by_repos_0)]
+                   top_orgs_by_repos_0
+                   [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-card [:span
-                    (i/i lang [:orgas-with-more-stars])]
-                   top_orgs_by_stars)]]
-     
+                    (i/i lang [:orgas])
+                    (i/i lang [:with-more-of])
+                    (i/i lang [:stars])]
+                   top_orgs_by_stars
+                   [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
+
      [:div.fr-grid-row
       (deps-card (i/i lang [:Deps]) deps lang)]
 
@@ -1028,7 +1032,7 @@
        (stats-card (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
        [:img {:src "/top_licenses.svg" :width "100%"}]]]
-     
+
      ;; [:div
      ;;  (stats-card [:span (i/i lang [:archive-on])
      ;;               "Software Heritage"
