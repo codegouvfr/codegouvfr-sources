@@ -1109,8 +1109,8 @@
      (condp = view
        :home-redirect
        (if (contains? i/supported-languages lang)
-         (do (set! (.-location js/window) (str "/" lang "/repos")) "")
-         (do (set! (.-location js/window) (str "/en/repos")) ""))
+         (do (set! (.-location js/window) (str "/" lang "/groups")) "")
+         (do (set! (.-location js/window) (str "/en/groups")) ""))
        ;; Table to display organizations
        :orgas [orgas-page lang]
        ;; Table to display repositories
