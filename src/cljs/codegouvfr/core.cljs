@@ -23,7 +23,6 @@
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
-(defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
 
@@ -59,7 +58,7 @@
     :filter         init-filter
     :display-filter init-filter
     :lang           "en"
-    :path-params    nil}))
+    :path    ""}))
 
 (re-frame/reg-event-db
  :lang!
@@ -67,17 +66,17 @@
    (assoc db :lang lang)))
 
 (re-frame/reg-event-db
- :path-params!
- (fn [db [_ path-params]]
-   (assoc db :path-params path-params)))
+ :path!
+ (fn [db [_ path]]
+   (assoc db :path path)))
 
 (re-frame/reg-sub
  :lang?
  (fn [db _] (:lang db)))
 
 (re-frame/reg-sub
- :path-params?
- (fn [db _] (:path-params db)))
+ :path?
+ (fn [db _] (:path db)))
 
 (re-frame/reg-event-db
  :update-platforms!
@@ -418,7 +417,7 @@
            [:a.fr-link
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col-1
@@ -428,7 +427,7 @@
           [:th.fr-col-3
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#"
+             :href     ""
              :title    (i/i lang [:sort-description-length])
              :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
             (i/i lang [:description])]]
@@ -436,35 +435,35 @@
            [:a.fr-link
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-update-date])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :forks) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-forks])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :stars) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-stars])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :issues) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-issues])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
             (i/i lang [:issues])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-reused])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
             (i/i lang [:reused])]]]]
         (into [:tbody]
@@ -653,14 +652,14 @@
            [:a.fr-link
             {:class    (when (= org-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-alpha])
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
             (i/i lang [:orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#"
+             :href     ""
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
@@ -669,7 +668,7 @@
            ;; FIXME
            ;; [:a.fr-link
            ;;  {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           ;;   :href     "#"
+           ;;   :href     ""
            ;;   :title    (i/i lang [:sort-orgas-creation])
            ;;   :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
            ;;  (i/i lang [:created-at])]
@@ -742,26 +741,26 @@
         [:th.fr-col-3
          [:a.fr-link
           {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#"
+           :href     ""
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
          [:a.fr-link
           {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#"
+           :href     ""
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
          [:a.fr-link
           {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#"
+           :href     ""
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
         (when-not repo
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#"
+             :href     ""
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
       (into
@@ -799,8 +798,7 @@
      [:div.fr-grid-row
 
       [:a.fr-link
-       {:title (i/i lang [:download])
-        :href  "/deps.json"}
+       {:title (i/i lang [:download]) :href "/data/deps.json"}
        [:span.fr-fi-download-line {:aria-hidden true}]]
 
       [:strong.fr-m-auto
@@ -829,7 +827,7 @@
    {:display-name   "repos-page-class"
     :component-did-mount
     (fn []
-      (GET "/repos.json"
+      (GET "/data/repos.json"
            :handler
            #(re-frame/dispatch
              [:update-repos! (map (comp bean clj->js) %)])))
@@ -886,6 +884,12 @@
                            :href  (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
+(defn tile [l i s]
+  [:div.fr-tile.fr-col-2.fr-m-1w
+   [:div.fr-tile__body
+    [:h1.fr-tile__title (i/i l [i])]
+    [:div.fr-tile__desc
+     [:h3 s]]]])
 
 (defn stats-page
   [lang stats deps deps-total]
@@ -911,35 +915,11 @@
                   (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
-      [:div.fr-tile.fr-col-2.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
-        [:div.fr-tile__desc
-         [:h3 avg_repos_cnt]]]]
-
-      [:div.fr-tile.fr-col-2.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
-        [:div.fr-tile__desc
-         [:h3 orgs_cnt]]]]
-
-      [:div.fr-tile.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:repos-of-source-code])]
-        [:div.fr-tile__desc [:h3 repos_cnt]]]]
-
-      [:div.fr-tile.fr-col-2.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:deps-stats])]
-        [:div.fr-tile__desc
-         [:h3
-          (:deps-total deps-total)]]]]
-
-      [:div.fr-tile.fr-col-2.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
-        [:div.fr-tile__desc
-         [:h3 median_repos_cnt]]]]]
+      (tile lang :mean-repos-by-orga avg_repos_cnt)
+      (tile lang :orgas-or-groups orgs_cnt)
+      (tile lang :repos-of-source-code repos_cnt)
+      (tile lang :deps-stats (:deps-total deps-total))
+      (tile lang :median-repos-by-orga median_repos_cnt)]
 
      [:div.fr-grid-row
       [:div.fr-col-6
@@ -974,8 +954,9 @@
       [:div.fr-col-6
        (stats-card (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
-       [:img {:src "/top_licenses.svg" :width "100%"}]]]
+       [:img {:src "/data/top_licenses.svg" :width "100%"}]]]
 
+     ;; FIXME: Shall we add this?
      ;; [:div
      ;;  (stats-card [:span (i/i lang [:archive-on])
      ;;               "Software Heritage"
@@ -995,7 +976,7 @@
      {:display-name   "deps-page-class"
       :component-did-mount
       (fn []
-        (GET "/deps-repos-sim.json"
+        (GET "/data/deps-repos-sim.json"
              :handler #(reset! deps-repos-sim %)))
       :reagent-render (fn [] (deps-page lang @deps-repos-sim))})))
 
@@ -1007,11 +988,11 @@
      {:display-name   "stats-page-class"
       :component-did-mount
       (fn []
-        (GET "/deps-total.json"
+        (GET "/data/deps-total.json"
              :handler #(reset! deps-total (walk/keywordize-keys %)))
-        (GET "/deps-top.json"
+        (GET "/data/deps-top.json"
              :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
-        (GET "/general.json"
+        (GET "/data/general.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
@@ -1048,27 +1029,87 @@
        (when-let [ff (not-empty (:repo flt))]
          (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
 
+(defn banner [lang]
+  (let [path @(re-frame/subscribe [:path?])]
+    [:header.fr-header {:role "banner"}
+     ;; Header body
+     [:div.fr-header__body
+      [:div.fr-container
+       [:div.fr-header__body-row
+        [:div.fr-header__brand.fr-enlarge-link
+         [:div.fr-header__brand-top
+          [:div.fr-header__logo
+           [:p.fr-logo "République<br>Française"]]
+          [:div.fr-header__navbar
+           [:button.fr-btn--menu.fr-btn
+            {:data-fr-opened false
+             :aria-controls  "header-navigation"
+             :aria-haspopup  "menu"
+             :title          "menu"}
+            "Menu"]]]
+         [:div.fr-header__service
+          [:a {:href "/" :title (i/i lang [:index-title])}
+           [:p.fr-header__service-title (i/i lang [:index-title])]]
+          [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]
+        [:div.fr-header__tools
+         [:div.fr-header__tools-links
+          [:ul.fr-links-group
+           [:li
+            [:a.fr-link.fr-fi-mail-line
+             {:href "mailto:logiciels-libres@data.gouv.fr"}
+             "Contact"]]
+           [:li
+            [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
+             {:href "https://twitter.com/codegouvfr"}
+             "@codegouvfr"]]]]]]]]
+     ;; Header menu
+     [:div#header-navigation.fr-header__menu.fr-modal
+      {:aria-labelledby "button-menu"}
+      [:div.fr-container
+       [:button.fr-link--close.fr-link
+        {:aria-controls "header-navigation"} "Fermer"]
+       [:div.fr-header__menu-links]
+       [:nav.fr-nav {:role "navigation" :aria-label "Menu principal"}
+        [:ul.fr-nav__list
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/") "page")
+            :href "" :on-click #(rfe/push-state :orgas)}
+           (i/i lang [:orgas-or-groups])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/repos") "page")
+            :href "" :on-click #(rfe/push-state :repos)}
+           (i/i lang [:Repos])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/deps") "page")
+            :href "" :on-click #(rfe/push-state :deps)}
+           (i/i lang [:Deps])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/stats") "page")
+            :href "" :on-click #(rfe/push-state :stats)}
+           (i/i lang [:stats])]]]]]]]))
+
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
-    [:div.fr-container.fr-container--fluid
-     [main-menu q lang view]
-     (condp = view
-       :home-redirect
-       (if (contains? i/supported-languages lang)
-         (do (set! (.-location js/window) (str "/" lang "/groups")) "")
-         (do (set! (.-location js/window) (str "/en/groups")) ""))
-       ;; Table to display organizations
-       :orgas [orgas-page lang]
-       ;; Table to display repositories
-       :repos [repos-page-class lang license language platform]
-       ;; Table to display statistics
-       :stats [stats-page-class lang]
-       ;; Table to display all dependencies
-       :deps  [deps-page-class lang]
-       ;; :live      [live lang]
-       ;; Fall back on the organizations page
-       :else  (rfe/push-state :orgas {:lang lang}))]))
+    [:div (banner lang)
+     [:div.fr-container.fr-container--fluid
+      [main-menu q lang view]
+      (condp = view
+        ;; Table to display organizations
+        :orgas [orgas-page lang]
+        ;; Table to display repositories
+        :repos [repos-page-class lang license language platform]
+        ;; Table to display statistics
+        :stats [stats-page-class lang]
+        ;; Table to display all dependencies
+        :deps  [deps-page-class lang]
+        ;; :live      [live lang]
+        ;; Fall back on the organizations page
+        :else  (rfe/push-state :orgas))]]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
@@ -1079,11 +1120,11 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
-        (GET "/platforms.csv"
+        (GET "/data/platforms.csv"
              :handler
              #(re-frame/dispatch
                [:update-platforms! (map first (next (js->clj (csv/parse %))))]))
-        (GET "/deps.json"
+        (GET "/data/deps.json"
              :handler
              #(do
                 (re-frame/dispatch
@@ -1094,41 +1135,40 @@
                              clj->js
                              (fn [e] (dissoc e :t :d :l :r)))
                        %)])))
-        (GET "/orgas.json"
+        (GET "/data/orgas.json"
              :handler
              #(re-frame/dispatch
                [:update-orgas! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language platform))})))
 
 (defn on-navigate [match]
-  (let [lang (:lang (:path-params match))]
-    (when (string? lang) (re-frame/dispatch [:lang! lang]))
-    (re-frame/dispatch [:path-params! (:path-params match)])
-    (re-frame/dispatch [:view!
-                        (keyword (:name (:data match)))
-                        (:query-params match)])))
+  (re-frame/dispatch [:path! (:path match)])
+  (re-frame/dispatch [:view!
+                      (keyword (:name (:data match)))
+                      (:query-params match)]))
 
 (defonce routes
-  [["/" :home-redirect]
-   ["/:lang"
-    ["/repos" :repos]
-    ["/groups" :orgas]
-    ["/stats" :stats]
-    ["/deps" :deps]
-    ]])
+  [["/" :orgas]
+   ["/repos" :repos]
+   ["/stats" :stats]
+   ["/deps" :deps]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
-  (re-frame/dispatch
-   [:lang! (subs (or js/navigator.language "en") 0 2)])
-  (rfe/start!
-   (rf/router routes {:conflicts nil})
-   on-navigate
-   {:use-fragment false})
-  (start-filter-loop)
-  (start-display-filter-loop)
-  (reagent.dom/render
-   [main-class]
-   (.getElementById js/document "app"))
-  )
+  (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
+    (re-frame/dispatch
+     [:lang!
+      (if (contains? i/supported-languages browser-lang)
+        browser-lang
+        "en")])
+    ;; :home-redirect
+    (rfe/start!
+     (rf/router routes {:conflicts nil})
+     on-navigate
+     {:use-fragment false})
+    (start-filter-loop)
+    (start-display-filter-loop)
+    (reagent.dom/render
+     [main-class]
+     (.getElementById js/document "app"))))
