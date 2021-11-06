@@ -243,7 +243,7 @@
         pl       (:platform f)
         lic      (:license f)
         e        (:is-esr f)
-        fk       (:is-fork f)
+        fk       (:is-not-fork f)
         li       (:is-licensed f)
         ;; FIXME: Don't check this for now
         ;; de       (:has-description f)
@@ -319,15 +319,12 @@
  :repos?
  (fn [db _]
    (let [repos0 (:repos db)
-         ;; favs   (get-item :favs)
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
                   :issues (sort-by :i repos0)
                   :reused (sort-by :g repos0)
-                  ;; :favs   (concat (filter #(not-any? #{(:n %)} favs) repos0)
-                  ;;                 (filter #(some #{(:n %)} favs) repos0))
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
@@ -571,43 +568,16 @@
                      filter?)
                 (s/join "&")
                 (str "/repos-csv?"))}
-       [:span.fr-fi-download-line {:aria-hidden true}]
-       ;; <span class="fr-fi-download-line" aria-hidden="true"></span>
-       ;; (fa "fa-download")
-       ]
-      ;; [:div.dropdown
-      ;;  [:div.dropdown-trigger
-      ;;   [:button.button {:aria-haspopup true :aria-controls "dropdown-menu3"}
-      ;;    [:span (i/i lang [:options])] (fa "fa-angle-down")]]
-      ;;  [:div.dropdown-menu {:role "menu" :id "dropdown-menu3"}
-      ;;   [:div.dropdown-content
-      ;;    [:div.dropdown-item
-      ;;     [:label
-      ;;      [:input.fr-input
-      ;;       {:type      "checkbox"
-      ;;        :checked   (get-item :is-fork)
-      ;;        :on-change #(let [v (.-checked (.-target %))]
-      ;;                      (set-item! :is-fork v)
-      ;;                      (re-frame/dispatch [:filter! {:is-fork v}]))}]
-      ;;      (i/i lang [:only-forks])]]
-      ;;    [:div.dropdown-item
-      ;;     [:label.checkbox.level {:title (i/i lang [:only-with-license])}
-      ;;      [:input.fr-input
-      ;;       {:type      "checkbox"
-      ;;        :checked   (get-item :is-licensed)
-      ;;        :on-change #(let [v (.-checked (.-target %))]
-      ;;                      (set-item! :is-licensed v)
-      ;;                      (re-frame/dispatch [:filter! {:is-licensed v}]))}]
-      ;;      (i/i lang [:with-license])]]
-      ;;    [:div.dropdown-item
-      ;;     [:label.checkbox.level
-      ;;      [:input.fr-input
-      ;;       {:type      "checkbox"
-      ;;        :checked   (get-item :is-esr)
-      ;;        :on-change #(let [v (.-checked (.-target %))]
-      ;;                      (set-item! :is-esr v)
-      ;;                      (re-frame/dispatch [:filter! {:is-esr v}]))}]
-      ;;      (i/i lang [:only-her])]]]]]
+       [:span.fr-fi-download-line {:aria-hidden true}]]
+
+      [:strong.fr-m-auto
+       (let [rps (count repos)]
+         (if (< rps 2)
+           (str rps (i/i lang [:repo]))
+           (str rps (i/i lang [:repos]))))]
+      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
+
+     [:div.fr-grid-row
       [:input.fr-input.fr-col-2.fr-m-1w
        {:placeholder (i/i lang [:license])
         :value       (or @license
@@ -644,12 +614,27 @@
        (for [x @(re-frame/subscribe [:platforms?])]
          ^{:key x}
          [:option {:value x} x])]
-      [:strong.fr-m-auto
-       (let [rps (count repos)]
-         (if (< rps 2)
-           (str rps (i/i lang [:repo]))
-           (str rps (i/i lang [:repos]))))]
-      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
+
+      [:div.fr-checkbox-group.fr-col.fr-ml-3w
+       [:input {:type      "checkbox" :id "1" :name "1"
+                :on-change #(let [v (.-checked (.-target %))]
+                              (set-item! :is-not-fork v)
+                              (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
+       [:label.fr-label {:for "1"} "Pas de fork"]]
+
+      [:div.fr-checkbox-group.fr-col
+       [:input {:type      "checkbox" :id "2" :name "2"
+                :on-change #(let [v (.-checked (.-target %))]
+                              (set-item! :is-licensed v)
+                              (re-frame/dispatch [:filter! {:is-licensed v}]))}]
+       [:label.fr-label {:for "2"} "Avec licence"]]
+
+      [:div.fr-checkbox-group.fr-col
+       [:input {:type      "checkbox" :id "3" :name "3"
+                :on-change #(let [v (.-checked (.-target %))]
+                              (set-item! :is-esr v)
+                              (re-frame/dispatch [:filter! {:is-esr v}]))}]
+       [:label.fr-label {:for "3"} "Seuls ESR"]]]
 
      [repos-table lang (count repos)]
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
@@ -811,7 +796,13 @@
         first-disabled      (zero? deps-pages)
         last-disabled       (= deps-pages (dec count-pages))]
     [:div.fr-grid
-     [:div.fr-grid-row.fr-m-1w
+     [:div.fr-grid-row
+
+      [:a.fr-link
+       {:title (i/i lang [:download])
+        :href  "/deps.json"}
+       [:span.fr-fi-download-line {:aria-hidden true}]]
+
       [:strong.fr-m-auto
        (let [deps (count deps)]
          (if (< deps 2)
