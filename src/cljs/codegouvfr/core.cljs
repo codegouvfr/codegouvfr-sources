@@ -322,7 +322,7 @@
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
-                  :issues (sort-by :i repos0)
+                  ;; :issues (sort-by :i repos0)
                   :reused (sort-by :g repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
@@ -424,7 +424,7 @@
            [:a.fr-link {:href   "https://www.softwareheritage.org"
                         :title  "www.softwareheritage.org"
                         :target "new"} (i/i lang [:archive])]]
-          [:th.fr-col-3
+          [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :href     ""
@@ -452,13 +452,13 @@
              :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
-          [:th.fr-col-1
-           [:a.fr-link
-            {:class    (when (= rep-f :issues) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :title    (i/i lang [:sort-issues])
-             :href     ""
-             :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
-            (i/i lang [:issues])]]
+          ;; [:th.fr-col-1
+          ;;  [:a.fr-link
+          ;;   {:class    (when (= rep-f :issues) "fr-fi-checkbox-circle-line fr-link--icon-left")
+          ;;    :title    (i/i lang [:sort-issues])
+          ;;    :href     ""
+          ;;    :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
+          ;;   (i/i lang [:issues])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -470,7 +470,8 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a? d f i li n o r s u dp g]}
+                (let [{:keys [a? d f li n o r s u dp g]}
+                      ;; remove i as we don't want to display issues
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
@@ -512,7 +513,7 @@
                    ;; Stars
                    [:td s]
                    ;; Issues
-                   [:td i]
+                   ;; [:td i]
                    ;; Reused
                    [:td
                     ;; FIXME: not working?
@@ -1163,7 +1164,6 @@
       (if (contains? i/supported-languages browser-lang)
         browser-lang
         "en")])
-    ;; :home-redirect
     (rfe/start!
      (rf/router routes {:conflicts nil})
      on-navigate
