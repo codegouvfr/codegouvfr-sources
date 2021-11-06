@@ -419,16 +419,16 @@
         [:thead
          [:tr
           [:th
-           [:a.fr-link
+           [:a
             {;; :class    (when (= rep-f :name) "is-light")
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th
-           [:a.fr-link {:title (i/i lang [:swh-link])}
+           [:a {:title (i/i lang [:swh-link])}
             (i/i lang [:archive])]]
           [:th
-           [:a.fr-link
+           [:a
             {;; :class    (when (= rep-f :desc) "is-light")
              :title    (i/i lang [:sort-description-length])
              :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
@@ -665,7 +665,7 @@
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div.fr-grid-row
-     [:a.fr-link.fr-col-1
+     [:a.fr-col-1
       {:title (i/i lang [:download])
        :href  (->>
                (map (fn [[k v :as kv]]
@@ -675,17 +675,17 @@
                (s/join "&")
                (str "/orgas-csv?"))}
       (fa "fa-download")]
-     [:a.fr-link.fr-col-2
+     [:a.fr-col-2
       {;; :class    (str "is-" (if (= org-f :name) "info" "light"))
        :title    (i/i lang [:sort-orgas-alpha])
        :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
       (i/i lang [:sort-alpha])]
-     [:a.fr-link.fr-col-2
+     [:a.fr-col-2
       {;; :class    (str "is-" (if (= org-f :repos) "info" "light"))
        :title    (i/i lang [:sort-repos])
        :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
       (i/i lang [:sort-repos])]
-     [:a.fr-link.fr-col-2
+     [:a.fr-col-2
       {;; :class    (str "is-" (if (= org-f :date) "info" "light"))
        :title    (i/i lang [:sort-orgas-creation])
        :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
@@ -835,29 +835,30 @@
         first-disabled      (zero? deps-pages)
         last-disabled       (= deps-pages (dec count-pages))
         dep-f               @(re-frame/subscribe [:sort-deps-by?])]
-    [:div
-     [:div.fr-m-2w
-      [:a.fr-link
-       {;; :class    (str "is-" (if (= dep-f :name) "info" "light"))
+    [:div.fr-grid
+     [:div.fr-grid-row
+      [:button.fr-btn.fr-btn--secondary.fr-col.fr-m-1w
+       {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-btn--icon-left")
         :title    (i/i lang [:sort-name])
         :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
        (i/i lang [:name])]
-      [:a.fr-link
-       {;; :class    (str "is-" (if (= dep-f :type) "info" "light"))
+      [:button.fr-btn.fr-btn--secondary.fr-col.fr-m-1w
+       {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-btn--icon-left")
         :title    (i/i lang [:sort-type])
         :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
        (i/i lang [:type])]
-      [:a.fr-link
-       {;; :class    (str "is-" (if (= dep-f :description) "info" "light"))
+      [:button.fr-btn.fr-btn--secondary.fr-col.fr-m-1w
+       {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-btn--icon-left")
         :title    (i/i lang [:sort-description])
         :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
        (i/i lang [:description])]
-      [:a.fr-link
-       {;; :class    (str "is-" (if (= dep-f :repos) "info" "light"))
+      [:button.fr-btn.fr-btn--secondary.fr-col.fr-m-1w
+       {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-btn--icon-left")
         :title    (i/i lang [:sort-repos])
         :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
        (i/i lang [:Repos])]
-      [:span.fr-btn.fr-btn--secondary
+      [:button.fr-btn.fr-btn--secondary.fr-btn--secondary.fr-col.fr-m-1w
+       {:disabled true}
        (let [deps (count deps)]
          (if (< deps 2)
            (str deps (i/i lang [:dep]))
