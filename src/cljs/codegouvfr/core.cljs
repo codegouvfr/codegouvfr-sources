@@ -46,7 +46,7 @@
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce repos-csv-url "https://www.data.gouv.fr/fr/datasets/r/54a38a62-411f-4ea7-9631-ae78d1cef34c")
 (defonce orgas-csv-url "https://www.data.gouv.fr/fr/datasets/r/79f8975b-a747-445c-85d0-2cf707e12200")
-(defonce platforms-csv-url "https://raw.githubusercontent.com/etalab/data-codes-sources-fr/master/platforms.csv")
+(defonce platforms-csv-url "https://git.sr.ht/~etalab/codegouvfr-fetch-data/blob/master/platforms.csv")
 (defonce stats-url "https://api-code.etalab.gouv.fr/api/stats/general")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
