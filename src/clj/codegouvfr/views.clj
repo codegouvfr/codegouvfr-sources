@@ -95,14 +95,21 @@
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
          {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]
+
     [:div.fr-footer__bottom
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
-       [:a {:href "mailto:logiciels-libres@data.gouv.fr"} "Contact"]]
+       [:a.fr-footer__bottom-link
+        {:href "mentions légales"}
+        "Accessibilité: conforme à 75%"]]
       [:li.fr-footer__bottom-item
-       [:p "Accessibilité: conforme à 75%"]]
+       [:a.fr-footer__bottom-link
+        {:href "mentions légales"}
+        "Mentions légales"]]
       [:li.fr-footer__bottom-item
-       [:p "Mentions légales"]]]]]])
+       [:a.fr-footer__bottom-link
+        {:href "mentions légales"}
+        "Données personnelles et cookies"]]]]]])
 
 ;; (def navbar
 ;;   [:nav.navbar {:role "navigation" :aria-label "main navigation"}
@@ -157,7 +164,11 @@
          [:li
           [:a.fr-link.fr-fi-mail-line
            {:href "mailto:logiciels-libres@data.gouv.fr"}
-           "Contact"]]]]]]]]
+           "Contact"]]
+         [:li
+          [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
+           {:href "https://twitter.com/codegouvfr"}
+           "@codegouvfr"]]]]]]]]
    ;; Header menu
    [:div#header-navigation.fr-header__menu.fr-modal
     {:aria-labelledby "button-menu"}
