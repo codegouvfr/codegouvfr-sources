@@ -663,7 +663,7 @@
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
            (str rps (i/i lang [:repos]))))]]
-     
+
      [repos-table lang (count repos)]
      [navigate-pagination :repos first-disabled last-disabled]]))
 
@@ -676,117 +676,96 @@
         count-pages    (count (partition-all orgas-per-page orgas))
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))]
-    [:div.fr-grid-row
-     [:a.fr-col-1
-      {:title (i/i lang [:download])
-       :href  (->>
-               (map (fn [[k v :as kv]]
-                      (when (not-empty kv)
-                        (str (name k) "=" v)))
-                    filter?)
-               (s/join "&")
-               (str "/orgas-csv?"))}
-      (fa "fa-download")]
-     [:a.fr-col-2
-      {;; :class    (str "is-" (if (= org-f :name) "info" "light"))
-       :title    (i/i lang [:sort-orgas-alpha])
-       :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
-      (i/i lang [:sort-alpha])]
-     [:a.fr-col-2
-      {;; :class    (str "is-" (if (= org-f :repos) "info" "light"))
-       :title    (i/i lang [:sort-repos])
-       :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
-      (i/i lang [:sort-repos])]
-     [:a.fr-col-2
-      {;; :class    (str "is-" (if (= org-f :date) "info" "light"))
-       :title    (i/i lang [:sort-orgas-creation])
-       :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
-      (i/i lang [:sort-creation])]
-     [:button.fr-btn.fr-btn--secondary
-      (let [orgs (count orgas)]
-        (if (< orgs 2)
-          (str orgs (i/i lang [:one-group]))
-          (str orgs (i/i lang [:groups]))))]
-     ;; FIXME
-     [navigate-pagination :orgas first-disabled last-disabled]
-     
+    [:div.fr-grid
+     [:div.fr-grid-row
+      [:a.fr-link.fr-m-1w
+       {:title (i/i lang [:download])
+        :href  (->>
+                (map (fn [[k v :as kv]]
+                       (when (not-empty kv)
+                         (str (name k) "=" v)))
+                     filter?)
+                (s/join "&")
+                (str "/orgas-csv?"))}
+       (fa "fa-download")]
+      [:a.fr-link.fr-col-3.fr-m-1w
+       {:class    (if (= org-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+        :href     "#"
+        :title    (i/i lang [:sort-orgas-alpha])
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
+       (i/i lang [:sort-alpha])]
+      [:a.fr-link.fr-col-3.fr-m-1w
+       {:class    (if (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
+        :title    (i/i lang [:sort-repos])
+        :href     "#"
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
+       (i/i lang [:sort-repos])]
+      [:a.fr-link.fr-col-3.fr-m-1w
+       {:class    (if (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+        :title    (i/i lang [:sort-orgas-creation])
+        :href     "#"
+        :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
+       (i/i lang [:sort-creation])]
+      [:button.fr-btn.fr-btn--secondary
+       {:disabled true}
+       (let [orgs (count orgas)]
+         (if (< orgs 2)
+           (str orgs (i/i lang [:one-group]))
+           (str orgs (i/i lang [:groups]))))]]
+
      [:br]
      (into
       [:div]
       (if (zero? orgs-cnt)
         [[:p (i/i lang [:no-orga-found])] [:br]] ;; FIXME: Why [[ ?
         (for [dd (partition-all
-                  3
+                  2
                   (take orgas-per-page
                         (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                               @(re-frame/subscribe [:orgas?]))))]
           ^{:key dd}
-          [:div.columns
+          [:div.fr-grid-row.fr-m-4w
            (for [{:keys [n l o h c d r e au p an dp fp] :as oo} dd]
              ^{:key oo}
-             [:div.column.is-4
-              [:div.card
-               [:div.card-content
-                [:div.media
-                 (when au
-                   [:div.media-left
-                    [:figure.image.is-48x48
-                     [:img {:src au}]]])
-                 [:div.media-content
-                  [:a
-                   {:target "new"
-                    :title  (i/i lang [:go-to-orga])
-                    :href   o}
-                   [:span (or n l)
-                    " "
-                    [:span
-                     (cond (= p "GitHub")
-                           (fab "fa-github")
-                           (= p "GitLab")
-                           (fab "fa-gitlab"))]]]
-                  [:br]
-                  (let [date (to-locale-date c)]
-                    (when date
-                      [:p (str (i/i lang [:created-at]) date)]))
-                  (when r
-                    ;; FIXME: hackish, orgas-mapping should give
-                    ;; the forge base on top of "plateforme".
-                    [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos {:lang lang}
-                                          {:g (s/replace o "/groups/" "/")})}
-                     r (if (< r 2)
-                         (i/i lang [:repo])
-                         (i/i lang [:repos]))])]]
-                [:div.content
-                 [:p d]
-                 (when-let [fp (not-empty fp)]
-                   [:a {:href   fp
-                        :target "new"
-                        :title  (i/i lang [:publication-policy])}
-                    [:p "Politique de publication open source"]])]]
-               [:div.card-footer
+             [:div.fr-col-6
+              [:div.fr-grid-row.fr-mb-2w
+               (when au [:img.fr-col-2.fr-responsive-img {:src au}])
+               [:a.fr-link.fr-col-4.fr-m-2w
+                {:target "new"
+                 :title  (i/i lang [:go-to-orga])
+                 :href   o}
+                (or n l)]
+               [:div.fr-col-5.fr-m-auto
                 (when dp
-                  [:a.card-footer-item
+                  [:a.fr-link
                    {:title (i/i lang [:Deps])
                     :href  (rfe/href :deps {:lang lang} {:orga o})}
                    (fa "fa-cubes")])
-                (when e [:a.card-footer-item
+                (when e [:a.fr-link
                          {:title (i/i lang [:contact-by-email])
                           :href  (str "mailto:" e)}
                          (fa "fa-envelope")])
-                (when h [:a.card-footer-item
+                (when h [:a.fr-link
                          {:title  (i/i lang [:go-to-website])
                           :target "new"
                           :href   h} (fa "fa-globe")])
-                (when an [:a.card-footer-item
+                (when an [:a.fr-link
                           {:title  (i/i lang [:go-to-sig-website])
                            :target "new"
                            :href   (str annuaire-prefix an)}
-                          (fa "fa-link")])]]])])))]))
+                          (fa "fa-link")])
+                (when an [:a.fr-link
+                          {:title  (i/i lang [:go-to-sig-website])
+                           :target "new"
+                           :href   (str annuaire-prefix an)}
+                          (fa "fa-link")])]]
+              [:div.fr-grid-row [:p d]]])])))
+
+     [navigate-pagination :orgas first-disabled last-disabled]]))
 
 (defn deps-table [lang deps repo orga]
-  (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
-        deps-page @(re-frame/subscribe [:deps-page?])]
+(let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
+      deps-page @(re-frame/subscribe [:deps-page?])]
     [:div.fr-grid-row
      [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
       [:thead.fr-grid.fr-col-12
@@ -1147,8 +1126,7 @@
   [["/" :home-redirect]
    ["/:lang"
     ["/repos" :repos]
-    ;; ["/groups" :orgas]
-    ;; ["/live" :live]
+    ["/groups" :orgas]
     ;; ["/stats" :stats]
     ["/deps" :deps]
     ]])

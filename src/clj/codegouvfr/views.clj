@@ -168,11 +168,9 @@
      [:div.fr-header__menu-links]
      [:nav.fr-nav {:role "navigation" :aria-label "Menu principal"}
       [:ul.fr-nav__list
-       ;; [:li.fr-nav__item.fr-nav__item--active
-       ;;  [:a.fr-nav__link {:href         "groups"
-       ;;                    :target       "_self"
-       ;;                    :aria-current "groups"}
-       ;;   "Organisation ou groupes"]]
+       [:li.fr-nav__item
+        [:a.fr-nav__link {:href "groups" :target "_self"}
+         "Organisation ou groupes"]]
        [:li.fr-nav__item
         [:a.fr-nav__link {:href "repos" :target "_self"}
          "Dépôts de code source"]]
