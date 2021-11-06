@@ -21,7 +21,7 @@
     :archive-on                    "Archive sur "
     :browse-repos-orga             "Voir la liste des dépôts de cette organisation ou de ce groupe"
     :contact                       "Contact"
-    :created-at                    "Créé le "
+    :created-at                    "Création"
     :dep                           " dépendance"
     :dep-of                        "dépendance identifiée pour"
     :deps                          " dépendances"
@@ -138,7 +138,7 @@
     :archive-on                    "Archive on "
     :browse-repos-orga             "See the list of repositories from this organization or group"
     :contact                       "Contact"
-    :created-at                    "Created on "
+    :created-at                    "Created"
     :dep                           " dependency"
     :dep-of                        "identified dependency for"
     :deps                          " dependencies"
@@ -251,7 +251,7 @@
     :archive-on                    "Archiviato su "
     :browse-repos-orga             "Vedere la lista di repository di questa organizazzione o di questo gruppo"
     :contact                       "Contatti"
-    :created-at                    "Creato il "
+    :created-at                    "Creato"
     :dep                           " dependency"                  ;; TODO
     :dep-of                        "identified dependency for"    ;; TODO
     :deps                          " dependencies"                ;; TODO
