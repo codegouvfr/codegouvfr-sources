@@ -495,8 +495,7 @@
                       :target "new"}
                      [:img {:width "18px" :src "/images/swh-logo.png"}]]]
                    ;; Description
-                   [:td {:class (when a? "has-text-grey")
-                         :title (when a? (i/i lang [:repo-archived]))}
+                   [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
                      ;; FIXME
                      (when dp
@@ -506,7 +505,7 @@
                           :href  (rfe/href :deps {:lang lang} {:repo r})}
                          [:span.fr-fi-search-line {:aria-hidden true}]]
                         " "])
-                     d]]
+                     (if a? [:em d] d)]]
                    ;; Update
                    [:td (or (to-locale-date u) "N/A")]
                    ;; Forks
