@@ -72,7 +72,7 @@
     :no-forks                      "Pas de forks"
     :only-her                      "Que ESR"
     :only-with-license             "Avec licence"
-    :orga-repo                     "Dépôt (organisation)"
+    :orga-repo                     "Dépôt (groupe)"
     :orgas                         "Organisations"
     :orgas-or-groups               "Organisations ou groupes"
     :percent-of-repos-archived     "Proportion de dépôts archivés"
