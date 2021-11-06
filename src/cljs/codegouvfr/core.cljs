@@ -627,14 +627,14 @@
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-licensed v)
                               (re-frame/dispatch [:filter! {:is-licensed v}]))}]
-       [:label.fr-label {:for "2"} "Avec licence"]]
+       [:label.fr-label {:for "2"} (i/i lang [:only-with-license])]]
 
       [:div.fr-checkbox-group.fr-col
        [:input {:type      "checkbox" :id "3" :name "3"
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-esr v)
                               (re-frame/dispatch [:filter! {:is-esr v}]))}]
-       [:label.fr-label {:for "3"} "Seuls ESR"]]]
+       [:label.fr-label {:for "3"} (i/i lang [:only-her])]]]
 
      [repos-table lang (count repos)]
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
@@ -937,10 +937,9 @@
 
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:deps-stats])]
+        [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
         [:div.fr-tile__desc
-         [:h3
-          (:deps-total deps-total)]]]]]
+         [:h3 median_repos_cnt]]]]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
