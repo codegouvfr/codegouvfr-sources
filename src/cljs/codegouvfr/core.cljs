@@ -417,7 +417,7 @@
            [:a.fr-link
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
-             :href     ""
+             :href "#/repos"
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col-1
@@ -427,29 +427,29 @@
           [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     ""
+             :href     "#/repos"
              :title    (i/i lang [:sort-description-length])
              :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
             (i/i lang [:description])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :href     "#/repos"
              :title    (i/i lang [:sort-update-date])
-             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :forks) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :href     "#/repos"
              :title    (i/i lang [:sort-forks])
-             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :stars) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :href     "#/repos"
              :title    (i/i lang [:sort-stars])
-             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           ;; [:th.fr-col-1
@@ -462,8 +462,8 @@
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :href     "#/repos"
              :title    (i/i lang [:sort-reused])
-             :href     ""
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
             (i/i lang [:reused])]]]]
         (into [:tbody]
@@ -654,14 +654,13 @@
            [:a.fr-link
             {:class    (when (= org-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-alpha])
-             :href     ""
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
             (i/i lang [:orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     ""
+             :href     "#"
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
@@ -670,7 +669,6 @@
            ;; FIXME
            ;; [:a.fr-link
            ;;  {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           ;;   :href     ""
            ;;   :title    (i/i lang [:sort-orgas-creation])
            ;;   :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
            ;;  (i/i lang [:created-at])]
@@ -744,26 +742,26 @@
         [:th.fr-col-3
          [:a.fr-link
           {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     ""
+           :href     "#/deps"
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
          [:a.fr-link
           {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     ""
+           :href     "#/deps"
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
          [:a.fr-link
           {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     ""
+           :href     "#/deps"
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
         (when-not repo
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     ""
+             :href     "#/deps"
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
       (into
