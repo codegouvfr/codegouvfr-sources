@@ -723,7 +723,10 @@
                    [:td
                     [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
-                   [:td r]
+                   [:td [:a {:title (i/i lang [:go-to-repos])
+                             :href  (rfe/href :repos {:lang lang}
+                                              {:g (s/replace o "/groups/" "/")})}
+                         r]]
                    [:td (to-locale-date c)]])))]])))
 
 (defn orgas-page [lang]
