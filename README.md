@@ -1,5 +1,7 @@
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/etalab/code.etalab.gouv.fr/)](https://archive.softwareheritage.org/browse/origin/https://github.com/etalab/code.etalab.gouv.fr/)
 
+[![img](https://img.shields.io/badge/Licence-EPL-orange.svg?style=flat-square)](https://git.sr.ht/~etalab/code.gouv.fr/blob/master/LICENSE)
+
 # code.etalab.gouv.fr
 
 Browse sector source code repositories from the french public sector.
