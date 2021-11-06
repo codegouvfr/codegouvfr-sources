@@ -8,12 +8,11 @@
             [clj-rss.core :as rss]
             [clj-http.client :as http]
             [hiccup.page :as h]
-            [ring.middleware.anti-forgery :as anti-forgery]
-            [ring.util.anti-forgery :as afu]
             [ring.util.response :as response]
             [codegouvfr.i18n :as i]
             [codegouvfr.config :as config]
-            [codegouvfr.md :as md]))
+            ;; [codegouvfr.md :as md]
+            ))
 
 (defonce ^{:doc "The URL for the latest repositories."}
   latest-repositories-url
@@ -80,7 +79,7 @@
       [:a.fr-link {:href "/" :title "Retour à l'accueil"}
        [:p.fr-logo "République<br>Française"]]]
      [:div.fr-footer__content
-      [:p.fr-footer__content-desc "Codes sources du secteur public"]
+      [:p.fr-footer__content-desc (i/i lang [:index-title])]
       [:ul.fr-footer__content-list
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
@@ -179,14 +178,14 @@
       [:ul.fr-nav__list
        [:li.fr-nav__item
         [:a.fr-nav__link {:href "groups" :target "_self"}
-         "Organisation ou groupes"]]
+         (i/i lang [:orgas-or-groups])]]
        [:li.fr-nav__item
         [:a.fr-nav__link {:href "repos" :target "_self"}
-         "Dépôts de code source"]]
+         (i/i lang [:Repos])]]
        [:li.fr-nav__item
         ;; FIXME: Use fr-nav__item--active or :aria-current "/fr/deps"?
         [:a.fr-nav__link {:href "deps" :target "_self"}
-         "Dépendances"]]
+         (i/i lang [:Deps])]]
        [:li.fr-nav__item
         [:a.fr-nav__link {:href "stats" :target "_self"} "Chiffres"]]]]]]])
 
@@ -200,8 +199,6 @@
      {:lang lang}
      (head title lang)
      [:body
-      (let [csrf-token (force anti-forgery/*anti-forgery-token*)]
-        [:div#sente-csrf-token {:data-csrf-token csrf-token}])
       (banner lang title subtitle)
       [:div content0]
       (when-not content

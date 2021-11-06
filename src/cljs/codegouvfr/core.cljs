@@ -280,9 +280,9 @@
   (let [f @(re-frame/subscribe [:filter?])
         s (:q f)]
     (filter
-     #(and (if s (s-includes?
-                  (s/join " " [(:n %) (:t %) (:d %)]) s)
-               true))
+     #(if s (s-includes?
+             (s/join " " [(:n %) (:t %) (:d %)]) s)
+          true)
      m)))
 
 (defn apply-orgas-filters [m]
@@ -670,9 +670,8 @@
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
     [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]]
-    (let [org-f      @(re-frame/subscribe [:sort-orgas-by?])
-          orgas-page @(re-frame/subscribe [:orgas-page?])
-          orgas      @(re-frame/subscribe [:orgas?])]
+    (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
+          orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-grid-row
        [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
         [:thead.fr-grid.fr-col-12
@@ -709,10 +708,11 @@
                              (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
-                (let [{:keys [n l d o dp h an au c r]} dd]
+                (let [{:keys [n l d o h an au c r]} dd]
+                  ;; FIXME: use dp for dependencies here?
                   [:tr
                    [:td
-                    (if-let [website (or h an)]
+                    (if (or h an)
                       (let [w (if h h (str "https://lannuaire.service-public.fr/" an))]
                         [:a.fr-link
                          {:title  (i/i lang [:go-to-website])
@@ -727,8 +727,7 @@
                    [:td (to-locale-date c)]])))]])))
 
 (defn orgas-page [lang]
-  (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
-        orgas          @(re-frame/subscribe [:orgas?])
+  (let [orgas          @(re-frame/subscribe [:orgas?])
         filter?        @(re-frame/subscribe [:filter?])
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
@@ -818,8 +817,7 @@
         deps-pages          @(re-frame/subscribe [:deps-page?])
         count-pages         (count (partition-all deps-per-page deps))
         first-disabled      (zero? deps-pages)
-        last-disabled       (= deps-pages (dec count-pages))
-        dep-f               @(re-frame/subscribe [:sort-deps-by?])]
+        last-disabled       (= deps-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row.fr-m-1w
       [:strong.fr-m-auto
@@ -908,7 +906,8 @@
   [lang stats deps deps-total]
   (let [{:keys [repos_cnt orgs_cnt avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars top_licenses
-                platforms software_heritage top_languages]} stats
+                platforms top_languages]} stats
+        ;; Use software_heritage ?
         top_orgs_by_repos_0
         (into {} (map #(vector (str (:organization_name %)
                                     " (" (:platform %) ")")
