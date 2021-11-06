@@ -911,14 +911,15 @@
                            :href  (str "/" lang "/repos?" param "=" k)} k] v})))
             top))))
 
+
 (defn stats-page
   [lang stats deps deps-total]
-  (let [{:keys [nb_repos nb_orgs avg_nb_repos median_nb_repos
+  (let [{:keys [repos_cnt orgs_cnt avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars top_licenses
                 platforms software_heritage top_languages]} stats
         top_orgs_by_repos_0
-        (into {} (map #(vector (str (:organisation_nom %)
-                                    " (" (:plateforme %) ")")
+        (into {} (map #(vector (str (:organization_name %)
+                                    " (" (:platform %) ")")
                                (:count %))
                       top_orgs_by_repos))
         top_languages_1
@@ -934,65 +935,67 @@
                   (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
-      [:div.fr-tile.fr-tile--horizontal.fr-m-1w
+      [:div.fr-tile.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:repos-of-source-code])]
-        [:p.fr-tile__desc nb_repos]]]
+        [:div.fr-tile__desc [:h3 repos_cnt]]]]
 
-      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+      [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
         [:div.fr-tile__desc
-         [:h3 nb_orgs]]]]
+         [:h3 orgs_cnt]]]]
 
-      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+      [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
         [:div.fr-tile__desc
-         [:h3 avg_nb_repos]]]]
+         [:h3 avg_repos_cnt]]]]
       
-      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+      [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
         [:div.fr-tile__desc
-         [:h3 median_nb_repos]]]]
+         [:h3 median_repos_cnt]]]]
       
-      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+      [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:deps-stats])]
         [:div.fr-tile__desc
          [:h3
           (:deps-total deps-total)]]]]]
 
-     ;; [:div.fr-grid-row
-     ;;  [:div.fr-col-6
-     ;;   (stats-card [:span (i/i lang [:most-used-languages])]
-     ;;               top_languages_1
-     ;;               [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
-     ;;  [:div.fr-col-6
-     ;;   (stats-card [:span (i/i lang [:most-used-identified-licenses])]
-     ;;               top_licenses_0
-     ;;               [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-card [:span (i/i lang [:most-used-languages])]
+                   top_languages_1
+                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+      [:div.fr-col-6
+       (stats-card [:span (i/i lang [:most-used-identified-licenses])]
+                   top_licenses_0
+                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
 
-     ;; [:div.fr-grid-row
-     ;;  [:div.fr-col-6
-     ;;   (stats-card [:span
-     ;;                (i/i lang [:orgas-or-groups])
-     ;;                " "
-     ;;                (i/i lang [:with-more-of])
-     ;;                (i/i lang [:repos])]
-     ;;               top_orgs_by_repos_0)]
-     ;;  [:div.fr-col-6
-     ;;   (stats-card [:span
-     ;;                (i/i lang [:orgas-with-more-stars])]
-     ;;               top_orgs_by_stars)]]
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-card [:span
+                    (i/i lang [:orgas-or-groups])
+                    " "
+                    (i/i lang [:with-more-of])
+                    (i/i lang [:repos])]
+                   top_orgs_by_repos_0)]
+      [:div.fr-col-6
+       (stats-card [:span
+                    (i/i lang [:orgas-with-more-stars])]
+                   top_orgs_by_stars)]]
      
-     ;; [:div.fr-grid-row
-     ;;  [:div.fr-col-6
-     ;;   (deps-card (i/i lang [:Deps]) deps lang)]
-     ;;  [:div.fr-col-6
-     ;;   (stats-card (i/i lang [:distribution-by-platform]) platforms)
-     ;;   [:img {:src "/top_licenses.svg" :width "100%"}]]]
+     [:div.fr-grid-row
+      (deps-card (i/i lang [:Deps]) deps lang)]
+
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-card (i/i lang [:distribution-by-platform]) platforms)]
+      [:div.fr-col-6
+       [:img {:src "/top_licenses.svg" :width "100%"}]]]
      
      ;; [:div
      ;;  (stats-card [:span (i/i lang [:archive-on])
