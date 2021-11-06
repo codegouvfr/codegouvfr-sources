@@ -19,9 +19,9 @@
             ;; [taoensso.sente  :as sente]
             ))
 
-(def ?csrf-token
-  (when-let [el (.getElementById js/document "sente-csrf-token")]
-    (.getAttribute el "data-csrf-token")))
+;; (def ?csrf-token
+;;   (when-let [el (.getElementById js/document "sente-csrf-token")]
+;;     (.getAttribute el "data-csrf-token")))
 
 ;; (let [{:keys [chsk ch-recv send-fn state]}
 ;;       (sente/make-channel-socket! "/chsk" ?csrf-token {:type :auto})]
