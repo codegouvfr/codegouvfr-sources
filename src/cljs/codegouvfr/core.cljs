@@ -16,27 +16,7 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]
-            ;; [taoensso.sente  :as sente]
             ))
-
-;; (def ?csrf-token
-;;   (when-let [el (.getElementById js/document "sente-csrf-token")]
-;;     (.getAttribute el "data-csrf-token")))
-
-;; (let [{:keys [chsk ch-recv send-fn state]}
-;;       (sente/make-channel-socket! "/chsk" ?csrf-token {:type :auto})]
-;;   (def chsk       chsk)
-;;   (def ch-chsk    ch-recv)
-;;   (def chsk-send! send-fn)
-;;   (def chsk-state state))
-
-;; (defn event-msg-handler [{:keys [event]}]
-;;   ;; (.log js/console (pr-str event)) ; FIXME
-;;   (let [recv (:chsk/recv (apply hash-map event))
-;;         push (:event/PushEvent (apply hash-map recv))]
-;;     (when (not-empty (:u push))
-;;       (println push)
-;;       (re-frame/dispatch [:levent! push]))))
 
 (defonce repos-per-page 100) ;; FIXME: Make customizable?
 (defonce orgas-per-page 100) ;; FIXME: Make customizable?
@@ -98,14 +78,6 @@
 (re-frame/reg-sub
  :lang?
  (fn [db _] (:lang db)))
-
-;; (re-frame/reg-sub
-;;  :levent?
-;;  (fn [db _] (:levent db)))
-
-;; (re-frame/reg-event-db
-;;  :levent!
-;;  (fn [db [_ le]] (update-in db [:levent] conj le)))
 
 (re-frame/reg-sub
  :path-params?
@@ -409,19 +381,6 @@
         orgas
         (reverse orgas))))))
 
-;; (defn favorite [lang n]
-;;   (let [fav-class
-;;         (reagent/atom (if (some #{n} (get-item :favs)) "" "has-text-grey"))]
-;;     [:a {:class    @fav-class
-;;          :title    (i/i lang [:fav-add])
-;;          :on-click #(let [favs (get-item :favs)]
-;;                       (if (some #{n} favs)
-;;                         (do (set-item! :favs (remove (fn [x] (= n x)) favs))
-;;                             (reset! fav-class "has-text-grey"))
-;;                         (do (set-item! :favs (distinct (conj favs n)))
-;;                             (reset! fav-class ""))))}
-;;      (fa "fa-star")]))
-
 (defn change-page [type next]
   (let [sub         (condp = type
                       :repos :repos-page?
@@ -457,11 +416,6 @@
       [:table.fr-table.fr-table--bordered.fr-table--layout-fixed
        [:thead
         [:tr
-         ;; [:th [:abbr
-         ;;       [:a {:class    (when-not (= rep-f :favs) "has-text-grey")
-         ;;            :title    (i/i lang [:fav-sort])
-         ;;            :on-click #(re-frame/dispatch [:sort-repos-by! :favs])}
-         ;;        (fa "fa-star")]]]
          [:th
           [:a.fr-link
            {;; :class    (when (= rep-f :name) "is-light")
@@ -510,8 +464,6 @@
                      dd
                      group (subs r 0 (- (count r) (inc (count n))))]
                  [:tr
-                  ;; Favorite star
-                  ;; [:td [favorite lang n]]
                   ;; Repo < orga
                   [:td [:div
                         [:a {:href   r
@@ -1118,11 +1070,11 @@
         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
-                          (reset! q ev)
-                          (async/go
-                            (async/>! display-filter-chan {:q ev})
-                            (async/<! (async/timeout timeout))
-                            (async/>! filter-chan {:q ev}))))}])
+                         (reset! q ev)
+                         (async/go
+                           (async/>! display-filter-chan {:q ev})
+                           (async/<! (async/timeout timeout))
+                           (async/>! filter-chan {:q ev}))))}])
     (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
       [:div.level
        (when-let [ff (not-empty (:g flt))]
@@ -1134,25 +1086,6 @@
        (when-let [ff (not-empty (:repo flt))]
          (close-filter-button lang ff :is-success :deps (merge flt {:repo nil})))])]
    [:br]])
-
-;; (defn live []
-;;   (let [r (reagent/atom 10)]
-;;     (fn []
-;;       [:div
-;;        [:input {:type      "range" :min "10" :max "50"
-;;                 :on-change #(let [v (.-value (.-target %))]
-;;                               (println "Value:" v)
-;;                               ;; (re-frame/dispatch [:range!] v)
-;;                               (reset! r (js/parseInt v))
-;;                               )}]
-;;        ]))
-;;   ;; [:ul
-;;   ;;  (for [{:keys [u r n d o] :as e} @(re-frame/subscribe [:levent?])]
-;;   ;;    ^{:key e}
-;;   ;;    [:li
-;;   ;;     [:p
-;;   ;;      (gstring/format "%s (%s) pushed %s commits to %s at %s" u o n r d)]])]
-;;   )
 
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
@@ -1238,5 +1171,4 @@
   (reagent.dom/render
    [main-class]
    (.getElementById js/document "app"))
-  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
   )

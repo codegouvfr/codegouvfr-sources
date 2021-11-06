@@ -24,8 +24,6 @@
             [taoensso.timbre.appenders (postal :as postal-appender)]
             [cheshire.core :as json]
             [org.httpkit.server :as server]
-            ;; [taoensso.sente :as sente]
-            ;; [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
             [clojure.core.async :as async]
             [clj-http.client :as http]
             [tea-time.core :as tt]
@@ -53,23 +51,6 @@
                     {:from config/from
                      :to   config/admin-email})
                    {:min-level :error})}})
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Sente setup
-
-;; (let [{:keys [ch-recv send-fn connected-uids
-;;               ajax-post-fn ajax-get-or-ws-handshake-fn]}
-;;       (sente/make-channel-socket! (get-sch-adapter) {})]
-
-;;   (def ring-ajax-post                ajax-post-fn)
-;;   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-;;   (def ch-chsk                       ch-recv)
-;;   (def chsk-send!                    send-fn)
-;;   (def connected-uids                connected-uids))
-
-;; (defn event-msg-handler [{:keys [id ?data event]}] ; FIXME: unused id ?data
-;;   (doseq [uid (:any @connected-uids)]
-;;     (chsk-send! uid [:event/PushEvent event])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Profiles for interactive development
@@ -106,9 +87,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility functions
-
-;; (defn seqs-difference [seq1 seq2]
-;;   (seq (set/difference (into #{} seq2) (into #{} seq1))))
 
 (defn get-repos-full []
   (json/parse-string (slurp repos-full-uri) true))
@@ -239,98 +217,6 @@
                   (repos-filtered p)
                   (orgas-filtered p))))))))
     :headers (csv-headers type))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Initial setup for retrieving events constantly
-
-;; (def gh-org-events "https://api.github.com/orgs/%s/events")
-;; (def last-orgs-events (agent '()))
-;; (def events-channel (async/chan))
-;; (def http-get-gh-params
-;;   (merge http-get-params
-;;          {:basic-auth
-;;           (str config/github-user ":" config/github-access-token)}))
-
-;; (defn start-events-channel! []
-;;   (async/go
-;;     (loop [e (async/<! events-channel)]
-;;       (when-let [{:keys [u]} e] ; FIXME: Is a user defined?
-;;         (event-msg-handler {:event e}))
-;;       (recur (async/<! events-channel)))))
-
-;; (defn sort-events-by-date [diff]
-;;   (map (fn [d] (update d :d #(t/format "MM/dd/YYYY HH:mm" %)))
-;;        (sort-by :d (map #(update % :d t/zoned-date-time)
-;;                         diff))))
-
-;; (add-watch last-orgs-events
-;;            :watcher
-;;            (fn [_ _ old new]
-;;              (when-let [diff (seqs-difference old new)]
-;;                (async/thread
-;;                  (doseq [e (sort-events-by-date diff)]
-;;                    (timbre/info (pr-str e))
-;;                    (Thread/sleep (:send_channel_sleep @profile))
-;;                    (async/>!! events-channel e))))))
-
-;; (def latest-updated-orgas-filter
-;;   (comp
-;;    (filter #(= (:plateforme %) "GitHub"))
-;;    (map #(select-keys % [:organisation_nom :derniere_mise_a_jour]))
-;;    (map #(update % :derniere_mise_a_jour t/zoned-date-time))))
-
-;; (defn latest-updated-orgas [n]
-;;   (let [orgas (json/parse-string
-;;                (:body (try (http/get orgas-url http-get-params)
-;;                            (catch Exception _ nil))) ;; FIXME: add error?
-;;                true)]
-;;     (take
-;;      n
-;;      (distinct
-;;       (->> (reverse
-;;             (sort-by :derniere_mise_a_jour
-;;                      (sequence latest-updated-orgas-filter orgas)))
-;;            (map :organisation_nom))))))
-
-;; (defn filter-old-events [events]
-;;   (let [yesterday (t/minus (t/instant) (t/days 1))]
-;;     (filter (fn [{:keys [date]}]
-;;               (not (t/before? (t/instant date) yesterday)))
-;;             events)))
-
-;; ;; Authenticated rate limit is 5000 per hour.  Every hour, take 20
-;; ;; GitHub orgas with recently updated repos and get the last events
-;; ;; 240 times for these orgas every 15 seconds.
-;; (defn latest-orgas-events! [orgas]
-;;   (http/with-connection-pool
-;;     {:timeout 5 :threads 4 :insecure? false :default-per-route 10}
-;;     (dotimes [_ (:repeat_in_connection_pool @profile)]
-;;       (let [new-events (atom nil)]
-;;         ;; Fet new-events for all recently updated orgas
-;;         (doseq [org orgas]
-;;           (when-let [events (json/parse-string
-;;                              (:body
-;;                               (try (http/get (format gh-org-events org)
-;;                                              http-get-gh-params)
-;;                                    (catch Exception e
-;;                                      (timbre/error "Can't get events for" org e))))
-;;                              true)]
-;;             (doseq [{:keys [id actor repo payload created_at org]} ;; FIXME: use id
-;;                     ;; Only take PushEvents so far
-;;                     (filter #(= (:type %) "PushEvent") events)
-;;                     :let
-;;                     [user (:login actor)
-;;                      repo-name (:name repo)
-;;                      nb (:distinct_size payload)
-;;                      date created_at
-;;                      org-name (:login org)]]
-;;               (swap! new-events conj {:u user :r repo-name :n nb
-;;                                       :d date :o org-name}))))
-;;         ;; Only update the main events list now, trigger UI updates
-;;         (send last-orgs-events
-;;               #(filter-old-events (apply merge %1 %2)) @new-events)
-;;         ;; Then wait for 15 seconds
-;;         (Thread/sleep (:repeat_in_connection_pool_sleep @profile))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Export licenses data as vega images
@@ -532,11 +418,6 @@
    14400 (fn []
            (timbre/info "Generating license chart")
            (vega-licenses-chart!)))
-  ;; (tt/every! ;; FIXME: why the error when done?
-  ;;  36000 (fn []
-  ;;          (timbre/info "Start streaming GitHub events")
-  ;;          (latest-orgas-events!
-  ;;           (latest-updated-orgas (:latest_updated_orgas @profile)))))
   )
 
 (defn -main
@@ -544,7 +425,5 @@
   []
   (reset! profile (profiles :production))
   (server/run-server app {:port config/codegouvfr_port :join? false})
-  ;; (sente/start-chsk-router! ch-chsk event-msg-handler)
-  ;; (start-events-channel!)
   (start-tasks!)
   (timbre/info (str "codegouvfr application started on localhost:" config/codegouvfr_port)))
