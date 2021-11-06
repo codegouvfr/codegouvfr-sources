@@ -173,16 +173,13 @@
        ;;                    :target       "_self"
        ;;                    :aria-current "groups"}
        ;;   "Organisation ou groupes"]]
-       [:li.fr-nav__item.fr-nav__item--active
-        [:a.fr-nav__link {:href         "repos"
-                          :target       "_self"
-                          :aria-current "repos"}
+       [:li.fr-nav__item
+        [:a.fr-nav__link {:href "repos" :target "_self"}
          "Dépôts de code source"]]
-       ;; [:li.fr-nav__item.fr-nav__item--active
-       ;;  [:a.fr-nav__link {:href         "deps"
-       ;;                    :target       "_self"
-       ;;                    :aria-current "deps"}
-       ;;   "Dépendances"]]
+       [:li.fr-nav__item
+        ;; FIXME: Use fr-nav__item--active or :aria-current "/fr/deps"?
+        [:a.fr-nav__link {:href "deps" :target "_self"}
+         "Dépendances"]]
        ;; [:li.fr-nav__item.fr-nav__item--active
        ;;  [:a.fr-nav__link {:href         "stats"
        ;;                    :target       "_self"
