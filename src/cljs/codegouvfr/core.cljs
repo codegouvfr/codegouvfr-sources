@@ -502,12 +502,13 @@
                    [:td {:class (when a? "has-text-grey")
                          :title (when a? (i/i lang [:repo-archived]))}
                     [:span
+                     ;; FIXME
                      (when dp
                        [:span
                         [:a.fr-link
                          {:title (i/i lang [:Deps])
                           :href  (rfe/href :deps {:lang lang} {:repo r})}
-                         (fa "fa-cubes")]
+                         [:span.fr-fi-search-line {:aria-hidden true}]]
                         " "])
                      d]]
                    ;; Update
@@ -829,7 +830,7 @@
        [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
      [navigate-pagination :deps first-disabled last-disabled]
      (when-let [sims (get repos-sim repo)]
-       [:div
+       [:div.fr-grid
         [:h2 (i/i lang [:Repos-deps-sim])]
         [:br]
         [:ul
@@ -1051,7 +1052,7 @@
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}])]
     (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
-      [:div.fr-col-4.fr-grid-row.fr-m-1w
+      [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
          (close-filter-button lang ff :repos (merge flt {:g nil})))
        (when-let [ff (not-empty (:d flt))]

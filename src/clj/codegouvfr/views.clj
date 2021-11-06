@@ -66,7 +66,6 @@
    [:link {:rel "canonical" :href "https://code.etalab.gouv.fr"}]
    [:link {:rel   "alternate" :type "application/rss+xml"
            :title "RSS feed"  :href "https://code.etalab.gouv.fr/latest.xml"}]
-   (h/include-css "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css")
    (h/include-css (str config/codegouvfr_base_url "/css/dsfr.min.css"))
    [:script {:src "https://tag.aticdn.net/619928/smarttag.js"}]
    [:script "var ATTag = new ATInternet.Tracker.Tag(); ATTag.page.send({name:'Page_Name'});"]
