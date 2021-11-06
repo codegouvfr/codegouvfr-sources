@@ -978,7 +978,7 @@
       [:div.fr-col-6
        (stats-card [:span
                     (i/i lang [:orgas])
-                    (i/i lang [:with-more-of])
+                    (i/i lang [:with-more-of*])
                     (i/i lang [:stars])]
                    top_orgs_by_stars
                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
