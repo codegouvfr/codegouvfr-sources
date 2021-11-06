@@ -15,8 +15,7 @@
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
-            [goog.labs.format.csv :as csv]
-            ))
+            [goog.labs.format.csv :as csv]))
 
 (defonce repos-per-page 50) ;; FIXME: Make customizable?
 (defonce orgas-per-page 50) ;; FIXME: Make customizable?
@@ -530,26 +529,22 @@
   [:div.fr-grid-row.fr-grid-row--center
    [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
     [:ul.fr-pagination__list
-     [:li.fr-pagination__link.fr-pagination__link--first
-      [:a
+     [:li
+      [:a.fr-pagination__link.fr-pagination__link--first
        {:on-click #(change-page type "first")
-        :disabled first-disabled}
-       (fa "fa-fast-backward")]]
-     [:li.fr-pagination__link.fr-pagination__link--prev
-      [:a
+        :disabled first-disabled}]]
+     [:li
+      [:a.fr-pagination__link.fr-pagination__link--prev
        {:on-click #(change-page type nil)
-        :disabled first-disabled}
-       (fa "fa-step-backward")]]
-     [:li.fr-pagination__link.fr-pagination__link--next
-      [:a
+        :disabled first-disabled}]]
+     [:li
+      [:a.fr-pagination__link.fr-pagination__link--next
        {:on-click #(change-page type true)
-        :disabled last-disabled}
-       (fa "fa-step-forward")]]
-     [:li.fr-pagination__link.fr-pagination__link--last
-      [:a
+        :disabled last-disabled}]]
+     [:li
+      [:a.fr-pagination__link.fr-pagination__link--last
        {:on-click #(change-page type "last")
-        :disabled last-disabled}
-       (fa "fa-fast-forward")]]]]])
+        :disabled last-disabled}]]]]])
 
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -713,14 +708,16 @@
                 ^{:key dd}
                 (let [{:keys [n l d o dp h an au c r]} dd]
                   [:tr
-                   [:td [:img {:src au :width "60%"}]]
                    [:td
-                    (when-let [website (or h an)]
+                    (if-let [website (or h an)]
                       (let [w (if h h (str "https://lannuaire.service-public.fr/" an))]
                         [:a.fr-link
                          {:title  (i/i lang [:go-to-website])
                           :target "new"
-                          :href   w} (fa "fa-globe")]))
+                          :href   w}
+                         [:img {:src au :width "100%"}]])
+                      [:img {:src au :width "100%"}])]
+                   [:td
                     [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
                    [:td r]
@@ -927,11 +924,6 @@
                   (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
-      [:div.fr-tile.fr-m-1w
-       [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:repos-of-source-code])]
-        [:div.fr-tile__desc [:h3 repos_cnt]]]]
-
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
@@ -943,6 +935,11 @@
         [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
         [:div.fr-tile__desc
          [:h3 avg_repos_cnt]]]]
+
+      [:div.fr-tile.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:repos-of-source-code])]
+        [:div.fr-tile__desc [:h3 repos_cnt]]]]
 
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
