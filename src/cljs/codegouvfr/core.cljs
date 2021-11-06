@@ -521,9 +521,11 @@
                    [:td i]
                    ;; Reused
                    [:td
-                    [:a {:title  (i/i lang [:reuses-expand])
-                         :target "new"
-                         :href   (str r "/network/dependents")}
+                    ;; FIXME: not working?
+                    [:a.fr-link
+                     {:title  (i/i lang [:reuses-expand])
+                      :target "new"
+                      :href   (str r "/network/dependents")}
                      g]]])))]])))
 
 (defn navigate-pagination [type first-disabled last-disabled]
