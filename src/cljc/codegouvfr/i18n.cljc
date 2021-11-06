@@ -37,7 +37,7 @@
     :deps-expand                   "Naviguer dans les dépendances logicielles des dépôts"
     :deps-not-found                "Pas de dépendances identifiées."
     :deps-of                       "dépendances identifiées pour"
-    :deps-stats                    "Nombre de dépendances identifiées"
+    :deps-stats                    "Dépendances identifiées"
     :description                   "Description"
     :distribution-by-platform      "Répartition par plateforme"
     :download                      "Télécharger"
@@ -74,8 +74,8 @@
     :main-etalab-website           "Site principal d'Etalab"
     :matching                      " et contenant "
     :matching-s                    " et contenants "
-    :mean-repos-by-orga            "Nombre moyen de dépôts par organisation/groupe"
-    :median-repos-by-orga          "Nombre médian de dépôts par organisation/groupe"
+    :mean-repos-by-orga            "Moyenne des dépôts par organisation"
+    :median-repos-by-orga          "Médiane des dépôts par organisation"
     :message-placeholder           "Votre message"
     :message-received              "Message reçu !"
     :message-received-ok           "Nous nous efforçons de répondre au plus vite."
@@ -184,7 +184,7 @@
     :deps-expand                   "Browse software dependencies of repositories"
     :deps-not-found                "No identified dependencies."
     :deps-of                       "identified dependencies for"
-    :deps-stats                    "Number of identified dependencies"
+    :deps-stats                    "Identified dependencies"
     :description                   "Description"
     :distribution-by-platform      "Distribution per platform"
     :download                      "Download"
@@ -303,7 +303,7 @@
    ;; Italian translation
    :it
    {
-    :all-forges                    "All forges"                        ;; FIXME
+    :all-forges                    "All forges"                   ;; FIXME
     :Dep                           "Dipendenza"
     :Deps                          "Dipendenze"
     :Repo                          "Repository"
@@ -321,19 +321,19 @@
     :contact-by-email              "Contatta per email"
     :contact-form                  "Contatti da"
     :created-at                    "Creato il "
-    :dep                           " dependency"                       ;; TODO
-    :dep-of                        "identified dependency for"         ;; TODO
-    :deps                          " dependencies"                     ;; TODO
+    :dep                           " dependency"                  ;; TODO
+    :dep-of                        "identified dependency for"    ;; TODO
+    :deps                          " dependencies"                ;; TODO
     :deps-expand                   "Sfoglia le dipendenze software dei repository"
-    :deps-not-found                "No identified dependencies."       ;; TODO
-    :deps-of                       "Identified dependencies for "      ;; TODO
-    :deps-stats                    "Number of identified dependencies" ;; TODO
+    :deps-not-found                "No identified dependencies."  ;; TODO
+    :deps-of                       "Identified dependencies for " ;; TODO
+    :deps-stats                    "Identified dependencies"      ;; TODO
     :description                   "Descrizione"
     :distribution-by-platform      "Distribuzione per piattaforma"
     :download                      "Scaricare"
     :email-placeholder             "Es toto@modernisation.gouv.fr"
-    :fav-add                       "Add to favorites"                  ;; TODO
-    :fav-sort                      "Sort by favorites"                 ;; TODO
+    :fav-add                       "Add to favorites"             ;; TODO
+    :fav-sort                      "Sort by favorites"            ;; TODO
     :for-orga                      " per l'organizzazione "
     :for-repo                      " per il repository "
     :forks                         "Fork"
@@ -346,7 +346,7 @@
     :go-to-repos                   "Vedi i reposutory"
     :go-to-sig-website             "Visita il sito sull'annuario di servizio pubblico"
     :go-to-website                 "Visita il sito web"
-    :group-repo-not-found          "Group/repository not found."       ;; TODO
+    :group-repo-not-found          "Group/repository not found."  ;; TODO
     :groups                        " grouppi"
     :here                          "qui"
     :index-subtitle                "Questo sito permette di navigare in alcuni codici sorgenti aperti degli enti pubblici."
@@ -373,13 +373,13 @@
     :most-used-identified-licenses "Licenze identificate più utilizzate"
     :most-used-languages           "Le 10 lingue più utilizzate"
     :most-used-licenses            "Licenze più utilizzate"
-    :name                          "Name"                              ;; TODO
+    :name                          "Name"                         ;; TODO
     :no-archived-repos             "Non includere i repository archiviati"
     :no-archives                   " Rimuovi archivi"
     :no-dep-found                  "Nessuna dipendenza trovata: volete fare una nuova richiesta?"
     :no-orga-found                 "Nessuna organizzazione o gruppo trovato: vuoi provare con un'altra richiesta?"
     :no-repo-found                 "Repository non trovato: vuoi provre a fare una nuova ricerca?"
-    :number-of-repos               "Number of repositories"            ;; TODO
+    :number-of-repos               "Number of repositories"       ;; TODO
     :one-group                     " gruppo"
     :one-repo                      " repository"
     :only-forked-repos             "Solo repository forcati"
@@ -427,7 +427,7 @@
     :submit                        "Invia"
     :subscribe-rss-flux            "Sottoscrivi il nostro feed RSS per ricevere informazioni sugli ultimi repository pubblicati!"
     :swh-link                      "Link all'archivio fatto per il Software Heritage"
-    :type                          "Type"                              ;; TODO
+    :type                          "Type"                         ;; TODO
     :under-license                 " licenza "
     :understand-tech-terms         "Glossario per comprendere i termini tecnici usati in questo sito web"
     :update                        "Aggiorna"
