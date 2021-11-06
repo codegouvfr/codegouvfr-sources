@@ -860,53 +860,42 @@
              [:update-repos! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (repos-page lang license language platform))}))
 
-(defn figure [heading title]
-  [:div.column
-   [:div.has-text-centered
-    [:div
-     [:p.heading heading]
-     [:p.title (str title)]]]])
-
 (defn stats-card [heading data & [thead]]
-  [:div.column
-   [:div.card
-    [:h1.card-header-title.subtitle heading]
-    [:div.card-content
-     [:table.table.is-fullwidth
-      thead
-      [:tbody
-       (for [o (reverse (walk/stringify-keys (sort-by val data)))]
-         ^{:key (key o)}
-         [:tr [:td (key o)] [:td (val o)]])]]]]])
+  [:div.fr-m-3w
+   [:h3 heading]
+   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
+    thead
+    [:tbody
+     (for [o (reverse (walk/stringify-keys (sort-by val data)))]
+       ^{:key (key o)}
+       [:tr [:td (key o)] [:td (val o)]])]]])
 
 (defn deps-card [heading deps lang]
-  [:div.column
-   [:div.card
-    [:h1.card-header-title.subtitle
-     heading
-     ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-     ;;  {:href  (str "/" lang "/glossary#dependencies")
-     ;;   :title (i/i lang [:go-to-glossary])}]
-     ]
-    [:div.card-content
-     [:table.table.is-fullwidth
-      [:thead [:tr
-               [:th (i/i lang [:name])]
-               [:th (i/i lang [:type])]
-               [:th (i/i lang [:description])]
-               [:th (i/i lang [:Repos])]]]
-      [:tbody
-       (for [{:keys [n t d l r] :as o} deps]
-         ^{:key o}
-         [:tr
-          [:td [:a {:href  l :target "new"
-                    :title (i/i lang [:more-info])} n]]
-          [:td t]
-          [:td d]
-          [:td
-           [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                :href  (rfe/href :repos {:lang lang} {:d n})}
-            (count r)]]])]]]]])
+  [:div.fr-m-3w
+   [:h3
+    heading
+    ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
+    ;;  {:href  (str "/" lang "/glossary#dependencies")
+    ;;   :title (i/i lang [:go-to-glossary])}]
+    ]
+   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
+    [:thead [:tr
+             [:th (i/i lang [:name])]
+             [:th (i/i lang [:type])]
+             [:th (i/i lang [:description])]
+             [:th (i/i lang [:Repos])]]]
+    [:tbody
+     (for [{:keys [n t d l r] :as o} deps]
+       ^{:key o}
+       [:tr
+        [:td [:a {:href  l :target "new"
+                  :title (i/i lang [:more-info])} n]]
+        [:td t]
+        [:td d]
+        [:td
+         [:a {:title (i/i lang [:list-repos-depending-on-dep])
+              :href  (rfe/href :repos {:lang lang} {:d n})}
+          (count r)]]])]]])
 
 (defn top-clean-up [top lang param title]
   (let [total (reduce + (map val top))]
@@ -944,62 +933,79 @@
                   lang "license"
                   (i/i lang [:list-repos-using-license])))]
     [:div
-     [:div.columns
-      (figure (i/i lang [:repos-of-source-code]) nb_repos)
-      (figure (i/i lang [:orgas-or-groups]) nb_orgs)
-      (figure (i/i lang [:mean-repos-by-orga]) avg_nb_repos)
-      (figure (i/i lang [:median-repos-by-orga]) median_nb_repos)
-      (figure (i/i lang [:deps-stats]) (:deps-total deps-total))]
-     [:br]
-     [:div.columns
-      (stats-card [:span (i/i lang [:most-used-languages])]
-                  top_languages_1
-                  [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])
-      (deps-card (i/i lang [:Deps]) deps lang)]
-     [:div.columns
-      (stats-card [:span
-                   (i/i lang [:most-used-identified-licenses])
-                   ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-                   ;;  {:href  (str "/" lang "/glossary#license")
-                   ;;   :title (i/i lang [:go-to-glossary])}]
-                   ]
-                  top_licenses_0
-                  [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])
-      [:div.column [:img {:src "/top_licenses.svg"}]]]
-     [:div.columns
-      (stats-card [:span
-                   (i/i lang [:orgas-or-groups])
-                   ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-                   ;;  {:href  (str "/" lang "/glossary#organization-group")
-                   ;;   :title (i/i lang [:go-to-glossary])}]
-                   " "
-                   (i/i lang [:with-more-of])
-                   (i/i lang [:repos])
-                   ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-                   ;;  {:href  (str "/" lang "/glossary#repository")
-                   ;;   :title (i/i lang [:go-to-glossary])}]
-                   ]
-                  top_orgs_by_repos_0)
-      (stats-card [:span
-                   (i/i lang [:orgas-with-more-stars])
-                   ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-                   ;;  {:href  (str "/" lang "/glossary#star")
-                   ;;   :title (i/i lang [:go-to-glossary])}]
-                   ]
-                  top_orgs_by_stars)]
-     [:div.columns
-      (stats-card (i/i lang [:distribution-by-platform]) platforms)
-      (stats-card [:span (i/i lang [:archive-on])
-                   "Software Heritage"
-                   ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-                   ;;  {:href  (str "/" lang "/glossary#software-heritage")
-                   ;;   :title (i/i lang [:go-to-glossary])}]
-                   ]
-                  {(i/i lang [:repos-on-swh])
-                   (:repos_in_archive software_heritage)
-                   (i/i lang [:percent-of-repos-archived])
-                   (:ratio_in_archive software_heritage)})]
-     [:br]]))
+     [:div.fr-grid-row.fr-grid-row--center
+      [:div.fr-tile.fr-tile--horizontal.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:repos-of-source-code])]
+        [:p.fr-tile__desc nb_repos]]]
+
+      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
+        [:div.fr-tile__desc
+         [:h3 nb_orgs]]]]
+
+      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
+        [:div.fr-tile__desc
+         [:h3 avg_nb_repos]]]]
+      
+      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
+        [:div.fr-tile__desc
+         [:h3 median_nb_repos]]]]
+      
+      [:div.fr-tile.fr-tile--horizontal.fr-col-2.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:deps-stats])]
+        [:div.fr-tile__desc
+         [:h3
+          (:deps-total deps-total)]]]]]
+
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-card [:span (i/i lang [:most-used-languages])]
+                   top_languages_1
+                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+      [:div.fr-col-6
+       (stats-card [:span (i/i lang [:most-used-identified-licenses])]
+                   top_licenses_0
+                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
+
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-card [:span
+                    (i/i lang [:orgas-or-groups])
+                    " "
+                    (i/i lang [:with-more-of])
+                    (i/i lang [:repos])]
+                   top_orgs_by_repos_0)]
+      [:div.fr-col-6
+       (stats-card [:span
+                    (i/i lang [:orgas-with-more-stars])]
+                   top_orgs_by_stars)]]
+     
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (deps-card (i/i lang [:Deps]) deps lang)]
+      [:div.fr-col-6
+       (stats-card (i/i lang [:distribution-by-platform]) platforms)
+       [:img {:src "/top_licenses.svg" :width "100%"}]]]
+     
+     ;; [:div
+     ;;  (stats-card [:span (i/i lang [:archive-on])
+     ;;               "Software Heritage"
+     ;;               ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
+     ;;               ;;  {:href  (str "/" lang "/glossary#software-heritage")
+     ;;               ;;   :title (i/i lang [:go-to-glossary])}]
+     ;;               ]
+     ;;              {(i/i lang [:repos-on-swh])
+     ;;               (:repos_in_archive software_heritage)
+     ;;               (i/i lang [:percent-of-repos-archived])
+     ;;               (:ratio_in_archive software_heritage)})]
+     ]))
 
 (defn deps-page-class [lang]
   (let [deps-repos-sim (reagent/atom nil)]
@@ -1125,7 +1131,7 @@
    ["/:lang"
     ["/repos" :repos]
     ["/groups" :orgas]
-    ;; ["/stats" :stats]
+    ["/stats" :stats]
     ["/deps" :deps]
     ]])
 

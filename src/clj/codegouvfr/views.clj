@@ -178,13 +178,8 @@
         ;; FIXME: Use fr-nav__item--active or :aria-current "/fr/deps"?
         [:a.fr-nav__link {:href "deps" :target "_self"}
          "Dépendances"]]
-       ;; [:li.fr-nav__item.fr-nav__item--active
-       ;;  [:a.fr-nav__link {:href         "stats"
-       ;;                    :target       "_self"
-       ;;                    :aria-current "stats"}
-       ;;   "Chiffres"]]
-       ]]]]
-   ])
+       [:li.fr-nav__item
+        [:a.fr-nav__link {:href "stats" :target "_self"} "Chiffres"]]]]]]])
 
 (defn default [lang & [title subtitle content]]
   (let [title    (or title (i/i lang [:index-title]))
