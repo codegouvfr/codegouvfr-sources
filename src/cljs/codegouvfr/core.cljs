@@ -881,7 +881,8 @@
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
              (map #(let [[k v] %]
                      {[:a {:title title
-                           :href  (str "/" lang "/repos?" param "=" k)} k] v})))
+                           ;; FIXME: use rfe/push-state instead?
+                           :href  (str "/repos?" param "=" k)} k] v})))
             top))))
 
 (defn tile [l i s]
