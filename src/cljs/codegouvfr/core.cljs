@@ -1108,7 +1108,6 @@
         :stats [stats-page-class lang]
         ;; Table to display all dependencies
         :deps  [deps-page-class lang]
-        ;; :live      [live lang]
         ;; Fall back on the organizations page
         :else  (rfe/push-state :orgas))]]))
 
