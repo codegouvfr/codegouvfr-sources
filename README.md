@@ -4,7 +4,8 @@
 
 Browse sector source code repositories from the french public sector.
 
-![img](codegouvfr.png)
+<!-- FIXME -->
+<!-- ![img](codegouvfr.png) -->
 
 This frontend retrieves information source code [repositories](https://api-code.etalab.gouv.fr/api/repertoires/all) and [organizations](https://api-code.etalab.gouv.fr/api/organisations/all) from the french public sector.  The source code for creating these endpoints can be found [here](https://github.com/etalab/data-codes-sources-fr).
 
