@@ -1027,41 +1027,38 @@
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
-(defn close-filter-button [lang ff k t reinit]
-  [:p.control.level-item
-   [:a.button
-    {:class k
-     :title (i/i lang [:remove-filter])
+(defn close-filter-button [lang ff t reinit]
+  [:span
+   [:a.fr-link.fr-fi-close-circle-line.fr-link--icon-right
+    {:title (i/i lang [:remove-filter])
      :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
-    [:span ff]
-    (fa "fa-times")]])
+    [:span ff]]])
 
 (defn main-menu [q lang view]
   [:div
-   [:br]
-   [:div.fr-grid-row
-    (when (or (= view :repos) (= view :orgas) (= view :deps))
-      [:input.fr-input
-       {:placeholder (i/i lang [:free-search])
-        :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-        :on-change   (fn [e]
-                       (let [ev (.-value (.-target e))]
-                         (reset! q ev)
-                         (async/go
-                           (async/>! display-filter-chan {:q ev})
-                           (async/<! (async/timeout timeout))
-                           (async/>! filter-chan {:q ev}))))}])
+   [:div.fr-grid-row.fr-mt-2w
+    [:div.fr-col-12
+     (when (or (= view :repos) (= view :orgas) (= view :deps))
+       [:input.fr-input
+        {:placeholder (i/i lang [:free-search])
+         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+         :on-change   (fn [e]
+                        (let [ev (.-value (.-target e))]
+                          (reset! q ev)
+                          (async/go
+                            (async/>! display-filter-chan {:q ev})
+                            (async/<! (async/timeout timeout))
+                            (async/>! filter-chan {:q ev}))))}])]
     (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
-      [:div.level
+      [:div.fr-col-4.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
-         (close-filter-button lang ff :is-danger :repos (merge flt {:g nil})))
+         (close-filter-button lang ff :repos (merge flt {:g nil})))
        (when-let [ff (not-empty (:d flt))]
-         (close-filter-button lang ff :is-warning :repos (merge flt {:d nil})))
+         (close-filter-button lang ff :repos (merge flt {:d nil})))
        (when-let [ff (not-empty (:orga flt))]
-         (close-filter-button lang ff  :is-danger :deps (merge flt {:orga nil})))
+         (close-filter-button lang ff :deps (merge flt {:orga nil})))
        (when-let [ff (not-empty (:repo flt))]
-         (close-filter-button lang ff :is-success :deps (merge flt {:repo nil})))])]
-   [:br]])
+         (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
 
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
