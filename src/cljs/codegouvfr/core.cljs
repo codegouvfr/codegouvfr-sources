@@ -922,15 +922,15 @@
      [:div.fr-grid-row.fr-grid-row--center
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
-        [:div.fr-tile__desc
-         [:h3 orgs_cnt]]]]
-
-      [:div.fr-tile.fr-col-2.fr-m-1w
-       [:div.fr-tile__body
         [:h1.fr-tile__title (i/i lang [:mean-repos-by-orga])]
         [:div.fr-tile__desc
          [:h3 avg_repos_cnt]]]]
+
+      [:div.fr-tile.fr-col-2.fr-m-1w
+       [:div.fr-tile__body
+        [:h1.fr-tile__title (i/i lang [:orgas-or-groups])]
+        [:div.fr-tile__desc
+         [:h3 orgs_cnt]]]]
 
       [:div.fr-tile.fr-m-1w
        [:div.fr-tile__body
@@ -939,9 +939,10 @@
 
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
-        [:h1.fr-tile__title (i/i lang [:median-repos-by-orga])]
+        [:h1.fr-tile__title (i/i lang [:deps-stats])]
         [:div.fr-tile__desc
-         [:h3 median_repos_cnt]]]]
+         [:h3
+          (:deps-total deps-total)]]]]
 
       [:div.fr-tile.fr-col-2.fr-m-1w
        [:div.fr-tile__body
