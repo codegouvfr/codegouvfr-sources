@@ -660,8 +660,7 @@
        (for [x @(re-frame/subscribe [:platforms?])]
          ^{:key x}
          [:option {:value x} x])]
-      [:button.fr-btn.fr-btn--secondary.fr-col-2.fr-m-1w
-       {:disabled true}
+      [:strong.fr-m-auto
        (let [rps (count repos)]
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
@@ -788,8 +787,7 @@
                 (s/join "&")
                 (str "/orgas-csv?"))}
        (fa "fa-download")]
-      [:button.fr-btn.fr-btn--secondary
-       {:disabled true}
+      [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
@@ -863,9 +861,8 @@
         last-disabled       (= deps-pages (dec count-pages))
         dep-f               @(re-frame/subscribe [:sort-deps-by?])]
     [:div.fr-grid
-     [:div.fr-grid-row
-      [:button.fr-btn.fr-btn--secondary.fr-btn--secondary.fr-m-1w
-       {:disabled true}
+     [:div.fr-grid-row.fr-m-1w
+      [:strong.fr-m-auto
        (let [deps (count deps)]
          (if (< deps 2)
            (str deps (i/i lang [:dep]))
