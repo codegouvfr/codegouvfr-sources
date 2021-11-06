@@ -500,13 +500,13 @@
                    [:td {:class (when a? "has-text-grey")
                          :title (when a? (i/i lang [:repo-archived]))}
                     [:span
-                     ;; (when dp
-                     ;;   [:span
-                     ;;    [:a.fr-link
-                     ;;     {:title (i/i lang [:Deps])
-                     ;;      :href  (rfe/href :deps {:lang lang} {:repo r})}
-                     ;;     (fa "fa-cubes")]
-                     ;;    " "])
+                     (when dp
+                       [:span
+                        [:a.fr-link
+                         {:title (i/i lang [:Deps])
+                          :href  (rfe/href :deps {:lang lang} {:repo r})}
+                         (fa "fa-cubes")]
+                        " "])
                      d]]
                    ;; Update
                    [:td (or (to-locale-date u) "N/A")]
@@ -764,8 +764,8 @@
      [navigate-pagination :orgas first-disabled last-disabled]]))
 
 (defn deps-table [lang deps repo orga]
-(let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
-      deps-page @(re-frame/subscribe [:deps-page?])]
+  (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
+        deps-page @(re-frame/subscribe [:deps-page?])]
     [:div.fr-grid-row
      [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
       [:thead.fr-grid.fr-col-12
@@ -802,12 +802,13 @@
          ^{:key dd}
          (let [{:keys [t n d l r]} dd]
            [:tr
-            [:td [:a {:href  l :target "new"
-                      :title (i/i lang [:more-info])} n]]
+            [:td
+             [:a {:href  l :target "new"
+                  :title (i/i lang [:more-info])} n]]
             [:td t]
-            [:td.has-text-right d]
+            [:td d]
             (when-not repo
-              [:td.has-text-right
+              [:td
                [:a {:title (i/i lang [:list-repos-depending-on-dep])
                     :href  (rfe/href :repos {:lang lang}
                                      (if orga {:d n :g orga} {:d n}))}
