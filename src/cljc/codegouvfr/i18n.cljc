@@ -59,7 +59,7 @@
     :group-repo-not-found          "Groupe et dépôt non trouvés."
     :groups                        " groupes"
     :here                          "ici"
-    :index-subtitle                "Parcourir les codes sources ouverts par des organismes publics."
+    :index-subtitle                "Pour explorer les codes sources ouverts par des organismes publics."
     :index-title                   "Codes sources du secteur public"
     :issues                        "Tickets"
     :keywords                      "Accès aux codes sources du secteur public"
