@@ -964,35 +964,35 @@
          [:h3
           (:deps-total deps-total)]]]]]
 
-     [:div.fr-grid-row
-      [:div.fr-col-6
-       (stats-card [:span (i/i lang [:most-used-languages])]
-                   top_languages_1
-                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
-      [:div.fr-col-6
-       (stats-card [:span (i/i lang [:most-used-identified-licenses])]
-                   top_licenses_0
-                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
+     ;; [:div.fr-grid-row
+     ;;  [:div.fr-col-6
+     ;;   (stats-card [:span (i/i lang [:most-used-languages])]
+     ;;               top_languages_1
+     ;;               [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+     ;;  [:div.fr-col-6
+     ;;   (stats-card [:span (i/i lang [:most-used-identified-licenses])]
+     ;;               top_licenses_0
+     ;;               [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
 
-     [:div.fr-grid-row
-      [:div.fr-col-6
-       (stats-card [:span
-                    (i/i lang [:orgas-or-groups])
-                    " "
-                    (i/i lang [:with-more-of])
-                    (i/i lang [:repos])]
-                   top_orgs_by_repos_0)]
-      [:div.fr-col-6
-       (stats-card [:span
-                    (i/i lang [:orgas-with-more-stars])]
-                   top_orgs_by_stars)]]
+     ;; [:div.fr-grid-row
+     ;;  [:div.fr-col-6
+     ;;   (stats-card [:span
+     ;;                (i/i lang [:orgas-or-groups])
+     ;;                " "
+     ;;                (i/i lang [:with-more-of])
+     ;;                (i/i lang [:repos])]
+     ;;               top_orgs_by_repos_0)]
+     ;;  [:div.fr-col-6
+     ;;   (stats-card [:span
+     ;;                (i/i lang [:orgas-with-more-stars])]
+     ;;               top_orgs_by_stars)]]
      
-     [:div.fr-grid-row
-      [:div.fr-col-6
-       (deps-card (i/i lang [:Deps]) deps lang)]
-      [:div.fr-col-6
-       (stats-card (i/i lang [:distribution-by-platform]) platforms)
-       [:img {:src "/top_licenses.svg" :width "100%"}]]]
+     ;; [:div.fr-grid-row
+     ;;  [:div.fr-col-6
+     ;;   (deps-card (i/i lang [:Deps]) deps lang)]
+     ;;  [:div.fr-col-6
+     ;;   (stats-card (i/i lang [:distribution-by-platform]) platforms)
+     ;;   [:img {:src "/top_licenses.svg" :width "100%"}]]]
      
      ;; [:div
      ;;  (stats-card [:span (i/i lang [:archive-on])
@@ -1029,7 +1029,7 @@
              :handler #(reset! deps-total (walk/keywordize-keys %)))
         (GET "/deps-top.json"
              :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
-        (GET stats-url
+        (GET "/general.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
