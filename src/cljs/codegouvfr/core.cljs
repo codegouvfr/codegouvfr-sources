@@ -243,10 +243,12 @@
         pl       (:platform f)
         lic      (:license f)
         e        (:is-esr f)
-        de       (:has-description f)
         fk       (:is-fork f)
-        ar       (:is-archive f)
-        li       (:is-licensed f)]
+        li       (:is-licensed f)
+        ;; FIXME: Don't check this for now
+        ;; de       (:has-description f)
+        ;; ar       (:is-archive f)
+        ]
     (filter
      #(and (if dp (contains?
                    (into #{}
@@ -255,8 +257,10 @@
                               deps-raw)))
                    (:r %)) true)
            (if e (:e %) true)
-           (if fk (:f? %) true)
-           (if ar (not (:a? %)) true)
+           (if fk (not (:f? %)) true)
+           ;; FIXME: Don't check this for now
+           ;; (if ar (not (:a? %)) true)
+           ;; (if de (seq (:d %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
            (if la
@@ -264,7 +268,6 @@
                    (s/split (s/lower-case la) #" +"))
              true)
            (if (= pl "all") true (s-includes? (:r %) pl))
-           (if de (seq (:d %)) true)
            (if g (s-includes? (:r %) g) true)
            (if s (s-includes?
                   (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)])
@@ -587,24 +590,6 @@
       ;;                      (set-item! :is-fork v)
       ;;                      (re-frame/dispatch [:filter! {:is-fork v}]))}]
       ;;      (i/i lang [:only-forks])]]
-      ;;    [:div.dropdown-item
-      ;;     [:label.checkbox.level {:title (i/i lang [:no-archived-repos])}
-      ;;      [:input.fr-input
-      ;;       {:type      "checkbox"
-      ;;        :checked   (get-item :is-archive)
-      ;;        :on-change #(let [v (.-checked (.-target %))]
-      ;;                      (set-item! :is-archive v)
-      ;;                      (re-frame/dispatch [:filter! {:is-archive v}]))}]
-      ;;      (i/i lang [:no-archives])]]
-      ;;    [:div.dropdown-item
-      ;;     [:label.checkbox.level {:title (i/i lang [:only-with-description-repos])}
-      ;;      [:input.fr-input
-      ;;       {:type      "checkbox"
-      ;;        :checked   (get-item :has-description)
-      ;;        :on-change #(let [v (.-checked (.-target %))]
-      ;;                      (set-item! :has-description v)
-      ;;                      (re-frame/dispatch [:filter! {:has-description v}]))}]
-      ;;      (i/i lang [:with-description])]]
       ;;    [:div.dropdown-item
       ;;     [:label.checkbox.level {:title (i/i lang [:only-with-license])}
       ;;      [:input.fr-input
