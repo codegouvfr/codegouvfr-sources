@@ -1148,10 +1148,11 @@
                       (:query-params match)]))
 
 (defonce routes
-  [["/" :orgas]
-   ["/repos" :repos]
-   ["/stats" :stats]
-   ["/deps" :deps]])
+  ["/"
+   ["" :orgas]
+   ["repos" :repos]
+   ["stats" :stats]
+   ["deps" :deps]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
