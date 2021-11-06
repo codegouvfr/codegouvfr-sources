@@ -561,6 +561,7 @@
      [:div.fr-grid-row
       [:a.fr-link
        {:title (i/i lang [:download])
+        ;; FIXME
         :href  (->>
                 (map (fn [[k v :as kv]]
                        (when (not-empty kv)
@@ -713,6 +714,7 @@
      [:div.fr-grid-row
       [:a.fr-link.fr-m-1w
        {:title (i/i lang [:download])
+        ;; FIXME
         :href  (->>
                 (map (fn [[k v :as kv]]
                        (when (not-empty kv)
@@ -883,7 +885,7 @@
              (map #(let [[k v] %]
                      {[:a {:title title
                            ;; FIXME: use rfe/push-state instead?
-                           :href  (str "/repos?" param "=" k)} k] v})))
+                           :href  (str "#/repos?" param "=" k)} k] v})))
             top))))
 
 (defn tile [l i s]
@@ -1076,22 +1078,22 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
-            :href "" :on-click #(rfe/push-state :orgas)}
+            :href "#"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
-            :href "" :on-click #(rfe/push-state :repos)}
+            :href "#/repos"}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/deps") "page")
-            :href "" :on-click #(rfe/push-state :deps)}
+            :href "#/deps"}
            (i/i lang [:Deps])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
-            :href "" :on-click #(rfe/push-state :stats)}
+            :href "#/stats"}
            (i/i lang [:stats])]]]]]]]))
 
 (defn main-page [q license language platform]
@@ -1167,7 +1169,7 @@
     (rfe/start!
      (rf/router routes {:conflicts nil})
      on-navigate
-     {:use-fragment false})
+     {:use-fragment true})
     (start-filter-loop)
     (start-display-filter-loop)
     (reagent.dom/render
