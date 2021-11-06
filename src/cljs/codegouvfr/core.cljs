@@ -711,14 +711,7 @@
                              (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
-                (let [{:keys [n l d o dp h an au c r]}
-                      dd
-                      ;; d [:span [:a.fr-link
-                      ;;         {:title (i/i lang [:Deps])
-                      ;;          :href  (rfe/href :deps {:lang lang} {:orga o})}
-                      ;;         (fa "fa-cubes")]
-                      ;;  d]
-                      ]
+                (let [{:keys [n l d o dp h an au c r]} dd]
                   [:tr
                    [:td [:img {:src au :width "60%"}]]
                    [:td
@@ -731,41 +724,7 @@
                     [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
                    [:td r]
-                   [:td (to-locale-date c)]
-                   ])))]])
-
-    ;; (for [dd (partition-all
-    ;;           2
-    ;;           (take orgas-per-page
-    ;;                 (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
-    ;;                       @(re-frame/subscribe [:orgas?]))))]
-    ;;   ^{:key dd}
-
-    ;;   [:div.fr-grid-row.fr-m-4w
-    ;;    (for [{:keys [n l o h c d r e au p an dp fp] :as oo} dd]
-    ;;      ^{:key oo}
-    ;;        (when au [:img.fr-col-2.fr-responsive-img {:src au}])
-    ;;        [:div.fr-col-5.fr-m-auto
-    ;;         (when e [:a.fr-link
-    ;;                  {:title (i/i lang [:contact-by-email])
-    ;;                   :href  (str "mailto:" e)}
-    ;;                  (fa "fa-envelope")])
-    ;;         (when h [:a.fr-link
-    ;;                  {:title  (i/i lang [:go-to-website])
-    ;;                   :target "new"
-    ;;                   :href   h} (fa "fa-globe")])
-    ;;         (when an [:a.fr-link
-    ;;                   {:title  (i/i lang [:go-to-sig-website])
-    ;;                    :target "new"
-    ;;                    :href   (str annuaire-prefix an)}
-    ;;                   (fa "fa-link")])
-    ;;         (when an [:a.fr-link
-    ;;                   {:title  (i/i lang [:go-to-sig-website])
-    ;;                    :target "new"
-    ;;                    :href   (str annuaire-prefix an)}
-    ;;                   (fa "fa-link")])]]
-    ;;       [:div.fr-grid-row [:p d]]])])
-    ))
+                   [:td (to-locale-date c)]])))]])))
 
 (defn orgas-page [lang]
   (let [org-f          @(re-frame/subscribe [:sort-orgas-by?])
@@ -787,7 +746,7 @@
                      filter?)
                 (s/join "&")
                 (str "/orgas-csv?"))}
-       (fa "fa-download")]
+       [:span.fr-fi-download-line {:aria-hidden true}]]
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
