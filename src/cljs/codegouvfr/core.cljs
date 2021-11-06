@@ -410,7 +410,7 @@
 
 (defn repos-table [lang repos-cnt]
   (if (zero? repos-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-repo-found])] [:br]]
+    [:div.fr-m-3w [:p (i/i lang [:no-repo-found])]]
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
           repos      @(re-frame/subscribe [:repos?])]
@@ -533,19 +533,21 @@
    [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
     [:ul.fr-pagination__list
      [:li
-      [:a.fr-pagination__link.fr-pagination__link--first
+      [:button.fr-pagination__link.fr-pagination__link--first
        {:on-click #(change-page type "first")
+        :href     ""
         :disabled first-disabled}]]
      [:li
-      [:a.fr-pagination__link.fr-pagination__link--prev
+      [:button.fr-pagination__link.fr-pagination__link--prev
        {:on-click #(change-page type nil)
+        :href     ""
         :disabled first-disabled}]]
      [:li
-      [:a.fr-pagination__link.fr-pagination__link--next
+      [:button.fr-pagination__link.fr-pagination__link--next
        {:on-click #(change-page type true)
         :disabled last-disabled}]]
      [:li
-      [:a.fr-pagination__link.fr-pagination__link--last
+      [:button.fr-pagination__link.fr-pagination__link--last
        {:on-click #(change-page type "last")
         :disabled last-disabled}]]]]])
 
@@ -662,7 +664,8 @@
        (let [rps (count repos)]
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
-           (str rps (i/i lang [:repos]))))]]
+           (str rps (i/i lang [:repos]))))]
+      [navigate-pagination :repos first-disabled last-disabled]]
 
      [repos-table lang (count repos)]
      [navigate-pagination :repos first-disabled last-disabled]]))
@@ -738,7 +741,7 @@
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div.fr-grid
-     [:div.fr-grid-row.fr-m-1w
+     [:div.fr-grid-row
       [:a.fr-link.fr-m-1w
        {:title (i/i lang [:download])
         :href  (->>
@@ -753,7 +756,8 @@
        (let [orgs (count orgas)]
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
-           (str orgs (i/i lang [:groups]))))]]
+           (str orgs (i/i lang [:groups]))))]
+      [navigate-pagination :orgas first-disabled last-disabled]]
 
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled]]))
@@ -827,20 +831,22 @@
        (let [deps (count deps)]
          (if (< deps 2)
            (str deps (i/i lang [:dep]))
-           (str deps (i/i lang [:deps]))))]]
+           (str deps (i/i lang [:deps]))))]
+      [navigate-pagination :deps first-disabled last-disabled]]
+
      (if (pos? (count deps))
        [deps-table lang deps repo orga]
        [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
+
      [navigate-pagination :deps first-disabled last-disabled]
+
      (when-let [sims (get repos-sim repo)]
        [:div.fr-grid
         [:h2 (i/i lang [:Repos-deps-sim])]
-        [:br]
         [:ul
          (for [s sims]
            ^{:key s}
-           [:li [:a {:href (rfe/href :deps {:lang lang} {:repo s})} s]])]
-        [:br]])]))
+           [:li [:a {:href (rfe/href :deps {:lang lang} {:repo s})} s]])]])]))
 
 (defn repos-page-class [lang license language platform]
   (reagent/create-class
