@@ -1,7 +1,7 @@
 publiccodeYmlVersion: "0.2"
 
 name: codegouvfr
-url: "https://github.com/etalab/code.etalab.gouv.fr.git"
+url: "https://git.sr.ht/~etalab/code.gouv.fr"
 releaseDate: "2019-06-28"
 platforms:
   - web

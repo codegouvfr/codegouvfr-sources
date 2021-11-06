@@ -1,13 +1,13 @@
 [![img](https://img.shields.io/badge/Licence-EPL-orange.svg?style=flat-square)](https://git.sr.ht/~etalab/code.gouv.fr/blob/master/LICENSE)
 
-# code.etalab.gouv.fr
+# code.gouv.fr
 
 Browse sector source code repositories from the french public sector.
 
 <!-- FIXME -->
 <!-- ![img](codegouvfr.png) -->
 
-This frontend retrieves information source code [repositories](https://api-code.etalab.gouv.fr/api/repertoires/all) and [organizations](https://api-code.etalab.gouv.fr/api/organisations/all) from the french public sector.  The source code for creating these endpoints can be found [here](https://github.com/etalab/data-codes-sources-fr).
+This frontend retrieves information source code [repositories](https://api-code.etalab.gouv.fr/api/repertoires/all) and [organizations](https://api-code.etalab.gouv.fr/api/organisations/all) from the french public sector.  The source code for creating these endpoints can be found [here](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
 
 # Install dependencies
 
@@ -17,8 +17,8 @@ You also need `vega-cli` to store charts, install it globally with `npm install 
 
 # Develop
 
-    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
-    ~$ cd code.etalab.gouv.fr/
+    ~$ git clone https://git.sr.ht/~etalab/code.gouv.fr
+    ~$ cd code.gouv.fr/
     ~$ clj -M:test
 	~$ clj -M:run
     ~$ clj -M:fig
@@ -43,10 +43,10 @@ You will need to configure these environment variables:
 
 ## Deploy as a jar
 
-    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
-    ~$ cd code.etalab.gouv.fr/
-    ~$ clj -Mjs
-    ~$ clj -Mjar
+    ~$ git clone https://git.sr.ht/~etalab/code.gouv.fr
+    ~$ cd code.gouv.fr/
+    ~$ clj -M:js
+    ~$ clj -M:jar
     ~$ java -cp codegouvfr.jar clojure.main -m codegouvfr.server
 
 Then go to <https://localhost:3000> or to your custom base URL.
@@ -56,22 +56,18 @@ Then go to <https://localhost:3000> or to your custom base URL.
 Assuming your environments variables are stored in `~/.codegouvfr_envs`
 and you want to expose the 3000 port:
 
-    ~$ git clone https://github.com/etalab/code.etalab.gouv.fr
-    ~$ cd code.etalab.gouv.fr/
-    ~$ clj -Mjs
-    ~$ clj -Mjar
+    ~$ git clone https://git.sr.ht/~etalab/code.gouv.fr
+    ~$ cd code.gouv.fr/
+    ~$ clj -M:js
+    ~$ clj -M:jar
     ~$ docker build -t codegouvfr .
     ~$ docker run -it -p 3000:3000 --env-file=~/.codegouvfr_envs codegouvfr
 
 Then go to <http://localhost:3000>.
 
-# Roadmap
-
-There is no real roadmap but you can check [our issues](https://github.com/etalab/code.etalab.gouv.fr/issues) to see if you can help or suggest a feature.
-
 # Contribute
 
-The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.etalab.gouv.fr).  The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
+The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.gouv.fr).  The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
 
 Your help is welcome.  You can contribute with bug reports, patches, feature requests or general questions by sending an email to [~etalab/logiciels-libres@lists.sr.ht](mailto:~etalab/logiciels-libres@lists.sr.ht).
 

@@ -60,11 +60,11 @@
    [:meta {:property "og:image" :content "https://www.etalab.gouv.fr/wp-content/uploads/2019/06/etalab-white.png"}]
    [:meta {:property "twitter:card" :content "summary_large_image"}]
    [:meta {:property "twitter:title" :content title}]
-   [:meta {:property "twitter:site" :content "@Etalab"}]
-   [:meta {:property "twitter:creator" :content "@Etalab"}]
+   [:meta {:property "twitter:site" :content "@codegouvfr"}]
+   [:meta {:property "twitter:creator" :content "@codegouvfr"}]
    [:link {:rel "canonical" :href "https://code.etalab.gouv.fr"}]
    [:link {:rel   "alternate" :type "application/rss+xml"
-           :title "RSS feed"  :href "https://code.etalab.gouv.fr/latest.xml"}]
+           :title "RSS feed"  :href "https://code.gouv.fr/latest.xml"}]
    (h/include-css (str config/codegouvfr_base_url "/css/dsfr.min.css"))
    [:script {:src "https://tag.aticdn.net/619928/smarttag.js"}]
    [:script "var ATTag = new ATInternet.Tracker.Tag(); ATTag.page.send({name:'Page_Name'});"]
