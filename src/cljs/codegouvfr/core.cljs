@@ -28,6 +28,7 @@
 (defonce timeout 100)
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
+(defonce srht-repo-basedir-prefix "https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
 
@@ -1065,9 +1066,14 @@
          [:div.fr-header__tools-links
           [:ul.fr-links-group
            [:li
+            [:a.fr-link
+             {:target "new"
+              :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
+             (i/i lang [:glossary])]]
+           [:li
             [:a.fr-link.fr-fi-mail-line
              {:href "mailto:logiciels-libres@data.gouv.fr"}
-             "Contact"]]
+             (i/i lang [:contact])]]
            [:li
             [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
              {:href "https://twitter.com/codegouvfr"}
