@@ -7,7 +7,7 @@
 
 (def supported-languages
   "A set of supported languages."
-  #{"en" "fr" "it"})
+  #{"en" "fr"})
 
 (def localization
   ;; French translation
@@ -22,6 +22,8 @@
     :archive                       "SWH"
     :archive-on                    "Archive sur "
     :back-to-homepage              "Retour à l'accueil"
+    :bluehats                      "Gazette BlueHats 🧢"
+    :bluehats-desc                 "Votre lettre d'information sur les logiciels libres par et pour les administrations"
     :browse-repos-orga             "Voir la liste des dépôts de cette organisation ou de ce groupe"
     :choose-theme                  "Paramètres d'affichage"
     :contact                       "Contact"
@@ -35,6 +37,7 @@
     :download                      "Télécharger"
     :forks                         "Forks"
     :free-search                   "Recherche libre"
+    :follow                        "Suivez-nous"
     :footer-desc                   "Ce site est géré par "
     :footer-desc-link              "le pôle logiciels libres d'Etalab"
     :glossary                      "Glossaire"
@@ -95,6 +98,7 @@
     :stars                         "étoiles"
     :stats                         "Chiffres"
     :stats-expand                  "Licences et langages les plus utilisées, etc."
+    :subscribe                     "Abonnez-vous"
     :subscribe-rss-flux            "S'abonner au flux RSS des derniers dépôts"
     :swh-link                      "Lien vers l'archive faite par Software Heritage"
     :twitter-follow                "Suivez-nous sur Tiwtter"
@@ -117,6 +121,8 @@
     :archive                       "SWH"
     :archive-on                    "Archive on "
     :back-to-homepage              "Back to homepage"
+    :bluehats                      "BlueHats 🧢 newsletter"
+    :bluehats-desc                 "French new about free software by and for the public sector"
     :browse-repos-orga             "See the list of repositories from this organization or group"
     :choose-theme                  "Display parameter"
     :contact                       "Contact"
@@ -132,6 +138,7 @@
     :free-search                   "Free search"
     :footer-desc                   "This website is maintained by "
     :footer-desc-link              "the free software pole at Etalab"
+    :follow                        "Follow us"
     :glossary                      "Glossary"
     :go-to-orga                    "Visit the organization or group"
     :go-to-repo                    "See this repository"
@@ -190,6 +197,7 @@
     :stars                         "stars"
     :stats                         "Figures"
     :stats-expand                  "Most used Licenses and languages, etc."
+    :subscribe                     "Subscribe"
     :subscribe-rss-flux            "Subscribe to our RSS feed to receive information about the latest repositories!"
     :swh-link                      "A link to the Software Heritage archive"
     :twitter-follow                "Follow us on Tiwtter"
@@ -199,103 +207,7 @@
     :update-short                  "Updated"
     :with-more-of                  " with the most"
     :with-more-of*                 " with the most "
-    }
-   ;; Italian translation
-   :it
-   {
-    :Deps                          "Dipendenze"
-    :Repos                         "Repositories"
-    :Repos-deps-sim                "Repositories  con dipendenze simili"
-    :Stars                         "Stelle"
-    :accessibility                 "Accessibilità: parzialmente conforme"
-    :all-forges                    "All forges"              ;; FIXME
-    :archive                       "SWH"
-    :archive-on                    "Archiviato su "
-    :back-to-homepage              "Torna alla homepage"
-    :browse-repos-orga             "Vedere la lista di repository di questa organizazzione o di questo gruppo"
-    :choose-theme                  "Parametro di visualizzazione"
-    :contact                       "Contatti"
-    :contact-title                 "Per tutte le richieste, non esitate a inviarci un'e-mail"
-    :created-at                    "Creato"
-    :dep                           " dependency"             ;; TODO
-    :deps                          " dependencies"           ;; TODO
-    :deps-stats                    "Identified dependencies" ;; TODO
-    :description                   "Descrizione"
-    :distribution-by-platform      "Distribuzione per piattaforma"
-    :download                      "Scaricare"
-    :forks                         "Fork"
-    :free-search                   "Ricerca libera"
-    :footer-desc                   "Questo sito è gestito dalla "
-    :footer-desc-link              "divisione software libero di Etalab"
-    :glossary                      "Glossario"
-    :go-to-orga                    "Visita la pagina dell'organizzazione o del gruppo"
-    :go-to-repo                    "Vedere questo repository"
-    :go-to-repos                   "Vedi i reposutory"
-    :go-to-website                 "Visita il sito web"
-    :groups                        " grouppi"
-    :index-subtitle                "Questo sito permette di navigare in alcuni codici sorgenti aperti degli enti pubblici."
-    :index-title                   "Codici sorgenti del settore pubblico"
-    :issues                        "Issue"
-    :language                      "Lingua"
-    :legal                         "Menzioni legali"
-    :license                       "Licenza"
-    :list-repos-depending-on-dep   "Elenca i repository in base a questo"
-    :list-repos-using-license      "Elenca i repository pubblicati con questa licenza"
-    :list-repos-with-language      "Elenca i repository scritti principalmente in questa lingua"
-    :mean-repos-by-orga            "Numero medio di repository per organizzazione/gruppo"
-    :median-repos-by-orga          "Numero mediano di repository per organizzazione/gruppo"
-    :more-info                     "Maggiori informazioni"
-    :most-used-identified-licenses "Licenze identificate più utilizzate"
-    :most-used-languages           "Le 10 lingue più utilizzate"
-    :most-used-licenses            "Licenze più utilizzate"
-    :name                          "Name"                    ;; TODO
-    :no-dep-found                  "Nessuna dipendenza trovata: volete fare una nuova richiesta?"
-    :no-orga-found                 "Nessuna organizzazione o gruppo trovato: vuoi provare con un'altra richiesta?"
-    :no-repo-found                 "Repository non trovato: vuoi provre a fare una nuova ricerca?"
-    :number-of-repos               "Number of repositories"  ;; TODO
-    :one-group                     " gruppo"
-    :only-her                      "Solo HER"
-    :only-with-license             "Repository con una licenza identificata"
-    :orga-repo                     "Repository (organizzazione)"
-    :orgas                         "Organizzazioni"
-    :orgas-or-groups               "Organizzazioni o gruppi"
-    :personal-data                 "Dati personali e cookie"
-    :remove-filter                 "Rimuovi i filtri"
-    :repo                          " repository"
-    :repo-archived                 "Questo è un repository archiviato"
-    :repos                         " repositories"
-    :repos-number                  "Numero di repository"
-    :repos-of-source-code          "Repository del codice sorgente"
-    :repos-on-swh                  "Repository di Software Heritage"
-    :reused                        "Utilizzi"
-    :reuses-expand                 "Riutilizzo in altri repository o pacchetti"
-    :rss-feed                      "Feed RSS"
-    :sort                          "Ordina"
-    :sort-description-length       "Ordina per lunghezza della descrizione"
-    :sort-forks                    "Ordina per numero di fork"
-    :sort-name                     "Ordina per nome"
-    :sort-orgas-alpha              "Ordinare per ordine alfabetico del nome dell'organizzazione o del gruppo"
-    :sort-orgas-creation           "Ordinare per data di creazione dell'organizzazione o del gruppo"
-    :sort-repos                    "Per numero di repository"
-    :sort-repos-alpha              "Ordina alfabeticamente i repository"
-    :sort-reused                   "Ordina per numero di utilizzo in altri repository e / o pacchetti"
-    :sort-stars                    "Ordina per numero di stelle"
-    :sort-type                     "Ordina per tipo"
-    :sort-update-date              "Ordina per data di aggiornamento"
-    :stars                         "stelle"
-    :stats                         "Statistiche"
-    :stats-expand                  "Licenze e lingue più utilizzate, ecc."
-    :subscribe-rss-flux            "Sottoscrivi il nostro feed RSS per ricevere informazioni sugli ultimi repository pubblicati!"
-    :swh-link                      "Link all'archivio fatto per il Software Heritage"
-    :twitter-follow                "Seguici su Tiwtter"
-    :type                          "Type"                    ;; TODO
-    :under-license                 " licenza "
-    :understand-tech-terms         "Glossario per comprendere i termini tecnici usati in questo sito web"
-    :update-short                  "Agg."
-    :with-more-of                  " con più di"
-    :with-more-of*                 " con più di "
-    }
-   })
+    }})
 
 (def opts {:dict localization})
 

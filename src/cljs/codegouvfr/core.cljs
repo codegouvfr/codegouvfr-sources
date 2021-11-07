@@ -343,15 +343,13 @@
      m)))
 
 (defn apply-orgas-filters [m]
-  (let [f  @(re-frame/subscribe [:filter?])
-        s  (:q f)
-        de (:has-description f)]
+  (let [f @(re-frame/subscribe [:filter?])
+        s (:q f)]
     (filter
-     #(and (if de (seq (:d %)) true)
-           (if s (s-includes?
-                  (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
-                  s)
-               true))
+     #(if s (s-includes?
+             (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
+             s)
+          true)
      m)))
 
 (defn start-display-filter-loop []
@@ -482,7 +480,7 @@
           [:th.fr-col-1
            [:a.fr-link {:href   "https://www.softwareheritage.org"
                         :title  "www.softwareheritage.org"
-                        :target "new"} (i/i lang [:archive])]]
+                        :target "_blank"} (i/i lang [:archive])]]
           [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -537,7 +535,7 @@
                    ;; Repo (orga)
                    [:td [:div
                          [:a {:href   r
-                              :target "new"
+                              :target "_blank"
                               :title  (str (i/i lang [:go-to-repo])
                                            (when li (str (i/i lang [:under-license]) li)))}
                           n]
@@ -551,7 +549,7 @@
                     [:a.fr-link
                      {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                       :title  (i/i lang [:swh-link])
-                      :target "new"}
+                      :target "_blank"}
                      [:img {:width "18px" :src "/img/swh-logo.png"
                             :alt   "Software Heritage logo"}]]]
                    ;; Description
@@ -577,7 +575,7 @@
                     ;; FIXME: not working?
                     [:a.fr-link
                      {:title  (i/i lang [:reuses-expand])
-                      :target "new"
+                      :target "_blank"
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
 
@@ -748,12 +746,12 @@
                       (let [w (if h h (str annuaire-prefix an))]
                         [:a.fr-link
                          {:title  (i/i lang [:go-to-website])
-                          :target "new"
+                          :target "_blank"
                           :href   w}
                          [:img {:src au :width "100%" :alt ""}]])
                       [:img {:src au :width "100%" :alt ""}])]
                    [:td
-                    [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
+                    [:a {:target "_blank" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
                    [:td [:a {:title (i/i lang [:go-to-repos])
                              :href  (rfe/href :repos {:lang lang}
@@ -839,7 +837,7 @@
          (let [{:keys [t n d l r]} dd]
            [:tr
             [:td
-             [:a {:href  l :target "new"
+             [:a {:href  l :target "_blank"
                   :title (i/i lang [:more-info])} n]]
             [:td t]
             [:td d]
@@ -893,7 +891,7 @@
      ;; Additional informations
      (when-let [sims (get repos-sim repo)]
        [:div.fr-grid
-        [:h2 (i/i lang [:Repos-deps-sim])]
+        [:h5.fr-h5 (i/i lang [:Repos-deps-sim])]
         [:ul
          (for [s sims]
            ^{:key s}
@@ -912,7 +910,7 @@
 
 (defn stats-card [heading data & [thead]]
   [:div.fr-m-3w
-   [:h3 heading]
+   [:h3.fr-h3 heading]
    [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
     thead
     [:tbody
@@ -922,7 +920,7 @@
 
 (defn deps-card [heading deps lang]
   [:div.fr-m-3w
-   [:h3 heading]
+   [:h3.fr-h3 heading]
    [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
     [:thead [:tr
              [:th (i/i lang [:name])]
@@ -933,7 +931,7 @@
      (for [{:keys [n t d l r] :as o} deps]
        ^{:key o}
        [:tr
-        [:td [:a {:href  l :target "new"
+        [:td [:a {:href  l :target "_blank"
                   :title (i/i lang [:more-info])} n]]
         [:td t]
         [:td d]
@@ -960,9 +958,9 @@
 (defn tile [l i s]
   [:div.fr-tile.fr-col-2.fr-m-1w
    [:div.fr-tile__body
-    [:h1.fr-tile__title (i/i l [i])]
+    [:h6.fr-h6.fr-tile__title (i/i l [i])]
     [:div.fr-tile__desc
-     [:h3 s]]]])
+     [:p.fr-h3 s]]]])
 
 (defn stats-page
   [lang stats deps deps-total]
@@ -1131,7 +1129,7 @@
           [:ul.fr-links-group
            [:li
             [:a.fr-link
-             {:target "new"
+             {:target "_blank"
               :title  (i/i lang [:understand-tech-terms])
               :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
              (i/i lang [:glossary])]]
@@ -1179,6 +1177,28 @@
             :href         "#/stats"}
            (i/i lang [:stats])]]]]]]]))
 
+(defn subscribe [lang]
+  [:div.fr-follow
+   [:div.fr-container
+    [:div.fr-grid-row
+     [:div.fr-col-12.fr-col-md-8
+      [:div.fr-follow__newsletter
+       [:div
+        [:h5.fr-h5.fr-follow__title (i/i lang [:bluehats])]
+        [:p.fr-text--sm.fr-follow__desc (i/i lang [:bluehats-desc])]
+        [:button.fr-btn
+         {:type "button"
+          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
+         (i/i lang [:subscribe])]]]]
+     [:div.fr-col-12.fr-col-md-4
+      [:div.fr-follow__social
+       [:p.fr-h5.fr-mb-3v (i/i lang [:follow])]
+       [:ul.fr-links-group.fr-links-group--lg
+        [:li [:a.fr-link.fr-link--twitter
+              {:href   "https://twitter.com/codegouvfr"
+               :target "_blank"}
+              "twitter"]]]]]]]])
+
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
    [:div.fr-container
@@ -1188,7 +1208,7 @@
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
       [:p.fr-footer__content-desc (i/i lang [:footer-desc])
-       [:a {:href "https://communs.numerique.gouv.fr" :target "new"}
+       [:a {:href "https://communs.numerique.gouv.fr"}
         (i/i lang [:footer-desc-link])]]
       [:ul.fr-footer__content-list
        [:li.fr-footer__content-item
@@ -1255,6 +1275,7 @@
         :legal [legal-page lang]
         ;; Fall back on the organizations page
         :else  (rfe/push-state :orgas))]
+     (subscribe lang)
      (footer lang)]))
 
 (defn main-class []
