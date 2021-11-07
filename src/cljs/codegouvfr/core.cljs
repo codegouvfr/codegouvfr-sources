@@ -17,8 +17,8 @@
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]
             [markdown-to-hiccup.core :as md]
-            [semantic-csv.core :as sc]
-            ))
+            [semantic-csv.core :as sc])
+  (:require-macros [codegouvfr.macros :refer [inline-resource]]))
 
 ;; Defaults
 
@@ -269,11 +269,7 @@
         lic      (:license f)
         e        (:is-esr f)
         fk       (:is-not-fork f)
-        li       (:is-licensed f)
-        ;; FIXME: Don't check this for now
-        ;; de       (:has-description f)
-        ;; ar       (:is-archive f)
-        ]
+        li       (:is-licensed f)]
     (filter
      #(and (if dp (contains?
                    (into #{}
@@ -283,9 +279,6 @@
                    (:r %)) true)
            (if e (:e %) true)
            (if fk (not (:f? %)) true)
-           ;; FIXME: Don't check this for now
-           ;; (if ar (not (:a? %)) true)
-           ;; (if de (seq (:d %)) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
            (if la
@@ -501,7 +494,7 @@
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
-                   ;; Repo < orga
+                   ;; Repo (orga)
                    [:td [:div
                          [:a {:href   r
                               :target "new"
@@ -538,8 +531,6 @@
                    [:td f]
                    ;; Stars
                    [:td s]
-                   ;; Issues
-                   ;; [:td i]
                    ;; Reused
                    [:td
                     ;; FIXME: not working?
@@ -868,12 +859,7 @@
 
 (defn deps-card [heading deps lang]
   [:div.fr-m-3w
-   [:h3
-    heading
-    ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-    ;;  {:href  (str "/" lang "/glossary#dependencies")
-    ;;   :title (i/i lang [:go-to-glossary])}]
-    ]
+   [:h3 heading]
    [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
     [:thead [:tr
              [:th (i/i lang [:name])]
@@ -1116,6 +1102,10 @@
             :href         "#/stats"}
            (i/i lang [:stats])]]]]]]]))
 
+(defn legal-page [lang]
+  [:div.fr-container
+   (to-hiccup (inline-resource "public/md/legal.fr.md"))])
+
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
@@ -1131,6 +1121,8 @@
         :stats [stats-page-class lang]
         ;; Table to display all dependencies
         :deps  [deps-page-class lang]
+        ;; Page for legal mentions
+        :legal [legal-page lang]
         ;; Fall back on the organizations page
         :else  (rfe/push-state :orgas))]]))
 
@@ -1175,7 +1167,8 @@
    ["" :orgas]
    ["repos" :repos]
    ["stats" :stats]
-   ["deps" :deps]])
+   ["deps" :deps]
+   ["legal" :legal]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
