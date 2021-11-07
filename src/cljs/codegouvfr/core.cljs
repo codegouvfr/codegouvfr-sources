@@ -1020,8 +1020,9 @@
                    top_orgs_by_stars
                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
 
-     [:div.fr-grid-row
-      (deps-card (i/i lang [:Deps]) deps lang)]
+     [:div.fr-grid-row.fr-grid-row--center
+      [:div.fr-col-12
+       (deps-card (i/i lang [:Deps]) deps lang)]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
