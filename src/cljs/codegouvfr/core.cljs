@@ -12,6 +12,7 @@
             [ajax.core :refer [GET]]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
+            [clojure.set :as set]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
@@ -31,6 +32,44 @@
 (defonce srht-repo-basedir-prefix "https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
+
+(defonce repos-mapping
+  {:u  :last_update
+   :d  :description
+   :a? :is_archived
+   :f? :is_fork
+   :l  :language
+   :li :license
+   :n  :name
+   :f  :forks_count
+   :i  :open_issues_count
+   :s  :stars_count
+   :o  :organization_name
+   :p  :platform
+   :r  :repository_url
+   :t  :topics})
+
+(defonce orgas-mapping
+  {:d  :description
+   :a  :location
+   :e  :email
+   :n  :name
+   :p  :platform
+   :h  :website
+   :v? :is_verified
+   :l  :login
+   :c  :creation_date
+   :r  :repositories_count
+   :o  :organization_url
+   :au :avatar_url})
+
+(defonce deps-mapping
+  {:n :name
+   :t :type
+   :d :description
+   :l :link
+   :u :updated
+   :r :repositories})
 
 ;; Utility functions
 
@@ -582,7 +621,13 @@
       [:a.fr-link
        {:title    (i/i lang [:download])
         :href     "#/repos"
-        :on-click #(download-as-csv! repos "codegouvfr-repositories.csv")}
+        :on-click #(download-as-csv!
+                    (map
+                     (fn [r] (set/rename-keys
+                              (select-keys r (keys repos-mapping))
+                              repos-mapping))
+                     repos)
+                    "codegouvfr-repositories.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; Generaltion information
       [:strong.fr-m-auto
@@ -729,8 +774,14 @@
       ;; Download link
       [:a.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
-        :href     "#/orgas"
-        :on-click #(download-as-csv! orgas "codegouvfr-organizations.csv")}
+        :href     "#"
+        :on-click #(download-as-csv!
+                    (map
+                     (fn [r] (set/rename-keys
+                              (select-keys r (keys orgas-mapping))
+                              orgas-mapping))
+                     orgas)
+                    "codegouvfr-organizations.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -813,7 +864,13 @@
       [:a.fr-link
        {:title    (i/i lang [:download])
         :href     "#/deps"
-        :on-click #(download-as-csv! deps "codegouvfr-dependencies.csv")}
+        :on-click #(download-as-csv!
+                    (map
+                     (fn [r] (set/rename-keys
+                              (select-keys r (keys deps-mapping))
+                              deps-mapping))
+                     deps)
+                    "codegouvfr-dependencies.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; General informations
       [:strong.fr-m-auto
