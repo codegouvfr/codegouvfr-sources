@@ -17,15 +17,10 @@
   org.clojure/clojurescript             {:mvn/version "1.10.891"}
   org.clojure/core.async                {:mvn/version "1.4.627"}
   re-frame/re-frame                     {:mvn/version "1.2.0"}
-  semantic-csv/semantic-csv             {:mvn/version "0.2.1-alpha1"}
-  }
+  semantic-csv/semantic-csv             {:mvn/version "0.2.1-alpha1"}}
 
- :paths ["src" "resources"]
- 
+ :paths ["src/cljs" "src/clj" "resources"]
+
  :aliases
- {:fig {:main-opts   ["-m" "figwheel.main" "-b" "dev" "-r"]
-        :extra-paths ["src/cljs"]}
-
-  :js {:main-opts   ["-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]
-       :extra-paths ["src/cljs"]}
-  }}
+ {:fig {:main-opts ["-m" "figwheel.main" "-b" "dev" "-r"]}
+  :js  {:main-opts ["-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]}}}
