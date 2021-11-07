@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
-(ns codegouvfr.i18n
+(ns i18n
   (:require [taoensso.tempura :refer [tr]]))
 
 (def supported-languages

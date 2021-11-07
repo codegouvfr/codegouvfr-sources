@@ -10,12 +10,13 @@
             [cljs-bean.core :refer [bean]]
             [goog.string :as gstring]
             [ajax.core :refer [GET]]
-            [codegouvfr.i18n :as i]
+            [i18n :as i]
             [clojure.string :as s]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
-            [goog.labs.format.csv :as csv]))
+            [goog.labs.format.csv :as csv]
+            [markdown-to-hiccup.core :as md]))
 
 (defonce repos-per-page 100)
 (defonce orgas-per-page 20)
@@ -25,6 +26,11 @@
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
+
+(defn to-hiccup
+  "Convert a markdown `s` string to hiccup structure."
+  [s]
+  (-> s (md/md->hiccup) (md/component)))
 
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
@@ -871,7 +877,7 @@
               :href  (rfe/href :repos {:lang lang} {:d n})}
           (count r)]]])]]])
 
-(defn top-clean-up [top lang param title]
+(defn top-clean-up [top param title]
   (let [total (reduce + (map val top))]
     (apply merge
            (sequence
@@ -906,14 +912,14 @@
                       top_orgs_by_repos))
         top_languages_1
         (top-clean-up (walk/stringify-keys top_languages)
-                      lang "language" (i/i lang [:list-repos-with-language]))
+                      "language" (i/i lang [:list-repos-with-language]))
         top_licenses_0
         (take 10 (top-clean-up
                   (walk/stringify-keys
                    (-> top_licenses
                        (dissoc :Inconnue)
                        (dissoc :Other)))
-                  lang "license"
+                  "license"
                   (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
