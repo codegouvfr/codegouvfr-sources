@@ -1113,7 +1113,7 @@
         [:div.fr-header__brand.fr-enlarge-link
          [:div.fr-header__brand-top
           [:div.fr-header__logo
-           [:p.fr-logo "République<br>Française"]]
+           [:p.fr-logo "République" [:br] "Française"]]
           [:div.fr-header__navbar
            [:button.fr-btn--menu.fr-btn
             {:data-fr-opened false
