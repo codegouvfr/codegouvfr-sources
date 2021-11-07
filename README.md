@@ -1,4 +1,4 @@
-[![img](https://img.shields.io/badge/Licence-EPL-orange.svg?style=flat-square)](https://git.sr.ht/~etalab/code.gouv.fr/blob/master/LICENSE)
+[![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg?style=flat-square)](https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/LICENSES)
 
 # code.gouv.fr
 
