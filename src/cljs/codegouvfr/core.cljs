@@ -1062,7 +1062,7 @@
              :handler #(reset! deps-total (walk/keywordize-keys %)))
         (GET "/data/deps-top.json"
              :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
-        (GET "/data/general.json"
+        (GET "/data/stats.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
 
