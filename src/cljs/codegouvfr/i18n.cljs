@@ -35,6 +35,8 @@
     :download                      "Télécharger"
     :forks                         "Forks"
     :free-search                   "Recherche libre"
+    :footer-desc                   "Ce site est géré par "
+    :footer-desc-link              "le pôle logiciels libres d'Etalab"
     :glossary                      "Glossaire"
     :go-to-orga                    "Visiter le compte d'organisation ou le groupe"
     :go-to-repo                    "Voir ce dépôt"
@@ -128,6 +130,8 @@
     :download                      "Download"
     :forks                         "Forks"
     :free-search                   "Free search"
+    :footer-desc                   "This website is maintained by "
+    :footer-desc-link              "the free software pole at Etalab"
     :glossary                      "Glossary"
     :go-to-orga                    "Visit the organization or group"
     :go-to-repo                    "See this repository"
@@ -204,7 +208,7 @@
     :Repos-deps-sim                "Repositories  con dipendenze simili"
     :Stars                         "Stelle"
     :accessibility                 "Accessibilità: 75% conforme"
-    :all-forges                    "All forges"                                               ;; FIXME
+    :all-forges                    "All forges"              ;; FIXME
     :archive                       "SWH"
     :archive-on                    "Archiviato su "
     :back-to-homepage              "Torna alla homepage"
@@ -213,14 +217,16 @@
     :contact                       "Contatti"
     :contact-title                 "Per tutte le richieste, non esitate a inviarci un'e-mail"
     :created-at                    "Creato"
-    :dep                           " dependency"                                              ;; TODO
-    :deps                          " dependencies"                                            ;; TODO
-    :deps-stats                    "Identified dependencies"                                  ;; TODO
+    :dep                           " dependency"             ;; TODO
+    :deps                          " dependencies"           ;; TODO
+    :deps-stats                    "Identified dependencies" ;; TODO
     :description                   "Descrizione"
     :distribution-by-platform      "Distribuzione per piattaforma"
     :download                      "Scaricare"
     :forks                         "Fork"
     :free-search                   "Ricerca libera"
+    :footer-desc                   "Questo sito è gestito dalla "
+    :footer-desc-link              "divisione software libero di Etalab"
     :glossary                      "Glossario"
     :go-to-orga                    "Visita la pagina dell'organizzazione o del gruppo"
     :go-to-repo                    "Vedere questo repository"
@@ -242,11 +248,11 @@
     :most-used-identified-licenses "Licenze identificate più utilizzate"
     :most-used-languages           "Le 10 lingue più utilizzate"
     :most-used-licenses            "Licenze più utilizzate"
-    :name                          "Name"                                                     ;; TODO
+    :name                          "Name"                    ;; TODO
     :no-dep-found                  "Nessuna dipendenza trovata: volete fare una nuova richiesta?"
     :no-orga-found                 "Nessuna organizzazione o gruppo trovato: vuoi provare con un'altra richiesta?"
     :no-repo-found                 "Repository non trovato: vuoi provre a fare una nuova ricerca?"
-    :number-of-repos               "Number of repositories"                                   ;; TODO
+    :number-of-repos               "Number of repositories"  ;; TODO
     :one-group                     " gruppo"
     :only-her                      "Solo HER"
     :only-with-license             "Repository con una licenza identificata"
@@ -282,7 +288,7 @@
     :subscribe-rss-flux            "Sottoscrivi il nostro feed RSS per ricevere informazioni sugli ultimi repository pubblicati!"
     :swh-link                      "Link all'archivio fatto per il Software Heritage"
     :twitter-follow                "Seguici su Tiwtter"
-    :type                          "Type"                                                     ;; TODO
+    :type                          "Type"                    ;; TODO
     :under-license                 " licenza "
     :understand-tech-terms         "Glossario per comprendere i termini tecnici usati in questo sito web"
     :update-short                  "Agg."

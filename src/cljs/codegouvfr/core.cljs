@@ -1186,7 +1186,9 @@
       [:a.fr-link {:href "/" :title (i/i lang [:back-to-homepage])}
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
-      [:p.fr-footer__content-desc (i/i lang [:index-title])]
+      [:p.fr-footer__content-desc (i/i lang [:footer-desc])
+       [:a {:href "https://communs.numerique.gouv.fr" :target "new"}
+        (i/i lang [:footer-desc-link])]]
       [:ul.fr-footer__content-list
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
