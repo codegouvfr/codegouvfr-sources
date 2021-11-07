@@ -513,7 +513,7 @@
                      {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                       :title  (i/i lang [:swh-link])
                       :target "new"}
-                     [:img {:width "18px" :src "/images/swh-logo.png"}]]]
+                     [:img {:width "18px" :src "/img/swh-logo.png"}]]]
                    ;; Description
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
