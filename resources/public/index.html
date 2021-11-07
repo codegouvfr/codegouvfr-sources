@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-fr-theme="">
   <head>
     <title>code.gouv.fr</title>
     <meta charset="utf-8">
@@ -20,22 +20,12 @@
     <link href="/favicons/favicon.svg" rel="icon" type="image/svg+xml">
     <link href="/favicons/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <link crossorigin="use-credentials" href="/manifest.webmanifest" rel="manifest">
+    <link href="/css/dsfr.min.css" rel="stylesheet" type="text/css">
     <link href="https://code.gouv.fr" rel="canonical">
     <link href="https://code.gouv.fr/latest.xml" rel="alternate" title="RSS feed" type="application/rss+xml">
-    <link href="/css/dsfr.min.css" rel="stylesheet" type="text/css">
-    <script src="https://tag.aticdn.net/619928/smarttag.js"></script>
-    <script>var ATTag = new ATInternet.Tracker.Tag();ATTag.page.send({name:'Page_Name'});</script>
-    <noscript>
-      <p>I really understand why you don't want to use Javascript.</p>
-      <p>To access to the data exposed in this website, please refer to <a href="https://git.sr.ht/~etalab/code.gouv.fr">its repository</a>.
-    </noscript>
   </head>
   <body>
     <div id="app"></div>
-    <div>
-      <script src="/js/codegouvfr.js"></script>
-      <script>codegouvfr.core.init();</script>
-    </div>
     <footer class="fr-footer" role="contentinfo">
       <div class="fr-container">
 	<div class="fr-footer__body">
@@ -74,6 +64,7 @@
 	    </ul>
 	  </div>
 	</div>
+
 	<div class="fr-footer__bottom">
 	  <ul class="fr-footer__bottom-list">
 	    <li class="fr-footer__bottom-item">
@@ -85,9 +76,57 @@
 	    <li class="fr-footer__bottom-item">
 	      <a class="fr-footer__bottom-link" href="#/legal">Données personnelles et cookies</a>
 	    </li>
+	    <li class="fr-footer__bottom-item">
+	      <button class="fr-footer__bottom-link fr-fi-theme-fill fr-link--icon-left" aria-controls="fr-theme-modal" data-fr-opened="false">Paramètres d'affichage</button>
+	    </li>
 	  </ul>
 	</div>
       </div>
     </footer>
+
+    <dialog id="fr-theme-modal" class="fr-modal" role="dialog" aria-labelledby="fr-theme-modal-title">
+      <div class="fr-container fr-container--fluid">
+        <div class="fr-grid-row fr-grid-row--center">
+          <div class="fr-col-12 fr-col-md-6 fr-col-lg-4">
+            <div class="fr-modal__body">
+              <div class="fr-modal__header">
+                <button class="fr-link--close fr-link" aria-controls="fr-theme-modal">Fermer</button>
+              </div>
+              <div class="fr-modal__content">
+                <h1 id="fr-theme-modal-title" class="fr-modal__title">
+                  Paramètres d’affichage
+                </h1>
+                <div id="fr-switch-theme" class="fr-form-group fr-switch-theme">
+                  <fieldset class="fr-fieldset">
+                    <legend class="fr-fieldset__legend fr-text--regular">Choisissez un thème pour personnaliser l’apparence du site.</legend>
+                    <div class="fr-fieldset__content">
+                      <div class="fr-radio-group fr-radio-rich">
+                        <input type="radio" id="fr-radios-theme-light" name="fr-radios-theme" value="light">
+                        <label class="fr-label" for="fr-radios-theme-light">Thème clair</label>
+                      </div>
+                      <div class="fr-radio-group fr-radio-rich">
+                        <input type="radio" id="fr-radios-theme-dark" name="fr-radios-theme" value="dark">
+                        <label class="fr-label" for="fr-radios-theme-dark">Thème sombre</label>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="https://tag.aticdn.net/619928/smarttag.js"></script>
+    <script src="/js/codegouvfr.js"></script>
+    <script src="/js/dsfr.nomodule.min.js"></script>
+    <script>codegouvfr.core.init();</script>
+    <script>var ATTag = new ATInternet.Tracker.Tag();ATTag.page.send({name:'Page_Name'});</script>
+    <noscript>
+      <p>We do understand why you might not want to use Javascript.</p>
+      <p>To access to the data exposed in this website, please refer to <a href="https://git.sr.ht/~etalab/code.gouv.fr">its repository</a>.</p>
+    </noscript>
+
   </body>
 </html>
