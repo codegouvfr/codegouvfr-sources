@@ -806,18 +806,21 @@
          [:a.fr-link
           {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :href     "#/deps"
+           :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
          [:a.fr-link
           {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :href     "#/deps"
+           :title    (i/i lang [:sort-type])
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
          [:a.fr-link
           {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :href     "#/deps"
+           :title    (i/i lang [:sort-description-length])
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
         (when-not repo
@@ -825,6 +828,7 @@
            [:a.fr-link
             {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :href     "#/deps"
+             :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
       (into
@@ -1127,15 +1131,18 @@
            [:li
             [:a.fr-link
              {:target "new"
+              :title  (i/i lang [:understand-tech-terms])
               :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
              (i/i lang [:glossary])]]
            [:li
             [:a.fr-link.fr-fi-mail-line
-             {:href "mailto:logiciels-libres@data.gouv.fr"}
+             {:href  "mailto:logiciels-libres@data.gouv.fr"
+              :title (i/i lang [:contact-title])}
              (i/i lang [:contact])]]
            [:li
             [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
-             {:href "https://twitter.com/codegouvfr"}
+             {:href  "https://twitter.com/codegouvfr"
+              :title (i/i lang [:twitter-follow])}
              "@codegouvfr"]]]]]]]]
      ;; Header menu
      [:div#header-navigation.fr-header__menu.fr-modal
@@ -1149,32 +1156,87 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
+            :title        (i/i lang [:orgas-or-groups])
             :href         "#"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
+            :title        (i/i lang [:repos-of-source-code])
             :href         "#/repos"}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/deps") "page")
+            :title        (i/i lang [:deps-stats])
             :href         "#/deps"}
            (i/i lang [:Deps])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
+            :title        (i/i lang [:stats-expand])
             :href         "#/stats"}
            (i/i lang [:stats])]]]]]]]))
 
+(defn footer [lang]
+  [:footer.fr-footer {:role "contentinfo"}
+   [:div.fr-container
+    [:div.fr-footer__body
+     [:div.fr-footer__brand.fr-enlarge-link
+      [:a.fr-link {:href "/" :title (i/i lang [:back-to-homepage])}
+       [:p.fr-logo "République" [:br] "Française"]]]
+     [:div.fr-footer__content
+      [:p.fr-footer__content-desc "code.gouv.fr"]
+      [:ul.fr-footer__content-list
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://data.gouv.fr"} "data.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://etalab.gouv.fr"} "etalab.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://numerique.gouv.fr"} "numerique.gouv.fr"]]
+       [:li.fr-footer__content-item
+        [:a.fr-footer__content-link
+         {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]
+    [:div.fr-footer__bottom
+     [:ul.fr-footer__bottom-list
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
+        {:href "#/legal"}
+        (i/i lang [:accessibility])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
+        {:href "#/legal"}
+        (i/i lang [:legal])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
+        {:href "#/legal"}
+        (i/i lang [:personal-data])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
+        {:href "/data/latest.xml" :title (i/i lang [:subscribe-rss-flux])}
+        (i/i lang [:rss-feed])]]
+      [:li.fr-footer__bottom-item
+       [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
+        {:aria-controls  "fr-theme-modal"
+         :title          (i/i lang [::choose-theme])
+         :data-fr-opened false}
+        (i/i lang [:choose-theme])]]]]]])
+
 (defn legal-page [lang]
   [:div.fr-container
-   (to-hiccup (inline-resource "public/md/legal.fr.md"))])
+   (to-hiccup
+    (condp = lang
+      "fr" (inline-resource "public/md/legal.fr.md")
+      (inline-resource "public/md/legal.en.md")))])
 
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
-    [:div (banner lang)
+    [:div
+     (banner lang)
      [:div.fr-container.fr-container--fluid
       [main-menu q lang view]
       (condp = view
@@ -1189,7 +1251,8 @@
         ;; Page for legal mentions
         :legal [legal-page lang]
         ;; Fall back on the organizations page
-        :else  (rfe/push-state :orgas))]]))
+        :else  (rfe/push-state :orgas))]
+     (footer lang)]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
