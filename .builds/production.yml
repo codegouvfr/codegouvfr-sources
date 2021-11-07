@@ -1,0 +1,23 @@
+image: archlinux
+packages:
+  - rlwrap
+  - jre
+  - curl
+  - rsync
+secrets:
+  - a6db2c26-335f-4a97-bec4-445f09aeda3c
+tasks:
+  - prepare: |
+      curl -O https://download.clojure.org/install/linux-install-1.10.3.998.sh
+      chmod +x linux-install-1.10.3.998.sh
+      sudo ./linux-install-1.10.3.998.sh
+  - build: |
+      cd code.gouv.fr
+      clojure -M:js
+  - upload: |
+      cd code.gouv.fr/resources/public/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * communs.numerique.gouv.fr:/home/build/websites/code.gouv.fr/
+triggers:
+  - action: email
+    condition: failure
+    to: bastien.guerry@data.gouv.fr
