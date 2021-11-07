@@ -1,5 +1,7 @@
 # Glossaire pour code.gouv.fr
 
+*Pour proposer une amélioration, écrivez à [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr).*
+
 ## Codes sources
 
 Le code source d'un programme informatique est ce qu'écrit une

@@ -1,5 +1,7 @@
 # Glossary for code.gouv.fr
 
+*To suggest an enhancement, please reach us at [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr).*
+
 ## Source code
 
 A software's source code is what a developer writes.  Source code can

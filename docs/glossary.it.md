@@ -1,5 +1,7 @@
 # Glossario di code.gouv.fr
 
+*Per suggerire un miglioramento, contattaci all'indirizzo [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr).*
+
 ## Codici sorgenti
 
 Il codice sorgente di un programma informatico è quello che scrive una
