@@ -41,7 +41,7 @@
     :go-to-repos                   "Voir les dépôts"
     :go-to-website                 "Visiter le site web"
     :groups                        " groupes"
-    :index-subtitle                "Ce site vous permet d'explorer les codes sources ouverts par des organismes publics."
+    :index-subtitle                "Ce site permet d'explorer les codes sources ouverts par des organismes publics."
     :index-title                   "Codes sources du secteur public"
     :issues                        "Tickets"
     :keywords                      "Accès aux codes sources du secteur public"
