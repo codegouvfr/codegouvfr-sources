@@ -9,15 +9,15 @@ SIRET : 12000101100010 (secrétariat général du gouvernement)
 SIREN : 120 001 011
 ```
 
-## Directeur de la publication
+## Responsable de publication
 
-Directeur interministériel du numérique.
+Le directeur interministériel du numérique.
 
 ## Hébergement
 
 Ce site est hébergé par OVH France, 2 rue Kellermann - 59100 Roubaix - France.
 
-## Code source du site
+## Code source
 
 Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~etalab/code.gouv.fr).
 
@@ -27,4 +27,4 @@ Le site est accessible à 75%.
 
 ## Données personnelles et cookies
 
-Aucune donnée personnelle n'est collectée et le site n'utilise pas de cookies.
+Aucune donnée personnelle n'est collectée et le site n'utilise pas de cookie.
