@@ -10,3 +10,4 @@ figwheel_server.log
 *xml
 *csv
 resources/public/data/
+.cpcache/
