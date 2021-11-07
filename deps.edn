@@ -33,26 +33,10 @@
   semantic-csv/semantic-csv             {:mvn/version "0.2.1-alpha1"}
   org.clojure/data.csv                  {:mvn/version "1.0.0"}}
 
- :paths ["src" "src/clj" "src/cljc" "resources"]
-
  :aliases
- {:run {:main-opts ["-m" "codegouvfr.server"]}
-
-  :fig {:main-opts   ["-m" "figwheel.main" "-b" "dev" "-r"]
+ {:fig {:main-opts   ["-m" "figwheel.main" "-b" "dev" "-r"]
         :extra-paths ["src/cljs"]}
 
   :js {:main-opts   ["-m" "figwheel.main" "-O" "advanced" "-bo" "dev"]
        :extra-paths ["src/cljs"]}
-
-  :test {:extra-paths ["test"]
-         :extra-deps  {com.cognitect/test-runner
-                       {:git/url "https://github.com/cognitect-labs/test-runner.git"
-                        :sha     "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
-         :main-opts   ["-m" "cognitect.test-runner"
-                       "-d" "test" "-n" "codegouvfr.test"]}
-
-  :uberdeps {:replace-deps  {uberdeps/uberdeps {:mvn/version "1.0.4"}}
-             :replace-paths []
-             :main-opts     ["-m" "uberdeps.uberjar"]
-             }
   }}
