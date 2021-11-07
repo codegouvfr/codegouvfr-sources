@@ -10,13 +10,17 @@
             [cljs-bean.core :refer [bean]]
             [goog.string :as gstring]
             [ajax.core :refer [GET]]
-            [i18n :as i]
+            [codegouvfr.i18n :as i]
             [clojure.string :as s]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]
-            [markdown-to-hiccup.core :as md]))
+            [markdown-to-hiccup.core :as md]
+            [semantic-csv.core :as sc]
+            ))
+
+;; Defaults
 
 (defonce repos-per-page 100)
 (defonce orgas-per-page 20)
@@ -27,10 +31,7 @@
 (defonce filter-chan (async/chan 100))
 (defonce display-filter-chan (async/chan 100))
 
-(defn to-hiccup
-  "Convert a markdown `s` string to hiccup structure."
-  [s]
-  (-> s (md/md->hiccup) (md/component)))
+;; Utility functions
 
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
@@ -46,6 +47,46 @@
   "Remove the browser's localStorage value for the given `key`."
   [key]
   (.removeItem (.-localStorage js/window) key))
+
+(defn to-hiccup
+  "Convert a markdown `s` string to hiccup structure."
+  [s]
+  (-> s (md/md->hiccup) (md/component)))
+
+(defn to-locale-date [s]
+  (when (string? s)
+    (.toLocaleDateString
+     (js/Date. (.parse js/Date s)))))
+
+(defn or-kwds [m ks]
+  (first (remove nil? (map #(apply % [m]) ks))))
+
+(defn s-includes? [s sub]
+  (when (and (string? s) (string? sub))
+    (s/includes? (s/lower-case s) (s/lower-case sub))))
+
+(defn- get-first-match-s-for-k-in-m [s k m]
+  (reduce #(when (= (k %2) s) (reduced %2)) nil m))
+
+(defn vec-to-csv-string [data]
+  (->> data
+       ;; FIXME: Take care of escaping quotes?
+       (map #(map (fn [s] (gstring/format "\"%s\"" s)) %))
+       (map #(s/join ", " %))
+       (s/join "\n")))
+
+(defn download-as-csv!
+  [data file-name]
+  (let [data-string (-> data sc/vectorize vec-to-csv-string)
+        data-blob   (js/Blob. #js [data-string] #js {:type "text/csv"})
+        link        (js/document.createElement "a")]
+    (set! (.-href link) (js/URL.createObjectURL data-blob))
+    (.setAttribute link "download" file-name)
+    (js/document.body.appendChild link)
+    (.click link)
+    (js/document.body.removeChild link)))
+
+;; Events and subscriptions
 
 (re-frame/reg-event-db
  :initialize-db!
@@ -64,7 +105,7 @@
     :filter         init-filter
     :display-filter init-filter
     :lang           "en"
-    :path    ""}))
+    :path           ""}))
 
 (re-frame/reg-event-db
  :lang!
@@ -215,28 +256,7 @@
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-deps-by k)))
 
-(defn or-kwds [m ks]
-  (first (remove nil? (map #(apply % [m]) ks))))
-
-(defn fa [s]
-  [:span.icon
-   [:i {:class (str "fas " s)}]])
-
-(defn fab [s]
-  [:span.icon
-   [:i {:class (str "fab " s)}]])
-
-(defn to-locale-date [s]
-  (when (string? s)
-    (.toLocaleDateString
-     (js/Date. (.parse js/Date s)))))
-
-(defn s-includes? [s sub]
-  (when (and (string? s) (string? sub))
-    (s/includes? (s/lower-case s) (s/lower-case sub))))
-
-(defn- get-first-match-s-for-k-in-m [s k m]
-  (reduce #(when (= (k %2) s) (reduced %2)) nil m))
+;; Filters
 
 (defn apply-repos-filters [m]
   (let [f        @(re-frame/subscribe [:filter?])
@@ -423,7 +443,7 @@
            [:a.fr-link
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
-             :href "#/repos"
+             :href     "#/repos"
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col-1
@@ -565,25 +585,21 @@
         last-disabled  (= repos-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; Download link
       [:a.fr-link
-       {:title (i/i lang [:download])
-        ;; FIXME
-        :href  (->>
-                (map (fn [[k v :as kv]]
-                       (when (not-empty kv)
-                         (str (name k) "=" v)))
-                     filter?)
-                (s/join "&")
-                (str "/repos-csv?"))}
+       {:title    (i/i lang [:download])
+        :href     "#/repos"
+        :on-click #(download-as-csv! repos "codegouvfr-repositories.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
-
+      ;; Generaltion information
       [:strong.fr-m-auto
        (let [rps (count repos)]
          (if (< rps 2)
            (str rps (i/i lang [:repo]))
            (str rps (i/i lang [:repos]))))]
+      ;; Top pagination block
       [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
-
+     ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col-2.fr-m-1w
        {:placeholder (i/i lang [:license])
@@ -642,8 +658,9 @@
                               (set-item! :is-esr v)
                               (re-frame/dispatch [:filter! {:is-esr v}]))}]
        [:label.fr-label {:for "3"} (i/i lang [:only-her])]]]
-
+     ;; Main repos table display
      [repos-table lang (count repos)]
+     ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
 (defn orgas-table [lang orgas-cnt]
@@ -716,23 +733,19 @@
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; Download link
       [:a.fr-link.fr-m-1w
-       {:title (i/i lang [:download])
-        ;; FIXME
-        :href  (->>
-                (map (fn [[k v :as kv]]
-                       (when (not-empty kv)
-                         (str (name k) "=" v)))
-                     filter?)
-                (s/join "&")
-                (str "/orgas-csv?"))}
+       {:title    (i/i lang [:download])
+        :href     "#/orgas"
+        :on-click #(download-as-csv! orgas "codegouvfr-organizations.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
-
+      ;; General information
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
            (str orgs (i/i lang [:one-group]))
            (str orgs (i/i lang [:groups]))))]
+      ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
 
      [orgas-table lang orgas-cnt]
@@ -803,24 +816,27 @@
         last-disabled       (= deps-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
-
+      ;; Download link
       [:a.fr-link
-       {:title (i/i lang [:download]) :href "/data/deps.json"}
+       {:title    (i/i lang [:download])
+        :href     "#/deps"
+        :on-click #(download-as-csv! deps "codegouvfr-dependencies.csv")}
        [:span.fr-fi-download-line {:aria-hidden true}]]
-
+      ;; General informations
       [:strong.fr-m-auto
        (let [deps (count deps)]
          (if (< deps 2)
            (str deps (i/i lang [:dep]))
            (str deps (i/i lang [:deps]))))]
+      ;; Top pagination block
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
-
+     ;; Main deps display
      (if (pos? (count deps))
        [deps-table lang deps repo orga]
        [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
-
+     ;; Bottom pagination block
      [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]
-
+     ;; Additional informations
      (when-let [sims (get repos-sim repo)]
        [:div.fr-grid
         [:h2 (i/i lang [:Repos-deps-sim])]
@@ -1082,22 +1098,22 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
-            :href "#"}
+            :href         "#"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
-            :href "#/repos"}
+            :href         "#/repos"}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/deps") "page")
-            :href "#/deps"}
+            :href         "#/deps"}
            (i/i lang [:Deps])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
-            :href "#/stats"}
+            :href         "#/stats"}
            (i/i lang [:stats])]]]]]]]))
 
 (defn main-page [q license language platform]
