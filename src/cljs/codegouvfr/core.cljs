@@ -513,7 +513,8 @@
                      {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                       :title  (i/i lang [:swh-link])
                       :target "new"}
-                     [:img {:width "18px" :src "/img/swh-logo.png"}]]]
+                     [:img {:width "18px" :src "/img/swh-logo.png"
+                            :alt   "Software Heritage logo"}]]]
                    ;; Description
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
@@ -704,8 +705,8 @@
                          {:title  (i/i lang [:go-to-website])
                           :target "new"
                           :href   w}
-                         [:img {:src au :width "100%"}]])
-                      [:img {:src au :width "100%"}])]
+                         [:img {:src au :width "100%" :alt ""}]])
+                      [:img {:src au :width "100%" :alt ""}])]
                    [:td
                     [:a {:target "new" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
@@ -965,7 +966,8 @@
       [:div.fr-col-6
        (stats-card (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
-       [:img {:src "/data/top_licenses.svg" :width "100%"}]]]
+       [:img {:src "/data/top_licenses.svg" :width "100%"
+              :alt (i/i lang [:most-used-licenses])}]]]
 
      ;; FIXME: Shall we add this?
      ;; [:div
