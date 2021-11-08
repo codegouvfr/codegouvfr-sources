@@ -983,10 +983,10 @@
        [:tr [:td (key o)] [:td (val o)]])]]])
 
 (defn stats-tile [l i s]
-  [:div.fr-stats-tile.fr-col-2.fr-m-1w
-   [:div.fr-stats-tile__body
-    [:p.fr-stats-tile__title (i/i l [i])]
-    [:div.fr-stats-tile__desc
+  [:div.fr-tile.fr-col-2.fr-m-1w
+   [:div.fr-tile__body
+    [:p.fr-tile__title (i/i l [i])]
+    [:div.fr-tile__desc
      [:p.fr-h4 s]]]])
 
 (defn stats-page
