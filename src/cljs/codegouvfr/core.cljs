@@ -98,6 +98,11 @@
     (.toLocaleDateString
      (js/Date. (.parse js/Date s)))))
 
+(defn todays-date []
+  (s/replace
+   (.toLocaleDateString (js/Date.))
+   "/" "-"))
+
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
 
@@ -625,7 +630,7 @@
                               (select-keys r (keys repos-mapping))
                               repos-mapping))
                      repos)
-                    "codegouvfr-repositories.csv")}
+                    (str "codegouvfr-repositories-" (todays-date) ".csv"))}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; Generaltion information
       [:strong.fr-m-auto
@@ -779,7 +784,7 @@
                               (select-keys r (keys orgas-mapping))
                               orgas-mapping))
                      orgas)
-                    "codegouvfr-organizations.csv")}
+                    (str "codegouvfr-organizations-" (todays-date) ".csv"))}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -872,7 +877,7 @@
                               (select-keys r (keys deps-mapping))
                               deps-mapping))
                      deps)
-                    "codegouvfr-dependencies.csv")}
+                    (str "codegouvfr-dependencies-" (todays-date) ".csv"))}
        [:span.fr-fi-download-line {:aria-hidden true}]]
       ;; General informations
       [:strong.fr-m-auto
@@ -1395,6 +1400,7 @@
    ["error" :error]])
 
 (defn ^:export init []
+  (js/console.log (todays-date))
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
