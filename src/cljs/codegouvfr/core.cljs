@@ -24,13 +24,21 @@
 ;; Defaults
 
 (defonce repos-per-page 100)
+
 (defonce orgas-per-page 20)
+
 (defonce deps-per-page 100)
+
 (defonce timeout 100)
+
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
+
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
+
 (defonce srht-repo-basedir-prefix "https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/")
+
 (defonce filter-chan (async/chan 100))
+
 (defonce display-filter-chan (async/chan 100))
 
 (defonce repos-mapping
@@ -131,175 +139,20 @@
     (.click link)
     (js/document.body.removeChild link)))
 
-;; Events and subscriptions
-
-(re-frame/reg-event-db
- :initialize-db!
- (fn [_ _]
-   {:repos          nil
-    :orgas          nil
-    ;; :levent         nil
-    :repos-page     0
-    :orgas-page     0
-    :deps-page      0
-    :sort-repos-by  :reused
-    :sort-orgas-by  :repos
-    :sort-deps-by   :repos
-    :view           :orgas
-    :reverse-sort   false
-    :filter         init-filter
-    :display-filter init-filter
-    :lang           "en"
-    :path           ""}))
-
-(re-frame/reg-event-db
- :lang!
- (fn [db [_ lang]]
-   (assoc db :lang lang)))
-
-(re-frame/reg-event-db
- :path!
- (fn [db [_ path]]
-   (assoc db :path path)))
-
-(re-frame/reg-sub
- :lang?
- (fn [db _] (:lang db)))
-
-(re-frame/reg-sub
- :path?
- (fn [db _] (:path db)))
-
-(re-frame/reg-event-db
- :update-platforms!
- (fn [db [_ platforms]] (assoc db :platforms platforms)))
-
-(re-frame/reg-sub
- :platforms?
- (fn [db _] (:platforms db)))
-
-(re-frame/reg-event-db
- :update-repos!
- (fn [db [_ repos]] (assoc db :repos repos)))
-
-(re-frame/reg-event-db
- :update-deps!
- (fn [db [_ deps]] (assoc db :deps deps)))
-
-(re-frame/reg-event-db
- :update-deps-raw!
- (fn [db [_ deps-raw]] (assoc db :deps-raw deps-raw)))
-
-(re-frame/reg-event-db
- :update-dep-repos!
- (fn [db [_ dep-repos]] (assoc db :dep-repos dep-repos)))
-
-(re-frame/reg-event-db
- :filter!
- (fn [db [_ s]]
-   (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:deps-page! 0])
-   (update-in db [:filter] merge s)))
-
-(re-frame/reg-event-db
- :display-filter!
- (fn [db [_ s]]
-   (update-in db [:display-filter] merge s)))
-
-(re-frame/reg-event-db
- :repos-page!
- (fn [db [_ n]] (assoc db :repos-page n)))
-
-(re-frame/reg-event-db
- :orgas-page!
- (fn [db [_ n]] (assoc db :orgas-page n)))
-
-(re-frame/reg-event-db
- :deps-page!
- (fn [db [_ n]] (assoc db :deps-page n)))
-
-(re-frame/reg-event-db
- :view!
- (fn [db [_ view query-params]]
-   (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:deps-page! 0])
-   (re-frame/dispatch [:filter! (merge init-filter query-params)])
-   (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
-   (assoc db :view view)))
-
-(re-frame/reg-event-db
- :update-orgas!
- (fn [db [_ orgas]] (when orgas (assoc db :orgas orgas))))
-
-(re-frame/reg-sub
- :sort-repos-by?
- (fn [db _] (:sort-repos-by db)))
-
-(re-frame/reg-sub
- :sort-orgas-by?
- (fn [db _] (:sort-orgas-by db)))
-
-(re-frame/reg-sub
- :sort-deps-by?
- (fn [db _] (:sort-deps-by db)))
-
-(re-frame/reg-sub
- :repos-page?
- (fn [db _] (:repos-page db)))
-
-(re-frame/reg-sub
- :deps-page?
- (fn [db _] (:deps-page db)))
-
-(re-frame/reg-sub
- :orgas-page?
- (fn [db _] (:orgas-page db)))
-
-(re-frame/reg-sub
- :filter?
- (fn [db _] (:filter db)))
-
-(re-frame/reg-sub
- :display-filter?
- (fn [db _] (:display-filter db)))
-
-(re-frame/reg-sub
- :view?
- (fn [db _] (:view db)))
-
-(re-frame/reg-sub
- :reverse-sort?
- (fn [db _] (:reverse-sort db)))
-
-(re-frame/reg-event-db
- :reverse-sort!
- (fn [db _] (update-in db [:reverse-sort] not)))
-
-(re-frame/reg-event-db
- :sort-repos-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:repos-page! 0])
-   (when (= k (:sort-repos-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-repos-by k)))
-
-(re-frame/reg-event-db
- :sort-orgas-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:orgas-page! 0])
-   (when (= k (:sort-orgas-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-orgas-by k)))
-
-(re-frame/reg-event-db
- :sort-deps-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:deps-page! 0])
-   (when (= k (:sort-deps-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-deps-by k)))
+(defn top-clean-up [top param title]
+  (let [total (reduce + (map val top))]
+    (apply merge
+           (sequence
+            (comp
+             (filter (fn [[k _]] (not= k "Inconnu")))
+             (map (fn [[k v]]
+                    [k (js/parseFloat
+                        (gstring/format "%.2f" (* (/ v total) 100)))]))
+             (map #(let [[k v] %]
+                     {[:a {:title title
+                           ;; FIXME: use rfe/push-state instead?
+                           :href  (str "#/repos?" param "=" k)} k] v})))
+            top))))
 
 ;; Filters
 
@@ -357,6 +210,13 @@
           true)
      m)))
 
+(defn close-filter-button [lang ff t reinit]
+  [:span
+   [:a.fr-link.fr-fi-close-circle-line.fr-link--icon-right
+    {:title (i/i lang [:remove-filter])
+     :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
+    [:span ff]]])
+
 (defn start-display-filter-loop []
   (async/go
     (loop [f (async/<! display-filter-chan)]
@@ -375,6 +235,178 @@
                                 (merge fs f))))
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
+
+;; Events
+
+(re-frame/reg-event-db
+ :initialize-db!
+ (fn [_ _]
+   {:repos          nil
+    :orgas          nil
+    ;; :levent         nil
+    :repos-page     0
+    :orgas-page     0
+    :deps-page      0
+    :sort-repos-by  :reused
+    :sort-orgas-by  :repos
+    :sort-deps-by   :repos
+    :view           :orgas
+    :reverse-sort   false
+    :filter         init-filter
+    :display-filter init-filter
+    :lang           "en"
+    :path           ""}))
+
+(re-frame/reg-event-db
+ :lang!
+ (fn [db [_ lang]]
+   (assoc db :lang lang)))
+
+(re-frame/reg-event-db
+ :path!
+ (fn [db [_ path]]
+   (assoc db :path path)))
+
+(re-frame/reg-event-db
+ :update-platforms!
+ (fn [db [_ platforms]] (assoc db :platforms platforms)))
+
+(re-frame/reg-event-db
+ :update-repos!
+ (fn [db [_ repos]] (assoc db :repos repos)))
+
+(re-frame/reg-event-db
+ :update-deps!
+ (fn [db [_ deps]] (assoc db :deps deps)))
+
+(re-frame/reg-event-db
+ :update-deps-raw!
+ (fn [db [_ deps-raw]] (assoc db :deps-raw deps-raw)))
+
+(re-frame/reg-event-db
+ :update-dep-repos!
+ (fn [db [_ dep-repos]] (assoc db :dep-repos dep-repos)))
+
+(re-frame/reg-event-db
+ :filter!
+ (fn [db [_ s]]
+   (re-frame/dispatch [:repos-page! 0])
+   (re-frame/dispatch [:orgas-page! 0])
+   (re-frame/dispatch [:deps-page! 0])
+   (update-in db [:filter] merge s)))
+
+(re-frame/reg-event-db
+ :display-filter!
+ (fn [db [_ s]]
+   (update-in db [:display-filter] merge s)))
+
+(re-frame/reg-event-db
+ :repos-page!
+ (fn [db [_ n]] (assoc db :repos-page n)))
+
+(re-frame/reg-event-db
+ :orgas-page!
+ (fn [db [_ n]] (assoc db :orgas-page n)))
+
+(re-frame/reg-event-db
+ :deps-page!
+ (fn [db [_ n]] (assoc db :deps-page n)))
+
+(re-frame/reg-event-db
+ :view!
+ (fn [db [_ view query-params]]
+   (re-frame/dispatch [:repos-page! 0])
+   (re-frame/dispatch [:orgas-page! 0])
+   (re-frame/dispatch [:deps-page! 0])
+   (re-frame/dispatch [:filter! (merge init-filter query-params)])
+   (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
+   (assoc db :view view)))
+
+(re-frame/reg-event-db
+ :update-orgas!
+ (fn [db [_ orgas]] (when orgas (assoc db :orgas orgas))))
+
+(re-frame/reg-event-db
+ :reverse-sort!
+ (fn [db _] (update-in db [:reverse-sort] not)))
+
+(re-frame/reg-event-db
+ :sort-repos-by!
+ (fn [db [_ k]]
+   (re-frame/dispatch [:repos-page! 0])
+   (when (= k (:sort-repos-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-repos-by k)))
+
+(re-frame/reg-event-db
+ :sort-orgas-by!
+ (fn [db [_ k]]
+   (re-frame/dispatch [:orgas-page! 0])
+   (when (= k (:sort-orgas-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-orgas-by k)))
+
+(re-frame/reg-event-db
+ :sort-deps-by!
+ (fn [db [_ k]]
+   (re-frame/dispatch [:deps-page! 0])
+   (when (= k (:sort-deps-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-deps-by k)))
+
+;; Subscriptions
+
+(re-frame/reg-sub
+ :lang?
+ (fn [db _] (:lang db)))
+
+(re-frame/reg-sub
+ :path?
+ (fn [db _] (:path db)))
+
+(re-frame/reg-sub
+ :platforms?
+ (fn [db _] (:platforms db)))
+
+(re-frame/reg-sub
+ :sort-repos-by?
+ (fn [db _] (:sort-repos-by db)))
+
+(re-frame/reg-sub
+ :sort-orgas-by?
+ (fn [db _] (:sort-orgas-by db)))
+
+(re-frame/reg-sub
+ :sort-deps-by?
+ (fn [db _] (:sort-deps-by db)))
+
+(re-frame/reg-sub
+ :repos-page?
+ (fn [db _] (:repos-page db)))
+
+(re-frame/reg-sub
+ :deps-page?
+ (fn [db _] (:deps-page db)))
+
+(re-frame/reg-sub
+ :orgas-page?
+ (fn [db _] (:orgas-page db)))
+
+(re-frame/reg-sub
+ :filter?
+ (fn [db _] (:filter db)))
+
+(re-frame/reg-sub
+ :display-filter?
+ (fn [db _] (:display-filter db)))
+
+(re-frame/reg-sub
+ :view?
+ (fn [db _] (:view db)))
+
+(re-frame/reg-sub
+ :reverse-sort?
+ (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-sub
  :repos?
@@ -439,6 +471,8 @@
         orgas
         (reverse orgas))))))
 
+;; Pagination
+
 (defn change-page [type next]
   (let [sub         (condp = type
                       :repos :repos-page?
@@ -464,6 +498,35 @@
       (re-frame/dispatch [evt (inc repos-page)])
       (and (pos? repos-page) (not next))
       (re-frame/dispatch [evt (dec repos-page)]))))
+
+(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
+  [:div.fr-grid-row.fr-grid-row--center
+   [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
+    [:ul.fr-pagination__list
+     [:li
+      [:button.fr-pagination__link.fr-pagination__link--first
+       {:on-click #(change-page type "first")
+        :disabled first-disabled}]]
+     [:li
+      [:button.fr-pagination__link.fr-pagination__link--prev
+       {:on-click #(change-page type nil)
+        :disabled first-disabled}]]
+
+     [:li
+      [:button.fr-pagination__link.fr
+       {:disabled true} (str (inc current-page) "/"
+                             (if (> total-pages 0) total-pages 1))]]
+
+     [:li
+      [:button.fr-pagination__link.fr-pagination__link--next
+       {:on-click #(change-page type true)
+        :disabled last-disabled}]]
+     [:li
+      [:button.fr-pagination__link.fr-pagination__link--last
+       {:on-click #(change-page type "last")
+        :disabled last-disabled}]]]]])
+
+;; Main structure
 
 (defn repos-table [lang repos-cnt]
   (if (zero? repos-cnt)
@@ -571,36 +634,8 @@
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
 
-(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
-  [:div.fr-grid-row.fr-grid-row--center
-   [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
-    [:ul.fr-pagination__list
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--first
-       {:on-click #(change-page type "first")
-        :disabled first-disabled}]]
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--prev
-       {:on-click #(change-page type nil)
-        :disabled first-disabled}]]
-
-     [:li
-      [:button.fr-pagination__link.fr
-       {:disabled true} (str (inc current-page) "/"
-                             (if (> total-pages 0) total-pages 1))]]
-
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--next
-       {:on-click #(change-page type true)
-        :disabled last-disabled}]]
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--last
-       {:on-click #(change-page type "last")
-        :disabled last-disabled}]]]]])
-
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
-        filter?        @(re-frame/subscribe [:filter?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
         first-disabled (zero? repos-pages)
@@ -629,7 +664,7 @@
       [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
      [:div.fr-grid-row
-      [:input.fr-input.fr-col-2.fr-m-1w
+      [:input.fr-input.fr-col.fr-m-1w
        {:placeholder (i/i lang [:license])
         :value       (or @license
                          (:license @(re-frame/subscribe [:display-filter?])))
@@ -640,7 +675,7 @@
                            (async/>! display-filter-chan {:license ev})
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:license ev}))))}]
-      [:input.fr-input.fr-col-2.fr-m-1w
+      [:input.fr-input.fr-col.fr-m-1w
        {:value       (or @language
                          (:language @(re-frame/subscribe [:display-filter?])))
         :placeholder (i/i lang [:language])
@@ -651,7 +686,7 @@
                            (async/>! display-filter-chan {:language ev})
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:language ev}))))}]
-      [:select.fr-select.fr-col-2.fr-m-1w
+      [:select.fr-select.fr-col.fr-m-1w
        {:value (or @platform "all")
         :on-change
         (fn [e]
@@ -665,22 +700,20 @@
        (for [x @(re-frame/subscribe [:platforms?])]
          ^{:key x}
          [:option {:value x} x])]
-
-      [:div.fr-checkbox-group.fr-col.fr-ml-3w
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input {:type      "checkbox" :id "1" :name "1"
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-not-fork v)
                               (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
-       [:label.fr-label {:for "1"} "Pas de fork"]]
-
-      [:div.fr-checkbox-group.fr-col
+       [:label.fr-label {:for "1"} (i/i lang [:only-not-fork])]]
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input {:type      "checkbox" :id "2" :name "2"
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-licensed v)
                               (re-frame/dispatch [:filter! {:is-licensed v}]))}]
        [:label.fr-label {:for "2"} (i/i lang [:only-with-license])]]
 
-      [:div.fr-checkbox-group.fr-col
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input {:type      "checkbox" :id "3" :name "3"
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-esr v)
@@ -690,6 +723,17 @@
      [repos-table lang (count repos)]
      ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
+
+(defn repos-page-class [lang license language platform]
+  (reagent/create-class
+   {:display-name   "repos-page-class"
+    :component-did-mount
+    (fn []
+      (GET "/data/repos.json"
+           :handler
+           #(re-frame/dispatch
+             [:update-repos! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (repos-page lang license language platform))}))
 
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
@@ -753,7 +797,6 @@
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
-        filter?        @(re-frame/subscribe [:filter?])
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
@@ -842,6 +885,28 @@
                   (count r)
                   (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
 
+(defn stats-deps-table [heading deps lang]
+  [:div.fr-m-3w
+   [:h4.fr-h4 heading]
+   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
+    [:thead [:tr
+             [:th (i/i lang [:name])]
+             [:th (i/i lang [:type])]
+             [:th (i/i lang [:description])]
+             [:th (i/i lang [:Repos])]]]
+    [:tbody
+     (for [{:keys [n t d l r] :as o} deps]
+       ^{:key o}
+       [:tr
+        [:td [:a {:href  l :target "_blank"
+                  :title (i/i lang [:more-info])} n]]
+        [:td t]
+        [:td d]
+        [:td
+         [:a {:title (i/i lang [:list-repos-depending-on-dep])
+              :href  (rfe/href :repos {:lang lang} {:d n})}
+          (count r)]]])]]])
+
 (defn deps-page [lang repos-sim]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
         deps0               @(re-frame/subscribe [:deps?])
@@ -889,16 +954,15 @@
            ^{:key s}
            [:li [:a {:href (rfe/href :deps {:lang lang} {:repo s})} s]])]])]))
 
-(defn repos-page-class [lang license language platform]
-  (reagent/create-class
-   {:display-name   "repos-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/repos.json"
-           :handler
-           #(re-frame/dispatch
-             [:update-repos! (map (comp bean clj->js) %)])))
-    :reagent-render (fn [] (repos-page lang license language platform))}))
+(defn deps-page-class [lang]
+  (let [deps-repos-sim (reagent/atom nil)]
+    (reagent/create-class
+     {:display-name   "deps-page-class"
+      :component-did-mount
+      (fn []
+        (GET "/data/deps-repos-sim.json"
+             :handler #(reset! deps-repos-sim %)))
+      :reagent-render (fn [] (deps-page lang @deps-repos-sim))})))
 
 (defn stats-table [heading data & [thead]]
   [:div.fr-m-3w
@@ -910,48 +974,11 @@
        ^{:key (key o)}
        [:tr [:td (key o)] [:td (val o)]])]]])
 
-(defn deps-card [heading deps lang]
-  [:div.fr-m-3w
-   [:h4.fr-h4 heading]
-   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
-    [:thead [:tr
-             [:th (i/i lang [:name])]
-             [:th (i/i lang [:type])]
-             [:th (i/i lang [:description])]
-             [:th (i/i lang [:Repos])]]]
-    [:tbody
-     (for [{:keys [n t d l r] :as o} deps]
-       ^{:key o}
-       [:tr
-        [:td [:a {:href  l :target "_blank"
-                  :title (i/i lang [:more-info])} n]]
-        [:td t]
-        [:td d]
-        [:td
-         [:a {:title (i/i lang [:list-repos-depending-on-dep])
-              :href  (rfe/href :repos {:lang lang} {:d n})}
-          (count r)]]])]]])
-
-(defn top-clean-up [top param title]
-  (let [total (reduce + (map val top))]
-    (apply merge
-           (sequence
-            (comp
-             (filter (fn [[k _]] (not= k "Inconnu")))
-             (map (fn [[k v]]
-                    [k (js/parseFloat
-                        (gstring/format "%.2f" (* (/ v total) 100)))]))
-             (map #(let [[k v] %]
-                     {[:a {:title title
-                           ;; FIXME: use rfe/push-state instead?
-                           :href  (str "#/repos?" param "=" k)} k] v})))
-            top))))
-
-(defn tile [l i s]
-  [:div.fr-tile.fr-col-2.fr-m-1w
-   [:div.fr-tile__body
-    [:p.fr-tile__title (i/i l [i])]
-    [:div.fr-tile__desc
+(defn stats-tile [l i s]
+  [:div.fr-stats-tile.fr-col-2.fr-m-1w
+   [:div.fr-stats-tile__body
+    [:p.fr-stats-tile__title (i/i l [i])]
+    [:div.fr-stats-tile__desc
      [:p.fr-h4 s]]]])
 
 (defn stats-page
@@ -978,11 +1005,11 @@
                   (i/i lang [:list-repos-using-license])))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
-      (tile lang :mean-repos-by-orga avg_repos_cnt)
-      (tile lang :orgas-or-groups orgs_cnt)
-      (tile lang :repos-of-source-code repos_cnt)
-      (tile lang :deps-stats (:deps-total deps-total))
-      (tile lang :median-repos-by-orga median_repos_cnt)]
+      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
+      (stats-tile lang :orgas-or-groups orgs_cnt)
+      (stats-tile lang :repos-of-source-code repos_cnt)
+      (stats-tile lang :deps-stats (:deps-total deps-total))
+      (stats-tile lang :median-repos-by-orga median_repos_cnt)]
 
      [:div.fr-grid-row
       [:div.fr-col-6
@@ -1012,7 +1039,7 @@
 
      [:div.fr-grid-row.fr-grid-row--center
       [:div.fr-col-12
-       (deps-card (i/i lang [:Deps]) deps lang)]]
+       (stats-deps-table (i/i lang [:Deps]) deps lang)]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
@@ -1035,16 +1062,6 @@
      ;;               (:ratio_in_archive software_heritage)})]
      ]))
 
-(defn deps-page-class [lang]
-  (let [deps-repos-sim (reagent/atom nil)]
-    (reagent/create-class
-     {:display-name   "deps-page-class"
-      :component-did-mount
-      (fn []
-        (GET "/data/deps-repos-sim.json"
-             :handler #(reset! deps-repos-sim %)))
-      :reagent-render (fn [] (deps-page lang @deps-repos-sim))})))
-
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
         stats      (reagent/atom nil)
@@ -1060,13 +1077,6 @@
         (GET "/data/stats.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
-
-(defn close-filter-button [lang ff t reinit]
-  [:span
-   [:a.fr-link.fr-fi-close-circle-line.fr-link--icon-right
-    {:title (i/i lang [:remove-filter])
-     :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
-    [:span ff]]])
 
 (defn main-menu [q lang view]
   [:div
@@ -1257,6 +1267,8 @@
          :data-fr-opened false}
         (i/i lang [:choose-theme])]]]]]])
 
+;; Pages from md
+
 (defn legal-page [lang]
   [:div.fr-container
    (to-hiccup
@@ -1372,6 +1384,8 @@
              #(re-frame/dispatch
                [:update-orgas! (map (comp bean clj->js) %)])))
       :reagent-render (fn [] (main-page q license language platform))})))
+
+;; Setup router and init
 
 (defn on-navigate [match]
   (re-frame/dispatch [:path! (:path match)])
