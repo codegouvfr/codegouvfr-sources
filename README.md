@@ -8,12 +8,16 @@ Explore source code from the french public sector.
 
 # Data
 
-This application reuses data as fetch by [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) and
-consolidated with [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data).
+The list of organizations/groups accounts is maintained on
+[codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources).
+From these sources, data are then fetched by
+[codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data)
+and consolidated with
+[codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data).
 
-- Organizations: [code.gouv.fr/data/orgas.json](https://code.gouv.fr/data/orgas.json)
-- Repositories: [code.gouv.fr/data/repos.json](https://code.gouv.fr/data/repos.json)
-- Dependencies: [code.gouv.fr/data/deps.json](https://code.gouv.fr/data/deps.json)
+- Organizations: as [csv](https://code.gouv.fr/data/organizations/csv/all.csv) or [json](https://code.gouv.fr/data/organizations/json/all.json)
+- Repositories: as [csv](https://code.gouv.fr/data/repositories/csv/all.csv) or [json](https://code.gouv.fr/data/repositories/json/all.json)
+- Dependencies: [json](https://code.gouv.fr/data/deps.json)
 
 # Develop
 
