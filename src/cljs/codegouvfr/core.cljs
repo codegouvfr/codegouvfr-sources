@@ -1238,6 +1238,12 @@
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
+        {:href     "#"
+         :on-click #(re-frame/dispatch
+                     [:lang! (if (= lang "fr") "en" "fr")])}
+        (i/i lang [:switch-lang])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
         {:href "#/legal"}
         (i/i lang [:accessibility])]]
       [:li.fr-footer__bottom-item
