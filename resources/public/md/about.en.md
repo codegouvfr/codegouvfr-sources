@@ -1,14 +1,36 @@
-## Why this website?
+# Why this website?
 
-## How is it built?
+Source code bought or developed by public agencies are considered
+administrative documents, due to be opened as open data.
 
-## Where to download the data?
+Many agencies already publish source code repositories : we are
+listing them on this website to make it easier to find them and to
+encourage administrations to reuse them or to contribute to them.
 
-- La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
-- La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
-- La liste des dépendances en [json](/data/deps.json)
+# How is it built?
+
+This website is developed in four stages:
+
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources)
+   contains the list of organization and group accounts on github.com,
+   gitlab.com or local GitLab forges;
+2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data):
+   fetches data from organizations and repositories from this list;
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data)
+	consolidate the data et add the list of dependencies;
+4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose the data.
+
+
+# Where to download the data?
+
+- The list of organizations as [csv](/data/organizations/csv/all.csv)
+  and [json](/data/organizations/json/all.json)
+- The list of repositories as [csv](/data/repositories/csv/all.csv)
+  and [json](/data/repositories/json/all.json)
+- The list of dependencies as [json](/data/deps.json)
 
 # How to contribute?
 
-Vous êtes une mission de service public et publiez des codes
-sources que vous souhaitez référencer ?  [Écrivez-nous](mailto:logiciels-libres@data.gouv.fr) !
+If you are a public administration and publish source code that you
+want to list here, please reach us at
+[Écrivez-nous](mailto:logiciels-libres@data.gouv.fr)!
