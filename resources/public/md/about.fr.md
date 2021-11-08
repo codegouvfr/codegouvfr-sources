@@ -1,4 +1,4 @@
-# Pourquoi ce site ?
+## Pourquoi ce site ?
 
 Tout code source obtenu ou développé par un organisme remplissant une
 mission de service public est considéré comme un document
@@ -9,32 +9,24 @@ listons sur ce site de façon à faciliter leur découverte et à
 encourager les administrations à y trouver des occasions de
 réutilisation ou de contribution.
 
-# Comment est-il construit ?
+## Comment est-il construit ?
 
 Ce site est développé en quatre étapes:
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources)
-   contient la liste des comptes d'organisation sur github.com,
-   gitlab.com ou des forges GitLab locales ;
-2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data):
-   récupère les données des organisations et des dépôts à partir de
-   cette liste ;
-3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data)
-   consolide les données et y ajoute la liste des dépendances ;
-4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose les
-   données.
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contient la liste des comptes d'organisation sur github.com, gitlab.com ou des forges GitLab locales ;
+2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data): récupère les données des organisations et des dépôts à partir de cette liste ;
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolide les données et y ajoute la liste des dépendances ;
+4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose les données.
 
-# Où télécharger les données ?
+## Où télécharger les données ?
 
 Toutes les données sont publiées sous licence Ouverte 2.0 :
 
-- La liste des organisations en [csv](/data/organizations/csv/all.csv)
-  et [json](/data/organizations/json/all.json)
-- La liste des dépôts en [csv](/data/repositories/csv/all.csv) et
-  [json](/data/repositories/json/all.json)
+- La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
+- La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
 - La liste des dépendances en [json](/data/deps.json)
 
-# Comment contribuer ?
+## Comment contribuer ?
 
 Vous êtes une mission de service public et publiez des codes
 sources que vous souhaitez référencer ?

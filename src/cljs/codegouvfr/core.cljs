@@ -98,7 +98,8 @@
 
 (def to-hiccup-repl
   {:h2 :h2.fr-h2
-   :ul :ul.fr-list})
+   :ul :ul.fr-list
+   :ol :ol.fr-list})
 
 (defn to-hiccup
   "Convert a markdown `s` string to hiccup structure."
