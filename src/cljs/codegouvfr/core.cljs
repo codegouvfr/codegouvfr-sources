@@ -475,17 +475,13 @@
        [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col-2
+          [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
              :href     "#/repos"
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
-          [:th.fr-col-1
-           [:a.fr-link {:href   "https://www.softwareheritage.org"
-                        :title  "www.softwareheritage.org"
-                        :target "_blank"} (i/i lang [:archive])]]
           [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -514,13 +510,6 @@
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
-          ;; [:th.fr-col-1
-          ;;  [:a.fr-link
-          ;;   {:class    (when (= rep-f :issues) "fr-fi-checkbox-circle-line fr-link--icon-left")
-          ;;    :title    (i/i lang [:sort-issues])
-          ;;    :href     ""
-          ;;    :on-click #(re-frame/dispatch [:sort-repos-by! :issues])}
-          ;;   (i/i lang [:issues])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -533,34 +522,32 @@
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
                 (let [{:keys [a? d f li n o r s u dp g]}
-                      ;; remove i as we don't want to display issues
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
                    ;; Repo (orga)
-                   [:td [:div
-                         [:a {:href   r
-                              :target "_blank"
-                              :title  (str (i/i lang [:go-to-repo])
-                                           (when li (str (i/i lang [:under-license]) li)))}
-                          n]
-                         " ("
-                         [:a {:href  (rfe/href :repos {:lang lang} {:g group})
-                              :title (i/i lang [:browse-repos-orga])}
-                          o]
-                         ")"]]
-                   ;; SWH link
                    [:td
-                    [:a.fr-link
-                     {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
-                      :title  (i/i lang [:swh-link])
-                      :target "_blank"}
-                     [:img {:width "18px" :src "/img/swh-logo.png"
-                            :alt   "Software Heritage logo"}]]]
+                    [:div
+                     [:a.fr-link
+                      {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
+                       :title  (i/i lang [:swh-link])
+                       :target "_blank"}
+                      [:img {:width "18px" :src "/img/swh-logo.png"
+                             :alt   "Software Heritage logo"}]]
+                     [:a {:href   r
+                          :target "_blank"
+                          :title  (str (i/i lang [:go-to-repo])
+                                       (when li (str (i/i lang [:under-license]) li)))}
+                      n]
+                     " ("
+                     [:a {:href  (rfe/href :repos {:lang lang} {:g group})
+                          :title (i/i lang [:browse-repos-orga])}
+                      o]
+                     ")"]]
                    ;; Description
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
-                     ;; FIXME
+                     ;; FIXME: not working?
                      (when dp
                        [:span
                         [:a.fr-link
