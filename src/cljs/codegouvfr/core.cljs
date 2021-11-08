@@ -891,7 +891,7 @@
      ;; Additional informations
      (when-let [sims (get repos-sim repo)]
        [:div.fr-grid
-        [:h5.fr-h5 (i/i lang [:Repos-deps-sim])]
+        [:h4.fr-h4 (i/i lang [:Repos-deps-sim])]
         [:ul
          (for [s sims]
            ^{:key s}
@@ -908,9 +908,9 @@
              [:update-repos! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (repos-page lang license language platform))}))
 
-(defn stats-card [heading data & [thead]]
+(defn stats-table [heading data & [thead]]
   [:div.fr-m-3w
-   [:h3.fr-h3 heading]
+   [:h4.fr-h4 heading]
    [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
     thead
     [:tbody
@@ -920,7 +920,7 @@
 
 (defn deps-card [heading deps lang]
   [:div.fr-m-3w
-   [:h3.fr-h3 heading]
+   [:h4.fr-h4 heading]
    [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
     [:thead [:tr
              [:th (i/i lang [:name])]
@@ -958,9 +958,9 @@
 (defn tile [l i s]
   [:div.fr-tile.fr-col-2.fr-m-1w
    [:div.fr-tile__body
-    [:h6.fr-h6.fr-tile__title (i/i l [i])]
+    [:p.fr-tile__title (i/i l [i])]
     [:div.fr-tile__desc
-     [:p.fr-h3 s]]]])
+     [:p.fr-h4 s]]]])
 
 (defn stats-page
   [lang stats deps deps-total]
@@ -994,24 +994,24 @@
 
      [:div.fr-grid-row
       [:div.fr-col-6
-       (stats-card [:span (i/i lang [:most-used-languages])]
+       (stats-table [:span (i/i lang [:most-used-languages])]
                    top_languages_1
                    [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
-       (stats-card [:span (i/i lang [:most-used-identified-licenses])]
+       (stats-table [:span (i/i lang [:most-used-identified-licenses])]
                    top_licenses_0
                    [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
-       (stats-card [:span
+       (stats-table [:span
                     (i/i lang [:orgas])
                     (i/i lang [:with-more-of])
                     (i/i lang [:repos])]
                    top_orgs_by_repos_0
                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
-       (stats-card [:span
+       (stats-table [:span
                     (i/i lang [:orgas])
                     (i/i lang [:with-more-of*])
                     (i/i lang [:stars])]
@@ -1024,14 +1024,14 @@
 
      [:div.fr-grid-row
       [:div.fr-col-6
-       (stats-card (i/i lang [:distribution-by-platform]) platforms)]
+       (stats-table (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
        [:img {:src "/data/top_licenses.svg" :width "100%"
               :alt (i/i lang [:most-used-licenses])}]]]
 
      ;; FIXME: Shall we add this?
      ;; [:div
-     ;;  (stats-card [:span (i/i lang [:archive-on])
+     ;;  (stats-table [:span (i/i lang [:archive-on])
      ;;               "Software Heritage"
      ;;               ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
      ;;               ;;  {:href  (str "/" lang "/glossary#software-heritage")
@@ -1127,12 +1127,13 @@
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
-           [:li
-            [:a.fr-link
-             {:target "_blank"
-              :title  (i/i lang [:understand-tech-terms])
-              :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
-             (i/i lang [:glossary])]]
+           ;; FIXME: Definitely remove?
+           ;; [:li
+           ;;  [:a.fr-link
+           ;;   {:target "_blank"
+           ;;    :title  (i/i lang [:understand-tech-terms])
+           ;;    :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
+           ;;   (i/i lang [:glossary])]]
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
@@ -1148,15 +1149,21 @@
       {:aria-labelledby "button-menu"}
       [:div.fr-container
        [:button.fr-link--close.fr-link
-        {:aria-controls "header-navigation"} "Fermer"]
+        {:aria-controls "header-navigation"} (i/i lang [:close])]
        [:div.fr-header__menu-links]
-       [:nav.fr-nav {:role "navigation" :aria-label "Menu principal"}
+       [:nav.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
-            :title        (i/i lang [:orgas-or-groups])
+            :title        (i/i lang [:back-to-homepage])
             :href         "#"}
+           (i/i lang [:home])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/groups") "page")
+            :title        (i/i lang [:orgas-or-groups])
+            :href         "#/groups"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -1175,7 +1182,7 @@
            {:aria-current (when (= path "/stats") "page")
             :title        (i/i lang [:stats-expand])
             :href         "#/stats"}
-           (i/i lang [:stats])]]]]]]]))
+           (i/i lang [:Stats])]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
@@ -1186,10 +1193,9 @@
        [:div
         [:h5.fr-h5.fr-follow__title (i/i lang [:bluehats])]
         [:p.fr-text--sm.fr-follow__desc (i/i lang [:bluehats-desc])]
-        [:button.fr-btn
-         {:type "button"
-          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
-         (i/i lang [:subscribe])]]]]
+        [:a
+         {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
+         [:button.fr-btn {:type "button"} (i/i lang [:subscribe])]]]]]
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__social
        [:p.fr-h5.fr-mb-3v (i/i lang [:follow])]
@@ -1255,14 +1261,57 @@
       "fr" (inline-resource "public/md/legal.fr.md")
       (inline-resource "public/md/legal.en.md")))])
 
+;; #00AC8C
+;; #FF8D7E
+;; #FDCF41
+;; #484D7A
+(defn home-page [lang]
+  [:div.fr-grid
+   [:div.fr-grid-row.fr-grid-row--center
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/repos"} (i/i lang [:Repos])]]
+       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/deps"} (i/i lang [:Deps])]]
+       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]]]]
+   [:div.fr-grid-row.fr-grid-row--center
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/stats"} (i/i lang [:Stats])]]
+       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
+       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
+
+(defn error-page  [lang]
+  [:div.fr-container.fr-m-3w
+   [:h3.fr-h3 (i/i lang [:sorry])]
+   [:p (i/i lang [:nothing-here])]
+   [:p [:button.fr-btn.fr-btn--secondary
+        {:on-click #(rfe/push-state :home)}
+        (i/i lang [:back-to-homepage])]]])
+
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
      (banner lang)
-     [:div.fr-container.fr-container--fluid
+     [:div.fr-container.fr-container--fluid.fr-mb-3w
       [main-menu q lang view]
       (condp = view
+        ;; Default page
+        :home  [home-page lang]
         ;; Table to display organizations
         :orgas [orgas-page lang]
         ;; Table to display repositories
@@ -1274,7 +1323,7 @@
         ;; Page for legal mentions
         :legal [legal-page lang]
         ;; Fall back on the organizations page
-        :else  (rfe/push-state :orgas))]
+        [error-page lang])]
      (subscribe lang)
      (footer lang)]))
 
@@ -1316,11 +1365,13 @@
 
 (defonce routes
   ["/"
-   ["" :orgas]
+   ["" :home]
+   ["groups" :orgas]
    ["repos" :repos]
    ["stats" :stats]
    ["deps" :deps]
-   ["legal" :legal]])
+   ["legal" :legal]
+   ["error" :error]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
