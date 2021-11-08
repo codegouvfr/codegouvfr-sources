@@ -96,10 +96,17 @@
   [key]
   (.removeItem (.-localStorage js/window) key))
 
+(def to-hiccup-repl
+  {:h2 :h2.fr-h2
+   :ul :ul.fr-list})
+
 (defn to-hiccup
   "Convert a markdown `s` string to hiccup structure."
   [s]
-  (-> s (md/md->hiccup) (md/component)))
+  (->> s
+       (md/md->hiccup)
+       (md/component)
+       (walk/prewalk-replace to-hiccup-repl)))
 
 (defn to-locale-date [s]
   (when (string? s)
