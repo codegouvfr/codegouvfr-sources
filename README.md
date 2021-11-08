@@ -26,11 +26,13 @@ and consolidated with
     ~$ cd code.gouv.fr/
     ~$ clj -M:fig
 
-This will open <http://localhost:9500>.
+This will open you browser at `http://localhost:9500` where you can
+see your changes as you hack.
 
-You can then hack and see changes going live.
-
-**Note**: if you don't have the `clj` executable, try `apt install clojure` or [follow the instructions](https://clojure.org/guides/getting_started) on clojure.org.
+**Note**: if you don't have the `clj` executable, try `apt install
+clojure` or [follow the
+instructions](https://clojure.org/guides/getting_started) on
+clojure.org.
 
 # Contribute
 
