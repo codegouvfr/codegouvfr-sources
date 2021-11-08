@@ -1182,7 +1182,12 @@
            {:aria-current (when (= path "/stats") "page")
             :title        (i/i lang [:stats-expand])
             :href         "#/stats"}
-           (i/i lang [:Stats])]]]]]]]))
+           (i/i lang [:Stats])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/about") "page")
+            :href         "#/about"}
+           (i/i lang [:About])]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
@@ -1261,6 +1266,13 @@
       "fr" (inline-resource "public/md/legal.fr.md")
       (inline-resource "public/md/legal.en.md")))])
 
+(defn about-page [lang]
+  [:div.fr-container
+   (to-hiccup
+    (condp = lang
+      "fr" (inline-resource "public/md/about.fr.md")
+      (inline-resource "public/md/about.en.md")))])
+
 ;; #00AC8C
 ;; #FF8D7E
 ;; #FDCF41
@@ -1322,6 +1334,8 @@
         :deps  [deps-page-class lang]
         ;; Page for legal mentions
         :legal [legal-page lang]
+        ;; About page
+        :about [about-page lang]
         ;; Fall back on the organizations page
         [error-page lang])]
      (subscribe lang)
@@ -1371,6 +1385,7 @@
    ["stats" :stats]
    ["deps" :deps]
    ["legal" :legal]
+   ["about" :about]
    ["error" :error]])
 
 (defn ^:export init []
