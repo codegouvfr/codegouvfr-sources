@@ -34,7 +34,9 @@ You can then hack and see changes going live.
 
 # Contribute
 
-The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.gouv.fr).  The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
+The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.gouv.fr).
+
+The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
 
 Your help is welcome.  You can contribute with bug reports, patches, feature requests or general questions by sending an email to [~etalab/logiciels-libres@lists.sr.ht](mailto:~etalab/logiciels-libres@lists.sr.ht).
 
