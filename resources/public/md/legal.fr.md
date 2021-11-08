@@ -17,10 +17,13 @@ Le directeur interministériel du numérique.
 
 Ce site est hébergé par OVH France, 2 rue Kellermann - 59100 Roubaix - France.
 
-## Crédits images
+## Crédits
 
-- *Mechanical Keyboard with dsa keycaps* par © Jay Zhang, licence [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
-- *Pebble tower*" par © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+<ul>
+- *Mechanical Keyboard with dsa keycaps* © Jay Zhang , licence [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
+- *Pebble tower*" © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+</ul>
+<br>
 
 ## Code source
 
