@@ -10,6 +10,7 @@ Explore source code from the french public sector.
 
 The list of organizations/groups accounts is maintained on
 [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources).
+
 From these sources, data are then fetched by
 [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data)
 and consolidated with
