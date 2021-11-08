@@ -1000,28 +1000,28 @@
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
-                   top_languages_1
-                   [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
+                    top_languages_1
+                    [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
-                   top_licenses_0
-                   [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
+                    top_licenses_0
+                    [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span
-                    (i/i lang [:orgas])
-                    (i/i lang [:with-more-of])
-                    (i/i lang [:repos])]
-                   top_orgs_by_repos_0
-                   [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
+                     (i/i lang [:orgas])
+                     (i/i lang [:with-more-of])
+                     (i/i lang [:repos])]
+                    top_orgs_by_repos_0
+                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-table [:span
-                    (i/i lang [:orgas])
-                    (i/i lang [:with-more-of*])
-                    (i/i lang [:stars])]
-                   top_orgs_by_stars
-                   [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
+                     (i/i lang [:orgas])
+                     (i/i lang [:with-more-of*])
+                     (i/i lang [:stars])]
+                    top_orgs_by_stars
+                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
 
      [:div.fr-grid-row.fr-grid-row--center
       [:div.fr-col-12
@@ -1292,17 +1292,21 @@
   [:div.fr-grid
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link {:href "#/repos"} (i/i lang [:Repos])]]
-       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]]]
+       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/keyboard.jpg"}]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link {:href "#/deps"} (i/i lang [:Deps])]]
-       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]]]]
+       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/rocks.jpg"}]]]]]
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link

@@ -17,6 +17,11 @@ Le directeur interministériel du numérique.
 
 Ce site est hébergé par OVH France, 2 rue Kellermann - 59100 Roubaix - France.
 
+## Crédits images
+
+- *Mechanical Keyboard with dsa keycaps* par © Jay Zhang, licence [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
+- *Pebble tower*" par © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+
 ## Code source
 
 Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~etalab/code.gouv.fr).
