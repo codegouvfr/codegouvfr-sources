@@ -11,7 +11,7 @@ réutilisation ou de contribution.
 
 ## Comment est-il construit ?
 
-Ce site est développé en quatre étapes:
+Ce site est développé en quatre étapes :
 
 1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contient la liste des comptes d'organisation sur github.com, gitlab.com ou des forges GitLab locales ;
 2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data): récupère les données des organisations et des dépôts à partir de cette liste ;
@@ -20,11 +20,11 @@ Ce site est développé en quatre étapes:
 
 ## Où télécharger les données ?
 
-Toutes les données sont publiées sous licence Ouverte 2.0 :
+Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html).
 
-- La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
-- La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
-- La liste des dépendances en [json](/data/deps.json)
+* La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
+* La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
+* La liste des dépendances en [json](/data/deps.json)
 
 ## Comment contribuer ?
 

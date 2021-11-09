@@ -16,8 +16,9 @@ This website is developed in four stages:
 3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidate the data et add the list of dependencies;
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose the data.
 
-
 ## Where to download the data?
+
+All data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html).
 
 - The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json)
 - The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json)

@@ -97,9 +97,9 @@
   (.removeItem (.-localStorage js/window) key))
 
 (def to-hiccup-repl
-  {:h2 :h2.fr-h2
-   :ul :ul.fr-list
-   :ol :ol.fr-list})
+  {:h2 :h2.fr-h2.fr-mt-3w
+   :p  :p.fr-my-3w
+   :li :li.fr-ml-2w})
 
 (defn to-hiccup
   "Convert a markdown `s` string to hiccup structure."
