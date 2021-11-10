@@ -19,7 +19,7 @@
     :Repos-deps-sim                "Dépôts aux dépendances similaires"
     :Stars                         "Étoiles"
     :Stats                         "Chiffres"
-    :accessibility                 "Accessibilité: partiellement conforme"
+    :accessibility                 "Accessibilité : partiellement conforme"
     :all-forges                    "Toutes les forges"
     :archive                       "SWH"
     :archive-on                    "Archive sur "
