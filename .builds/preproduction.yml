@@ -17,7 +17,7 @@ tasks:
       clojure -M:js
   - upload: |
       cd code.gouv.fr/resources/public/
-      rsync -e "ssh -o StrictHostKeyChecking=no" -av * communs.numerique.gouv.fr:/home/build/websites/code.gouv.fr/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@communs.numerique.gouv.fr:/home/web/websites/code.gouv.fr_preprod/
 triggers:
   - action: email
     condition: failure
