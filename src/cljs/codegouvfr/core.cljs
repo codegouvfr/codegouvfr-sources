@@ -1285,11 +1285,12 @@
       (inline-resource "public/md/legal.en.md")))])
 
 (defn about-page [lang]
-  [:div.fr-container
-   (to-hiccup
-    (condp = lang
-      "fr" (inline-resource "public/md/about.fr.md")
-      (inline-resource "public/md/about.en.md")))])
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/about.fr.md")
+       (inline-resource "public/md/about.en.md")))]])
 
 ;; #00AC8C
 ;; #FF8D7E

@@ -9,11 +9,9 @@ encourage administrations to reuse them or to contribute to them.
 
 ## How is it built?
 
-This website is developed in four stages:
-
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization and group accounts on github.com, gitlab.com or local GitLab forges;
-2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data): fetches data from organizations and repositories from this list;
-3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidate the data et add the list of dependencies;
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on github.com, gitlab.com or local GitLab forges;
+2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list;
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidate the data and add the list of dependencies;
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose the data.
 
 ## Where to download the data?
