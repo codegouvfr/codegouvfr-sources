@@ -5,7 +5,7 @@ packages:
   - curl
   - rsync
 secrets:
-  - a6db2c26-335f-4a97-bec4-445f09aeda3c
+  - 4815455e-aea8-4fcc-821c-b8067e0d74fc
 tasks:
   - prepare: |
       curl -O https://download.clojure.org/install/linux-install-1.10.3.998.sh
@@ -13,6 +13,7 @@ tasks:
       sudo ./linux-install-1.10.3.998.sh
   - build: |
       cd code.gouv.fr
+      git checkout production
       clojure -M:js
   - upload: |
       cd code.gouv.fr/resources/public/
