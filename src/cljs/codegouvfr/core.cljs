@@ -1101,7 +1101,7 @@
                             (async/>! display-filter-chan {:q ev})
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}])]
-    (when-let [flt (not-empty  @(re-frame/subscribe [:filter?]))]
+    (when-let [flt (seq @(re-frame/subscribe [:filter?]))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
          (close-filter-button lang ff :repos (merge flt {:g nil})))
