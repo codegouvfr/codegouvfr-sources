@@ -988,13 +988,15 @@
         (top-clean-up (walk/stringify-keys top_languages)
                       "language" (i/i lang [:list-repos-with-language]))
         top_licenses_0
-        (take 10 (top-clean-up
+        (->> (top-clean-up
                   (walk/stringify-keys
                    (-> top_licenses
                        (dissoc :Inconnue)
                        (dissoc :Other)))
                   "license"
-                  (i/i lang [:list-repos-using-license])))]
+             (i/i lang [:list-repos-using-license]))
+            (sort-by val >)
+            (take 10))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
