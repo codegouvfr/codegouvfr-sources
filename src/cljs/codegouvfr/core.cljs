@@ -550,41 +550,35 @@
            [:a.fr-link
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
-             :href     "#/repos"
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col
            [:a.fr-link
             {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/repos"
              :title    (i/i lang [:sort-description-length])
              :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
             (i/i lang [:description])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/repos"
              :title    (i/i lang [:sort-update-date])
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :forks) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/repos"
              :title    (i/i lang [:sort-forks])
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :stars) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/repos"
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/repos"
              :title    (i/i lang [:sort-reused])
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
             (i/i lang [:reused])]]]]
@@ -653,7 +647,6 @@
       ;; Download link
       [:a.fr-link
        {:title    (i/i lang [:download])
-        :href     "#/repos"
         :on-click #(download-as-csv!
                     (map
                      (fn [r] (set/rename-keys
@@ -763,7 +756,6 @@
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#"
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
@@ -815,7 +807,6 @@
       ;; Download link
       [:a.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
-        :href     "#"
         :on-click #(download-as-csv!
                     (map
                      (fn [r] (set/rename-keys
@@ -846,21 +837,18 @@
         [:th.fr-col-3
          [:a.fr-link
           {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#/deps"
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
          [:a.fr-link
           {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#/deps"
            :title    (i/i lang [:sort-type])
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
          [:a.fr-link
           {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           :href     "#/deps"
            :title    (i/i lang [:sort-description-length])
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
@@ -868,7 +856,6 @@
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :href     "#/deps"
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
@@ -930,7 +917,6 @@
       ;; Download link
       [:a.fr-link
        {:title    (i/i lang [:download])
-        :href     "#/deps"
         :on-click #(download-as-csv!
                     (map
                      (fn [r] (set/rename-keys
@@ -1248,8 +1234,7 @@
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href     "#"
-         :on-click #(re-frame/dispatch
+        {:on-click #(re-frame/dispatch
                      [:lang! (if (= lang "fr") "en" "fr")])}
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
