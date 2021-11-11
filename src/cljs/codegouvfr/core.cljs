@@ -1012,7 +1012,7 @@
                   "license"
                   (i/i lang [:list-repos-using-license])))]
     [:div
-     [:div.fr-grid-row.fr-grid-row--center
+     [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
       (stats-tile lang :orgas-or-groups orgs_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
