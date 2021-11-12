@@ -482,30 +482,28 @@
 ;; Pagination
 
 (defn change-page [type next]
-  (let [sub         (condp = type
-                      :repos :repos-page?
-                      :deps  :deps-page?
-                      :orgas :orgas-page?)
-        evt         (condp = type
-                      :repos :repos-page!
-                      :deps  :deps-page!
-                      :orgas :orgas-page!)
-        cnt         (condp = type
-                      :repos :repos?
-                      :deps  :deps?
-                      :orgas :orgas?)
-        repos-page  @(re-frame/subscribe [sub])
-        count-pages (count (partition-all
-                            repos-per-page @(re-frame/subscribe [cnt])))]
+  (let [conf
+        (condp = type
+          :repos {:sub :repos-page? :evt      :repos-page!
+                  :cnt :repos?      :per-page repos-per-page}
+          :deps  {:sub :deps-page? :evt      :deps-page!
+                  :cnt :deps?      :per-page deps-per-page}
+          :orgas {:sub :orgas-page? :evt      :orgas-page!
+                  :cnt :orgas?      :per-page orgas-per-page})
+        evt         (:evt conf)
+        per-page    (:per-page conf)
+        cnt         @(re-frame/subscribe [(:cnt conf)])
+        page        @(re-frame/subscribe [(:sub conf)])
+        count-pages (count (partition-all per-page cnt))]
     (cond
       (= next "first")
       (re-frame/dispatch [evt 0])
       (= next "last")
       (re-frame/dispatch [evt (dec count-pages)])
-      (and (< repos-page (dec count-pages)) next)
-      (re-frame/dispatch [evt (inc repos-page)])
-      (and (pos? repos-page) (not next))
-      (re-frame/dispatch [evt (dec repos-page)]))))
+      (and (< page (dec count-pages)) next)
+      (re-frame/dispatch [evt (inc page)])
+      (and (pos? page) (not next))
+      (re-frame/dispatch [evt (dec page)]))))
 
 (defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
   [:div.fr-grid-row.fr-grid-row--center
