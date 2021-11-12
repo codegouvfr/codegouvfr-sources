@@ -5,6 +5,8 @@ packages:
   - curl
   - rsync
   - unzip
+sources:
+  - https://git.sr.ht/~etalab/code.gouv.fr
 secrets:
   - 4815455e-aea8-4fcc-821c-b8067e0d74fc
 tasks:
