@@ -54,7 +54,7 @@
     :home-deps-desc                "Quelles sont les bibliothèques de code les plus utilisées ?"
     :home-repos-desc               "Parcourez la liste des dépôts de code source publiés par des organismes publics pour les réutiliser ou y contribuer."
     :home-stats-desc               "Quels sont les langages de programmation et les licences les plus utilisés ?"
-    :index-subtitle                "Ce site permet d'explorer les codes sources ouverts par des organismes publics."
+    :index-subtitle                "Ce site permet d'explorer les codes sources publiés par des organismes publics."
     :index-title                   "Codes sources du secteur public"
     :issues                        "Tickets"
     :language                      "Langage"
