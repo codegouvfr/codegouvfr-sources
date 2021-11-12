@@ -2,7 +2,7 @@
 
 # code.gouv.fr
 
-Explore source code from the french public sector.
+Web application to explore the source code from the french public sector.
 
 ![img](codegouvfr.png)
 
@@ -34,13 +34,20 @@ clojure` or [follow the
 instructions](https://clojure.org/guides/getting_started) on
 clojure.org.
 
-# Contribute
+# Contributing
 
 The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~etalab/code.gouv.fr).
 
-The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers.
+The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers, but *do not propose pull requests* there.
 
-Your help is welcome.  You can contribute with bug reports, patches, feature requests or general questions by sending an email to [~etalab/logiciels-libres@lists.sr.ht](mailto:~etalab/logiciels-libres@lists.sr.ht).
+For confidential feedback, use [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr).
+
+For *patches*, configure your local copy of the repository like this:
+
+`git config format.subjectPrefix 'PATCH code.gouv.fr'`
+
+For bug reports, feature requests and general questions, send an email
+to the public mailing list [~etalab/codegouvfr-devel@lists.sr.ht](mailto:~etalab/codegouvfr-devel@lists.sr.ht).
 
 # Support the Clojure(script) ecosystem
 
