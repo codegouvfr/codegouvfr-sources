@@ -152,7 +152,6 @@
     (apply merge
            (sequence
             (comp
-             (filter (fn [[k _]] (not= k "Inconnu")))
              (map (fn [[k v]]
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
@@ -985,16 +984,20 @@
                                (:count %))
                       top_orgs_by_repos))
         top_languages_1
-        (top-clean-up (walk/stringify-keys top_languages)
+        (top-clean-up (walk/stringify-keys (-> top_languages
+                                               (dissoc :Inconnu)))
                       "language" (i/i lang [:list-repos-with-language]))
+
         top_licenses_0
-        (take 10 (top-clean-up
+        (->> (top-clean-up
                   (walk/stringify-keys
                    (-> top_licenses
                        (dissoc :Inconnue)
                        (dissoc :Other)))
                   "license"
-                  (i/i lang [:list-repos-using-license])))]
+             (i/i lang [:list-repos-using-license]))
+            (sort-by val >)
+            (take 10))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
