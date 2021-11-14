@@ -619,13 +619,15 @@
                         " "])
                      (if a? [:em d] d)]]
                    ;; Update
-                   [:td (or (to-locale-date u) "N/A")]
+                   [:td {:style {:text-align "center"}}
+                    (or (to-locale-date u) "N/A")]
                    ;; Forks
-                   [:td f]
+                   [:td {:style {:text-align "center"}} f]
                    ;; Stars
-                   [:td s]
+                   [:td {:style {:text-align "center"}} s]
                    ;; Reused
                    [:td
+                    {:style {:text-align "center"}}
                     ;; FIXME: not working?
                     [:a.fr-link
                      {:title  (i/i lang [:reuses-expand])
@@ -786,11 +788,14 @@
                    [:td
                     [:a {:target "_blank" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
                    [:td d]
-                   [:td [:a {:title (i/i lang [:go-to-repos])
-                             :href  (rfe/href :repos {:lang lang}
-                                              {:g (s/replace o "/groups/" "/")})}
-                         r]]
-                   [:td (to-locale-date c)]])))]])))
+                   [:td
+                    {:style {:text-align "center"}}
+                    [:a {:title (i/i lang [:go-to-repos])
+                         :href  (rfe/href :repos {:lang lang}
+                                          {:g (s/replace o "/groups/" "/")})}
+                     r]]
+                   [:td {:style {:text-align "center"}}
+                    (to-locale-date c)]])))]])))
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
@@ -869,7 +874,7 @@
             [:td t]
             [:td d]
             (when-not repo
-              [:td
+              [:td {:style {:text-align "center"}}
                [:a {:title (i/i lang [:list-repos-depending-on-dep])
                     :href  (rfe/href :repos {:lang lang}
                                      (if orga {:d n :g orga} {:d n}))}
