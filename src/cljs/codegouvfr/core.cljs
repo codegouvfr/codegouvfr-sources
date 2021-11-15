@@ -1400,7 +1400,6 @@
    ["error" :error]])
 
 (defn ^:export init []
-  (js/console.log (todays-date))
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
