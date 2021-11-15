@@ -25,7 +25,7 @@ Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/l
 
 * La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
-* La liste des dépendances en [json](/data/deps.json)
+* La liste des dépendances en [csv](/data/dependencies/csv/all.csv) et [json](/data/dependencies/json/all.json)
 
 ## Comment ces données sont-elles construites ?
 
