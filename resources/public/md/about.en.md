@@ -12,7 +12,7 @@ Many agencies already publish source code repositories : we are
 listing them on this website to make it easier to find them and to
 encourage administrations to reuse them or to contribute to them.
 
-# What is a "source code"?
+## What is a "source code"?
 
 The source code is the readable version of a computer program.
 
