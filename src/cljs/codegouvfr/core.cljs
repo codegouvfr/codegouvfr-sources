@@ -549,12 +549,7 @@
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
-          [:th.fr-col
-           [:a.fr-link
-            {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :title    (i/i lang [:sort-description-length])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
-            (i/i lang [:description])]]
+          [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
