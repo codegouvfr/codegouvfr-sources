@@ -1042,21 +1042,7 @@
        (stats-table (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
        [:img {:src "/data/top_licenses.svg" :width "100%"
-              :alt (i/i lang [:most-used-licenses])}]]]
-
-     ;; FIXME: Shall we add this?
-     ;; [:div
-     ;;  (stats-table [:span (i/i lang [:archive-on])
-     ;;               "Software Heritage"
-     ;;               ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-     ;;               ;;  {:href  (str "/" lang "/glossary#software-heritage")
-     ;;               ;;   :title (i/i lang [:go-to-glossary])}]
-     ;;               ]
-     ;;              {(i/i lang [:repos-on-swh])
-     ;;               (:repos_in_archive software_heritage)
-     ;;               (i/i lang [:percent-of-repos-archived])
-     ;;               (:ratio_in_archive software_heritage)})]
-     ]))
+              :alt (i/i lang [:most-used-licenses])}]]]]))
 
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
