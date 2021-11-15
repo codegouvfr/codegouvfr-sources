@@ -627,7 +627,6 @@
                    ;; Reused
                    [:td
                     {:style {:text-align "center"}}
-                    ;; FIXME: not working?
                     [:a.fr-link
                      {:title  (i/i lang [:reuses-expand])
                       :target "_blank"
@@ -991,14 +990,14 @@
 
         top_licenses_0
         (->> (top-clean-up
-                  (walk/stringify-keys
-                   (-> top_licenses
-                       (dissoc :Inconnue)
-                       (dissoc :Other)))
-                  "license"
-             (i/i lang [:list-repos-using-license]))
-            (sort-by val >)
-            (take 10))]
+              (walk/stringify-keys
+               (-> top_licenses
+                   (dissoc :Inconnue)
+                   (dissoc :Other)))
+              "license"
+              (i/i lang [:list-repos-using-license]))
+             (sort-by val >)
+             (take 10))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
