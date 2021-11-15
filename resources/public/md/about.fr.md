@@ -13,7 +13,7 @@ De nombreux organismes publient déjà des codes sources : nous les
 présentons sur ce site de façon à faciliter leur découverte et à
 encourager les administrations à les réutiliser ou à y contribuer.
 
-# Qu'est-ce qu'un « code source » ?
+## Qu'est-ce qu'un « code source » ?
 
 Le code source est la version lisible d'un programme informatique.
 
