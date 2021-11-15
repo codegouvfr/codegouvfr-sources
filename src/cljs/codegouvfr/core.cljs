@@ -31,6 +31,8 @@
 
 (defonce timeout 100)
 
+(def unix-epoch "1970-01-01T00:00:00Z")
+
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
@@ -465,13 +467,15 @@
    (let [orgs  (:orgas db)
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
-                 ;; FIXME
-                 ;; :date  (sort #(compare (js/Date. (.parse js/Date (:c %1)))
-                 ;;                        (js/Date. (.parse js/Date (:c %2))))
-                 ;;              orgs)
-                 :name  (reverse (sort #(compare (or-kwds %1 [:n :l])
-                                                 (or-kwds %2 [:n :l]))
-                                       orgs))
+                 :date  (sort
+                         #(compare
+                           (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
+                           (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
+                         orgs)
+                 :name  (reverse
+                         (sort #(compare (or-kwds %1 [:n :l])
+                                         (or-kwds %2 [:n :l]))
+                               orgs))
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -754,14 +758,11 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
           [:th.fr-col-1
-           (i/i lang [:created-at])
-           ;; FIXME
-           ;; [:a.fr-link
-           ;;  {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           ;;   :title    (i/i lang [:sort-orgas-creation])
-           ;;   :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
-           ;;  (i/i lang [:created-at])]
-           ]]]
+           [:a.fr-link
+            {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :title    (i/i lang [:sort-orgas-creation])
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
+            (i/i lang [:created-at])]]]]
 
         (into [:tbody]
               (for [dd (take orgas-per-page
