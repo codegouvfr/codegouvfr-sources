@@ -31,6 +31,8 @@
 
 (defonce timeout 100)
 
+(def unix-epoch "1970-01-01T00:00:00Z")
+
 (defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
 
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
@@ -254,7 +256,7 @@
     :repos-page     0
     :orgas-page     0
     :deps-page      0
-    :sort-repos-by  :reused
+    ;; :sort-repos-by  :reused
     :sort-orgas-by  :repos
     :sort-deps-by   :repos
     :view           :orgas
@@ -423,8 +425,7 @@
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
-                  ;; :issues (sort-by :i repos0)
-                  :reused (sort-by :g repos0)
+                  ;; :reused (sort-by :g repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
@@ -465,13 +466,15 @@
    (let [orgs  (:orgas db)
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
-                 ;; FIXME
-                 ;; :date  (sort #(compare (js/Date. (.parse js/Date (:c %1)))
-                 ;;                        (js/Date. (.parse js/Date (:c %2))))
-                 ;;              orgs)
-                 :name  (reverse (sort #(compare (or-kwds %1 [:n :l])
-                                                 (or-kwds %2 [:n :l]))
-                                       orgs))
+                 :date  (sort
+                         #(compare
+                           (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
+                           (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
+                         orgs)
+                 :name  (reverse
+                         (sort #(compare (or-kwds %1 [:n :l])
+                                         (or-kwds %2 [:n :l]))
+                               orgs))
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -549,12 +552,7 @@
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
-          [:th.fr-col
-           [:a.fr-link
-            {:class    (when (= rep-f :desc) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :title    (i/i lang [:sort-description-length])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :desc])}
-            (i/i lang [:description])]]
+          [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
            [:a.fr-link
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -573,12 +571,14 @@
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
-          [:th.fr-col-1
-           [:a.fr-link
-            {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
-             :title    (i/i lang [:sort-reused])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
-            (i/i lang [:reused])]]]]
+          ;; FIXME
+          ;; [:th.fr-col-1
+          ;;  [:a.fr-link
+          ;;   {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
+          ;;    :title    (i/i lang [:sort-reused])
+          ;;    :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
+          ;;   (i/i lang [:reused])]]
+          ]]
         (into [:tbody]
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
@@ -610,13 +610,13 @@
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
                      ;; FIXME: not working?
-                     (when dp
-                       [:span
-                        [:a.fr-link
-                         {:title (i/i lang [:Deps])
-                          :href  (rfe/href :deps {:lang lang} {:repo r})}
-                         [:span.fr-fi-search-line {:aria-hidden true}]]
-                        " "])
+                     ;; (when dp
+                     ;;   [:span
+                     ;;    [:a.fr-link
+                     ;;     {:title (i/i lang [:Deps])
+                     ;;      :href  (rfe/href :deps {:lang lang} {:repo r})}
+                     ;;     [:span.fr-fi-search-line {:aria-hidden true}]]
+                     ;;    " "])
                      (if a? [:em d] d)]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
@@ -625,15 +625,16 @@
                    [:td {:style {:text-align "center"}} f]
                    ;; Stars
                    [:td {:style {:text-align "center"}} s]
+                   ;; FIXME
                    ;; Reused
-                   [:td
-                    {:style {:text-align "center"}}
-                    ;; FIXME: not working?
-                    [:a.fr-link
-                     {:title  (i/i lang [:reuses-expand])
-                      :target "_blank"
-                      :href   (str r "/network/dependents")}
-                     g]]])))]])))
+                   ;; [:td
+                   ;;  {:style {:text-align "center"}}
+                   ;;  [:a.fr-link
+                   ;;   {:title  (i/i lang [:reuses-expand])
+                   ;;    :target "_blank"
+                   ;;    :href   (str r "/network/dependents")}
+                   ;;   g]]
+                   ])))]])))
 
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -759,14 +760,11 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
           [:th.fr-col-1
-           (i/i lang [:created-at])
-           ;; FIXME
-           ;; [:a.fr-link
-           ;;  {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
-           ;;   :title    (i/i lang [:sort-orgas-creation])
-           ;;   :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
-           ;;  (i/i lang [:created-at])]
-           ]]]
+           [:a.fr-link
+            {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :title    (i/i lang [:sort-orgas-creation])
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
+            (i/i lang [:created-at])]]]]
 
         (into [:tbody]
               (for [dd (take orgas-per-page
@@ -995,14 +993,14 @@
 
         top_licenses_0
         (->> (top-clean-up
-                  (walk/stringify-keys
-                   (-> top_licenses
-                       (dissoc :Inconnue)
-                       (dissoc :Other)))
-                  "license"
-             (i/i lang [:list-repos-using-license]))
-            (sort-by val >)
-            (take 10))]
+              (walk/stringify-keys
+               (-> top_licenses
+                   (dissoc :Inconnue)
+                   (dissoc :Other)))
+              "license"
+              (i/i lang [:list-repos-using-license]))
+             (sort-by val >)
+             (take 10))]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
@@ -1046,21 +1044,7 @@
        (stats-table (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
        [:img {:src "/data/top_licenses.svg" :width "100%"
-              :alt (i/i lang [:most-used-licenses])}]]]
-
-     ;; FIXME: Shall we add this?
-     ;; [:div
-     ;;  (stats-table [:span (i/i lang [:archive-on])
-     ;;               "Software Heritage"
-     ;;               ;; [:a.fr-link.fr-link--icon-right.fr-fi-question-line
-     ;;               ;;  {:href  (str "/" lang "/glossary#software-heritage")
-     ;;               ;;   :title (i/i lang [:go-to-glossary])}]
-     ;;               ]
-     ;;              {(i/i lang [:repos-on-swh])
-     ;;               (:repos_in_archive software_heritage)
-     ;;               (i/i lang [:percent-of-repos-archived])
-     ;;               (:ratio_in_archive software_heritage)})]
-     ]))
+              :alt (i/i lang [:most-used-licenses])}]]]]))
 
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
@@ -1129,13 +1113,6 @@
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
-           ;; FIXME: Definitely remove?
-           ;; [:li
-           ;;  [:a.fr-link
-           ;;   {:target "_blank"
-           ;;    :title  (i/i lang [:understand-tech-terms])
-           ;;    :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
-           ;;   (i/i lang [:glossary])]]
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
@@ -1405,7 +1382,6 @@
    ["error" :error]])
 
 (defn ^:export init []
-  (js/console.log (todays-date))
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
