@@ -256,7 +256,7 @@
     :repos-page     0
     :orgas-page     0
     :deps-page      0
-    ;; :sort-repos-by  :reused
+    :sort-repos-by  :reused
     :sort-orgas-by  :repos
     :sort-deps-by   :repos
     :view           :orgas
@@ -425,7 +425,8 @@
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
-                  ;; :reused (sort-by :g repos0)
+                  ;; :issues (sort-by :i repos0)
+                  :reused (sort-by :g repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
@@ -571,14 +572,12 @@
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
-          ;; FIXME
-          ;; [:th.fr-col-1
-          ;;  [:a.fr-link
-          ;;   {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
-          ;;    :title    (i/i lang [:sort-reused])
-          ;;    :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
-          ;;   (i/i lang [:reused])]]
-          ]]
+          [:th.fr-col-1
+           [:a.fr-link
+            {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :title    (i/i lang [:sort-reused])
+             :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
+            (i/i lang [:reused])]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
@@ -610,13 +609,13 @@
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
                      ;; FIXME: not working?
-                     ;; (when dp
-                     ;;   [:span
-                     ;;    [:a.fr-link
-                     ;;     {:title (i/i lang [:Deps])
-                     ;;      :href  (rfe/href :deps {:lang lang} {:repo r})}
-                     ;;     [:span.fr-fi-search-line {:aria-hidden true}]]
-                     ;;    " "])
+                     (when dp
+                       [:span
+                        [:a.fr-link
+                         {:title (i/i lang [:Deps])
+                          :href  (rfe/href :deps {:lang lang} {:repo r})}
+                         [:span.fr-fi-search-line {:aria-hidden true}]]
+                        " "])
                      (if a? [:em d] d)]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
@@ -625,16 +624,14 @@
                    [:td {:style {:text-align "center"}} f]
                    ;; Stars
                    [:td {:style {:text-align "center"}} s]
-                   ;; FIXME
                    ;; Reused
-                   ;; [:td
-                   ;;  {:style {:text-align "center"}}
-                   ;;  [:a.fr-link
-                   ;;   {:title  (i/i lang [:reuses-expand])
-                   ;;    :target "_blank"
-                   ;;    :href   (str r "/network/dependents")}
-                   ;;   g]]
-                   ])))]])))
+                   [:td
+                    {:style {:text-align "center"}}
+                    [:a.fr-link
+                     {:title  (i/i lang [:reuses-expand])
+                      :target "_blank"
+                      :href   (str r "/network/dependents")}
+                     g]]])))]])))
 
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -1113,6 +1110,13 @@
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
+           ;; FIXME: Definitely remove?
+           ;; [:li
+           ;;  [:a.fr-link
+           ;;   {:target "_blank"
+           ;;    :title  (i/i lang [:understand-tech-terms])
+           ;;    :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
+           ;;   (i/i lang [:glossary])]]
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
