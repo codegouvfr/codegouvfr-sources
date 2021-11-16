@@ -1031,9 +1031,10 @@
                     top_orgs_by_stars
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
 
-     [:div.fr-grid-row.fr-grid-row--center
-      [:div.fr-col-12
-       (stats-deps-table (i/i lang [:Deps]) deps lang)]]
+     ;; FIXME: the source data are wrong
+     ;; [:div.fr-grid-row.fr-grid-row--center
+     ;;  [:div.fr-col-12
+     ;;   (stats-deps-table (i/i lang [:Deps]) deps lang)]]
 
      [:div.fr-grid-row
       [:div.fr-col-6
