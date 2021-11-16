@@ -972,7 +972,7 @@
      [:p.fr-h4 s]]]])
 
 (defn stats-page
-  [lang stats deps deps-total]
+  [lang stats deps-total]
   (let [{:keys [repos_cnt orgs_cnt avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars top_licenses
                 platforms top_languages]} stats
@@ -1057,7 +1057,7 @@
              :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
         (GET "/data/stats.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
-      :reagent-render (fn [] (stats-page lang @stats @deps @deps-total))})))
+      :reagent-render (fn [] (stats-page lang @stats @deps-total))})))
 
 (defn main-menu [q lang view]
   [:div
