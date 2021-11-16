@@ -158,9 +158,9 @@
                     [k (js/parseFloat
                         (gstring/format "%.2f" (* (/ v total) 100)))]))
              (map #(let [[k v] %]
-                     {[:a {:title title
-                           ;; FIXME: use rfe/push-state instead?
-                           :href  (str "#/repos?" param "=" k)} k] v})))
+                     {[:a
+                       {:title title
+                        :href  (str "#/repos?" param "=" k)} k] v})))
             top))))
 
 ;; Filters
@@ -582,7 +582,7 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a? d f li n o r s u dp g]}
+                (let [{:keys [a? d f li n o r s u g]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
@@ -609,13 +609,13 @@
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
                     [:span
                      ;; FIXME: not working?
-                     (when dp
-                       [:span
-                        [:a.fr-link
-                         {:title (i/i lang [:Deps])
-                          :href  (rfe/href :deps {:lang lang} {:repo r})}
-                         [:span.fr-fi-search-line {:aria-hidden true}]]
-                        " "])
+                     ;; (when dp
+                     ;;   [:span
+                     ;;    [:a.fr-link
+                     ;;     {:title (i/i lang [:Deps])
+                     ;;      :href  (rfe/href :deps {:lang lang} {:repo r})}
+                     ;;     [:span.fr-fi-search-line {:aria-hidden true}]]
+                     ;;    " "])
                      (if a? [:em d] d)]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
@@ -769,7 +769,6 @@
                                    orgas))]
                 ^{:key dd}
                 (let [{:keys [n l d o h an au c r]} dd]
-                  ;; FIXME: use dp for dependencies here?
                   [:tr
                    [:td
                     (if (or h an)
@@ -1110,13 +1109,6 @@
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
-           ;; FIXME: Definitely remove?
-           ;; [:li
-           ;;  [:a.fr-link
-           ;;   {:target "_blank"
-           ;;    :title  (i/i lang [:understand-tech-terms])
-           ;;    :href   (str srht-repo-basedir-prefix "docs/glossary." lang ".md")}
-           ;;   (i/i lang [:glossary])]]
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
