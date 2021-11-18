@@ -17,7 +17,7 @@ encourager les administrations à les réutiliser ou à y contribuer.
 
 Le code source est la version lisible d'un programme informatique.
 
-Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/docs/glossary.fr.md).
+Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
 
 ## Où télécharger les données ?
 
