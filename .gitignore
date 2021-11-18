@@ -11,3 +11,4 @@ figwheel_server.log
 *csv
 resources/public/data/
 .cpcache/
+*org
