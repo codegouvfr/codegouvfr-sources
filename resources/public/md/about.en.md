@@ -16,7 +16,7 @@ encourage administrations to reuse them or to contribute to them.
 
 The source code is the readable version of a computer program.
 
-For more details on other technical terms, [please check this glossary](https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/docs/glossary.en.md).
+For more details on other technical terms, [please check this glossary](https://man.sr.ht/~etalab/logiciels-libres/glossary.en.md).
 
 ## Where to download the data?
 
