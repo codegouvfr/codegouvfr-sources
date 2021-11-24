@@ -1279,7 +1279,10 @@
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/repos"} (i/i lang [:Repos])]]
+        [:a.fr-card__link
+         {:href  "#/repos"
+          :title (i/i lang [:repos-of-source-code])}
+         (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
       [:div.fr-card__img
        [:img.fr-responsive-img {:src "/img/keyboard.jpg" :alt ""}]]]]
@@ -1287,7 +1290,10 @@
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/deps"} (i/i lang [:Deps])]]
+        [:a.fr-card__link
+         {:href  "#/deps"
+          :title (i/i lang [:deps-stats])}
+         (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img
        [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
@@ -1296,7 +1302,10 @@
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/stats"} (i/i lang [:Stats])]]
+        [:a.fr-card__link
+         {:href  "#/stats"
+          :title (i/i lang [:stats-expand])}
+         (i/i lang [:Stats])]]
        [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
