@@ -1051,8 +1051,9 @@
       [:div.fr-col-6
        (stats-table (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
-       [:img {:src "/data/top_licenses.svg" :width "100%"
-              :alt (i/i lang [:most-used-licenses])}]]]]))
+       [:img {:src      "/data/top_licenses.svg" :width "100%"
+              :longdesc (i/i lang [:most-used-licenses])
+              :alt      (i/i lang [:most-used-licenses])}]]]]))
 
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
