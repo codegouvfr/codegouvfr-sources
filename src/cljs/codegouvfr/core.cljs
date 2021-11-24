@@ -1283,7 +1283,7 @@
         [:a.fr-card__link {:href "#/repos"} (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/keyboard.jpg"}]]]]
+       [:img.fr-responsive-img {:src "/img/keyboard.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
@@ -1291,7 +1291,7 @@
         [:a.fr-card__link {:href "#/deps"} (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/rocks.jpg"}]]]]]
+       [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
