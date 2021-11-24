@@ -1174,7 +1174,7 @@
      [:div.fr-col-12.fr-col-md-8
       [:div.fr-follow__newsletter
        [:div
-        [:h5.fr-h5.fr-follow__title (i/i lang [:bluehats])]
+        [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
         [:p.fr-text--sm.fr-follow__desc (i/i lang [:bluehats-desc])]
         [:a
          {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
