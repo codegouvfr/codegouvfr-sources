@@ -700,6 +700,7 @@
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input {:type      "checkbox" :id "1" :name "1"
+                :title     (i/i lang [:only-not-fork-title])
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-not-fork v)
                               (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
