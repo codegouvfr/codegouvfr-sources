@@ -704,26 +704,29 @@
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "1" :name "1"
-                :title     (i/i lang [:only-not-fork-title])
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-not-fork v)
-                              (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
-       [:label.fr-label {:for "1"} (i/i lang [:only-not-fork])]]
+       [:input#1 {:type      "checkbox" :name "1"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-not-fork v)
+                                (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
+       [:label.fr-label
+        {:for   "1"
+         :title (i/i lang [:only-not-fork-title])}
+        (i/i lang [:only-not-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "2" :name "2"
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-licensed v)
-                              (re-frame/dispatch [:filter! {:is-licensed v}]))}]
+       [:input#2 {:type      "checkbox" :name "2"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-licensed v)
+                                (re-frame/dispatch [:filter! {:is-licensed v}]))}]
        [:label.fr-label {:for "2"} (i/i lang [:only-with-license])]]
 
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "3" :name "3"
-                :title     (i/i lang [:only-her-title])
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-esr v)
-                              (re-frame/dispatch [:filter! {:is-esr v}]))}]
-       [:label.fr-label {:for "3"} (i/i lang [:only-her])]]]
+       [:input#3 {:type      "checkbox" :name "3"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-esr v)
+                                (re-frame/dispatch [:filter! {:is-esr v}]))}]
+       [:label.fr-label
+        {:for "3" :title (i/i lang [:only-her-title])}
+        (i/i lang [:only-her])]]]
      ;; Main repos table display
      [repos-table lang (count repos)]
      ;; Bottom pagination block
@@ -1109,19 +1112,19 @@
           [:div.fr-header__logo
            [:p.fr-logo "République" [:br] "Française"]]
           [:div.fr-header__navbar
-           [:button.fr-btn--menu.fr-btn
+           [:button#fr-btn-menu-mobile.fr-btn--menu.fr-btn
             {:data-fr-opened false
-             :aria-controls  "header-navigation"
+             :aria-controls  "modal-833"
              :aria-haspopup  "menu"
-             :title          "menu"}
+             :title          "Menu"}
             "Menu"]]]
          [:div.fr-header__service
-          [:a {:href "/"}
+          [:a {:href "/"} ;; FIXME
            [:p.fr-header__service-title (i/i lang [:index-title])]]
           [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]
         [:div.fr-header__tools
          [:div.fr-header__tools-links
-          [:ul.fr-links-group
+          [:ul.fr-links-group   
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
@@ -1134,14 +1137,15 @@
               :title      (new-tab (i/i lang [:twitter-follow]) lang)
               :target     "_blank"}
              "@codegouvfr"]]]]]]]]
+
      ;; Header menu
-     [:div#header-navigation.fr-header__menu.fr-modal
-      {:aria-labelledby "button-menu"}
+     [:div#modal-833.fr-header__menu.fr-modal
+      {:aria-labelledby "fr-btn-menu-mobile"}
       [:div.fr-container
        [:button.fr-link--close.fr-link
-        {:aria-controls "header-navigation"} (i/i lang [:close])]
-       [:div.fr-header__menu-links]
-       [:nav.fr-nav {:role "navigation" :aria-label "Principal"}
+        {:aria-controls "modal-833"} (i/i lang [:close])]
+       [:div.fr-header__menu-links {:style {:display "none"}}]
+       [:nav#navigation-832.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -1200,6 +1204,40 @@
                :target     "_blank"}
               "Twitter"]]]]]]]])
 
+(defn display-parameters-modal [lang]
+  [:dialog#fr-theme-modal.fr-modal
+   {:role "dialog" :aria-labelledby "fr-theme-modal-title"}
+   [:div.fr-container.fr-container--fluid.fr-container-md
+    [:div.fr-grid-row.fr-grid-row--center
+     [:div.fr-col-12.fr-col-md-6.fr-col-lg-4
+      [:div.fr-modal__body
+       [:div.fr-modal__header
+        [:button.fr-link--close.fr-link {:aria-controls "fr-theme-modal"}
+         (i/i lang [:modal-close])]]
+       [:div.fr-modal__content
+        [:h1#fr-theme-modal-title.fr-modal__title
+         (i/i lang [:modal-title])]
+        [:div#fr-display.fr-form-group.fr-display
+         [:fieldset.fr-fieldset
+          [:legend#-legend.fr-fieldset__legend.fr-text--regular
+           (i/i lang [:modal-select-theme])]
+          [:div.fr-fieldset__content
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-light
+             {:type "radio" :name "fr-radios-theme" :value "light"}]
+            [:label.fr-label {:for "fr-radios-theme-light"}
+             (i/i lang [:modal-theme-light])]]
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-dark
+             {:type "radio" :name "fr-radios-theme" :value "dark"}]
+            [:label.fr-label {:for "fr-radios-theme-dark"}
+             (i/i lang [:modal-theme-dark])]]
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-system
+             {:type "radio" :name "fr-radios-theme" :value "system"}]
+            [:label.fr-label {:for "fr-radios-theme-system"}
+             (i/i lang [:modal-theme-system])]]]]]]]]]]])
+
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
    [:div.fr-container
@@ -1255,9 +1293,9 @@
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
-         :title          (i/i lang [::choose-theme])
+         :title          (i/i lang [:modal-title])
          :data-fr-opened false}
-        (i/i lang [:choose-theme])]]]]]])
+        (i/i lang [:modal-title])]]]]]])
 
 ;; Pages from md
 
@@ -1343,8 +1381,8 @@
         view @(re-frame/subscribe [:view?])]
     [:div
      (banner lang)
-     [:main.fr-container.fr-container--fluid.fr-mb-3w
-      {:id "main" :role "main"}
+     [:main#main.fr-container.fr-container--fluid.fr-mb-3w
+      {:role "main"}
       [main-menu q lang view]
       (condp = view
         ;; Default page
@@ -1366,7 +1404,8 @@
         ;; Fall back on the organizations page
         [error-page lang])]
      (subscribe lang)
-     (footer lang)]))
+     (footer lang)
+     (display-parameters-modal lang)]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
