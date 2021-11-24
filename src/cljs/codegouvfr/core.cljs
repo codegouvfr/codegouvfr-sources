@@ -1319,7 +1319,8 @@
         view @(re-frame/subscribe [:view?])]
     [:div
      (banner lang)
-     [:div.fr-container.fr-container--fluid.fr-mb-3w
+     [:main.fr-container.fr-container--fluid.fr-mb-3w
+      {:id "main" :role "main"}
       [main-menu q lang view]
       (condp = view
         ;; Default page
