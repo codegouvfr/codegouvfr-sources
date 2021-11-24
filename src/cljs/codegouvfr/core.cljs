@@ -83,6 +83,9 @@
 
 ;; Utility functions
 
+(defn new-tab [s lang]
+  (str s " - " (i/i lang [:new-tab])))
+
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
   [key val]
@@ -591,14 +594,16 @@
                     [:div
                      [:a.fr-link
                       {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
-                       :title  (i/i lang [:swh-link])
+                       :title  (new-tab (i/i lang [:swh-link]) lang)
                        :target "_blank"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:a {:href   r
                           :target "_blank"
-                          :title  (str (i/i lang [:go-to-repo])
-                                       (when li (str (i/i lang [:under-license]) li)))}
+                          :title  (new-tab
+                                   (str
+                                    (i/i lang [:go-to-repo])
+                                    (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
                      [:a {:href  (rfe/href :repos {:lang lang} {:g group})
@@ -628,7 +633,7 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a.fr-link
-                     {:title  (i/i lang [:reuses-expand])
+                     {:title  (new-tab (i/i lang [:reuses-expand]) lang)
                       :target "_blank"
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
@@ -776,13 +781,15 @@
                     (if (or h an)
                       (let [w (if h h (str annuaire-prefix an))]
                         [:a.fr-link
-                         {:title  (i/i lang [:go-to-website])
+                         {:title  (new-tab (i/i lang [:go-to-website]) lang)
                           :target "_blank"
                           :href   w}
                          [:img {:src au :width "100%" :alt ""}]])
                       [:img {:src au :width "100%" :alt ""}])]
                    [:td
-                    [:a {:target "_blank" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
+                    [:a {:target "_blank"
+                         :title  (new-tab (i/i lang [:go-to-orga]) lang)
+                         :href   o} (or n l)]]
                    [:td d]
                    [:td
                     {:style {:text-align "center"}}
@@ -865,8 +872,9 @@
          (let [{:keys [t n d l r]} dd]
            [:tr
             [:td
-             [:a {:href  l :target "_blank"
-                  :title (i/i lang [:more-info])} n]]
+             [:a {:href   l
+                  :target "_blank"
+                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
             [:td t]
             [:td d]
             (when-not repo
@@ -891,8 +899,9 @@
      (for [{:keys [n t d l r] :as o} deps]
        ^{:key o}
        [:tr
-        [:td [:a {:href  l :target "_blank"
-                  :title (i/i lang [:more-info])} n]]
+        [:td [:a {:href   l
+                  :target "_blank"
+                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
         [:td t]
         [:td d]
         [:td
@@ -1185,6 +1194,7 @@
        [:ul.fr-links-group.fr-links-group--lg
         [:li [:a.fr-link.fr-link--twitter
               {:href   "https://twitter.com/codegouvfr"
+               :title  (i/i lang [:new-tab])
                :target "_blank"}
               "Twitter"]]]]]]]])
 
