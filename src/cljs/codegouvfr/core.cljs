@@ -1129,8 +1129,10 @@
              (i/i lang [:contact])]]
            [:li
             [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
-             {:href  "https://twitter.com/codegouvfr"
-              :title (i/i lang [:twitter-follow])}
+             {:href       "https://twitter.com/codegouvfr"
+              :aria-label (i/i lang [:twitter-follow])
+              :title      (new-tab (i/i lang [:twitter-follow]) lang)
+              :target     "_blank"}
              "@codegouvfr"]]]]]]]]
      ;; Header menu
      [:div#header-navigation.fr-header__menu.fr-modal
@@ -1192,9 +1194,10 @@
        [:p.fr-h5.fr-mb-3v (i/i lang [:follow])]
        [:ul.fr-links-group.fr-links-group--lg
         [:li [:a.fr-link.fr-link--twitter
-              {:href   "https://twitter.com/codegouvfr"
-               :title  (i/i lang [:new-tab])
-               :target "_blank"}
+              {:href       "https://twitter.com/codegouvfr"
+               :aria-label (i/i lang [:twitter-follow])
+               :title      (new-tab (i/i lang [:twitter-follow]) lang)
+               :target     "_blank"}
               "Twitter"]]]]]]]])
 
 (defn footer [lang]
