@@ -8,4 +8,3 @@
 - [About](#/about)
 - [Legal mentions](#/legal)
 - [RSS feed](/data/latest.xml)
-- [Sitemap](#/sitemap)

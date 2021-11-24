@@ -8,4 +8,3 @@
 - [À propos](#/about)
 - [Mentions légales](#/legal)
 - [Flux RSS](/data/latest.xml)
-- [Pages du site](#/sitemap)
