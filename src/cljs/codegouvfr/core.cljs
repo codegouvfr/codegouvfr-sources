@@ -8,6 +8,7 @@
             [reagent.core :as reagent]
             [reagent.dom]
             [cljs-bean.core :refer [bean]]
+            [clojure.browser.dom :as dom]
             [goog.string :as gstring]
             [ajax.core :refer [GET]]
             [codegouvfr.i18n :as i]
@@ -82,6 +83,9 @@
    :r :repositories})
 
 ;; Utility functions
+
+(defn new-tab [s lang]
+  (str s " - " (i/i lang [:new-tab])))
 
 (defn set-item!
   "Set `key` in browser's localStorage to `val`."
@@ -269,6 +273,9 @@
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
+   (dom/set-properties
+    (dom/get-element "html")
+    {"lang" lang})
    (assoc db :lang lang)))
 
 (re-frame/reg-event-db
@@ -591,14 +598,16 @@
                     [:div
                      [:a.fr-link
                       {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
-                       :title  (i/i lang [:swh-link])
+                       :title  (new-tab (i/i lang [:swh-link]) lang)
                        :target "_blank"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:a {:href   r
                           :target "_blank"
-                          :title  (str (i/i lang [:go-to-repo])
-                                       (when li (str (i/i lang [:under-license]) li)))}
+                          :title  (new-tab
+                                   (str
+                                    (i/i lang [:go-to-repo])
+                                    (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
                      [:a {:href  (rfe/href :repos {:lang lang} {:g group})
@@ -628,7 +637,7 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a.fr-link
-                     {:title  (i/i lang [:reuses-expand])
+                     {:title  (new-tab (i/i lang [:reuses-expand]) lang)
                       :target "_blank"
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
@@ -699,24 +708,29 @@
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "1" :name "1"
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-not-fork v)
-                              (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
-       [:label.fr-label {:for "1"} (i/i lang [:only-not-fork])]]
+       [:input#1 {:type      "checkbox" :name "1"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-not-fork v)
+                                (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
+       [:label.fr-label
+        {:for   "1"
+         :title (i/i lang [:only-not-fork-title])}
+        (i/i lang [:only-not-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "2" :name "2"
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-licensed v)
-                              (re-frame/dispatch [:filter! {:is-licensed v}]))}]
+       [:input#2 {:type      "checkbox" :name "2"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-licensed v)
+                                (re-frame/dispatch [:filter! {:is-licensed v}]))}]
        [:label.fr-label {:for "2"} (i/i lang [:only-with-license])]]
 
       [:div.fr-checkbox-group.fr-col.fr-m-1w
-       [:input {:type      "checkbox" :id "3" :name "3"
-                :on-change #(let [v (.-checked (.-target %))]
-                              (set-item! :is-esr v)
-                              (re-frame/dispatch [:filter! {:is-esr v}]))}]
-       [:label.fr-label {:for "3"} (i/i lang [:only-her])]]]
+       [:input#3 {:type      "checkbox" :name "3"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-esr v)
+                                (re-frame/dispatch [:filter! {:is-esr v}]))}]
+       [:label.fr-label
+        {:for "3" :title (i/i lang [:only-her-title])}
+        (i/i lang [:only-her])]]]
      ;; Main repos table display
      [repos-table lang (count repos)]
      ;; Bottom pagination block
@@ -774,13 +788,15 @@
                     (if (or h an)
                       (let [w (if h h (str annuaire-prefix an))]
                         [:a.fr-link
-                         {:title  (i/i lang [:go-to-website])
+                         {:title  (new-tab (i/i lang [:go-to-website]) lang)
                           :target "_blank"
                           :href   w}
                          [:img {:src au :width "100%" :alt ""}]])
                       [:img {:src au :width "100%" :alt ""}])]
                    [:td
-                    [:a {:target "_blank" :title (i/i lang [:go-to-orga]) :href o} (or n l)]]
+                    [:a {:target "_blank"
+                         :title  (new-tab (i/i lang [:go-to-orga]) lang)
+                         :href   o} (or n l)]]
                    [:td d]
                    [:td
                     {:style {:text-align "center"}}
@@ -863,8 +879,9 @@
          (let [{:keys [t n d l r]} dd]
            [:tr
             [:td
-             [:a {:href  l :target "_blank"
-                  :title (i/i lang [:more-info])} n]]
+             [:a {:href   l
+                  :target "_blank"
+                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
             [:td t]
             [:td d]
             (when-not repo
@@ -889,8 +906,9 @@
      (for [{:keys [n t d l r] :as o} deps]
        ^{:key o}
        [:tr
-        [:td [:a {:href  l :target "_blank"
-                  :title (i/i lang [:more-info])} n]]
+        [:td [:a {:href   l
+                  :target "_blank"
+                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
         [:td t]
         [:td d]
         [:td
@@ -1040,8 +1058,9 @@
       [:div.fr-col-6
        (stats-table (i/i lang [:distribution-by-platform]) platforms)]
       [:div.fr-col-6
-       [:img {:src "/data/top_licenses.svg" :width "100%"
-              :alt (i/i lang [:most-used-licenses])}]]]]))
+       [:img {:src      "/data/top_licenses.svg" :width "100%"
+              :longdesc (i/i lang [:most-used-licenses])
+              :alt      (i/i lang [:most-used-licenses])}]]]]))
 
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
@@ -1097,19 +1116,19 @@
           [:div.fr-header__logo
            [:p.fr-logo "République" [:br] "Française"]]
           [:div.fr-header__navbar
-           [:button.fr-btn--menu.fr-btn
+           [:button#fr-btn-menu-mobile.fr-btn--menu.fr-btn
             {:data-fr-opened false
-             :aria-controls  "header-navigation"
+             :aria-controls  "modal-833"
              :aria-haspopup  "menu"
-             :title          "menu"}
+             :title          "Menu"}
             "Menu"]]]
          [:div.fr-header__service
-          [:a {:href "/" :title (i/i lang [:index-title])}
+          [:a {:href "/"} ;; FIXME
            [:p.fr-header__service-title (i/i lang [:index-title])]]
           [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]
         [:div.fr-header__tools
          [:div.fr-header__tools-links
-          [:ul.fr-links-group
+          [:ul.fr-links-group   
            [:li
             [:a.fr-link.fr-fi-mail-line
              {:href  "mailto:logiciels-libres@data.gouv.fr"
@@ -1117,28 +1136,29 @@
              (i/i lang [:contact])]]
            [:li
             [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
-             {:href  "https://twitter.com/codegouvfr"
-              :title (i/i lang [:twitter-follow])}
+             {:href       "https://twitter.com/codegouvfr"
+              :aria-label (i/i lang [:twitter-follow])
+              :title      (new-tab (i/i lang [:twitter-follow]) lang)
+              :target     "_blank"}
              "@codegouvfr"]]]]]]]]
+
      ;; Header menu
-     [:div#header-navigation.fr-header__menu.fr-modal
-      {:aria-labelledby "button-menu"}
+     [:div#modal-833.fr-header__menu.fr-modal
+      {:aria-labelledby "fr-btn-menu-mobile"}
       [:div.fr-container
        [:button.fr-link--close.fr-link
-        {:aria-controls "header-navigation"} (i/i lang [:close])]
-       [:div.fr-header__menu-links]
-       [:nav.fr-nav {:role "navigation" :aria-label "Principal"}
+        {:aria-controls "modal-833"} (i/i lang [:close])]
+       [:div.fr-header__menu-links {:style {:display "none"}}]
+       [:nav#navigation-832.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
-            :title        (i/i lang [:back-to-homepage])
-            :href         "#"}
+            :on-click     #(rfe/push-state :home)}
            (i/i lang [:home])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
-            :title        (i/i lang [:orgas-or-groups])
             :href         "#/groups"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
@@ -1172,7 +1192,7 @@
      [:div.fr-col-12.fr-col-md-8
       [:div.fr-follow__newsletter
        [:div
-        [:h5.fr-h5.fr-follow__title (i/i lang [:bluehats])]
+        [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
         [:p.fr-text--sm.fr-follow__desc (i/i lang [:bluehats-desc])]
         [:a
          {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
@@ -1182,16 +1202,53 @@
        [:p.fr-h5.fr-mb-3v (i/i lang [:follow])]
        [:ul.fr-links-group.fr-links-group--lg
         [:li [:a.fr-link.fr-link--twitter
-              {:href   "https://twitter.com/codegouvfr"
-               :target "_blank"}
-              "twitter"]]]]]]]])
+              {:href       "https://twitter.com/codegouvfr"
+               :aria-label (i/i lang [:twitter-follow])
+               :title      (new-tab (i/i lang [:twitter-follow]) lang)
+               :target     "_blank"}
+              "Twitter"]]]]]]]])
+
+(defn display-parameters-modal [lang]
+  [:dialog#fr-theme-modal.fr-modal
+   {:role "dialog" :aria-labelledby "fr-theme-modal-title"}
+   [:div.fr-container.fr-container--fluid.fr-container-md
+    [:div.fr-grid-row.fr-grid-row--center
+     [:div.fr-col-12.fr-col-md-6.fr-col-lg-4
+      [:div.fr-modal__body
+       [:div.fr-modal__header
+        [:button.fr-link--close.fr-link {:aria-controls "fr-theme-modal"}
+         (i/i lang [:modal-close])]]
+       [:div.fr-modal__content
+        [:h1#fr-theme-modal-title.fr-modal__title
+         (i/i lang [:modal-title])]
+        [:div#fr-display.fr-form-group.fr-display
+         [:fieldset.fr-fieldset
+          [:legend#-legend.fr-fieldset__legend.fr-text--regular
+           (i/i lang [:modal-select-theme])]
+          [:div.fr-fieldset__content
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-light
+             {:type "radio" :name "fr-radios-theme" :value "light"}]
+            [:label.fr-label {:for "fr-radios-theme-light"}
+             (i/i lang [:modal-theme-light])]]
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-dark
+             {:type "radio" :name "fr-radios-theme" :value "dark"}]
+            [:label.fr-label {:for "fr-radios-theme-dark"}
+             (i/i lang [:modal-theme-dark])]]
+           [:div.fr-radio-group
+            [:input#fr-radios-theme-system
+             {:type "radio" :name "fr-radios-theme" :value "system"}]
+            [:label.fr-label {:for "fr-radios-theme-system"}
+             (i/i lang [:modal-theme-system])]]]]]]]]]]])
 
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
    [:div.fr-container
     [:div.fr-footer__body
      [:div.fr-footer__brand.fr-enlarge-link
-      [:a.fr-link {:href "/" :title (i/i lang [:back-to-homepage])}
+      [:a {:on-click #(rfe/push-state :home)
+           :title    (i/i lang [:home])}
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
       [:p.fr-footer__content-desc (i/i lang [:footer-desc])
@@ -1214,7 +1271,8 @@
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:on-click #(re-frame/dispatch
+        {:lang     (if (= lang "fr") "en" "fr")
+         :on-click #(re-frame/dispatch
                      [:lang! (if (= lang "fr") "en" "fr")])}
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
@@ -1231,14 +1289,19 @@
         (i/i lang [:personal-data])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
+        {:href "#/sitemap"}
+        (i/i lang [:sitemap])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
         {:href "/data/latest.xml" :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
-         :title          (i/i lang [::choose-theme])
+         :title          (str (i/i lang [:modal-title]) " - "
+                              (i/i lang [:new-modal]))
          :data-fr-opened false}
-        (i/i lang [:choose-theme])]]]]]])
+        (i/i lang [:modal-title])]]]]]])
 
 ;; Pages from md
 
@@ -1257,6 +1320,14 @@
        "fr" (inline-resource "public/md/about.fr.md")
        (inline-resource "public/md/about.en.md")))]])
 
+(defn sitemap-page [lang]
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/sitemap.fr.md")
+       (inline-resource "public/md/sitemap.en.md")))]])
+
 ;; #00AC8C
 ;; #FF8D7E
 ;; #FDCF41
@@ -1268,24 +1339,33 @@
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/repos"} (i/i lang [:Repos])]]
+        [:a.fr-card__link
+         {:href  "#/repos"
+          :title (i/i lang [:repos-of-source-code])}
+         (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/keyboard.jpg"}]]]]
+       [:img.fr-responsive-img {:src "/img/keyboard.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/deps"} (i/i lang [:Deps])]]
+        [:a.fr-card__link
+         {:href  "#/deps"
+          :title (i/i lang [:deps-stats])}
+         (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/rocks.jpg"}]]]]]
+       [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/stats"} (i/i lang [:Stats])]]
+        [:a.fr-card__link
+         {:href  "#/stats"
+          :title (i/i lang [:stats-expand])}
+         (i/i lang [:Stats])]]
        [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
@@ -1307,27 +1387,31 @@
         view @(re-frame/subscribe [:view?])]
     [:div
      (banner lang)
-     [:div.fr-container.fr-container--fluid.fr-mb-3w
+     [:main#main.fr-container.fr-container--fluid.fr-mb-3w
+      {:role "main"}
       [main-menu q lang view]
       (condp = view
         ;; Default page
-        :home  [home-page lang]
+        :home    [home-page lang]
         ;; Table to display organizations
-        :orgas [orgas-page lang]
+        :orgas   [orgas-page lang]
         ;; Table to display repositories
-        :repos [repos-page-class lang license language platform]
+        :repos   [repos-page-class lang license language platform]
         ;; Table to display statistics
-        :stats [stats-page-class lang]
+        :stats   [stats-page-class lang]
         ;; Table to display all dependencies
-        :deps  [deps-page-class lang]
+        :deps    [deps-page-class lang]
         ;; Page for legal mentions
-        :legal [legal-page lang]
+        :legal   [legal-page lang]
         ;; About page
-        :about [about-page lang]
+        :about   [about-page lang]
+        ;; Sitemap
+        :sitemap [sitemap-page lang]
         ;; Fall back on the organizations page
         [error-page lang])]
      (subscribe lang)
-     (footer lang)]))
+     (footer lang)
+     (display-parameters-modal lang)]))
 
 (defn main-class []
   (let [q        (reagent/atom nil)
@@ -1376,6 +1460,7 @@
    ["deps" :deps]
    ["legal" :legal]
    ["about" :about]
+   ["sitemap" :sitemap]
    ["error" :error]])
 
 (defn ^:export init []
