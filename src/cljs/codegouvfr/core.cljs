@@ -1106,7 +1106,7 @@
              :title          "menu"}
             "Menu"]]]
          [:div.fr-header__service
-          [:a {:href "/" :title (i/i lang [:index-title])}
+          [:a {:href "/"}
            [:p.fr-header__service-title (i/i lang [:index-title])]]
           [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]
         [:div.fr-header__tools
