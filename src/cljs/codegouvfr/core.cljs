@@ -1143,13 +1143,11 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/") "page")
-            :title        (i/i lang [:back-to-homepage])
-            :href         "#"}
+            :on-click     #(rfe/push-state :home)}
            (i/i lang [:home])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
-            :title        (i/i lang [:orgas-or-groups])
             :href         "#/groups"}
            (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
@@ -1203,7 +1201,8 @@
    [:div.fr-container
     [:div.fr-footer__body
      [:div.fr-footer__brand.fr-enlarge-link
-      [:a.fr-link {:href "/" :title (i/i lang [:back-to-homepage])}
+      [:a {:on-click #(rfe/push-state :home)
+           :title    (i/i lang [:home])}
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
       [:p.fr-footer__content-desc (i/i lang [:footer-desc])
