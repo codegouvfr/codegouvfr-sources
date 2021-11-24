@@ -1294,7 +1294,8 @@
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
-         :title          (i/i lang [:modal-title])
+         :title          (str (i/i lang [:modal-title]) " - "
+                              (i/i lang [:new-modal]))
          :data-fr-opened false}
         (i/i lang [:modal-title])]]]]]])
 
