@@ -8,6 +8,7 @@
             [reagent.core :as reagent]
             [reagent.dom]
             [cljs-bean.core :refer [bean]]
+            [clojure.browser.dom :as dom]
             [goog.string :as gstring]
             [ajax.core :refer [GET]]
             [codegouvfr.i18n :as i]
@@ -272,6 +273,9 @@
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
+   (dom/set-properties
+    (dom/get-element "html")
+    {"lang" lang})
    (assoc db :lang lang)))
 
 (re-frame/reg-event-db
@@ -1294,7 +1298,8 @@
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
-         :title          (i/i lang [:modal-title])
+         :title          (str (i/i lang [:modal-title]) " - "
+                              (i/i lang [:new-modal]))
          :data-fr-opened false}
         (i/i lang [:modal-title])]]]]]])
 
