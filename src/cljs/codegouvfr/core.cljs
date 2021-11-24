@@ -713,6 +713,7 @@
 
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input {:type      "checkbox" :id "3" :name "3"
+                :title     (i/i lang [:only-her-title])
                 :on-change #(let [v (.-checked (.-target %))]
                               (set-item! :is-esr v)
                               (re-frame/dispatch [:filter! {:is-esr v}]))}]
