@@ -167,6 +167,15 @@
                         :href  (str "#/repos?" param "=" k)} k] v})))
             top))))
 
+;; https://gist.github.com/rotaliator/73daca2dc93c586122a0da57189ece13
+(defn copy-to-clipboard [val]
+  (let [el (js/document.createElement "textarea")]
+    (set! (.-value el) val)
+    (.appendChild js/document.body el)
+    (.select el)
+    (js/document.execCommand "copy")
+    (.removeChild js/document.body el)))
+
 ;; Filters
 
 (defn apply-repos-filters [m]
@@ -599,11 +608,13 @@
                      [:a.fr-link
                       {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
                        :title  (new-tab (i/i lang [:swh-link]) lang)
+                       :rel    "noreferrer noopener"
                        :target "_blank"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:a {:href   r
                           :target "_blank"
+                          :rel    "noreferrer noopener"
                           :title  (new-tab
                                    (str
                                     (i/i lang [:go-to-repo])
@@ -638,6 +649,7 @@
                     {:style {:text-align "center"}}
                     [:a.fr-link
                      {:title  (new-tab (i/i lang [:reuses-expand]) lang)
+                      :rel    "noreferrer noopener"
                       :target "_blank"
                       :href   (str r "/network/dependents")}
                      g]]])))]])))
@@ -790,11 +802,13 @@
                         [:a.fr-link
                          {:title  (new-tab (i/i lang [:go-to-website]) lang)
                           :target "_blank"
+                          :rel    "noreferrer noopener"
                           :href   w}
                          [:img {:src au :width "100%" :alt ""}]])
                       [:img {:src au :width "100%" :alt ""}])]
                    [:td
                     [:a {:target "_blank"
+                         :rel    "noreferrer noopener"
                          :title  (new-tab (i/i lang [:go-to-orga]) lang)
                          :href   o} (or n l)]]
                    [:td d]
@@ -881,6 +895,7 @@
             [:td
              [:a {:href   l
                   :target "_blank"
+                  :rel    "noreferrer noopener"
                   :title  (new-tab (i/i lang [:more-info]) lang)} n]]
             [:td t]
             [:td d]
@@ -908,6 +923,7 @@
        [:tr
         [:td [:a {:href   l
                   :target "_blank"
+                  :rel    "noreferrer noopener"
                   :title  (new-tab (i/i lang [:more-info]) lang)} n]]
         [:td t]
         [:td d]
@@ -1125,22 +1141,7 @@
          [:div.fr-header__service
           [:a {:href "/"} ;; FIXME
            [:p.fr-header__service-title (i/i lang [:index-title])]]
-          [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]
-        [:div.fr-header__tools
-         [:div.fr-header__tools-links
-          [:ul.fr-links-group   
-           [:li
-            [:a.fr-link.fr-fi-mail-line
-             {:href  "mailto:logiciels-libres@data.gouv.fr"
-              :title (i/i lang [:contact-title])}
-             (i/i lang [:contact])]]
-           [:li
-            [:a.fr-link.fr-fi-mail-line.fr-share__link--twitter
-             {:href       "https://twitter.com/codegouvfr"
-              :aria-label (i/i lang [:twitter-follow])
-              :title      (new-tab (i/i lang [:twitter-follow]) lang)
-              :target     "_blank"}
-             "@codegouvfr"]]]]]]]]
+          [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]]]]
 
      ;; Header menu
      [:div#modal-833.fr-header__menu.fr-modal
@@ -1148,7 +1149,7 @@
       [:div.fr-container
        [:button.fr-link--close.fr-link
         {:aria-controls "modal-833"} (i/i lang [:close])]
-       [:div.fr-header__menu-links {:style {:display "none"}}]
+       [:div.fr-header__menu-links]
        [:nav#navigation-832.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
          [:li.fr-nav__item
@@ -1189,22 +1190,48 @@
   [:div.fr-follow
    [:div.fr-container
     [:div.fr-grid-row
-     [:div.fr-col-12.fr-col-md-8
+     [:div.fr-col-12.fr-col-md-4
+      ;; Contact by email
+      [:div.fr-follow__special
+       [:div
+        [:h1.fr-h5.fr-follow__title
+         (i/i lang [:contact])
+         " "
+         [:button.fr-share__link.fr-share__link--copy.fr-text-sm
+          {:type     "button"
+           :on-click #(do (.stopPropagation %)
+                          (copy-to-clipboard "logiciels-libres@data.gouv.fr"))
+           :title    (i/i lang [:copy-to-clipboard])}]]
+        [:p.fr-text--sm.fr-follow__desc (i/i lang [:contact-title])]
+        [:a {:href "mailto:logiciels-libres@data.gouv.fr"}
+         [:button.fr-btn {:type "button"} "logiciels-libres@data.gouv.fr"]]]]]
+     ;; Subscribe to he newsletter
+     [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
-        [:p.fr-text--sm.fr-follow__desc (i/i lang [:bluehats-desc])]
+        [:p.fr-text--sm.fr-follow__desc
+         (i/i lang [:bluehats-desc])]
         [:a
          {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
          [:button.fr-btn {:type "button"} (i/i lang [:subscribe])]]]]]
-     [:div.fr-col-12.fr-col-md-4
+     ;; Follow elsewhere
+     [:div.fr-col-12.fr-col-md-3
       [:div.fr-follow__social
-       [:p.fr-h5.fr-mb-3v (i/i lang [:follow])]
+       [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:ul.fr-links-group.fr-links-group--lg
-        [:li [:a.fr-link.fr-link--twitter
+        [:li [:a.fr-share__link
+              {:href       "https://sr.ht/~etalab/"
+               :aria-label (i/i lang [:sourcehut-link])
+               :title      (new-tab (i/i lang [:sourcehut-link]) lang)
+               :rel        "noreferrer noopener"
+               :target     "_blank"}
+              "SourceHut"]]
+        [:li [:a.fr-share__link
               {:href       "https://twitter.com/codegouvfr"
                :aria-label (i/i lang [:twitter-follow])
                :title      (new-tab (i/i lang [:twitter-follow]) lang)
+               :rel        "noreferrer noopener"
                :target     "_blank"}
               "Twitter"]]]]]]]])
 
