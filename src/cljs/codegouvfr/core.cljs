@@ -1186,7 +1186,7 @@
         [:li [:a.fr-link.fr-link--twitter
               {:href   "https://twitter.com/codegouvfr"
                :target "_blank"}
-              "twitter"]]]]]]]])
+              "Twitter"]]]]]]]])
 
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
