@@ -1246,6 +1246,10 @@
         (i/i lang [:personal-data])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
+        {:href "#/sitemap"}
+        (i/i lang [:sitemap])]]
+      [:li.fr-footer__bottom-item
+       [:a.fr-footer__bottom-link
         {:href "/data/latest.xml" :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
@@ -1271,6 +1275,14 @@
      (condp = lang
        "fr" (inline-resource "public/md/about.fr.md")
        (inline-resource "public/md/about.en.md")))]])
+
+(defn sitemap-page [lang]
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/sitemap.fr.md")
+       (inline-resource "public/md/sitemap.en.md")))]])
 
 ;; #00AC8C
 ;; #FF8D7E
@@ -1336,19 +1348,21 @@
       [main-menu q lang view]
       (condp = view
         ;; Default page
-        :home  [home-page lang]
+        :home    [home-page lang]
         ;; Table to display organizations
-        :orgas [orgas-page lang]
+        :orgas   [orgas-page lang]
         ;; Table to display repositories
-        :repos [repos-page-class lang license language platform]
+        :repos   [repos-page-class lang license language platform]
         ;; Table to display statistics
-        :stats [stats-page-class lang]
+        :stats   [stats-page-class lang]
         ;; Table to display all dependencies
-        :deps  [deps-page-class lang]
+        :deps    [deps-page-class lang]
         ;; Page for legal mentions
-        :legal [legal-page lang]
+        :legal   [legal-page lang]
         ;; About page
-        :about [about-page lang]
+        :about   [about-page lang]
+        ;; Sitemap
+        :sitemap [sitemap-page lang]
         ;; Fall back on the organizations page
         [error-page lang])]
      (subscribe lang)
@@ -1401,6 +1415,7 @@
    ["deps" :deps]
    ["legal" :legal]
    ["about" :about]
+   ["sitemap" :sitemap]
    ["error" :error]])
 
 (defn ^:export init []
