@@ -1217,23 +1217,23 @@
          [:button.fr-btn {:type "button"} (i/i lang [:subscribe])]]]]]
      ;; Follow elsewhere
      [:div.fr-col-12.fr-col-md-3
-      [:div.fr-follow__social
+      [:div.fr-share
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
-       [:ul.fr-links-group.fr-links-group--lg
-        [:li [:a.fr-share__link
+       [:div.fr-share__group
+        [:a.fr-share__link
               {:href       "https://sr.ht/~etalab/"
                :aria-label (i/i lang [:sourcehut-link])
                :title      (new-tab (i/i lang [:sourcehut-link]) lang)
                :rel        "noreferrer noopener"
                :target     "_blank"}
-              "SourceHut"]]
-        [:li [:a.fr-share__link
+              "SourceHut"]
+        [:a.fr-share__link
               {:href       "https://twitter.com/codegouvfr"
                :aria-label (i/i lang [:twitter-follow])
                :title      (new-tab (i/i lang [:twitter-follow]) lang)
                :rel        "noreferrer noopener"
                :target     "_blank"}
-              "Twitter"]]]]]]]])
+              "Twitter"]]]]]]])
 
 (defn display-parameters-modal [lang]
   [:dialog#fr-theme-modal.fr-modal
