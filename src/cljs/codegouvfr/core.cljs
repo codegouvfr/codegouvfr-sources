@@ -1194,16 +1194,10 @@
       ;; Contact by email
       [:div.fr-follow__special
        [:div
-        [:h1.fr-h5.fr-follow__title
-         (i/i lang [:contact])
-         " "
-         [:button.fr-share__link.fr-share__link--copy.fr-text-sm
-          {:type     "button"
-           :on-click #(do (.stopPropagation %)
-                          (copy-to-clipboard "logiciels-libres@data.gouv.fr"))
-           :title    (i/i lang [:copy-to-clipboard])}]]
-        [:p.fr-text--sm.fr-follow__desc (i/i lang [:contact-title])]
-        [:a {:href "mailto:logiciels-libres@data.gouv.fr"}
+        [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
+        [:p.fr-text--sm.fr-follow__desc (to-hiccup (i/i lang [:contact-title]))]
+        [:a {:on-click #(do (.stopPropagation %)
+                            (copy-to-clipboard "logiciels-libres@data.gouv.fr"))}
          [:button.fr-btn {:type "button"} "logiciels-libres@data.gouv.fr"]]]]]
      ;; Subscribe to he newsletter
      [:div.fr-col-12.fr-col-md-5
@@ -1221,19 +1215,19 @@
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:div.fr-share__group
         [:a.fr-share__link
-              {:href       "https://sr.ht/~etalab/"
-               :aria-label (i/i lang [:sourcehut-link])
-               :title      (new-tab (i/i lang [:sourcehut-link]) lang)
-               :rel        "noreferrer noopener"
-               :target     "_blank"}
-              "SourceHut"]
+         {:href       "https://sr.ht/~etalab/"
+          :aria-label (i/i lang [:sourcehut-link])
+          :title      (new-tab (i/i lang [:sourcehut-link]) lang)
+          :rel        "noreferrer noopener"
+          :target     "_blank"}
+         "SourceHut"]
         [:a.fr-share__link
-              {:href       "https://twitter.com/codegouvfr"
-               :aria-label (i/i lang [:twitter-follow])
-               :title      (new-tab (i/i lang [:twitter-follow]) lang)
-               :rel        "noreferrer noopener"
-               :target     "_blank"}
-              "Twitter"]]]]]]])
+         {:href       "https://twitter.com/codegouvfr"
+          :aria-label (i/i lang [:twitter-follow])
+          :title      (new-tab (i/i lang [:twitter-follow]) lang)
+          :rel        "noreferrer noopener"
+          :target     "_blank"}
+         "Twitter"]]]]]]])
 
 (defn display-parameters-modal [lang]
   [:dialog#fr-theme-modal.fr-modal
