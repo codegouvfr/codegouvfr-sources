@@ -167,15 +167,6 @@
                         :href  (str "#/repos?" param "=" k)} k] v})))
             top))))
 
-;; https://gist.github.com/rotaliator/73daca2dc93c586122a0da57189ece13
-(defn copy-to-clipboard [val]
-  (let [el (js/document.createElement "textarea")]
-    (set! (.-value el) val)
-    (.appendChild js/document.body el)
-    (.select el)
-    (js/document.execCommand "copy")
-    (.removeChild js/document.body el)))
-
 ;; Filters
 
 (defn apply-repos-filters [m]
@@ -1195,10 +1186,7 @@
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
-        [:p.fr-text--sm.fr-follow__desc (to-hiccup (i/i lang [:contact-title]))]
-        [:a {:on-click #(do (.stopPropagation %)
-                            (copy-to-clipboard "logiciels-libres@data.gouv.fr"))}
-         [:button.fr-btn {:type "button"} "logiciels-libres@data.gouv.fr"]]]]]
+        [:p.fr-text--sm.fr-follow__desc (to-hiccup (i/i lang [:contact-title]))]]]]
      ;; Subscribe to he newsletter
      [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
