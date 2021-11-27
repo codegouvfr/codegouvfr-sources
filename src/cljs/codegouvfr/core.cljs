@@ -530,8 +530,9 @@
 
      [:li
       [:button.fr-pagination__link.fr
-       {:disabled true} (str (inc current-page) "/"
-                             (if (> total-pages 0) total-pages 1))]]
+       {:disabled true}
+       (str (inc current-page) "/"
+            (if (> total-pages 0) total-pages 1))]]
 
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
@@ -550,8 +551,9 @@
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
           repos      @(re-frame/subscribe [:repos?])]
-      [:div.fr-grid-row
-       [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
+      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+       [:table
+        [:caption (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col
@@ -755,8 +757,9 @@
     [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]]
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
           orgas @(re-frame/subscribe [:orgas?])]
-      [:div.fr-grid-row
-       [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
+      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+       [:table
+        [:caption (i/i lang [:orgas-or-groups])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Image"]
@@ -847,8 +850,9 @@
 (defn deps-table [lang deps repo orga]
   (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
         deps-page @(re-frame/subscribe [:deps-page?])]
-    [:div.fr-grid-row
-     [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col
+    [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+     [:table
+      [:caption (i/i lang [:deps])]
       [:thead.fr-grid.fr-col-12
        [:tr
         [:th.fr-col-3
@@ -899,29 +903,30 @@
                   (count r)
                   (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
 
-(defn stats-deps-table [heading deps lang]
-  [:div.fr-m-3w
-   [:h4.fr-h4 heading]
-   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
-    [:thead [:tr
-             [:th (i/i lang [:name])]
-             [:th (i/i lang [:type])]
-             [:th (i/i lang [:description])]
-             [:th (i/i lang [:Repos])]]]
-    [:tbody
-     (for [{:keys [n t d l r] :as o} deps]
-       ^{:key o}
-       [:tr
-        [:td [:a {:href   l
-                  :target "_blank"
-                  :rel    "noreferrer noopener"
-                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
-        [:td t]
-        [:td d]
-        [:td
-         [:a {:title (i/i lang [:list-repos-depending-on-dep])
-              :href  (rfe/href :repos {:lang lang} {:d n})}
-          (count r)]]])]]])
+;; (defn stats-deps-table [heading deps lang]
+;;   [:div.fr-m-3w
+;;    [:h4.fr-h4 heading]
+;;    [:div.fr-table
+;;     [:table.fr-col-12
+;;      [:thead [:tr
+;;               [:th (i/i lang [:name])]
+;;               [:th (i/i lang [:type])]
+;;               [:th (i/i lang [:description])]
+;;               [:th (i/i lang [:Repos])]]]
+;;      [:tbody
+;;       (for [{:keys [n t d l r] :as o} deps]
+;;         ^{:key o}
+;;         [:tr
+;;          [:td [:a {:href   l
+;;                    :target "_blank"
+;;                    :rel    "noreferrer noopener"
+;;                    :title  (new-tab (i/i lang [:more-info]) lang)} n]]
+;;          [:td t]
+;;          [:td d]
+;;          [:td
+;;           [:a {:title (i/i lang [:list-repos-depending-on-dep])
+;;                :href  (rfe/href :repos {:lang lang} {:d n})}
+;;            (count r)]]])]]]])
 
 (defn deps-page [lang repos-sim]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
@@ -982,12 +987,13 @@
 (defn stats-table [heading data & [thead]]
   [:div.fr-m-3w
    [:h4.fr-h4 heading]
-   [:table.fr-table.fr-table--bordered.fr-table--layout-fixed.fr-col-12
-    thead
-    [:tbody
-     (for [o (reverse (walk/stringify-keys (sort-by val data)))]
-       ^{:key (key o)}
-       [:tr [:td (key o)] [:td (val o)]])]]])
+   [:div.fr-table.fr-table--layout-fixed
+    [:table
+     thead
+     [:tbody
+      (for [o (reverse (walk/stringify-keys (sort-by val data)))]
+        ^{:key (key o)}
+        [:tr [:td (key o)] [:td (val o)]])]]]])
 
 (defn stats-tile [l i s]
   [:div.fr-tile.fr-col-2.fr-m-1w
@@ -1055,6 +1061,8 @@
                      (i/i lang [:stars])]
                     top_orgs_by_stars
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
+
+     
 
      ;; FIXME: the source data are wrong
      ;; [:div.fr-grid-row.fr-grid-row--center
