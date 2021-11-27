@@ -1235,21 +1235,27 @@
           [:legend#-legend.fr-fieldset__legend.fr-text--regular
            (i/i lang [:modal-select-theme])]
           [:div.fr-fieldset__content
-           [:div.fr-radio-group
+           [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-light
              {:type "radio" :name "fr-radios-theme" :value "light"}]
             [:label.fr-label {:for "fr-radios-theme-light"}
-             (i/i lang [:modal-theme-light])]]
-           [:div.fr-radio-group
+             (i/i lang [:modal-theme-light])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "/img/artwork/light.svg"}]]]
+           [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-dark
              {:type "radio" :name "fr-radios-theme" :value "dark"}]
             [:label.fr-label {:for "fr-radios-theme-dark"}
-             (i/i lang [:modal-theme-dark])]]
-           [:div.fr-radio-group
+             (i/i lang [:modal-theme-dark])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "/img/artwork/dark.svg"}]]]
+           [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-system
              {:type "radio" :name "fr-radios-theme" :value "system"}]
             [:label.fr-label {:for "fr-radios-theme-system"}
-             (i/i lang [:modal-theme-system])]]]]]]]]]]])
+             (i/i lang [:modal-theme-system])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "/img/artwork/system.svg"}]]]]]]]]]]]])
 
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
@@ -1345,7 +1351,7 @@
   [:div.fr-grid
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
@@ -1356,7 +1362,7 @@
       [:div.fr-card__img
        [:img.fr-responsive-img {:src "/img/keyboard.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
@@ -1368,7 +1374,7 @@
        [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
+     [:div.fr-card.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
@@ -1377,7 +1383,7 @@
          (i/i lang [:Stats])]]
        [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
+     [:div.fr-card.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
