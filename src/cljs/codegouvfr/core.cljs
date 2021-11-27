@@ -1382,7 +1382,7 @@
        [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
    [:div.fr-grid-row.fr-grid-row--center
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link.fr-card--neutral
+     [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
@@ -1391,7 +1391,7 @@
          (i/i lang [:Stats])]]
        [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link.fr-card--neutral
+     [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
