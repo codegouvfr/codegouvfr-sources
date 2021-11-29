@@ -1100,6 +1100,7 @@
      (when (or (= view :repos) (= view :orgas) (= view :deps))
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
+         :aria-label  (i/i lang [:free-search])
          :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
          :on-change   (fn [e]
                         (let [ev (.-value (.-target e))]
@@ -1194,7 +1195,8 @@
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
-        [:p.fr-text--sm.fr-follow__desc (to-hiccup (i/i lang [:contact-title]))]]]]
+        [:div.fr-text--sm.fr-follow__desc
+         (to-hiccup (i/i lang [:contact-title]))]]]]
      ;; Subscribe to he newsletter
      [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
@@ -1202,9 +1204,9 @@
         [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
         [:p.fr-text--sm.fr-follow__desc
          (i/i lang [:bluehats-desc])]
-        [:a
-         {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
-         [:button.fr-btn {:type "button"} (i/i lang [:subscribe])]]]]]
+        [:a.fr-btn
+         {:type "button"
+          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"} (i/i lang [:subscribe])]]]]
      ;; Follow elsewhere
      [:div.fr-col-12.fr-col-md-3
       [:div.fr-share
@@ -1293,7 +1295,7 @@
     [:div.fr-footer__bottom
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
-       [:a.fr-footer__bottom-link
+       [:button.fr-footer__bottom-link
         {:lang     (if (= lang "fr") "en" "fr")
          :on-click #(re-frame/dispatch
                      [:lang! (if (= lang "fr") "en" "fr")])}
