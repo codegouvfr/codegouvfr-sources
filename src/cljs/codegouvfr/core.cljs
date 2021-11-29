@@ -1295,7 +1295,7 @@
     [:div.fr-footer__bottom
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
-       [:a.fr-footer__bottom-link
+       [:button.fr-footer__bottom-link
         {:lang     (if (= lang "fr") "en" "fr")
          :on-click #(re-frame/dispatch
                      [:lang! (if (= lang "fr") "en" "fr")])}
