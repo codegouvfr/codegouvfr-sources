@@ -1194,7 +1194,8 @@
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
-        [:p.fr-text--sm.fr-follow__desc (to-hiccup (i/i lang [:contact-title]))]]]]
+        [:div.fr-text--sm.fr-follow__desc
+         (to-hiccup (i/i lang [:contact-title]))]]]]
      ;; Subscribe to he newsletter
      [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
