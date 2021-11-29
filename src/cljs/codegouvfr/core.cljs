@@ -1204,9 +1204,9 @@
         [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
         [:p.fr-text--sm.fr-follow__desc
          (i/i lang [:bluehats-desc])]
-        [:a
-         {:href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
-         [:button.fr-btn {:type "button"} (i/i lang [:subscribe])]]]]]
+        [:a.fr-btn
+         {:type "button"
+          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"} (i/i lang [:subscribe])]]]]
      ;; Follow elsewhere
      [:div.fr-col-12.fr-col-md-3
       [:div.fr-share
