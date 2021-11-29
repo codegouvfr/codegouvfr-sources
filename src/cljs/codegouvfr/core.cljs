@@ -1100,6 +1100,7 @@
      (when (or (= view :repos) (= view :orgas) (= view :deps))
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
+         :aria-label  (i/i lang [:free-search])
          :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
          :on-change   (fn [e]
                         (let [ev (.-value (.-target e))]
