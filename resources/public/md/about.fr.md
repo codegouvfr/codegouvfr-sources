@@ -9,7 +9,7 @@ Tout code source obtenu ou développé par un organisme remplissant une
 mission de service public est considéré comme un document
 administratif, relevant des obligations de publication en open data.
 
-De nombreux organismes publient déjà des codes sources : nous les
+De nombreux organismes publient déjà des codes sources : nous les
 présentons sur ce site de façon à faciliter leur découverte et à
 encourager les administrations à les réutiliser ou à y contribuer.
 
@@ -36,5 +36,5 @@ Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/l
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
-Nous ne référençons pour l'instant que les comptes de github.com, gitlab.com et des instances GitLab locales : si vous pouvez aider à référencer des comptes qui publient sur d'autres forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), instances [Gogs](https://gogs.io) ou [Gitea](https://gitea.io), etc.), n'hésitez pas à [contribuer](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
+Nous ne référençons pour l'instant que les comptes de github.com, gitlab.com et des instances GitLab locales : si vous pouvez aider à référencer des comptes qui publient sur d'autres forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), instances [Gogs](https://gogs.io) ou [Gitea](https://gitea.io), etc.), n'hésitez pas à [contribuer](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
 
