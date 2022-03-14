@@ -1062,8 +1062,6 @@
                     top_orgs_by_stars
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
 
-     
-
      ;; FIXME: the source data are wrong
      ;; [:div.fr-grid-row.fr-grid-row--center
      ;;  [:div.fr-col-12
@@ -1219,6 +1217,13 @@
           :rel        "noreferrer noopener"
           :target     "_blank"}
          "SourceHut"]
+        [:a.fr-share__link
+         {:href       "https://mastodon.social/@codegouvfr"
+          :aria-label (i/i lang [:mastodon-follow])
+          :title      (new-tab (i/i lang [:mastodon-follow]) lang)
+          :rel        "noreferrer noopener"
+          :target     "_blank"}
+         "Mastodon"]
         [:a.fr-share__link
          {:href       "https://twitter.com/codegouvfr"
           :aria-label (i/i lang [:twitter-follow])
