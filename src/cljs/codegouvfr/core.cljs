@@ -1307,7 +1307,7 @@
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "#/legal"}
+        {:href "#/a11y"}
         (i/i lang [:accessibility])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
@@ -1341,6 +1341,15 @@
     (condp = lang
       "fr" (inline-resource "public/md/legal.fr.md")
       (inline-resource "public/md/legal.en.md")))])
+
+(defn a11y-page [lang]
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/a11y.fr.md")
+       ;; FIXME: No english version yet
+       (inline-resource "public/md/a11y.fr.md")))]])
 
 (defn about-page [lang]
   [:div.fr-container.fr-grid.fr-grid--row
@@ -1433,6 +1442,8 @@
         :deps    [deps-page-class lang]
         ;; Page for legal mentions
         :legal   [legal-page lang]
+        ;; Page for accessibility mentions
+        :a11y    [a11y-page lang]
         ;; About page
         :about   [about-page lang]
         ;; Sitemap
@@ -1489,6 +1500,7 @@
    ["stats" :stats]
    ["deps" :deps]
    ["legal" :legal]
+   ["a11y" :a11y]
    ["about" :about]
    ["sitemap" :sitemap]
    ["error" :error]])
