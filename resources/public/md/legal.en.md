@@ -14,7 +14,7 @@ The director of the interministerial directorate of digital affairs.
 
 ## Hosting
 
-The website is hosted by OVH France, 2 rue Kellermann - 59100 Roubaix - France.
+The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Phone number: +33 09 72 10 10 07
 
 ## Credits
 
