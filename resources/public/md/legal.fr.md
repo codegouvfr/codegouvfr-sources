@@ -29,10 +29,6 @@ Ce site est hébergé par OVH France, 2 rue Kellermann, 59100 Roubaix, France.  
 
 Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~etalab/code.gouv.fr).
 
-## Accessibilité
-
-Le site est accessible à 75%.
-
 ## Données personnelles et cookies
 
 Aucune donnée personnelle n'est collectée et le site n'utilise pas de cookie.

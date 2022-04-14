@@ -27,10 +27,6 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 
 The [source code of this website is published on SourceHut](https://git.sr.ht/~etalab/code.gouv.fr).
 
-## Accessibility
-
-The website is at least 75% conformm of the accessibility norm.
-
 ## Personal data and cookies
 
 The website does not collect any personal data nor uses cookies.
