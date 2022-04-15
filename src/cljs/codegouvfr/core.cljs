@@ -179,7 +179,7 @@
         pl       (:platform f)
         lic      (:license f)
         e        (:is-esr f)
-        fk       (:is-not-fork f)
+        fk       (:is-fork f)
         li       (:is-licensed f)]
     (filter
      #(and (if dp (contains?
@@ -189,7 +189,7 @@
                               deps-raw)))
                    (:r %)) true)
            (if e (:e %) true)
-           (if fk (not (:f? %)) true)
+           (if fk (:f? %) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
            (if la
@@ -715,12 +715,12 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#1 {:type      "checkbox" :name "1"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-not-fork v)
-                                (re-frame/dispatch [:filter! {:is-not-fork v}]))}]
+                                (set-item! :is-fork v)
+                                (re-frame/dispatch [:filter! {:is-fork v}]))}]
        [:label.fr-label
         {:for   "1"
-         :title (i/i lang [:only-not-fork-title])}
-        (i/i lang [:only-not-fork])]]
+         :title (i/i lang [:only-fork-title])}
+        (i/i lang [:only-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#2 {:type      "checkbox" :name "2"
                   :on-change #(let [v (.-checked (.-target %))]
