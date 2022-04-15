@@ -1348,8 +1348,7 @@
     (to-hiccup
      (condp = lang
        "fr" (inline-resource "public/md/a11y.fr.md")
-       ;; FIXME: No english version yet
-       (inline-resource "public/md/a11y.fr.md")))]])
+       (inline-resource "public/md/a11y.en.md")))]])
 
 (defn about-page [lang]
   [:div.fr-container.fr-grid.fr-grid--row
