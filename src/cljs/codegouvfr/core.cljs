@@ -1263,8 +1263,9 @@
             "Menu"]]]
          [:div.fr-header__service
           [:a {:href "/"} ;; FIXME
-           [:p.fr-header__service-title (i/i lang [:index-title])]]
-          [:p.fr-header__service-tagline (i/i lang [:index-subtitle])]]]]]]
+           [:div.fr-header__service-title
+            [:img.fr-responsive-img {:src "/img/cgfr.png" :alt ""}]]]
+          [:p.fr-header__service-tagline (i/i lang [:index-title])]]]]]]
      ;; Header menu
      [:div#modal-833.fr-header__menu.fr-modal
       {:aria-labelledby "fr-btn-menu-mobile"}
