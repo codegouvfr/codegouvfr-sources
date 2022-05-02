@@ -1468,11 +1468,12 @@
 ;; Pages from md
 
 (defn legal-page [lang]
-  [:div.fr-container
-   (to-hiccup
-    (condp = lang
-      "fr" (inline-resource "public/md/legal.fr.md")
-      (inline-resource "public/md/legal.en.md")))])
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/legal.fr.md")
+       (inline-resource "public/md/legal.en.md")))]])
 
 (defn a11y-page [lang]
   [:div.fr-container.fr-grid.fr-grid--row
@@ -1497,6 +1498,14 @@
      (condp = lang
        "fr" (inline-resource "public/md/sitemap.fr.md")
        (inline-resource "public/md/sitemap.en.md")))]])
+
+(defn error-page [lang]
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/error.fr.md")
+       (inline-resource "public/md/error.en.md")))]])
 
 ;; #00AC8C
 ;; #FF8D7E
@@ -1544,14 +1553,6 @@
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
        [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
-(defn error-page  [lang]
-  [:div.fr-container.fr-m-3w
-   [:h3.fr-h3 (i/i lang [:sorry])]
-   [:p (i/i lang [:nothing-here])]
-   [:p [:button.fr-btn.fr-btn--secondary
-        {:on-click #(rfe/push-state :home)}
-        (i/i lang [:back-to-homepage])]]])
-
 (defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
@@ -1581,7 +1582,9 @@
         :about   [about-page lang]
         ;; Sitemap
         :sitemap [sitemap-page lang]
-        ;; Fall back on the organizations page
+        ;; Error
+        :error   [error-page lang]
+        ;; Fall back on the error page
         [error-page lang])]
      (subscribe lang)
      (footer lang)
