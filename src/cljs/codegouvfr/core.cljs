@@ -34,6 +34,8 @@
 
 (defonce timeout 100)
 
+(def dp-filter (reagent/atom nil))
+
 (def unix-epoch "1970-01-01T00:00:00Z")
 
 (defonce init-filter
@@ -137,9 +139,6 @@
   (when (and (string? s) (string? sub))
     (s/includes? (s/lower-case s) (s/lower-case sub))))
 
-(defn- get-first-match-s-for-k-in-m [s k m]
-  (reduce #(when (= (k %2) s) (reduced %2)) nil m))
-
 (defn vec-to-csv-string [data]
   (->> data
        ;; FIXME: Take care of escaping quotes?
@@ -174,25 +173,19 @@
 ;; Filters
 
 (defn apply-repos-filters [m]
-  (let [f        @(re-frame/subscribe [:filter?])
-        deps-raw @(re-frame/subscribe [:deps-raw?])
-        dp       (:d f)
-        s        (:q f)
-        g        (:g f)
-        la       (:language f)
-        pl       (:platform f)
-        lic      (:license f)
-        e        (:is-esr f)
-        l        (:is-lib f)
-        fk       (:is-fork f)
-        li       (:is-licensed f)]
+  (let [f   @(re-frame/subscribe [:filter?])
+        dp  (:d f)
+        s   (:q f)
+        g   (:g f)
+        la  (:language f)
+        pl  (:platform f)
+        lic (:license f)
+        e   (:is-esr f)
+        l   (:is-lib f)
+        fk  (:is-fork f)
+        li  (:is-licensed f)]
     (filter
-     #(and (if dp (contains?
-                   (into #{}
-                         (:r (get-first-match-s-for-k-in-m
-                              dp :n
-                              deps-raw)))
-                   (:r %)) true)
+     #(and (if (and dp @dp-filter) (some @dp-filter [(:r %)]) true)
            (if e (:e? %) true)
            (if fk (:f? %) true)
            (if l (:l? %) true)
@@ -504,17 +497,12 @@
 (re-frame/reg-sub
  :deps?
  (fn [db _]
-   (let [orga  (:orga @(re-frame/subscribe [:filter?]))
-         deps0 (:deps db)
+   (let [deps0 (:deps db)
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
                  :name        (reverse (sort-by :n deps0))
                  :type        (reverse (sort-by :t deps0))
                  :description (sort-by :d deps0)
-                 :repos       (sort-by
-                               #(if orga
-                                  (count (filter (fn [a] (re-find (re-pattern orga) a)) (:r %)))
-                                  (count (:r %)))
-                               deps0)
+                 :repos       (sort-by #(count (:r %)) deps0)
                  deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -971,8 +959,7 @@
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
         first-disabled (zero? orgas-pages)
-        last-disabled  (= orgas-pages (dec count-pages))
-        ministries     @(re-frame/subscribe [:ministries?])]
+        last-disabled  (= orgas-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; Download link
@@ -1014,7 +1001,7 @@
 
 ;; Main structure - deps
 
-(defn deps-table [lang deps repo orga]
+(defn deps-table [lang deps repo]
   (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
         deps-page @(re-frame/subscribe [:deps-page?])]
     [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
@@ -1052,7 +1039,12 @@
        (for [dd (take deps-per-page
                       (drop (* deps-per-page deps-page) deps))]
          ^{:key dd}
-         (let [{:keys [t n d l r]} dd]
+         (let [{:keys [t ; type
+                       n ; name
+                       d ; description
+                       l ; link
+                       r ; repositories
+                       ]} dd]
            [:tr
             [:td
              [:a {:href   l
@@ -1063,23 +1055,21 @@
             [:td d]
             (when-not repo
               [:td {:style {:text-align "center"}}
-               [:a {:title (i/i lang [:list-repos-depending-on-dep])
-                    :href  (rfe/href :repos {:lang lang}
-                                     (if orga {:d n :g orga} {:d n}))}
-                (if-not orga
-                  (count r)
-                  (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
+               [:a {:title    (i/i lang [:list-repos-depending-on-dep])
+                    :on-click #(do (reset! dp-filter (into #{} (js->clj r)))
+                                   (rfe/push-state :repos {:lang l} {:d n}))}
+                (count r)]])])))]]))
 
-(defn deps-page [lang repos-sim]
-  (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
-        deps0               @(re-frame/subscribe [:deps?])
-        deps                (if-let [s (or repo orga)]
-                              (filter #(s-includes? (s/join " " (:r %)) s) deps0)
-                              deps0)
-        deps-pages          @(re-frame/subscribe [:deps-page?])
-        count-pages         (count (partition-all deps-per-page deps))
-        first-disabled      (zero? deps-pages)
-        last-disabled       (= deps-pages (dec count-pages))]
+(defn deps-page [lang]
+  (let [{:keys [repo]} @(re-frame/subscribe [:filter?])
+        deps0          @(re-frame/subscribe [:deps?])
+        deps           (if-let [s repo]
+                         (filter #(s-includes? (s/join " " (:r %)) s) deps0)
+                         deps0)
+        deps-pages     @(re-frame/subscribe [:deps-page?])
+        count-pages    (count (partition-all deps-per-page deps))
+        first-disabled (zero? deps-pages)
+        last-disabled  (= deps-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; Download link
@@ -1103,28 +1093,10 @@
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      ;; Main deps display
      (if (pos? (count deps))
-       [deps-table lang deps repo orga]
+       [deps-table lang deps repo]
        [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
      ;; Bottom pagination block
-     [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]
-     ;; Additional informations
-     (when-let [sims (get repos-sim repo)]
-       [:div.fr-grid
-        [:h4.fr-h4 (i/i lang [:Repos-deps-sim])]
-        [:ul
-         (for [s sims]
-           ^{:key s}
-           [:li [:a {:href (rfe/href :deps {:lang lang} {:repo s})} s]])]])]))
-
-(defn deps-page-class [lang]
-  (let [deps-repos-sim (reagent/atom nil)]
-    (reagent/create-class
-     {:display-name   "deps-page-class"
-      :component-did-mount
-      (fn []
-        (GET "/data/deps-repos-sim.json"
-             :handler #(reset! deps-repos-sim %)))
-      :reagent-render (fn [] (deps-page lang @deps-repos-sim))})))
+     [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]))
 
 ;; Main structure - stats
 
@@ -1147,9 +1119,9 @@
      [:p.fr-h4 s]]]])
 
 (defn stats-page
-  [lang stats deps-total]
+  [lang stats]
   (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt
-                avg_repos_cnt median_repos_cnt
+                avg_repos_cnt ;; median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
                 platforms]} stats]
@@ -1206,16 +1178,14 @@
        (stats-table (i/i lang [:distribution-by-platform]) platforms)]]]))
 
 (defn stats-page-class [lang]
-  (let [deps       (reagent/atom nil)
-        stats      (reagent/atom nil)
-        deps-total (reagent/atom nil)]
+  (let [stats (reagent/atom nil)]
     (reagent/create-class
      {:display-name   "stats-page-class"
       :component-did-mount
       (fn []
         (GET "/data/stats.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
-      :reagent-render (fn [] (stats-page lang @stats @deps-total))})))
+      :reagent-render (fn [] (stats-page lang @stats))})))
 
 ;; Main structure - menu, banner
 
@@ -1240,9 +1210,7 @@
        (when-let [ff (not-empty (:g flt))]
          (close-filter-button lang ff :repos (merge flt {:g nil})))
        (when-let [ff (not-empty (:d flt))]
-         (close-filter-button lang ff :repos (merge flt {:d nil})))
-       (when-let [ff (not-empty (:orga flt))]
-         (close-filter-button lang ff :deps (merge flt {:orga nil})))
+         (close-filter-button lang ff :deps (merge flt {:d nil})))
        (when-let [ff (not-empty (:repo flt))]
          (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
 
@@ -1585,7 +1553,7 @@
         ;; Table to display statistics
         :stats   [stats-page-class lang]
         ;; Table to display all dependencies
-        :deps    [deps-page-class lang]
+        :deps    [deps-page lang]
         ;; Page for legal mentions
         :legal   [legal-page lang]
         ;; Page for accessibility mentions
@@ -1620,15 +1588,8 @@
                [:update-platforms! (map first (next (js->clj (csv/parse %))))]))
         (GET "/data/deps.json"
              :handler
-             #(do
-                (re-frame/dispatch
-                 [:update-deps! (map (comp bean clj->js) %)])
-                (re-frame/dispatch
-                 [:update-deps-raw!
-                  (map (comp bean
-                             clj->js
-                             (fn [e] (dissoc e :t :d :l :r)))
-                       %)])))
+             #(re-frame/dispatch
+               [:update-deps! (map (comp bean clj->js) %)]))
         (GET "/data/orgas.json"
              :handler
              #(re-frame/dispatch
