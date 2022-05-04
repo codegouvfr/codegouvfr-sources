@@ -28,6 +28,8 @@
 
 (defonce libs-per-page 100)
 
+(defonce sill-per-page 100)
+
 (defonce orgas-per-page 20)
 
 (defonce deps-per-page 100)
@@ -232,6 +234,14 @@
           true)
      m)))
 
+(defn apply-sill-filters [m]
+  (let [f @(re-frame/subscribe [:filter?])
+        s (:q f)]
+    (filter
+     #(if s (s-includes? (s/join " " [(:n %) (:f %)]) s)
+          true)
+     m)))
+
 (defn close-filter-button [lang ff t reinit]
   [:span
    [:a.fr-link.fr-fi-close-circle-line.fr-link--icon-right
@@ -266,10 +276,13 @@
    {:repos          nil
     :orgas          nil
     :libs           nil
+    :deps           nil
+    :sill           nil
     :repos-page     0
     :orgas-page     0
     :libs-page      0
     :deps-page      0
+    :sill-page      0
     :sort-repos-by  :reused
     :sort-orgas-by  :repos
     :sort-deps-by   :repos
@@ -306,6 +319,10 @@
  (fn [db [_ libs]] (assoc db :libs libs)))
 
 (re-frame/reg-event-db
+ :update-sill!
+ (fn [db [_ sill]] (assoc db :sill sill)))
+
+(re-frame/reg-event-db
  :update-deps!
  (fn [db [_ deps]] (assoc db :deps deps)))
 
@@ -324,6 +341,7 @@
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
+   (re-frame/dispatch [:sill-page! 0])
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
@@ -338,6 +356,10 @@
 (re-frame/reg-event-db
  :libs-page!
  (fn [db [_ n]] (assoc db :libs-page n)))
+
+(re-frame/reg-event-db
+ :sill-page!
+ (fn [db [_ n]] (assoc db :sill-page n)))
 
 (re-frame/reg-event-db
  :orgas-page!
@@ -383,6 +405,14 @@
    (assoc db :sort-libs-by k)))
 
 (re-frame/reg-event-db
+ :sort-sill-by!
+ (fn [db [_ k]]
+   (re-frame/dispatch [:sill-page! 0])
+   (when (= k (:sort-sill-by db))
+     (re-frame/dispatch [:reverse-sort!]))
+   (assoc db :sort-sill-by k)))
+
+(re-frame/reg-event-db
  :sort-orgas-by!
  (fn [db [_ k]]
    (re-frame/dispatch [:orgas-page! 0])
@@ -421,6 +451,10 @@
  (fn [db _] (:sort-libs-by db)))
 
 (re-frame/reg-sub
+ :sort-sill-by?
+ (fn [db _] (:sort-sill-by db)))
+
+(re-frame/reg-sub
  :sort-orgas-by?
  (fn [db _] (:sort-orgas-by db)))
 
@@ -435,6 +469,10 @@
 (re-frame/reg-sub
  :libs-page?
  (fn [db _] (:libs-page db)))
+
+(re-frame/reg-sub
+ :sill-page?
+ (fn [db _] (:sill-page db)))
 
 (re-frame/reg-sub
  :deps-page?
@@ -493,6 +531,20 @@
                            (reverse libs))))))
 
 (re-frame/reg-sub
+ :sill?
+ (fn [db _]
+   (let [sill0 (:sill db)
+         sill  (case @(re-frame/subscribe [:sort-sill-by?])
+                 :name (reverse (sort-by :n sill0))
+                 :date (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                       (js/Date. (.parse js/Date (:u %2))))
+                             sill0)
+                 sill0)]
+     (apply-sill-filters (if @(re-frame/subscribe [:reverse-sort?])
+                           sill
+                           (reverse sill))))))
+
+(re-frame/reg-sub
  :deps?
  (fn [db _]
    (let [deps0 (:deps db)
@@ -544,6 +596,8 @@
                   :cnt :repos?      :per-page repos-per-page}
           :libs  {:sub :libs-page? :evt      :libs-page!
                   :cnt :libs?      :per-page libs-per-page}
+          :sill  {:sub :sill-page? :evt      :sill-page!
+                  :cnt :sill?      :per-page sill-per-page}
           :deps  {:sub :deps-page? :evt      :deps-page!
                   :cnt :deps?      :per-page deps-per-page}
           :orgas {:sub :orgas-page? :evt      :orgas-page!
@@ -878,6 +932,100 @@
              [:update-libs! (map (comp bean clj->js) %)])))
     :reagent-render (fn [] (libs-page lang))}))
 
+;; Main structure - sill
+
+(defn sill-table [lang sill-cnt]
+  (if (zero? sill-cnt)
+    [:div.fr-m-3w [:p (i/i lang [:no-lib-found])]]
+    (let [sill-f    @(re-frame/subscribe [:sort-sill-by?])
+          sill-page @(re-frame/subscribe [:sill-page?])
+          sill      ((if sill-f identity shuffle)
+                     @(re-frame/subscribe [:sill?]))]
+      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+       [:table
+        [:caption (i/i lang [:Libraries])]
+        [:thead.fr-grid.fr-col-12
+         [:tr
+          [:th.fr-col-3
+           [:a.fr-link
+            {:class    (when (= sill-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :title    (i/i lang [:sort-sill-alpha])
+             :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
+            (i/i lang [:library])]]
+          [:th.fr-col (i/i lang [:description])]
+          [:th.fr-col-2 (i/i lang [:license])]
+          [:th.fr-col-1
+           [:a.fr-link
+            {:class    (when (= sill-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+             :title    (i/i lang [:sort-sill-date])
+             :on-click #(re-frame/dispatch [:sort-sill-by! :date])}
+            (i/i lang [:update-short])]]]]
+        (into [:tbody]
+              (for [dd (take sill-per-page
+                             (drop (* sill-per-page sill-page) sill))]
+                ^{:key dd}
+                (let [{:keys [n   ; name
+                              id  ; sill id
+                              l   ; license
+                              f   ; description
+                              fr  ; from the FR public sector?
+                              u   ; added to the sill
+                              cl  ; Comptoir du libre ID
+                              clp ; Are there providers?
+                              ]} dd]
+                  [:tr
+                   ;; Lib
+                   [:td
+                    [:a.fr-link
+                     {:href   (str "https://sill.etalab.gouv.fr/" lang "/software?id=" id)
+                      :rel    "noreferrer noopener"
+                      :target "_blank"}
+                     (if fr (str "🇫🇷 " n) n)]]
+                   ;; Description
+                   [:td (if clp [:a
+                                 {:href   (str "https://comptoir-du-libre.org/fr/softwares/servicesProviders/" cl)
+                                  :rel    "noreferrer noopener"
+                                  :target "_blank"}
+                                 f]
+                            f)]
+                   ;; License
+                   [:td l]
+                   ;; Date when added
+                   [:td (to-locale-date u)]])))]])))
+
+(defn sill-page [lang]
+  (let [sill           @(re-frame/subscribe [:sill?])
+        sill-pages     @(re-frame/subscribe [:sill-page?])
+        count-pages    (count (partition-all sill-per-page sill))
+        first-disabled (zero? sill-pages)
+        last-disabled  (= sill-pages (dec count-pages))]
+    [:div.fr-grid
+     [:div.fr-grid-row
+      ;; General information
+      [:strong.fr-m-auto
+       (let [rps (count sill)]
+         (if (< rps 2)
+           (str rps (i/i lang [:sill0]))
+           (str rps (i/i lang [:sill]))))]
+      ;; Top pagination block
+      [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]
+     ;; Specific sill search filters and options
+     ;; Main sill table display
+     [sill-table lang (count sill)]
+     ;; Bottom pagination block
+     [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]))
+
+(defn sill-page-class [lang]
+  (reagent/create-class
+   {:display-name   "sill-page-class"
+    :component-did-mount
+    (fn []
+      (GET "/data/sill.json"
+           :handler
+           #(re-frame/dispatch
+             [:update-sill! (map (comp bean clj->js) %)])))
+    :reagent-render (fn [] (sill-page lang))}))
+
 ;; Main structure - orgas
 
 (defn orgas-table [lang orgas-cnt]
@@ -1191,7 +1339,7 @@
   [:div
    [:div.fr-grid-row.fr-mt-2w
     [:div.fr-col-12
-     (when (or (= view :repos) (= view :orgas) (= view :deps) (= view :libs))
+     (when (into #{:repos :orgas :deps :libs :sill} [view])
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
@@ -1273,6 +1421,11 @@
             :title        (i/i lang [:deps-stats])
             :href         "#/deps"}
            (i/i lang [:Deps])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/sill") "page")
+            :href         "#/sill"}
+           (i/i lang [:Sill])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
@@ -1548,6 +1701,8 @@
         :repos   [repos-page-class lang license language platform]
         ;; Table to display libraries
         :libs    [libs-page-class lang]
+        ;; Table to display sill entries
+        :sill    [sill-page-class lang]
         ;; Table to display statistics
         :stats   [stats-page-class lang]
         ;; Table to display all dependencies
@@ -1608,6 +1763,7 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["libs" :libs]
+   ["sill" :sill]
    ["stats" :stats]
    ["deps" :deps]
    ["legal" :legal]
