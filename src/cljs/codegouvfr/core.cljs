@@ -51,16 +51,18 @@
    :d  :description
    :a? :is_archived
    :f? :is_fork
+   :e? :is_esr
+   :l? :is_lib
    :l  :language
    :li :license
    :n  :name
    :f  :forks_count
-   :i  :open_issues_count
    :s  :stars_count
    :o  :organization_name
    :p  :platform
+   :re :reuses
    :r  :repository_url
-   :t  :topics})
+   })
 
 (defonce orgas-mapping
   {:d  :description
@@ -180,6 +182,7 @@
         pl       (:platform f)
         lic      (:license f)
         e        (:is-esr f)
+        l        (:is-lib f)
         fk       (:is-fork f)
         li       (:is-licensed f)]
     (filter
@@ -189,8 +192,9 @@
                               dp :n
                               deps-raw)))
                    (:r %)) true)
-           (if e (:e %) true)
+           (if e (:e? %) true)
            (if fk (:f? %) true)
+           (if l (:l? %) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
            (if la
@@ -472,7 +476,7 @@
                   :forks  (sort-by :f repos0)
                   :stars  (sort-by :s repos0)
                   ;; :issues (sort-by :i repos0)
-                  :reused (sort-by :g repos0)
+                  :reused (sort-by :re repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                           (js/Date. (.parse js/Date (:u %2))))
                                 repos0)
@@ -643,7 +647,17 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a? d f li n o r s u g]}
+                (let [{:keys [a? ; is_archived
+                              d  ; description
+                              f  ; forks_count
+                              li ; license
+                              n  ; name
+                              o  ; organization_name
+                              r  ; repository_url
+                              s  ; stars_count
+                              u  ; last_update
+                              re ; reuses
+                              ]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
@@ -672,16 +686,7 @@
                      ")"]]
                    ;; Description
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
-                    [:span
-                     ;; FIXME: not working?
-                     ;; (when dp
-                     ;;   [:span
-                     ;;    [:a.fr-link
-                     ;;     {:title (i/i lang [:Deps])
-                     ;;      :href  (rfe/href :deps {:lang lang} {:repo r})}
-                     ;;     [:span.fr-fi-search-line {:aria-hidden true}]]
-                     ;;    " "])
-                     (if a? [:em d] d)]]
+                    [:span (if a? [:em d] d)]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
                     (or (to-locale-date u) "N/A")]
@@ -697,7 +702,7 @@
                       :rel    "noreferrer noopener"
                       :target "_blank"
                       :href   (str r "/network/dependents")}
-                     g]]])))]])))
+                     re]]])))]])))
 
 (defn repos-page [lang license language platform]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -786,7 +791,15 @@
                                 (re-frame/dispatch [:filter! {:is-esr v}]))}]
        [:label.fr-label
         {:for "3" :title (i/i lang [:only-her-title])}
-        (i/i lang [:only-her])]]]
+        (i/i lang [:only-her])]]
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
+       [:input#4 {:type      "checkbox" :name "4"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-lib v)
+                                (re-frame/dispatch [:filter! {:is-lib v}]))}]
+       [:label.fr-label
+        {:for "4" :title (i/i lang [:only-lbi-title])}
+        (i/i lang [:only-lib])]]]
      ;; Main repos table display
      [repos-table lang (count repos)]
      ;; Bottom pagination block
