@@ -155,19 +155,18 @@
     (.click link)
     (js/document.body.removeChild link)))
 
-(defn top-clean-up [top param title]
-  (let [total (reduce + (map val top))]
-    (apply merge
-           (sequence
-            (comp
-             (map (fn [[k v]]
-                    [k (js/parseFloat
-                        (gstring/format "%.2f" (* (/ v total) 100)))]))
-             (map #(let [[k v] %]
-                     {[:a
-                       {:title title
-                        :href  (str "#/repos?" param "=" k)} k] v})))
-            top))))
+(defn top-clean-up [data param title]
+  (let [total (reduce + (map last data))]
+    (sequence
+     (comp
+      (map (fn [[k v]]
+             [k (js/parseFloat
+                 (gstring/format "%.2f" (* (/ v total) 100)))]))
+      (map #(let [[k v] %]
+              [[:a
+                {:title title
+                 :href  (str "#/repos?" param "=" k)} k] v])))
+     data)))
 
 ;; Filters
 
@@ -828,20 +827,18 @@
               (for [dd (take libs-per-page
                              (drop (* libs-per-page libs-page) libs))]
                 ^{:key dd}
-                (let [{:keys [name description repository_url]} dd]
+                (let [{:keys [n l d]} dd]
                   [:tr
                    ;; Lib
                    [:td
                     [:div
                      [:a.fr-link
-                      {:href   repository_url
+                      {:href   l
                        :rel    "noreferrer noopener"
                        :target "_blank"}
-                      name]
-                     ]]
+                      n]]]
                    ;; Description
-                   [:td description]
-                   ])))]])))
+                   [:td d]])))]])))
 
 (defn libs-page [lang]
   (let [libs           @(re-frame/subscribe [:libs?])
@@ -870,7 +867,7 @@
    {:display-name   "libs-page-class"
     :component-did-mount
     (fn []
-      (GET "/data/libraries/json/all.json"
+      (GET "/data/libs.json"
            :handler
            #(re-frame/dispatch
              [:update-libs! (map (comp bean clj->js) %)])))
@@ -1119,12 +1116,12 @@
     [:table
      thead
      [:tbody
-      (for [o (reverse (walk/stringify-keys (sort-by val data)))]
-        ^{:key (key o)}
-        [:tr [:td (key o)] [:td (val o)]])]]]])
+      (for [[k v] (walk/stringify-keys data)]
+        ^{:key k}
+        [:tr [:td k] [:td v]])]]]])
 
 (defn stats-tile [l i s]
-  [:div.fr-tile.fr-col-2.fr-m-1w
+  [:div.fr-tile.fr-col-2 ;; FIXME: Spacing between tiles?
    [:div.fr-tile__body
     [:p.fr-tile__title (i/i l [i])]
     [:div.fr-tile__desc
@@ -1132,44 +1129,31 @@
 
 (defn stats-page
   [lang stats deps-total]
-  (let [{:keys [repos_cnt orgs_cnt avg_repos_cnt median_repos_cnt
-                top_orgs_by_repos top_orgs_by_stars top_licenses
-                platforms top_languages]} stats
-        ;; Use software_heritage ?
-        top_orgs_by_repos_0
-        (into {} (map #(vector (str (:organization_name %)
-                                    " (" (:platform %) ")")
-                               (:count %))
-                      top_orgs_by_repos))
-        top_languages_1
-        (top-clean-up (walk/stringify-keys (-> top_languages
-                                               (dissoc :Inconnu)))
-                      "language" (i/i lang [:list-repos-with-language]))
-        top_licenses_0
-        (->> (top-clean-up
-              (walk/stringify-keys
-               (-> top_licenses
-                   (dissoc :Inconnue)
-                   (dissoc :Other)))
-              "license"
-              (i/i lang [:list-repos-using-license]))
-             (sort-by val >)
-             (take 10))]
+  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt
+                avg_repos_cnt median_repos_cnt
+                top_orgs_by_repos top_orgs_by_stars
+                top_licenses top_languages top_topics
+                platforms]} stats]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
-      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
-      (stats-tile lang :orgas-or-groups orgs_cnt)
+      (stats-tile lang :orgas-or-groups orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
-      (stats-tile lang :deps-stats (:deps-total deps-total))
-      (stats-tile lang :median-repos-by-orga median_repos_cnt)]
+      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
+      ;; FIXME: Don't show the median?
+      ;; (stats-tile lang :median-repos-by-orga median_repos_cnt)
+      (stats-tile lang :sill-stats sill_cnt)
+      (stats-tile lang :deps-stats deps_cnt)
+      (stats-tile lang :libs-stats libs_cnt)]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
-                    top_languages_1
+                    (top-clean-up
+                     top_languages "language" (i/i lang [:list-repos-with-language]))
                     [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
-                    top_licenses_0
+                    (top-clean-up
+                     top_licenses "license" (i/i lang [:list-repos-using-license]))
                     [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
      [:div.fr-grid-row
       [:div.fr-col-6
@@ -1177,7 +1161,7 @@
                      (i/i lang [:orgas])
                      (i/i lang [:with-more-of])
                      (i/i lang [:repos])]
-                    top_orgs_by_repos_0
+                    top_orgs_by_repos
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-table [:span
@@ -1206,10 +1190,6 @@
      {:display-name   "stats-page-class"
       :component-did-mount
       (fn []
-        (GET "/data/deps-total.json"
-             :handler #(reset! deps-total (walk/keywordize-keys %)))
-        (GET "/data/deps-top.json"
-             :handler #(reset! deps (take 10 (map (comp bean clj->js) %))))
         (GET "/data/stats.json"
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats @deps-total))})))
