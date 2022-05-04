@@ -36,7 +36,8 @@
 
 (def unix-epoch "1970-01-01T00:00:00Z")
 
-(defonce init-filter {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all"})
+(defonce init-filter
+  {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all" :ministry "all"})
 
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 
@@ -219,13 +220,15 @@
      m)))
 
 (defn apply-orgas-filters [m]
-  (let [f @(re-frame/subscribe [:filter?])
-        s (:q f)]
+  (let [f  @(re-frame/subscribe [:filter?])
+        s  (:q f)
+        mi (:ministry f)]
     (filter
-     #(if s (s-includes?
-             (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
-             s)
-          true)
+     #(and (if s (s-includes?
+                  (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
+                  s)
+               true)
+           (if (= mi "all") true (= (:m %) mi)))
      m)))
 
 (defn apply-libs-filters [m]
@@ -272,7 +275,6 @@
    {:repos          nil
     :orgas          nil
     :libs           nil
-    ;; :levent         nil
     :repos-page     0
     :orgas-page     0
     :libs-page      0
@@ -542,6 +544,10 @@
       (if @(re-frame/subscribe [:reverse-sort?])
         orgas
         (reverse orgas))))))
+
+(re-frame/reg-sub
+ :ministries?
+ (fn [db _] (filter not-empty (distinct (map :m (:orgas db))))))
 
 ;; Pagination
 
@@ -923,7 +929,16 @@
                              (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
-                (let [{:keys [n l d o h an au c r]} dd]
+                (let [{:keys [n ; name
+                              l ; login
+                              d ; description
+                              o ; organization_url
+                              h ; website
+                              an ; annuaire
+                              au ; avatar_url
+                              c ; creation_date
+                              r ; repositories_count
+                              ]} dd]
                   [:tr
                    [:td
                     (if (or h an)
@@ -939,7 +954,7 @@
                     [:a {:target "_blank"
                          :rel    "noreferrer noopener"
                          :title  (new-tab (i/i lang [:go-to-orga]) lang)
-                         :href   o} (or n l)]]
+                         :href   o} (or (not-empty n) l)]]
                    [:td d]
                    [:td
                     {:style {:text-align "center"}}
@@ -950,13 +965,14 @@
                    [:td {:style {:text-align "center"}}
                     (to-locale-date c)]])))]])))
 
-(defn orgas-page [lang]
+(defn orgas-page [lang ministry]
   (let [orgas          @(re-frame/subscribe [:orgas?])
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
         first-disabled (zero? orgas-pages)
-        last-disabled  (= orgas-pages (dec count-pages))]
+        last-disabled  (= orgas-pages (dec count-pages))
+        ministries     @(re-frame/subscribe [:ministries?])]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; Download link
@@ -978,6 +994,21 @@
            (str orgs (i/i lang [:groups]))))]
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
+     [:div.fr-grid-row
+      [:select.fr-select.fr-col.fr-m-1w
+       {:value (or @ministry "all")
+        :on-change
+        (fn [e]
+          (let [ev (.-value (.-target e))]
+            (reset! ministry ev)
+            (async/go
+              (async/>! display-filter-chan {:ministry ev})
+              (async/<! (async/timeout timeout))
+              (async/>! filter-chan {:ministry ev}))))}
+       [:option {:value "all"} (i/i lang [:all-ministries])]
+       (for [x @(re-frame/subscribe [:ministries?])]
+         ^{:key x}
+         [:option {:value x} x])]]
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
@@ -1525,7 +1556,7 @@
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
        [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
-(defn main-page [q license language platform]
+(defn main-page [q license language platform ministry]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
@@ -1537,11 +1568,11 @@
         ;; Default page
         :home    [home-page lang]
         ;; Table to display organizations
-        :orgas   [orgas-page lang]
+        :orgas   [orgas-page lang ministry]
         ;; Table to display repositories
         :repos   [repos-page-class lang license language platform]
         ;; Table to display libraries
-        :libs    [libs-page-class lang license language platform]
+        :libs    [libs-page-class lang]
         ;; Table to display statistics
         :stats   [stats-page-class lang]
         ;; Table to display all dependencies
@@ -1566,7 +1597,8 @@
   (let [q        (reagent/atom nil)
         license  (reagent/atom nil)
         language (reagent/atom nil)
-        platform (reagent/atom nil)]
+        platform (reagent/atom nil)
+        ministry (reagent/atom nil)]
     (reagent/create-class
      {:display-name   "main-class"
       :component-did-mount
@@ -1590,7 +1622,7 @@
              :handler
              #(re-frame/dispatch
                [:update-orgas! (map (comp bean clj->js) %)])))
-      :reagent-render (fn [] (main-page q license language platform))})))
+      :reagent-render (fn [] (main-page q license language platform ministry))})))
 
 ;; Setup router and init
 
