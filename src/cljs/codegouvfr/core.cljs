@@ -1026,31 +1026,6 @@
                   (count r)
                   (count (filter #(re-find (re-pattern orga) %) r)))]])])))]]))
 
-;; (defn stats-deps-table [heading deps lang]
-;;   [:div.fr-m-3w
-;;    [:h4.fr-h4 heading]
-;;    [:div.fr-table
-;;     [:table.fr-col-12
-;;      [:thead [:tr
-;;               [:th (i/i lang [:name])]
-;;               [:th (i/i lang [:type])]
-;;               [:th (i/i lang [:description])]
-;;               [:th (i/i lang [:Repos])]]]
-;;      [:tbody
-;;       (for [{:keys [n t d l r] :as o} deps]
-;;         ^{:key o}
-;;         [:tr
-;;          [:td [:a {:href   l
-;;                    :target "_blank"
-;;                    :rel    "noreferrer noopener"
-;;                    :title  (new-tab (i/i lang [:more-info]) lang)} n]]
-;;          [:td t]
-;;          [:td d]
-;;          [:td
-;;           [:a {:title (i/i lang [:list-repos-depending-on-dep])
-;;                :href  (rfe/href :repos {:lang lang} {:d n})}
-;;            (count r)]]])]]]])
-
 (defn deps-page [lang repos-sim]
   (let [{:keys [repo orga]} @(re-frame/subscribe [:filter?])
         deps0               @(re-frame/subscribe [:deps?])
@@ -1151,10 +1126,22 @@
                      top_languages "language" (i/i lang [:list-repos-with-language]))
                     [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
+       (stats-table
+        [:span (i/i lang [:topics])]
+        top_topics
+        [:thead [:tr [:th (i/i lang [:topics])] [:th (i/i lang [:occurrences])]]])]]
+     [:div.fr-grid-row
+      [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
                     (top-clean-up
                      top_licenses "license" (i/i lang [:list-repos-using-license]))
-                    [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]]
+                    [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
+      [:div.fr-col-6
+       [:div.fr-m-3w
+        [:h4.fr-h4 (i/i lang [:most-used-identified-licenses])]
+        [:img {:src      "/data/top_licenses.svg" :width "100%"
+               :longdesc (i/i lang [:most-used-identified-licenses])
+               :alt      (i/i lang [:most-used-identified-licenses])}]]]]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span
@@ -1170,17 +1157,9 @@
                      (i/i lang [:stars])]
                     top_orgs_by_stars
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
-     ;; FIXME: the source data are wrong
-     ;; [:div.fr-grid-row.fr-grid-row--center
-     ;;  [:div.fr-col-12
-     ;;   (stats-deps-table (i/i lang [:Deps]) deps lang)]]
      [:div.fr-grid-row
       [:div.fr-col-6
-       (stats-table (i/i lang [:distribution-by-platform]) platforms)]
-      [:div.fr-col-6
-       [:img {:src      "/data/top_licenses.svg" :width "100%"
-              :longdesc (i/i lang [:most-used-licenses])
-              :alt      (i/i lang [:most-used-licenses])}]]]]))
+       (stats-table (i/i lang [:distribution-by-platform]) platforms)]]]))
 
 (defn stats-page-class [lang]
   (let [deps       (reagent/atom nil)
