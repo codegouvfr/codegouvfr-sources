@@ -228,9 +228,7 @@
   (let [f @(re-frame/subscribe [:filter?])
         s (:q f)]
     (filter
-     #(if s (s-includes?
-             (s/join " " [(:name %) (:description %) (:keywords %)])
-             s)
+     #(if s (s-includes? (s/join " " [(:n %) (:d %)]) s)
           true)
      m)))
 
