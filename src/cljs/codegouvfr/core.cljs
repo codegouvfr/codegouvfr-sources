@@ -1458,7 +1458,8 @@
         (i/i lang [:sitemap])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "/data/latest.xml" :title (i/i lang [:subscribe-rss-flux])}
+        {:href  "#/feeds"
+         :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
@@ -1509,6 +1510,14 @@
      (condp = lang
        "fr" (inline-resource "public/md/error.fr.md")
        (inline-resource "public/md/error.en.md")))]])
+
+(defn feeds-page [lang]
+  [:div.fr-container.fr-grid.fr-grid--row
+   [:div.fr-col-10.fr-col-md-10
+    (to-hiccup
+     (condp = lang
+       "fr" (inline-resource "public/md/feeds.fr.md")
+       (inline-resource "public/md/feeds.en.md")))]])
 
 ;; #00AC8C
 ;; #FF8D7E
@@ -1585,6 +1594,8 @@
         :about   [about-page lang]
         ;; Sitemap
         :sitemap [sitemap-page lang]
+        ;; Feeds
+        :feeds   [feeds-page lang]
         ;; Error
         :error   [error-page lang]
         ;; Fall back on the error page
@@ -1644,6 +1655,7 @@
    ["a11y" :a11y]
    ["about" :about]
    ["sitemap" :sitemap]
+   ["feeds" :feeds]
    ["error" :error]])
 
 (defn ^:export init []
