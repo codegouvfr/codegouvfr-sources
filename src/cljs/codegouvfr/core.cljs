@@ -981,6 +981,7 @@
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
          [:tr
+          [:th.fr-col-1 "Logo"]
           [:th.fr-col-3
            [:button
             {:class    (when (= sill-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
@@ -1001,6 +1002,7 @@
                 ^{:key dd}
                 (let [{:keys [n   ; name
                               id  ; sill id
+                              i   ; image link
                               l   ; license
                               f   ; description
                               fr  ; from the FR public sector?
@@ -1009,6 +1011,8 @@
                               clp ; Are there providers?
                               ]} dd]
                   [:tr
+                   ;; Logo
+                   [:td [:img {:src i :width "100%" :alt ""}]]
                    ;; Lib
                    [:td
                     [:a.fr-link
