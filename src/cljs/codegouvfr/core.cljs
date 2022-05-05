@@ -1730,6 +1730,26 @@
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
+         {:href "#/sill"}
+         (i/i lang [:sill-stats])]]
+       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/compass.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href "#/libs"}
+         (i/i lang [:Libraries])]]
+       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/library.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
          {:href  "#/deps"
           :title (i/i lang [:deps-stats])}
          (i/i lang [:Deps])]]
