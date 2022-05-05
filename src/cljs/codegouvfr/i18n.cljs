@@ -32,7 +32,7 @@
     :browse-repos-orga             "Voir la liste des dépôts de cette organisation ou de ce groupe"
     :close                         "Fermer"
     :contact                       "Contact"
-    :contact-title                 "Vous pouvez nous contacter en utilisant l'adresse électronique :<br>[logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr \"Suivez ce lien pour nous envoyer un courriel\")"
+    :contact-title                 "Vous pouvez nous contacter en utilisant l'adresse électronique<br>[logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr \"Suivez ce lien pour nous envoyer un courriel\")"
     :created-at                    "Création"
     :dep                           " dépendance"
     :deps                          " dépendances"
