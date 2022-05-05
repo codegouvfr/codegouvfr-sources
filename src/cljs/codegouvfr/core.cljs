@@ -91,6 +91,19 @@
    :u :updated
    :r :repositories})
 
+(defonce sill-mapping
+  {:n :name
+   :f :description
+   :l :license
+   :u :added})
+
+(defonce libs-mapping
+  {:n :name
+   :t :type
+   :d :description
+   :l :link
+   :u :updated})
+
 ;; Utility functions
 
 (defn new-tab [s lang]
@@ -659,32 +672,32 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col
-           [:a.fr-link
+           [:button
             {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-update-date])
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= rep-f :forks) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-forks])
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= rep-f :stars) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-reused])
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
@@ -711,23 +724,24 @@
                    [:td
                     [:div
                      [:a.fr-link
-                      {:href   (str "https://archive.softwareheritage.org/browse/origin/" r)
-                       :title  (new-tab (i/i lang [:swh-link]) lang)
-                       :rel    "noreferrer noopener"
-                       :target "_blank"}
+                      {:href  (str "https://archive.softwareheritage.org/browse/origin/" r)
+                       :title (new-tab (i/i lang [:swh-link]) lang)
+                       :rel   "noreferrer noopener"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
-                     [:a {:href   r
-                          :target "_blank"
-                          :rel    "noreferrer noopener"
-                          :title  (new-tab
-                                   (str
-                                    (i/i lang [:go-to-repo])
-                                    (when li (str (i/i lang [:under-license]) li))) lang)}
+                     [:a.fr-link
+                      {:href   r
+                       :target "new"
+                       :rel    "noreferrer noopener"
+                       :title  (new-tab
+                                (str
+                                 (i/i lang [:go-to-repo])
+                                 (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
-                     [:a {:href  (rfe/href :repos {:lang lang} {:g group})
-                          :title (i/i lang [:browse-repos-orga])}
+                     [:a.fr-link
+                      {:href  (rfe/href :repos {:lang lang} {:g group})
+                       :title (i/i lang [:browse-repos-orga])}
                       o]
                      ")"]]
                    ;; Description
@@ -746,7 +760,7 @@
                     [:a.fr-link
                      {:title  (new-tab (i/i lang [:reuses-expand]) lang)
                       :rel    "noreferrer noopener"
-                      :target "_blank"
+                      :target "new"
                       :href   (str r "/network/dependents")}
                      re]]])))]])))
 
@@ -758,8 +772,13 @@
         last-disabled  (= repos-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; RSS feed
+      [:button.fr-link
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
-      [:a.fr-link
+      [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
@@ -768,7 +787,7 @@
                               repos-mapping))
                      repos)
                     (str "codegouvfr-repositories-" (todays-date) ".csv"))}
-       [:span.fr-fi-download-line {:aria-hidden true}]]
+       [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
        (let [rps (count repos)]
@@ -876,7 +895,7 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col
-           [:a.fr-link
+           [:button
             {:class    (when (= lib-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-libs-alpha])
              :on-click #(re-frame/dispatch [:sort-libs-by! :name])}
@@ -907,6 +926,22 @@
         last-disabled  (= libs-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; RSS feed
+      [:button.fr-link
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest-libraries.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
+      ;; Download link
+      [:button.fr-link.fr-m-1w
+       {:title    (i/i lang [:download])
+        :on-click #(download-as-csv!
+                    (map
+                     (fn [r] (set/rename-keys
+                              (select-keys r (keys libs-mapping))
+                              libs-mapping))
+                     libs)
+                    (str "codegouvfr-libraries-" (todays-date) ".csv"))}
+       [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
        (let [rps (count libs)]
@@ -947,7 +982,7 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-3
-           [:a.fr-link
+           [:button
             {:class    (when (= sill-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-sill-alpha])
              :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
@@ -955,11 +990,11 @@
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-2 (i/i lang [:license])]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= sill-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-sill-date])
              :on-click #(re-frame/dispatch [:sort-sill-by! :date])}
-            (i/i lang [:update-short])]]]]
+            (i/i lang [:added])]]]]
         (into [:tbody]
               (for [dd (take sill-per-page
                              (drop (* sill-per-page sill-page) sill))]
@@ -979,15 +1014,18 @@
                     [:a.fr-link
                      {:href   (str "https://sill.etalab.gouv.fr/" lang "/software?id=" id)
                       :rel    "noreferrer noopener"
+                      :title  (new-tab (i/i lang [:more-info]) lang)
                       :target "_blank"}
                      (if fr (str "🇫🇷 " n) n)]]
                    ;; Description
-                   [:td (if clp [:a
-                                 {:href   (str "https://comptoir-du-libre.org/fr/softwares/servicesProviders/" cl)
-                                  :rel    "noreferrer noopener"
-                                  :target "_blank"}
-                                 f]
-                            f)]
+                   [:td (if clp
+                          [:a
+                           {:href   (str "https://comptoir-du-libre.org/fr/softwares/servicesProviders/" cl)
+                            :rel    "noreferrer noopener"
+                            :title  (new-tab (i/i lang [:providers]) lang)
+                            :target "_blank"}
+                           f]
+                          f)]
                    ;; License
                    [:td l]
                    ;; Date when added
@@ -1001,6 +1039,22 @@
         last-disabled  (= sill-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; RSS feed
+      [:button.fr-link
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest-sill.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
+      ;; Download link
+      [:button.fr-link.fr-m-1w
+       {:title    (i/i lang [:download])
+        :on-click #(download-as-csv!
+                    (map
+                     (fn [r] (set/rename-keys
+                              (select-keys r (keys sill-mapping))
+                              sill-mapping))
+                     sill)
+                    (str "codegouvfr-sill-" (todays-date) ".csv"))}
+       [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
        (let [rps (count sill)]
@@ -1040,20 +1094,20 @@
          [:tr
           [:th.fr-col-1 "Image"]
           [:th.fr-col-2
-           [:a.fr-link
+           [:button
             {:class    (when (= org-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-alpha])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
             (i/i lang [:orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-creation])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
@@ -1108,8 +1162,13 @@
         last-disabled  (= orgas-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; RSS feed
+      [:button.fr-link
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest-organizations.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
-      [:a.fr-link.fr-m-1w
+      [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
@@ -1118,7 +1177,7 @@
                               orgas-mapping))
                      orgas)
                     (str "codegouvfr-organizations-" (todays-date) ".csv"))}
-       [:span.fr-fi-download-line {:aria-hidden true}]]
+       [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
@@ -1156,26 +1215,26 @@
       [:thead.fr-grid.fr-col-12
        [:tr
         [:th.fr-col-3
-         [:a.fr-link
+         [:button
           {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
-         [:a.fr-link
+         [:button
           {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-type])
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
-         [:a.fr-link
+         [:button
           {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-description-length])
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
         (when-not repo
           [:th.fr-col-1
-           [:a.fr-link
+           [:button
             {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
@@ -1193,10 +1252,11 @@
                        ]} dd]
            [:tr
             [:td
-             [:a {:href   l
-                  :target "_blank"
-                  :rel    "noreferrer noopener"
-                  :title  (new-tab (i/i lang [:more-info]) lang)} n]]
+             [:a.fr-link
+              {:href   l
+               :target "_blank"
+               :rel    "noreferrer noopener"
+               :title  (new-tab (i/i lang [:more-info]) lang)} n]]
             [:td t]
             [:td d]
             (when-not repo
@@ -1218,8 +1278,13 @@
         last-disabled  (= deps-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
+      ;; RSS feed
+      [:button.fr-link
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest-dependencies.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
-      [:a.fr-link
+      [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
@@ -1228,7 +1293,7 @@
                               deps-mapping))
                      deps)
                     (str "codegouvfr-dependencies-" (todays-date) ".csv"))}
-       [:span.fr-fi-download-line {:aria-hidden true}]]
+       [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General informations
       [:strong.fr-m-auto
        (let [deps (count deps)]
@@ -1339,7 +1404,7 @@
   [:div
    [:div.fr-grid-row.fr-mt-2w
     [:div.fr-col-12
-     (when (into #{:repos :orgas :deps :libs :sill} [view])
+     (when (some #{:repos :orgas :deps :libs :sill} [view])
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
@@ -1394,7 +1459,7 @@
        [:nav#navigation-832.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
          [:li.fr-nav__item
-          [:a.fr-nav__link
+          [:button.fr-nav__link
            {:aria-current (when (= path "/") "page")
             :on-click     #(rfe/push-state :home)}
            (i/i lang [:home])]]
