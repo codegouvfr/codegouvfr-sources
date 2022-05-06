@@ -729,6 +729,7 @@
                        :rel   "noreferrer noopener"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
+                     [:span " "]
                      [:a.fr-link
                       {:href   r
                        :target "new"
@@ -1132,16 +1133,7 @@
                               r ; repositories_count
                               ]} dd]
                   [:tr
-                   [:td
-                    (if (or h an)
-                      (let [w (if h h (str annuaire-prefix an))]
-                        [:a.fr-link
-                         {:title  (new-tab (i/i lang [:go-to-website]) lang)
-                          :target "_blank"
-                          :rel    "noreferrer noopener"
-                          :href   w}
-                         [:img {:src au :width "100%" :alt ""}]])
-                      [:img {:src au :width "100%" :alt ""}])]
+                   [:td (if au [:img {:src au :width "100%" :alt ""}])]
                    [:td
                     [:a {:target "_blank"
                          :rel    "noreferrer noopener"
@@ -1152,7 +1144,11 @@
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
                          :href  (rfe/href :repos {:lang lang}
-                                          {:g (s/replace o "/groups/" "/")})}
+                                          {:g (condp = p
+                                                "GitHub"    o
+                                                "SourceHut" (s/replace o "//" "//git.")
+                                                ;; FIXME: what's the rationale?
+                                                "GitLab"    (s/replace o "/groups/" "/"))})}
                      r]]
                    [:td {:style {:text-align "center"}}
                     (to-locale-date c)]])))]])))
