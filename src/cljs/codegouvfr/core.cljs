@@ -41,7 +41,7 @@
 (def unix-epoch "1970-01-01T00:00:00Z")
 
 (defonce init-filter
-  {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all" :ministry "all"})
+  {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all" :ministry "all" :dep-type "all" :lib-type "all"})
 
 (defonce annuaire-prefix "https://lannuaire.service-public.fr/")
 
@@ -196,6 +196,7 @@
         pl  (:platform f)
         lic (:license f)
         e   (:is-esr f)
+        c   (:is-contrib f)
         l   (:is-lib f)
         fk  (:is-fork f)
         li  (:is-licensed f)]
@@ -203,6 +204,7 @@
      #(and (if (and dp @dp-filter) (some @dp-filter [(:r %)]) true)
            (if e (:e? %) true)
            (if fk (:f? %) true)
+           (if c (:c? %) true)
            (if l (:l? %) true)
            (if li (let [l (:li %)] (and l (not= l "Other"))) true)
            (if lic (s-includes? (:li %) lic) true)
@@ -220,11 +222,14 @@
 
 (defn apply-deps-filters [m]
   (let [f @(re-frame/subscribe [:filter?])
+        t (:dep-type f)
         s (:q f)]
     (filter
-     #(if s (s-includes?
-             (s/join " " [(:n %) (:t %) (:d %)]) s)
-          true)
+     #(and
+       (if (= t "all") true (= (:t %) t))
+       (if s (s-includes?
+              (s/join " " [(:n %) (:t %) (:d %)]) s)
+           true))
      m)))
 
 (defn apply-orgas-filters [m]
@@ -241,10 +246,13 @@
 
 (defn apply-libs-filters [m]
   (let [f @(re-frame/subscribe [:filter?])
+        t (:lib-type f)
         s (:q f)]
     (filter
-     #(if s (s-includes? (s/join " " [(:n %) (:d %)]) s)
-          true)
+     #(and
+       (if (= t "all") true (= (:t %) t))
+       (if s (s-includes? (s/join " " [(:n %) (:d %)]) s)
+           true))
      m)))
 
 (defn apply-sill-filters [m]
@@ -572,6 +580,14 @@
         deps (reverse deps))))))
 
 (re-frame/reg-sub
+ :deps-types?
+ (fn [db _] (distinct (map :t (:deps db)))))
+
+(re-frame/reg-sub
+ :libs-types?
+ (fn [db _] (distinct (map :t (:libs db)))))
+
+(re-frame/reg-sub
  :deps-raw?
  (fn [db _] (:deps-raw db)))
 
@@ -821,7 +837,7 @@
                            (async/>! display-filter-chan {:language ev})
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:language ev}))))}]
-      [:select.fr-select.fr-col.fr-m-1w
+      [:select.fr-select.fr-col-3
        {:value (or @platform "all")
         :on-change
         (fn [e]
@@ -849,7 +865,8 @@
                   :on-change #(let [v (.-checked (.-target %))]
                                 (set-item! :is-licensed v)
                                 (re-frame/dispatch [:filter! {:is-licensed v}]))}]
-       [:label.fr-label {:for "2"} (i/i lang [:only-with-license])]]
+       [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
+        (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#3 {:type      "checkbox" :name "3"
                   :on-change #(let [v (.-checked (.-target %))]
@@ -864,8 +881,16 @@
                                 (set-item! :is-lib v)
                                 (re-frame/dispatch [:filter! {:is-lib v}]))}]
        [:label.fr-label
-        {:for "4" :title (i/i lang [:only-lbi-title])}
-        (i/i lang [:only-lib])]]]
+        {:for "4" :title (i/i lang [:only-lib-title])}
+        (i/i lang [:only-lib])]]
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
+       [:input#5 {:type      "checkbox" :name "5"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-contrib v)
+                                (re-frame/dispatch [:filter! {:is-contrib v}]))}]
+       [:label.fr-label
+        {:for "5" :title (i/i lang [:only-contrib-title])}
+        (i/i lang [:only-contrib])]]]
      ;; Main repos table display
      [repos-table lang (count repos)]
      ;; Bottom pagination block
@@ -901,12 +926,17 @@
              :title    (i/i lang [:sort-libs-alpha])
              :on-click #(re-frame/dispatch [:sort-libs-by! :name])}
             (i/i lang [:library])]]
+          [:th.fr-col (i/i lang [:lib-type])]
           [:th.fr-col (i/i lang [:description])]]]
         (into [:tbody]
               (for [dd (take libs-per-page
                              (drop (* libs-per-page libs-page) libs))]
                 ^{:key dd}
-                (let [{:keys [n l d]} dd]
+                (let [{:keys [n ; name
+                              l ; link
+                              d ; description
+                              t ; type
+                              ]} dd]
                   [:tr
                    ;; Lib
                    [:td
@@ -916,15 +946,19 @@
                        :rel    "noreferrer noopener"
                        :target "_blank"}
                       n]]]
+                   ;; Type
+                   [:td t]
                    ;; Description
                    [:td d]])))]])))
 
 (defn libs-page [lang]
   (let [libs           @(re-frame/subscribe [:libs?])
         libs-pages     @(re-frame/subscribe [:libs-page?])
+        libtypes       @(re-frame/subscribe [:libs-types?])
         count-pages    (count (partition-all libs-per-page libs))
         first-disabled (zero? libs-pages)
-        last-disabled  (= libs-pages (dec count-pages))]
+        last-disabled  (= libs-pages (dec count-pages))
+        lib-type       (reagent/atom nil)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -951,6 +985,21 @@
            (str rps (i/i lang [:libs]))))]
       ;; Top pagination block
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
+     [:div.fr-grid-row
+      [:select.fr-select.fr-col.fr-m-1w
+       {:value (or @lib-type "all")
+        :on-change
+        (fn [e]
+          (let [ev (.-value (.-target e))]
+            (reset! lib-type ev)
+            (async/go
+              (async/>! display-filter-chan {:lib-type ev})
+              (async/<! (async/timeout timeout))
+              (async/>! filter-chan {:lib-type ev}))))}
+       [:option {:value "all"} (i/i lang [:all-lib-types])]
+       (for [x libtypes]
+         ^{:key x}
+         [:option {:value x} x])]]
      ;; Specific libs search filters and options
      ;; Main libs table display
      [libs-table lang (count libs)]
@@ -1126,8 +1175,10 @@
                               l ; login
                               d ; description
                               o ; organization_url
-                              h ; website
-                              an ; annuaire
+                              ;; FIXME: Where to use this?
+                              ;; h ; website
+                              ;; an ; annuaire
+                              p ; platform
                               au ; avatar_url
                               c ; creation_date
                               r ; repositories_count
@@ -1261,9 +1312,10 @@
             [:td d]
             (when-not repo
               [:td {:style {:text-align "center"}}
-               [:a {:title    (i/i lang [:list-repos-depending-on-dep])
-                    :on-click #(do (reset! dp-filter (into #{} (js->clj r)))
-                                   (rfe/push-state :repos {:lang l} {:d n}))}
+               [:button.fr-link
+                {:title    (i/i lang [:list-repos-depending-on-dep])
+                 :on-click #(do (reset! dp-filter (into #{} (js->clj r)))
+                                (rfe/push-state :repos {:lang l} {:d n}))}
                 (count r)]])])))]]))
 
 (defn deps-page [lang]
@@ -1272,10 +1324,12 @@
         deps           (if-let [s repo]
                          (filter #(s-includes? (s/join " " (:r %)) s) deps0)
                          deps0)
+        deptypes       @(re-frame/subscribe [:deps-types?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (zero? deps-pages)
-        last-disabled  (= deps-pages (dec count-pages))]
+        last-disabled  (= deps-pages (dec count-pages))
+        dep-type       (reagent/atom nil)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -1302,6 +1356,21 @@
            (str deps (i/i lang [:deps]))))]
       ;; Top pagination block
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
+     [:div.fr-grid-row
+      [:select.fr-select.fr-col.fr-m-1w
+       {:value (or @dep-type "all")
+        :on-change
+        (fn [e]
+          (let [ev (.-value (.-target e))]
+            (reset! dep-type ev)
+            (async/go
+              (async/>! display-filter-chan {:dep-type ev})
+              (async/<! (async/timeout timeout))
+              (async/>! filter-chan {:dep-type ev}))))}
+       [:option {:value "all"} (i/i lang [:all-dep-types])]
+       (for [x deptypes]
+         ^{:key x}
+         [:option {:value x} x])]]
      ;; Main deps display
      (if (pos? (count deps))
        [deps-table lang deps repo]
@@ -1333,7 +1402,7 @@
   [lang stats]
   (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt papillon_cnt
                 avg_repos_cnt median_repos_cnt
-                top_orgs_by_repos top_orgs_by_stars
+                top_orgs_by_repos ;; top_orgs_by_stars
                 top_licenses top_languages top_topics
                 top_forges]} stats]
     [:div
@@ -1456,6 +1525,7 @@
          [:div.fr-header__tools-links
           [:ul.fr-links-group
            [:li [:a.fr-link {:href "https://twitter.com/codegouvfr"} "@codegouvfr"]]
+           [:li [:a.fr-link {:href "/#/feeds"} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
@@ -1836,7 +1906,8 @@
         (GET "/data/platforms.csv"
              :handler
              #(re-frame/dispatch
-               [:update-platforms! (map first (next (js->clj (csv/parse %))))]))
+               [:update-platforms! (conj (map first (next (js->clj (csv/parse %))))
+                                         "sr.ht")]))
         (GET "/data/deps.json"
              :handler
              #(re-frame/dispatch
