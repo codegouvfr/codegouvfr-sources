@@ -257,7 +257,7 @@
 
 (defn close-filter-button [lang ff t reinit]
   [:span
-   [:a.fr-link.fr-fi-close-circle-line.fr-link--icon-right
+   [:a.fr-link.fr-icon-close-circle-line.fr-link--icon-right
     {:title (i/i lang [:remove-filter])
      :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
     [:span ff]]])
@@ -673,32 +673,32 @@
          [:tr
           [:th.fr-col
            [:button
-            {:class    (when (= rep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= rep-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
            [:button
-            {:class    (when (= rep-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= rep-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-update-date])
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
            [:button
-            {:class    (when (= rep-f :forks) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= rep-f :forks) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-forks])
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
            [:button
-            {:class    (when (= rep-f :stars) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= rep-f :stars) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           [:th.fr-col-1
            [:button
-            {:class    (when (= rep-f :reused) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= rep-f :reused) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-reused])
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
             (i/i lang [:reused])]]]]
@@ -896,7 +896,7 @@
          [:tr
           [:th.fr-col
            [:button
-            {:class    (when (= lib-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= lib-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-libs-alpha])
              :on-click #(re-frame/dispatch [:sort-libs-by! :name])}
             (i/i lang [:library])]]
@@ -984,7 +984,7 @@
           [:th.fr-col-1 "Logo"]
           [:th.fr-col-3
            [:button
-            {:class    (when (= sill-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= sill-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-sill-alpha])
              :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
             (i/i lang [:library])]]
@@ -992,7 +992,7 @@
           [:th.fr-col-2 (i/i lang [:license])]
           [:th.fr-col-1
            [:button
-            {:class    (when (= sill-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= sill-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-sill-date])
              :on-click #(re-frame/dispatch [:sort-sill-by! :date])}
             (i/i lang [:added])]]]]
@@ -1099,20 +1099,20 @@
           [:th.fr-col-1 "Image"]
           [:th.fr-col-2
            [:button
-            {:class    (when (= org-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= org-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-alpha])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
             (i/i lang [:orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:button
-            {:class    (when (= org-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= org-f :repos) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
           [:th.fr-col-1
            [:button
-            {:class    (when (= org-f :date) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= org-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-orgas-creation])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
             (i/i lang [:created-at])]]]]
@@ -1220,26 +1220,26 @@
        [:tr
         [:th.fr-col-3
          [:button
-          {:class    (when (= dep-f :name) "fr-fi-checkbox-circle-line fr-link--icon-left")
+          {:class    (when (= dep-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1
          [:button
-          {:class    (when (= dep-f :type) "fr-fi-checkbox-circle-line fr-link--icon-left")
+          {:class    (when (= dep-f :type) "fr-icon-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-type])
            :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
           (i/i lang [:type])]]
         [:th.fr-col-5
          [:button
-          {:class    (when (= dep-f :description) "fr-fi-checkbox-circle-line fr-link--icon-left")
+          {:class    (when (= dep-f :description) "fr-icon-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-description-length])
            :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
           (i/i lang [:description])]]
         (when-not repo
           [:th.fr-col-1
            [:button
-            {:class    (when (= dep-f :repos) "fr-fi-checkbox-circle-line fr-link--icon-left")
+            {:class    (when (= dep-f :repos) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
@@ -1327,7 +1327,7 @@
         [:tr [:td k] [:td v]])]]]])
 
 (defn stats-tile [l i s]
-  [:div.fr-tile.fr-col-2 ;; FIXME: Spacing between tiles?
+  [:div.fr-tile.fr-col-2.fr-m-1w
    [:div.fr-tile__body
     [:p.fr-tile__title (i/i l [i])]
     [:div.fr-tile__desc
@@ -1335,21 +1335,17 @@
 
 (defn stats-page
   [lang stats]
-  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt
-                avg_repos_cnt ;; median_repos_cnt
+  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt papillon_cnt
+                avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
-                platforms]} stats]
+                top_forges]} stats]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :orgas-or-groups orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
-      ;; FIXME: Don't show the median?
-      ;; (stats-tile lang :median-repos-by-orga median_repos_cnt)
-      (stats-tile lang :sill-stats sill_cnt)
-      (stats-tile lang :deps-stats deps_cnt)
-      (stats-tile lang :libs-stats libs_cnt)]
+      (stats-tile lang :median-repos-by-orga median_repos_cnt)]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
@@ -1381,16 +1377,23 @@
                      (i/i lang [:repos])]
                     top_orgs_by_repos
                     [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
+      ;; Who really likes stars?
+      ;; [:div.fr-col-6
+      ;;  (stats-table [:span
+      ;;                (i/i lang [:orgas])
+      ;;                (i/i lang [:with-more-of*])
+      ;;                (i/i lang [:stars])]
+      ;;               top_orgs_by_stars
+      ;;               [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]
       [:div.fr-col-6
-       (stats-table [:span
-                     (i/i lang [:orgas])
-                     (i/i lang [:with-more-of*])
-                     (i/i lang [:stars])]
-                    top_orgs_by_stars
-                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]]
-     [:div.fr-grid-row
-      [:div.fr-col-6
-       (stats-table (i/i lang [:distribution-by-platform]) platforms)]]]))
+       (stats-table (i/i lang [:top-forges]) top_forges
+                    [:thead [:tr [:th (i/i lang [:forge])]
+                             [:th (i/i lang [:repos-of-source-code])]]])]]
+     [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
+      (stats-tile lang :sill-stats sill_cnt)
+      (stats-tile lang :sill-stats papillon_cnt)
+      (stats-tile lang :deps-stats deps_cnt)
+      (stats-tile lang :libs-stats libs_cnt)]]))
 
 (defn stats-page-class [lang]
   (let [stats (reagent/atom nil)]
@@ -1452,7 +1455,17 @@
            [:div.fr-header__service-title
             [:svg {:width "240px" :viewBox "0 0 299.179 49.204"}
              [:path {:d "M5.553 2.957v2.956h4.829V0H5.553Zm5.554 0v2.956h4.829V0h-4.829Zm5.553 0v2.956h4.587V0H16.66zm5.553 0v2.956h4.829V0h-4.829zm76.057 0v2.956h4.829V0H98.27zm5.553 0v2.956h4.829V0h-4.829zm53.843 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.587zm5.313 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.588zM0 10.27v3.112h4.854l-.073-3.05-.073-3.018-2.342-.094L0 7.127zm5.553 0v3.143l2.367-.093 2.342-.093V7.314L7.92 7.22l-2.367-.093zm16.66 0v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.554 0v3.112h4.587V7.158h-4.587zm70.672-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm48.362 2.925v3.112h4.588V7.158h-4.588zm5.481-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm16.732 2.894v3.112h4.588V7.158h-4.588zm5.553 0v3.112h4.588V7.158h-4.587zM0 17.428v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019H0Zm5.553 0v3.143l2.367-.093 2.342-.093v-5.913l-2.342-.094-2.367-.093zm38.197-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.554 0 .072 3.05h4.588l.072-3.05.073-3.019H49.23zm5.505.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm21.248 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.505.093v3.143l2.366-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.602-.093.072 3.05 2.367.093 2.342.093v-6.255h-4.854zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm15.936 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.747.093v3.112h4.587v-6.224h-4.587zm15.694 0v3.112h4.588v-6.224h-4.588zm5.36-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm38.342.093v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm15.936 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm16.66 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.505.093v3.143l2.367-.093 2.342-.093.072-3.05.073-3.019h-4.854zm10.142 0v3.143l2.365-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.6-.093.073 3.05h4.588l.072-3.05.073-3.019h-4.878zm16.66 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.506.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zM0 24.742v2.956h4.829v-5.913H0Zm5.553 0v2.956h4.829v-5.913H5.553Zm32.596 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.141 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.829v-5.913H81.61zm16.66 0v2.956h4.829v-5.913H98.27zm5.553 0v2.956h4.829v-5.913h-4.829zm10.382 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.828v-5.913h-4.828zm16.901 0v2.956h4.587v-5.913h-4.587zm5.312 0v2.956h4.828v-5.913h-4.828zm10.382 0v2.956h4.588v-5.913h-4.588zm5.312 0v2.956h4.829v-5.913h-4.829zm11.107 0v2.956h4.829v-5.913h-4.829zm5.794 0v2.956h4.588v-5.913h-4.588zm5.553 0v2.956h4.588v-5.913h-4.587zm10.383 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.588v-5.913h-4.588zm16.66 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.587v-5.913h-4.587zm10.382 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.142 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zM0 31.744v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094L0 28.601zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm32.596 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.141 0v3.112h4.829v-6.224h-4.829zm5.554 0v3.112h4.829v-6.224H81.61zm16.756-2.707c-.072.249-.096 1.618-.048 3.05l.072 2.614 2.367.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm10.479-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.438.405zm5.457 2.707v3.112h4.828v-6.224h-4.828zm5.649-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm5.795 0v3.112h4.587v-6.224h-4.587zm5.408-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm10.286 2.707v3.112h4.588v-6.224h-4.588zm5.409-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256H160.2c-1.714 0-2.342.125-2.438.405zm16.804 2.707v3.112h4.588v-6.224h-4.588zm5.553 0v3.112h4.588v-6.224h-4.587zm10.383 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.112h4.588v-6.224h-4.588zm16.66 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.554 0v3.112h4.587v-6.224h-4.587zm10.382 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.142 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.112h4.829v-6.224h-4.829zM0 38.747v2.956h4.829V35.79H0Zm5.553 0v2.956h4.829V35.79H5.553Zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm10.141 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.829V35.79H81.61zm16.66 0v2.956h4.829V35.79H98.27zm5.553 0v2.956h4.829V35.79h-4.829zm10.382 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm32.595 0v2.956h4.588V35.79h-4.588zm5.312 0v2.956h4.829V35.79h-4.829zm16.901 0v2.956h4.588V35.79h-4.588zm5.553 0v2.956h4.588V35.79h-4.587zm10.383 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.588V35.79h-4.588zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm15.695 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.828V35.79h-4.828zM5.553 46.06v3.144l2.367-.094 2.342-.093v-5.913L7.92 43.01l-2.367-.093zm5.554 0v3.112h4.853l-.073-3.05-.072-3.018-2.342-.094-2.366-.093zm5.553 0v3.112h4.587v-6.224H16.66zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.072-3.018-2.174-.094c-1.207-.03-2.27 0-2.366.125zm21.489 0c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.554 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm21.248 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.553.031c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.384 2.894v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.723-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm15.936 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.552.031c-.096.093-.168 1.494-.168 3.112v2.894h4.828v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.554-.031c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.626 2.925v3.112h4.587v-6.224h-4.587zm21.175-2.925c-.097.124-.17 1.525-.17 3.143v2.894h4.855l-.073-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.625 2.925v3.112h4.588v-6.224h-4.587zm5.482-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.625 2.894v3.112h4.588v-6.224h-4.588zm21.489 0v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm21.658-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.854l-.073-3.05-.072-3.018-2.342-.094-2.367-.093zm5.554 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm26.801 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.385 2.925v3.112h4.852l-.072-3.05-.073-3.018-2.342-.094-2.366-.093z"}]]]]
-          [:p.fr-header__service-tagline (i/i lang [:index-title])]]]]]]
+          [:p.fr-header__service-tagline (i/i lang [:index-title])]]]
+        [:div.fr-header__tools
+         [:div.fr-header__tools-links
+          [:ul.fr-links-group
+           [:li [:a.fr-link {:href "https://twitter.com/codegouvfr"} "@codegouvfr"]]
+           [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
+                 {:aria-controls  "fr-theme-modal"
+                  :title          (str (i/i lang [:modal-title]) " - "
+                                       (i/i lang [:new-modal]))
+                  :data-fr-opened false}
+                 (i/i lang [:modal-title])]]]]]]]]
      ;; Header menu
      [:div#modal-833.fr-header__menu.fr-modal
       {:aria-labelledby "fr-btn-menu-mobile"}
@@ -1650,7 +1663,7 @@
          :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
-       [:button.fr-footer__bottom-link.fr-fi-theme-fill.fr-link--icon-left
+       [:button.fr-footer__bottom-link.fr-icon-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
          :title          (str (i/i lang [:modal-title]) " - "
                               (i/i lang [:new-modal]))
