@@ -177,7 +177,7 @@
     :Repos-deps-sim                "Repositories with similar dependencies"
     :Sill                          "Recommended free software"
     :Stars                         "Stars"
-    :Stats                         "Overview"
+    :Stats                         "Stats"
     :accessibility                 "Accessibility: partially conform"
     :added                         "Added"
     :all-dep-types                 "All dependency types"
