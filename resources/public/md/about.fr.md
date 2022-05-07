@@ -19,9 +19,9 @@ Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](ht
 
 Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html).
 
-* La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json)
-* La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
-* La liste des dépendances en [csv](/data/dependencies/csv/all.csv) et [json](/data/dependencies/json/all.json)
+* La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json).
+* La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json).
+* La liste des bibliothèques en [csv](/data/libraries/csv/all.csv) et [json](/data/libraries/json/all.json).
 
 ## Comment suivre les mises à jour ?
 

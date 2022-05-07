@@ -22,9 +22,9 @@ For more details on other technical terms, [please check this glossary](https://
 
 All data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html).
 
-- The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json)
-- The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json)
-- The list of dependencies as [csv](/data/dependencies/csv/all.csv) and [json](/data/dependencies/json/all.json)
+- The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json).
+- The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json).
+- The list of libraries as [csv](/data/libraries/csv/all.csv) and [json](/data/libraries/json/all.json).
 
 ## How to get updates?
 
