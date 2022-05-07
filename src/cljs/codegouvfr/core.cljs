@@ -2002,7 +2002,7 @@
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
-         {:href  "#/orgas"
+         {:href  "#/groups"
           :title (i/i lang [:orgas-or-groups])}
          (i/i lang [:orgas])]]
        [:div.fr-card__desc (i/i lang [:home-groups-desc])]]
