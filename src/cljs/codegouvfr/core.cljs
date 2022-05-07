@@ -2002,11 +2002,12 @@
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
-         {:href "#/sill"}
-         (i/i lang [:sill-stats])]]
-       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
+         {:href  "#/orgas"
+          :title (i/i lang [:orgas-or-groups])}
+         (i/i lang [:orgas])]]
+       [:div.fr-card__desc (i/i lang [:home-groups-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/compass.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/window.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -2027,8 +2028,27 @@
          (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]]
-   [:div.fr-grid-row.fr-grid-row--center
+       [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href "#/sill"}
+         (i/i lang [:sill-stats])]]
+       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/compass.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href "#/papillon"}
+         (i/i lang [:papillon-title])]]
+       [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
+      [:div.fr-card__img
+       [:img.fr-responsive-img {:src "/img/directions.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
