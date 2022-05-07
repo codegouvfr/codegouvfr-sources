@@ -23,6 +23,12 @@ Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/l
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json)
 * La liste des dépendances en [csv](/data/dependencies/csv/all.csv) et [json](/data/dependencies/json/all.json)
 
+## Comment suivre les mises à jour ?
+
+Voir notre [page avec tous les flux RSS](/#/feeds).
+
+Vous pouvez aussi suivre les annonces du pôle logiciels libres en vous abonnant à la [gazette BlueHats](https://communs.numerique.gouv.fr/gazette/) ou en nous suivant sur [Twitter](https://twitter.com/codegouvfr) et [Mastodon](https://mastodon.social/@codegouvfr).
+
 ## Comment ces données sont-elles construites ?
 
 1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) référence les comptes d'organisation ouverts par des organismes publics sur sr.ht (SourceHut), github.com, gitlab.com ou des forges GitLab locales ;
