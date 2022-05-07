@@ -19,9 +19,14 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 ## Credits
 
 <ul>
-- *Mechanical Keyboard with dsa keycaps* © Jay Zhang, [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY) license
-- *Pebble tower*" © Jeremy Thomas, [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ) license
+- *Mechanical Keyboard with dsa keycaps* © Jay Zhang , license [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
+- *Pebble tower* © Jeremy Thomas, license [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+- *People walking inside library* © Gabriel Sollmannn, license [Unsplash](https://unsplash.com/photos/Y7d265_7i08)
+- *Person holding green and gold compass* © Mariah Hewines, license [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
+- *White and black street sign* © Shawn Sim, license [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
+- *Aerial photography of two boats on body of water during daytime* © Nicolas Jossi, license [Unsplash](https://unsplash.com/photos/h3ki3bbJWk0)
 </ul>
+<br>
 
 ## Source code
 

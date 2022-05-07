@@ -22,17 +22,23 @@ For more details on other technical terms, [please check this glossary](https://
 
 All data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html).
 
-- The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json)
-- The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json)
-- The list of dependencies as [csv](/data/dependencies/csv/all.csv) and [json](/data/dependencies/json/all.json)
+- The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json).
+- The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json).
+- The list of libraries as [csv](/data/libraries/csv/all.csv) and [json](/data/libraries/json/all.json).
 
-## How do we build the data?
+## How to get updates?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on github.com, gitlab.com or local GitLab forges;
+Check our [list of RSS feeds](/#/feeds).
+
+You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodon](https://mastodon.social/@codegouvfr).
+
+## How are the data collected?
+
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges;
 2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list;
 3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidate the data and add the list of dependencies;
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose the data.
 
 **Warning**: We don't reference personal accounts.
 
-So far, we only reference accounts on github.com, gitlab.com and local GitLab instances: if you can help referencing accounts that publish code on other forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), [Gogs](https://gogs.io) or [Gitea](https://gitea.io) instances, etc.), please see how to [contribute](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
+So far, we only reference accounts on sr.ht (SourceHut), github.com, gitlab.com and local GitLab instances: if you can help referencing accounts that publish code on other forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), [Gogs](https://gogs.io) or [Gitea](https://gitea.io) instances, etc.), please see how to [contribute](https://git.sr.ht/~etalab/codegouvfr-fetch-data).

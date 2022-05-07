@@ -21,7 +21,11 @@ Ce site est hébergé par OVH France, 2 rue Kellermann, 59100 Roubaix, France.  
 
 <ul>
 - *Mechanical Keyboard with dsa keycaps* © Jay Zhang , licence [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
-- *Pebble tower*" © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+- *Pebble tower* © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
+- *People walking inside library* © Gabriel Sollmannn, licence [Unsplash](https://unsplash.com/photos/Y7d265_7i08)
+- *Person holding green and gold compass* © Mariah Hewines, licence [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
+- *White and black street sign* © Shawn Sim, licence [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
+- *Aerial photography of two boats on body of water during daytime* © Nicolas Jossi, licence [Unsplash](https://unsplash.com/photos/h3ki3bbJWk0)
 </ul>
 <br>
 

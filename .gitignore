@@ -7,7 +7,6 @@ figwheel_server.log
 *txt
 .lsp/*
 .eastwood
-*xml
 *csv
 resources/public/data/
 .cpcache/
