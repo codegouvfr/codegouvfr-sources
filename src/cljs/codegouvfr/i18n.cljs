@@ -203,7 +203,7 @@
     :footer-desc-link              "the free software pole at Etalab."
     :forge                         "Forge"
     :forks                         "Forks"
-    :free-search                   "Free search"
+    :free-search                   "Free-form search"
     :glossary                      "Glossary"
     :go-to-orga                    "Visit the organization or group"
     :go-to-repo                    "See this repository"
