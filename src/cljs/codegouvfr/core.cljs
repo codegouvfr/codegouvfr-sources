@@ -172,17 +172,32 @@
     (.click link)
     (js/document.body.removeChild link)))
 
-(defn top-clean-up [data param title]
+(defn top-clean-up-repos [data param title]
   (let [total (reduce + (map last data))]
     (sequence
      (comp
       (map (fn [[k v]]
-             [k (js/parseFloat
-                 (gstring/format "%.2f" (* (/ v total) 100)))]))
+             [k (if (some #{"license" "language"} param)
+                  (js/parseFloat
+                   (gstring/format "%.2f" (* (/ v total) 100)))
+                  v)]))
       (map #(let [[k v] %]
               [[:a
                 {:title title
-                 :href  (str "#/repos?" param "=" k)} k] v])))
+                 ;; FIXME: Shoud reset the parameter globally
+                 :href  (rfe/href :repos {} {param k})} k] v])))
+     data)))
+
+(defn top-clean-up-orgas [data param title]
+  (let [total (reduce + (map last data))]
+    (sequence
+     (comp
+      (map #(let [[k v] %
+                  k0    (s/replace k #" \([^)]+\)" "")]
+              [[:a
+                {:title title
+                 ;; FIXME: Shoud reset the parameter globally
+                 :href  (rfe/href :orgas {} {param k})} k] v])))
      data)))
 
 ;; Filters
@@ -1402,9 +1417,9 @@
   [lang stats]
   (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt papillon_cnt
                 avg_repos_cnt median_repos_cnt
-                top_orgs_by_repos ;; top_orgs_by_stars
+                top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
-                top_forges]} stats]
+                top_forges top_ministries]} stats]
     [:div
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :orgas-or-groups orgas_cnt)
@@ -1414,19 +1429,22 @@
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
-                    (top-clean-up
-                     top_languages "language" (i/i lang [:list-repos-with-language]))
+                    (top-clean-up-repos
+                     top_languages "language"
+                     (i/i lang [:list-repos-with-language]))
                     [:thead [:tr [:th (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
        (stats-table
         [:span (i/i lang [:topics])]
         top_topics
-        [:thead [:tr [:th (i/i lang [:topics])] [:th (i/i lang [:occurrences])]]])]]
+        [:thead [:tr [:th (i/i lang [:topics])]
+                 [:th (i/i lang [:occurrences])]]])]]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
-                    (top-clean-up
-                     top_licenses "license" (i/i lang [:list-repos-using-license]))
+                    (top-clean-up-repos
+                     top_licenses "license"
+                     (i/i lang [:list-repos-using-license]))
                     [:thead [:tr [:th (i/i lang [:license])] [:th "%"]]])]
       [:div.fr-col-6
        [:div.fr-m-3w
@@ -1440,20 +1458,35 @@
                      (i/i lang [:orgas])
                      (i/i lang [:with-more-of])
                      (i/i lang [:repos])]
-                    top_orgs_by_repos
-                    [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Repos])]]])]
-      ;; Who really likes stars?
-      ;; [:div.fr-col-6
-      ;;  (stats-table [:span
-      ;;                (i/i lang [:orgas])
-      ;;                (i/i lang [:with-more-of*])
-      ;;                (i/i lang [:stars])]
-      ;;               top_orgs_by_stars
-      ;;               [:thead [:tr [:th (i/i lang [:orgas])] [:th (i/i lang [:Stars])]]])]
+                    (top-clean-up-orgas
+                     top_orgs_by_repos "q"
+                     [:thead [:tr [:th (i/i lang [:orgas])]
+                              [:th (i/i lang [:Repos])]]]))]
       [:div.fr-col-6
-       (stats-table (i/i lang [:top-forges]) top_forges
-                    [:thead [:tr [:th (i/i lang [:forge])]
-                             [:th (i/i lang [:repos-of-source-code])]]])]]
+       (stats-table [:span
+                     (i/i lang [:orgas])
+                     (i/i lang [:with-more-of*])
+                     (i/i lang [:stars])]
+                    (top-clean-up-orgas
+                     top_orgs_by_stars
+                     "q"
+                     [:thead [:tr [:th (i/i lang [:orgas])]
+                              [:th (i/i lang [:Stars])]]]))]]
+     [:div.fr-grid-row
+      [:div.fr-col-6
+       (stats-table (i/i lang [:top-forges])
+                    (top-clean-up-repos
+                     top_forges
+                     "platform"
+                     [:thead [:tr [:th (i/i lang [:forge])]
+                              [:th (i/i lang [:repos-of-source-code])]]]))]
+      [:div.fr-col-6
+       (stats-table (i/i lang [:top-ministries])
+                    (top-clean-up-orgas
+                     top_ministries
+                     "ministry"
+                     [:thead [:tr [:th (i/i lang [:ministry])]
+                              [:th (i/i lang [:repos-of-source-code])]]]))]]
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :sill-stats sill_cnt)
       (stats-tile lang :sill-stats papillon_cnt)
