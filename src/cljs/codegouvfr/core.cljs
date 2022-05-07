@@ -1227,7 +1227,6 @@
             (i/i lang [:service])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col
-
            [:button
             {:class    (when (= papillon-f :agency) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-papillon-agency])
@@ -1755,12 +1754,14 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/sill") "page")
+            :title (i/i lang [:sill-stats])
             :href         "#/sill"}
            (i/i lang [:Sill])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/papillon") "page")
-            :href         "#/papillon"}
+            :title (i/i lang [:papillon-title])
+            :href         "#/services"}
            (i/i lang [:Papillon])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -2039,7 +2040,7 @@
       [:div.fr-card__body
        [:div.fr-card__title
         [:a.fr-card__link
-         {:href "#/papillon"}
+         {:href "#/services"}
          (i/i lang [:papillon-title])]]
        [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
       [:div.fr-card__img
@@ -2143,7 +2144,7 @@
    ["repos" :repos]
    ["libs" :libs]
    ["sill" :sill]
-   ["papillon" :papillon]
+   ["services" :papillon]
    ["stats" :stats]
    ["deps" :deps]
    ["legal" :legal]
