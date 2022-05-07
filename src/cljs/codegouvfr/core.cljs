@@ -1263,11 +1263,6 @@
         last-disabled  (= papillon-pages (dec count-pages))]
     [:div.fr-grid
      [:div.fr-grid-row
-      ;; RSS feed
-      [:button.fr-link
-       {:title (i/i lang [:rss-feed])
-        :href  "/data/latest-papillon.xml"}
-       [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
       [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
