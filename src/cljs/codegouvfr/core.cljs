@@ -514,11 +514,11 @@
 
 (re-frame/reg-sub
  :deps-types?
- (fn [db _] (distinct (map :t (:deps db)))))
+ (fn [db _] (distinct (map :t @deps))))
 
 (re-frame/reg-sub
  :libs-types?
- (fn [db _] (distinct (map :t (:libs db)))))
+ (fn [db _] (distinct (map :t @libs))))
 
 (re-frame/reg-sub
  :repos?
