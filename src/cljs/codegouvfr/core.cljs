@@ -54,66 +54,55 @@
 
 (defonce display-filter-chan (async/chan 100))
 
-(defonce repos-mapping
-  {:u  :last_update
-   :d  :description
-   :a? :is_archived
-   :f? :is_fork
-   :e? :is_esr
-   :l? :is_lib
-   :l  :language
-   :li :license
-   :n  :name
-   :f  :forks_count
-   :s  :stars_count
-   :o  :organization_name
-   :p  :platform
-   :re :reuses
-   :r  :repository_url
-   })
-
-(defonce orgas-mapping
-  {:d  :description
-   :a  :location
-   :e  :email
-   :n  :name
-   :p  :platform
-   :h  :website
-   :v? :is_verified
-   :l  :login
-   :c  :creation_date
-   :r  :repositories_count
-   :o  :organization_url
-   :au :avatar_url})
-
-(defonce deps-mapping
-  {:n :name
-   :t :type
-   :d :description
-   :l :link
-   :u :updated
-   :r :repositories})
-
-(defonce sill-mapping
-  {:n :name
-   :f :description
-   :l :license
-   :u :added})
-
-(defonce papillon-mapping
-  {:a :agencyName
-   :p :publicSector
-   :n :serviceName
-   :d :description
-   :l :serviceUrl
-   :i :softwareSillId})
-
-(defonce libs-mapping
-  {:n :name
-   :t :type
-   :d :description
-   :l :link
-   :u :updated})
+(defonce mappings
+  {:repos    {:u  :last_update
+              :d  :description
+              :a? :is_archived
+              :f? :is_fork
+              :e? :is_esr
+              :l? :is_lib
+              :l  :language
+              :li :license
+              :n  :name
+              :f  :forks_count
+              :s  :stars_count
+              :o  :organization_name
+              :p  :platform
+              :re :reuses
+              :r  :repository_url}
+   :orgas    {:d  :description
+              :a  :location
+              :e  :email
+              :n  :name
+              :p  :platform
+              :h  :website
+              :v? :is_verified
+              :l  :login
+              :c  :creation_date
+              :r  :repositories_count
+              :o  :organization_url
+              :au :avatar_url}
+   :deps     {:n :name
+              :t :type
+              :d :description
+              :l :link
+              :u :updated
+              :r :repositories}
+   :sill     {:n :name
+              :f :description
+              :l :license
+              :u :added}
+   :papillon {:a :agencyName
+              :p :publicSector
+              :n :serviceName
+              :d :description
+              :l :serviceUrl
+              :i :softwareSillId}
+   :libs     {:n :name
+              :t :type
+              :d :description
+              :l :link
+              :u :updated}})
 
 ;; Utility functions
 
@@ -825,7 +814,8 @@
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
         first-disabled (zero? repos-pages)
-        last-disabled  (= repos-pages (dec count-pages))]
+        last-disabled  (= repos-pages (dec count-pages))
+        mapping        (:repos mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -838,9 +828,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys repos-mapping))
-                              repos-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      repos)
                     (str "codegouvfr-repositories-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
@@ -996,7 +984,8 @@
         count-pages    (count (partition-all libs-per-page libs))
         first-disabled (zero? libs-pages)
         last-disabled  (= libs-pages (dec count-pages))
-        lib-type       (reagent/atom nil)]
+        lib-type       (reagent/atom nil)
+        mapping        (:libs mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -1009,9 +998,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys libs-mapping))
-                              libs-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      libs)
                     (str "codegouvfr-libraries-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
@@ -1127,7 +1114,8 @@
         sill-pages     @(re-frame/subscribe [:sill-page?])
         count-pages    (count (partition-all sill-per-page sill))
         first-disabled (zero? sill-pages)
-        last-disabled  (= sill-pages (dec count-pages))]
+        last-disabled  (= sill-pages (dec count-pages))
+        mapping        (:sill mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -1140,9 +1128,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys sill-mapping))
-                              sill-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      sill)
                     (str "codegouvfr-sill-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
@@ -1223,7 +1209,8 @@
         papillon-pages @(re-frame/subscribe [:papillon-page?])
         count-pages    (count (partition-all papillon-per-page papillon))
         first-disabled (zero? papillon-pages)
-        last-disabled  (= papillon-pages (dec count-pages))]
+        last-disabled  (= papillon-pages (dec count-pages))
+        mapping        (:papillon mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; Download link
@@ -1231,9 +1218,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys papillon-mapping))
-                              papillon-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      papillon)
                     (str "codegouvfr-papillon-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
@@ -1337,7 +1322,8 @@
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
         first-disabled (zero? orgas-pages)
-        last-disabled  (= orgas-pages (dec count-pages))]
+        last-disabled  (= orgas-pages (dec count-pages))
+        mapping        (:orgas mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -1350,9 +1336,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys orgas-mapping))
-                              orgas-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      orgas)
                     (str "codegouvfr-organizations-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
@@ -1456,7 +1440,8 @@
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (zero? deps-pages)
         last-disabled  (= deps-pages (dec count-pages))
-        dep-type       (reagent/atom nil)]
+        dep-type       (reagent/atom nil)
+        mapping        (:deps mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
@@ -1469,9 +1454,7 @@
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
-                     (fn [r] (set/rename-keys
-                              (select-keys r (keys deps-mapping))
-                              deps-mapping))
+                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      deps)
                     (str "codegouvfr-dependencies-" (todays-date) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
