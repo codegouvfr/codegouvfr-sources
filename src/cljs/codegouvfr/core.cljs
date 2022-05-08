@@ -349,6 +349,7 @@
 (re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
+   ;; FIXME: Necessary?
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
@@ -527,11 +528,11 @@
 
 (re-frame/reg-sub
  :deps-types?
- (fn [db _] (distinct (map :t @deps))))
+ (fn [_ _] (distinct (map :t @deps))))
 
 (re-frame/reg-sub
  :libs-types?
- (fn [db _] (distinct (map :t @libs))))
+ (fn [_ _] (distinct (map :t @libs))))
 
 (re-frame/reg-sub
  :repos?
