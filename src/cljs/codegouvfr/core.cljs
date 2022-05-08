@@ -847,7 +847,7 @@
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
-       {:value @platform
+       {:value (or @platform "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -994,7 +994,7 @@
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value @lib-type
+       {:value (or @lib-type "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -1332,7 +1332,7 @@
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value @ministry
+       {:value (or @ministry "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -1450,7 +1450,7 @@
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value @dep-type
+       {:value (or @dep-type "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
