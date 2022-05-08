@@ -195,6 +195,10 @@
 
 ;; Filters
 
+(defn ntaf
+  "Not a true and b false."
+  [a b] (if a b true))
+
 (defn apply-repos-filters [m]
   (let [{:keys [d q g language platform license
                 is-esr is-contrib is-lib is-fork is-licensed]}
@@ -203,20 +207,19 @@
      #(and
        ;; FIXME: dp-filter here is a hack
        (if (and d @dp-filter) (some @dp-filter [(:r %)]) true)
-       (if is-esr (:e? %) true)
-       (if is-fork (:f? %) true)
-       (if is-contrib (:c? %) true)
-       (if is-lib (:l? %) true)
-       (if is-licensed (let [l (:li %)] (and l (not= l "Other"))) true)
-       (if license (s-includes? (:li %) license) true)
+       (ntaf is-esr (:e? %))
+       (ntaf is-fork (:f? %))
+       (ntaf is-contrib (:c? %))
+       (ntaf is-lib (:l? %))
+       (ntaf is-licensed (let [l (:li %)] (and l (not= l "Other"))))
+       (ntaf license (s-includes? (:li %) license))
        (if language
          (some (into #{} (list (s/lower-case (or (:l %) ""))))
                (s/split (s/lower-case language) #" +"))
          true)
        (if (= platform "all") true (s-includes? (:r %) platform))
-       (if g (s-includes? (:r %) g) true)
-       (if q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)
-           true))
+       (ntaf g (s-includes? (:r %) g))
+       (ntaf q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)))
      m)))
 
 (defn apply-deps-filters [m]
@@ -224,13 +227,13 @@
     (filter
      #(and
        (if (= dep-type "all") true (= (:t %) dep-type))
-       (if q (s-includes? (s/join " " [(:n %) (:t %) (:d %)]) q) true))
+       (ntaf q (s-includes? (s/join " " [(:n %) (:t %) (:d %)]) q)))
      m)))
 
 (defn apply-orgas-filters [m]
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(and (if q (s-includes? (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)]) q) true)
+     #(and (ntaf q (s-includes? (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)]) q))
            (if (= ministry "all") true (= (:m %) ministry)))
      m)))
 
@@ -239,19 +242,19 @@
     (filter
      #(and
        (if (= lib-type "all") true (= (:t %) lib-type))
-       (if q (s-includes? (s/join " " [(:n %) (:d %)]) q) true))
+       (ntaf q (s-includes? (s/join " " [(:n %) (:d %)]) q)))
      m)))
 
 (defn apply-sill-filters [m]
   (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(if q (s-includes? (s/join " " [(:n %) (:f %)]) q) true)
+     #(ntaf q (s-includes? (s/join " " [(:n %) (:f %)]) q))
      m)))
 
 (defn apply-papillon-filters [m]
   (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(if q (s-includes? (s/join " " [(:n %) (:a %) (:d %)]) q) true)
+     #(ntaf q (s-includes? (s/join " " [(:n %) (:a %) (:d %)]) q))
      m)))
 
 (defn close-filter-button [lang ff t reinit]
