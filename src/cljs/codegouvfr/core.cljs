@@ -37,13 +37,8 @@
 (def dp-filter (reagent/atom nil))
 
 (defonce init-filter
-  {:q        nil
+  {:d        nil
    :g        nil
-   :d        nil
-   :repo     nil
-   :orga     nil
-   :language nil
-   :license  nil
    :platform ""
    :ministry ""
    :dep-type ""
@@ -183,7 +178,7 @@
     (sequence
      (comp
       (map (fn [[k v]]
-             [k (if (some #{"license" "language"} param)
+             [k (if (some #{"license" "language"} (list param))
                   (js/parseFloat
                    (gstring/format "%.2f" (* (/ v total) 100)))
                   v)]))
@@ -293,27 +288,22 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
-   {:repos          nil
-    :orgas          nil
-    :libs           nil
-    :deps           nil
-    :sill           nil
-    :papillon       nil
-    :repos-page     0
-    :orgas-page     0
-    :libs-page      0
-    :deps-page      0
-    :sill-page      0
-    :papillon-page  0
-    :sort-repos-by  :reused
-    :sort-orgas-by  :repos
-    :sort-deps-by   :repos
-    :view           :orgas
-    :reverse-sort   false
-    :filter         init-filter
-    :display-filter init-filter
-    :lang           "en"
-    :path           ""}))
+   {:repos-page       0
+    :orgas-page       0
+    :libs-page        0
+    :deps-page        0
+    :sill-page        0
+    :papillon-page    0
+    :sort-repos-by    :reused
+    :sort-orgas-by    :repos
+    :sort-deps-by     :repos
+    :sort-libs-by     :name
+    :sort-papillon-by :agency
+    :reverse-sort     false
+    :filter           init-filter
+    :display-filter   init-filter
+    :lang             "en"
+    :path             ""}))
 
 (def repos (reagent/atom nil))
 (def libs (reagent/atom nil))
@@ -963,7 +953,6 @@
         count-pages    (count (partition-all libs-per-page libs))
         first-disabled (zero? libs-pages)
         last-disabled  (= libs-pages (dec count-pages))
-        lib-type       (reagent/atom nil)
         mapping        (:libs mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
@@ -991,11 +980,11 @@
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @lib-type "")
+       {:value (:lib-type @(re-frame/subscribe [:filter?]))
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! lib-type ev)
+            (re-frame/dispatch [:filter! {:lib-type ev}])
             (async/go
               (async/>! display-filter-chan {:lib-type ev})
               (async/<! (async/timeout timeout))
@@ -1420,7 +1409,6 @@
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (zero? deps-pages)
         last-disabled  (= deps-pages (dec count-pages))
-        dep-type       (reagent/atom nil)
         mapping        (:deps mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
@@ -1448,11 +1436,11 @@
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @dep-type "")
+       {:value (:dep-type @(re-frame/subscribe [:filter?]))
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! dep-type ev)
+            (re-frame/dispatch [:filter! {:dep-type ev}])
             (async/go
               (async/>! display-filter-chan {:dep-type ev})
               (async/<! (async/timeout timeout))
@@ -2020,10 +2008,12 @@
 ;; Setup router and init
 
 (defn on-navigate [match]
-  (re-frame/dispatch [:path! (:path match)])
-  (re-frame/dispatch [:view!
-                      (keyword (:name (:data match)))
-                      (:query-params match)]))
+  (let [page (keyword (:name (:data match)))]
+    ;; FIXME: When returning to :deps, ensure dp-filter is nil
+    (when (= page :deps) (reset! dp-filter nil))
+    (re-frame/dispatch [:filter {:q nil}])
+    (re-frame/dispatch [:path! (:path match)])
+    (re-frame/dispatch [:view! page (:query-params match)])))
 
 (defonce routes
   ["/"
