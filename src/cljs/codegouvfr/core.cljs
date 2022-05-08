@@ -963,7 +963,6 @@
         count-pages    (count (partition-all libs-per-page libs))
         first-disabled (zero? libs-pages)
         last-disabled  (= libs-pages (dec count-pages))
-        lib-type       (reagent/atom nil)
         mapping        (:libs mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
@@ -991,11 +990,11 @@
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @lib-type "")
+       {:value (:lib-type @(re-frame/subscribe [:filter?]))
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! lib-type ev)
+            (re-frame/dispatch [:filter! {:lib-type ev}])
             (async/go
               (async/>! display-filter-chan {:lib-type ev})
               (async/<! (async/timeout timeout))
@@ -1420,7 +1419,6 @@
         count-pages    (count (partition-all deps-per-page deps))
         first-disabled (zero? deps-pages)
         last-disabled  (= deps-pages (dec count-pages))
-        dep-type       (reagent/atom nil)
         mapping        (:deps mappings)]
     [:div.fr-grid
      [:div.fr-grid-row
@@ -1448,11 +1446,11 @@
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @dep-type "")
+       {:value (:dep-type @(re-frame/subscribe [:filter?]))
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! dep-type ev)
+            (re-frame/dispatch [:filter! {:dep-type ev}])
             (async/go
               (async/>! display-filter-chan {:dep-type ev})
               (async/<! (async/timeout timeout))
