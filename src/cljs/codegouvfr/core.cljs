@@ -37,7 +37,17 @@
 (def dp-filter (reagent/atom nil))
 
 (defonce init-filter
-  {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all" :ministry "all" :dep-type "all" :lib-type "all"})
+  {:q        nil
+   :g        nil
+   :d        nil
+   :repo     nil
+   :orga     nil
+   :language nil
+   :license  nil
+   :platform ""
+   :ministry ""
+   :dep-type ""
+   :lib-type ""})
 
 (defonce urls
   {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
@@ -217,7 +227,7 @@
          (some (into #{} (list (s/lower-case (or (:l %) ""))))
                (s/split (s/lower-case language) #" +"))
          true)
-       (if (= platform "all") true (s-includes? (:r %) platform))
+       (if (= platform "") true (s-includes? (:r %) platform))
        (ntaf g (s-includes? (:r %) g))
        (ntaf q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)))
      m)))
@@ -226,7 +236,7 @@
   (let [{:keys [dep-type q]} @(re-frame/subscribe [:filter?])]
     (filter
      #(and
-       (if (= dep-type "all") true (= (:t %) dep-type))
+       (if (= dep-type "") true (= (:t %) dep-type))
        (ntaf q (s-includes? (s/join " " [(:n %) (:t %) (:d %)]) q)))
      m)))
 
@@ -234,14 +244,14 @@
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
     (filter
      #(and (ntaf q (s-includes? (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)]) q))
-           (if (= ministry "all") true (= (:m %) ministry)))
+           (if (= ministry "") true (= (:m %) ministry)))
      m)))
 
 (defn apply-libs-filters [m]
   (let [{:keys [q lib-type]} @(re-frame/subscribe [:filter?])]
     (filter
      #(and
-       (if (= lib-type "all") true (= (:t %) lib-type))
+       (if (= lib-type "") true (= (:t %) lib-type))
        (ntaf q (s-includes? (s/join " " [(:n %) (:d %)]) q)))
      m)))
 
@@ -837,7 +847,7 @@
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
-       {:value (or @platform "all")
+       {:value @platform
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -846,7 +856,7 @@
               (async/>! display-filter-chan {:platform ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:platform ev}))))}
-       [:option {:value "all"} (i/i lang [:all-forges])]
+       [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x @platforms]
          ^{:key x}
          [:option {:value x} x])]
@@ -984,7 +994,7 @@
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @lib-type "all")
+       {:value @lib-type
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -993,7 +1003,7 @@
               (async/>! display-filter-chan {:lib-type ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:lib-type ev}))))}
-       [:option {:value "all"} (i/i lang [:all-lib-types])]
+       [:option#default {:value ""} (i/i lang [:all-lib-types])]
        (for [x libtypes]
          ^{:key x}
          [:option {:value x} x])]]
@@ -1322,7 +1332,7 @@
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @ministry "all")
+       {:value @ministry
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -1331,7 +1341,7 @@
               (async/>! display-filter-chan {:ministry ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:ministry ev}))))}
-       [:option {:value "all"} (i/i lang [:all-ministries])]
+       [:option#default {:value ""} (i/i lang [:all-ministries])]
        (for [x @(re-frame/subscribe [:ministries?])]
          ^{:key x}
          [:option {:value x} x])]]
@@ -1440,7 +1450,7 @@
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @dep-type "all")
+       {:value @dep-type
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
@@ -1449,7 +1459,7 @@
               (async/>! display-filter-chan {:dep-type ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:dep-type ev}))))}
-       [:option {:value "all"} (i/i lang [:all-dep-types])]
+       [:option#default {:value ""} (i/i lang [:all-dep-types])]
        (for [x deptypes]
          ^{:key x}
          [:option {:value x} x])]]
