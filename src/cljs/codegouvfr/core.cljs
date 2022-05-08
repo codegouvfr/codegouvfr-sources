@@ -360,33 +360,13 @@
  (fn [db [_ path]]
    (assoc db :path path)))
 
-(re-frame/reg-event-db
- :update-repos!
- (fn [db [_ repos]] (assoc db :repos repos)))
-
-(re-frame/reg-event-db
- :update-libs!
- (fn [db [_ libs]] (assoc db :libs libs)))
-
-(re-frame/reg-event-db
- :update-sill!
- (fn [db [_ sill]] (assoc db :sill sill)))
-
-(re-frame/reg-event-db
- :update-papillon!
- (fn [db [_ papillon]] (assoc db :papillon papillon)))
-
-(re-frame/reg-event-db
- :update-deps!
- (fn [db [_ deps]] (assoc db :deps deps)))
-
-(re-frame/reg-event-db
- :update-deps-raw!
- (fn [db [_ deps-raw]] (assoc db :deps-raw deps-raw)))
-
-(re-frame/reg-event-db
- :update-dep-repos!
- (fn [db [_ dep-repos]] (assoc db :dep-repos dep-repos)))
+(def repos (reagent/atom nil))
+(def libs (reagent/atom nil))
+(def sill (reagent/atom nil))
+(def papillon (reagent/atom nil))
+(def deps (reagent/atom nil))
+(def orgas (reagent/atom nil))
+(def platforms (reagent/atom nil))
 
 (re-frame/reg-event-db
  :filter!
@@ -437,10 +417,6 @@
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
-
-(re-frame/reg-event-db
- :update-orgas!
- (fn [db [_ orgas]] (when orgas (assoc db :orgas orgas))))
 
 (re-frame/reg-event-db
  :reverse-sort!
@@ -503,8 +479,6 @@
 (re-frame/reg-sub
  :path?
  (fn [db _] (:path db)))
-
-(def platforms (reagent/atom nil))
 
 (re-frame/reg-sub
  :sort-repos-by?
@@ -573,7 +547,7 @@
 (re-frame/reg-sub
  :repos?
  (fn [db _]
-   (let [repos0 (:repos db)
+   (let [repos0 @repos
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (reverse (sort-by :n repos0))
                   :forks  (sort-by :f repos0)
@@ -594,7 +568,7 @@
 (re-frame/reg-sub
  :libs?
  (fn [db _]
-   (let [libs0 (:libs db)
+   (let [libs0 @libs
          libs  (case @(re-frame/subscribe [:sort-libs-by?])
                  :name (reverse (sort-by :name libs0))
                  libs0)]
@@ -605,7 +579,7 @@
 (re-frame/reg-sub
  :sill?
  (fn [db _]
-   (let [sill0 (:sill db)
+   (let [sill0 @sill
          sill  (case @(re-frame/subscribe [:sort-sill-by?])
                  :name (reverse (sort-by :n sill0))
                  :date (sort #(compare (js/Date. (.parse js/Date (:u %1)))
@@ -619,7 +593,7 @@
 (re-frame/reg-sub
  :papillon?
  (fn [db _]
-   (let [papillon0 (:papillon db)
+   (let [papillon0 @papillon
          papillon  (case @(re-frame/subscribe [:sort-papillon-by?])
                      :name   (reverse (sort-by :n papillon0))
                      :agency (reverse (sort-by :a papillon0))
@@ -631,7 +605,7 @@
 (re-frame/reg-sub
  :deps?
  (fn [db _]
-   (let [deps0 (:deps db)
+   (let [deps0 @deps
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
                  :name        (reverse (sort-by :n deps0))
                  :type        (reverse (sort-by :t deps0))
@@ -657,7 +631,7 @@
 (re-frame/reg-sub
  :orgas?
  (fn [db _]
-   (let [orgs  (:orgas db)
+   (let [orgs  @orgas
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
                  :date  (sort
@@ -968,8 +942,7 @@
     (fn []
       (GET "/data/repos.json"
            :handler
-           #(re-frame/dispatch
-             [:update-repos! (map (comp bean clj->js) %)])))
+           #(reset! repos (map (comp bean clj->js) %))))
     :reagent-render (fn [] (repos-page lang license language platform))}))
 
 ;; Main structure - libs
@@ -1078,8 +1051,7 @@
     (fn []
       (GET "/data/libs.json"
            :handler
-           #(re-frame/dispatch
-             [:update-libs! (map (comp bean clj->js) %)])))
+           #(reset! libs (map (comp bean clj->js) %))))
     :reagent-render (fn [] (libs-page lang))}))
 
 ;; Main structure - sill
@@ -1195,8 +1167,7 @@
     (fn []
       (GET "/data/sill.json"
            :handler
-           #(re-frame/dispatch
-             [:update-sill! (map (comp bean clj->js) %)])))
+           #(reset! sill (map (comp bean clj->js) %))))
     :reagent-render (fn [] (sill-page lang))}))
 
 ;; Main structure - papillon
@@ -1287,8 +1258,7 @@
     (fn []
       (GET "/data/papillon.json"
            :handler
-           #(re-frame/dispatch
-             [:update-papillon! (map (comp bean clj->js) %)])))
+           #(reset! papillon (map (comp bean clj->js) %))))
     :reagent-render (fn [] (papillon-page lang))}))
 
 ;; Main structure - orgas
@@ -2101,12 +2071,10 @@
              #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
         (GET "/data/deps.json"
              :handler
-             #(re-frame/dispatch
-               [:update-deps! (map (comp bean clj->js) %)]))
+             #(reset! deps (map (comp bean clj->js) %)))
         (GET "/data/orgas.json"
              :handler
-             #(re-frame/dispatch
-               [:update-orgas! (map (comp bean clj->js) %)])))
+             #(reset! orgas (map (comp bean clj->js) %))))
       :reagent-render (fn [] (main-page q license language platform ministry))})))
 
 ;; Setup router and init
