@@ -183,7 +183,7 @@
     (sequence
      (comp
       (map (fn [[k v]]
-             [k (if (some #{"license" "language"} param)
+             [k (if (some #{"license" "language"} (list param))
                   (js/parseFloat
                    (gstring/format "%.2f" (* (/ v total) 100)))
                   v)]))
