@@ -37,13 +37,8 @@
 (def dp-filter (reagent/atom nil))
 
 (defonce init-filter
-  {:q        nil
+  {:d        nil
    :g        nil
-   :d        nil
-   :repo     nil
-   :orga     nil
-   :language nil
-   :license  nil
    :platform ""
    :ministry ""
    :dep-type ""
@@ -293,27 +288,22 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
-   {:repos          nil
-    :orgas          nil
-    :libs           nil
-    :deps           nil
-    :sill           nil
-    :papillon       nil
-    :repos-page     0
-    :orgas-page     0
-    :libs-page      0
-    :deps-page      0
-    :sill-page      0
-    :papillon-page  0
-    :sort-repos-by  :reused
-    :sort-orgas-by  :repos
-    :sort-deps-by   :repos
-    :view           :orgas
-    :reverse-sort   false
-    :filter         init-filter
-    :display-filter init-filter
-    :lang           "en"
-    :path           ""}))
+   {:repos-page       0
+    :orgas-page       0
+    :libs-page        0
+    :deps-page        0
+    :sill-page        0
+    :papillon-page    0
+    :sort-repos-by    :reused
+    :sort-orgas-by    :repos
+    :sort-deps-by     :repos
+    :sort-libs-by     :name
+    :sort-papillon-by :agency
+    :reverse-sort     false
+    :filter           init-filter
+    :display-filter   init-filter
+    :lang             "en"
+    :path             ""}))
 
 (def repos (reagent/atom nil))
 (def libs (reagent/atom nil))
@@ -2018,10 +2008,12 @@
 ;; Setup router and init
 
 (defn on-navigate [match]
-  (re-frame/dispatch [:path! (:path match)])
-  (re-frame/dispatch [:view!
-                      (keyword (:name (:data match)))
-                      (:query-params match)]))
+  (let [page (keyword (:name (:data match)))]
+    ;; FIXME: When returning to :deps, ensure dp-filter is nil
+    (when (= page :deps) (reset! dp-filter nil))
+    (re-frame/dispatch [:filter {:q nil}])
+    (re-frame/dispatch [:path! (:path match)])
+    (re-frame/dispatch [:view! page (:query-params match)])))
 
 (defonce routes
   ["/"
