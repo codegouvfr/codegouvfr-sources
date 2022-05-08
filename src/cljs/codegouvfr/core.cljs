@@ -1661,7 +1661,7 @@
            (i/i lang [:Sill])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/papillon") "page")
+           {:aria-current (when (= path "/services") "page")
             :title        (i/i lang [:papillon-title])
             :href         "#/services"}
            (i/i lang [:Papillon])]]
@@ -2011,7 +2011,7 @@
   (let [page (keyword (:name (:data match)))]
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
-    (re-frame/dispatch [:filter {:q nil}])
+    (re-frame/dispatch [:filter! {:q ""}])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
 
