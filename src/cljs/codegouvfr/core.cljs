@@ -1661,7 +1661,7 @@
            (i/i lang [:Sill])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/papillon") "page")
+           {:aria-current (when (= path "/services") "page")
             :title        (i/i lang [:papillon-title])
             :href         "#/services"}
            (i/i lang [:Papillon])]]
