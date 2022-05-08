@@ -24,36 +24,32 @@
 
 ;; Defaults
 
+(defonce unix-epoch "1970-01-01T00:00:00Z")
 (defonce repos-per-page 100)
-
 (defonce libs-per-page 100)
-
 (defonce sill-per-page 100)
-
 (defonce papillon-per-page 100)
-
 (defonce orgas-per-page 20)
-
 (defonce deps-per-page 100)
-
 (defonce timeout 100)
 
 ;; FIXME
 (def dp-filter (reagent/atom nil))
 
-(def unix-epoch "1970-01-01T00:00:00Z")
-
 (defonce init-filter
   {:q nil :g nil :d nil :repo nil :orga nil :language nil :license nil :platform "all" :ministry "all" :dep-type "all" :lib-type "all"})
 
-(defonce annuaire-prefix "https://lannuaire.service-public.fr/")
-
-(defonce srht-repo-basedir-prefix "https://git.sr.ht/~etalab/code.gouv.fr/tree/master/item/")
+(defonce urls
+  {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
+   :swh-baseurl   "https://archive.softwareheritage.org/browse/origin/"
+   :cdl-providers "https://comptoir-du-libre.org/fr/softwares/servicesProviders/"
+   :sill-baseurl  "https://sill.etalab.gouv.fr/"})
 
 (defonce filter-chan (async/chan 100))
 
 (defonce display-filter-chan (async/chan 100))
 
+;; Mappings used when exporting displayed data to csv files
 (defonce mappings
   {:repos    {:u  :last_update
               :d  :description
@@ -183,8 +179,8 @@
                   v)]))
       (map #(let [[k v] %]
               [[:a
-                {;; FIXME: Shoud reset the parameter globally
-                 :href  (rfe/href :repos {} {param k})} k] v])))
+                {;; FIXME: Should reset the parameter globally
+                 :href (rfe/href :repos {} {param k})} k] v])))
      data)))
 
 (defn top-clean-up-orgas [data param]
@@ -193,94 +189,69 @@
     (map #(let [[k v] %
                 k0    (s/replace k #" \([^)]+\)" "")]
             [[:a
-              {;; FIXME: Shoud reset the parameter globally
-               :href  (rfe/href :orgas {} {param k0})} k] v])))
+              {;; FIXME: Should reset the parameter globally
+               :href (rfe/href :orgas {} {param k0})} k] v])))
    data))
 
 ;; Filters
 
 (defn apply-repos-filters [m]
-  (let [f   @(re-frame/subscribe [:filter?])
-        dp  (:d f)
-        s   (:q f)
-        g   (:g f)
-        la  (:language f)
-        pl  (:platform f)
-        lic (:license f)
-        e   (:is-esr f)
-        c   (:is-contrib f)
-        l   (:is-lib f)
-        fk  (:is-fork f)
-        li  (:is-licensed f)]
+  (let [{:keys [d q g language platform license
+                is-esr is-contrib is-lib is-fork is-licensed]}
+        @(re-frame/subscribe [:filter?])]
     (filter
-     #(and (if (and dp @dp-filter) (some @dp-filter [(:r %)]) true)
-           (if e (:e? %) true)
-           (if fk (:f? %) true)
-           (if c (:c? %) true)
-           (if l (:l? %) true)
-           (if li (let [l (:li %)] (and l (not= l "Other"))) true)
-           (if lic (s-includes? (:li %) lic) true)
-           (if la
-             (some (into #{} (list (s/lower-case (or (:l %) ""))))
-                   (s/split (s/lower-case la) #" +"))
-             true)
-           (if (= pl "all") true (s-includes? (:r %) pl))
-           (if g (s-includes? (:r %) g) true)
-           (if s (s-includes?
-                  (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)])
-                  s)
-               true))
+     #(and
+       ;; FIXME: dp-filter here is a hack
+       (if (and d @dp-filter) (some @dp-filter [(:r %)]) true)
+       (if is-esr (:e? %) true)
+       (if is-fork (:f? %) true)
+       (if is-contrib (:c? %) true)
+       (if is-lib (:l? %) true)
+       (if is-licensed (let [l (:li %)] (and l (not= l "Other"))) true)
+       (if license (s-includes? (:li %) license) true)
+       (if language
+         (some (into #{} (list (s/lower-case (or (:l %) ""))))
+               (s/split (s/lower-case language) #" +"))
+         true)
+       (if (= platform "all") true (s-includes? (:r %) platform))
+       (if g (s-includes? (:r %) g) true)
+       (if q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)
+           true))
      m)))
 
 (defn apply-deps-filters [m]
-  (let [f @(re-frame/subscribe [:filter?])
-        t (:dep-type f)
-        s (:q f)]
+  (let [{:keys [dep-type q]} @(re-frame/subscribe [:filter?])]
     (filter
      #(and
-       (if (= t "all") true (= (:t %) t))
-       (if s (s-includes?
-              (s/join " " [(:n %) (:t %) (:d %)]) s)
-           true))
+       (if (= dep-type "all") true (= (:t %) dep-type))
+       (if q (s-includes? (s/join " " [(:n %) (:t %) (:d %)]) q) true))
      m)))
 
 (defn apply-orgas-filters [m]
-  (let [f  @(re-frame/subscribe [:filter?])
-        s  (:q f)
-        mi (:ministry f)]
+  (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(and (if s (s-includes?
-                  (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)])
-                  s)
-               true)
-           (if (= mi "all") true (= (:m %) mi)))
+     #(and (if q (s-includes? (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %)]) q) true)
+           (if (= ministry "all") true (= (:m %) ministry)))
      m)))
 
 (defn apply-libs-filters [m]
-  (let [f @(re-frame/subscribe [:filter?])
-        t (:lib-type f)
-        s (:q f)]
+  (let [{:keys [q lib-type]} @(re-frame/subscribe [:filter?])]
     (filter
      #(and
-       (if (= t "all") true (= (:t %) t))
-       (if s (s-includes? (s/join " " [(:n %) (:d %)]) s)
-           true))
+       (if (= lib-type "all") true (= (:t %) lib-type))
+       (if q (s-includes? (s/join " " [(:n %) (:d %)]) q) true))
      m)))
 
 (defn apply-sill-filters [m]
-  (let [f @(re-frame/subscribe [:filter?])
-        s (:q f)]
+  (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(if s (s-includes? (s/join " " [(:n %) (:f %)]) s)
-          true)
+     #(if q (s-includes? (s/join " " [(:n %) (:f %)]) q) true)
      m)))
 
 (defn apply-papillon-filters [m]
-  (let [f @(re-frame/subscribe [:filter?])
-        s (:q f)]
+  (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(if s (s-includes? (s/join " " [(:n %) (:a %) (:d %)]) s)
-          true)
+     #(if q (s-includes? (s/join " " [(:n %) (:a %) (:d %)]) q) true)
      m)))
 
 (defn close-filter-button [lang ff t reinit]
@@ -336,6 +307,19 @@
     :lang           "en"
     :path           ""}))
 
+(def repos (reagent/atom nil))
+(def libs (reagent/atom nil))
+(def sill (reagent/atom nil))
+(def papillon (reagent/atom nil))
+(def deps (reagent/atom nil))
+(def orgas (reagent/atom nil))
+(def platforms (reagent/atom nil))
+(def ministries (filter not-empty (distinct (map :m @orgas))))
+
+(re-frame/reg-sub
+ :ministries?
+ (fn [] (filter not-empty (distinct (map :m @orgas)))))
+
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
@@ -349,14 +333,6 @@
  (fn [db [_ path]]
    (assoc db :path path)))
 
-(def repos (reagent/atom nil))
-(def libs (reagent/atom nil))
-(def sill (reagent/atom nil))
-(def papillon (reagent/atom nil))
-(def deps (reagent/atom nil))
-(def orgas (reagent/atom nil))
-(def platforms (reagent/atom nil))
-
 (re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
@@ -365,6 +341,7 @@
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
    (re-frame/dispatch [:sill-page! 0])
+   (re-frame/dispatch [:papillon-page! 0])
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
@@ -399,10 +376,12 @@
 (re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
+   ;; FIXME: necessary?
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
+   (re-frame/dispatch [:papillon-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
@@ -534,8 +513,16 @@
  (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-sub
+ :deps-types?
+ (fn [db _] (distinct (map :t (:deps db)))))
+
+(re-frame/reg-sub
+ :libs-types?
+ (fn [db _] (distinct (map :t (:libs db)))))
+
+(re-frame/reg-sub
  :repos?
- (fn [db _]
+ (fn []
    (let [repos0 @repos
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :name   (reverse (sort-by :n repos0))
@@ -556,7 +543,7 @@
 
 (re-frame/reg-sub
  :libs?
- (fn [db _]
+ (fn []
    (let [libs0 @libs
          libs  (case @(re-frame/subscribe [:sort-libs-by?])
                  :name (reverse (sort-by :name libs0))
@@ -567,7 +554,7 @@
 
 (re-frame/reg-sub
  :sill?
- (fn [db _]
+ (fn []
    (let [sill0 @sill
          sill  (case @(re-frame/subscribe [:sort-sill-by?])
                  :name (reverse (sort-by :n sill0))
@@ -581,7 +568,7 @@
 
 (re-frame/reg-sub
  :papillon?
- (fn [db _]
+ (fn []
    (let [papillon0 @papillon
          papillon  (case @(re-frame/subscribe [:sort-papillon-by?])
                      :name   (reverse (sort-by :n papillon0))
@@ -593,7 +580,7 @@
 
 (re-frame/reg-sub
  :deps?
- (fn [db _]
+ (fn []
    (let [deps0 @deps
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
                  :name        (reverse (sort-by :n deps0))
@@ -606,20 +593,8 @@
         deps (reverse deps))))))
 
 (re-frame/reg-sub
- :deps-types?
- (fn [db _] (distinct (map :t (:deps db)))))
-
-(re-frame/reg-sub
- :libs-types?
- (fn [db _] (distinct (map :t (:libs db)))))
-
-(re-frame/reg-sub
- :deps-raw?
- (fn [db _] (:deps-raw db)))
-
-(re-frame/reg-sub
  :orgas?
- (fn [db _]
+ (fn []
    (let [orgs  @orgas
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
@@ -637,10 +612,6 @@
       (if @(re-frame/subscribe [:reverse-sort?])
         orgas
         (reverse orgas))))))
-
-(re-frame/reg-sub
- :ministries?
- (fn [db _] (filter not-empty (distinct (map :m (:orgas db))))))
 
 ;; Pagination
 
@@ -686,13 +657,11 @@
       [:button.fr-pagination__link.fr-pagination__link--prev
        {:on-click #(change-page type nil)
         :disabled first-disabled}]]
-
      [:li
       [:button.fr-pagination__link.fr
        {:disabled true}
        (str (inc current-page) "/"
             (if (> total-pages 0) total-pages 1))]]
-
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
        {:on-click #(change-page type true)
@@ -768,7 +737,7 @@
                    [:td
                     [:div
                      [:a.fr-link
-                      {:href  (str "https://archive.softwareheritage.org/browse/origin/" r)
+                      {:href  (str (:swh-baseurl urls) r)
                        :title (new-tab (i/i lang [:swh-link]) lang)
                        :rel   "noreferrer noopener"}
                       [:img {:width "18px" :src "/img/swh-logo.png"
@@ -1090,7 +1059,7 @@
                    ;; Lib
                    [:td
                     [:a.fr-link
-                     {:href   (str "https://sill.etalab.gouv.fr/" lang "/software?id=" id)
+                     {:href   (str (:sill-baseurl urls) lang "/software?id=" id)
                       :rel    "noreferrer noopener"
                       :title  (new-tab (i/i lang [:more-info]) lang)
                       :target "_blank"}
@@ -1098,7 +1067,7 @@
                    ;; Description
                    [:td (if clp
                           [:a
-                           {:href   (str "https://comptoir-du-libre.org/fr/softwares/servicesProviders/" cl)
+                           {:href   (str (:cdl-providers urls) cl)
                             :rel    "noreferrer noopener"
                             :title  (new-tab (i/i lang [:providers]) lang)
                             :target "_blank"}
@@ -1198,7 +1167,7 @@
                    [:td [:span [:a.fr-link {:href l} n]
                          (when i [:span " "
                                   [:a.fr-link
-                                   {:href (str "https://sill.etalab.gouv.fr/fr/software?id=" i)} "(SILL)"]])]]
+                                   {:href (str (:sill-baseurl urls) lang "/software?id=" i)} "(SILL)"]])]]
                    ;; Service description
                    [:td d]
                    ;; Agency name
@@ -1510,8 +1479,8 @@
 
 (defn stats-page
   [lang stats]
-  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt papillon_cnt
-                avg_repos_cnt median_repos_cnt
+  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt
+                papillon_cnt avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
                 top_forges top_ministries]} stats]
@@ -1551,7 +1520,7 @@
                      (i/i lang [:repos])]
                     (top-clean-up-orgas top_orgs_by_repos "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:orgas])]
-                              [:th (i/i lang [:Repos])]]])]
+                             [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-table [:span
                      (i/i lang [:orgas])
@@ -1559,18 +1528,18 @@
                      (i/i lang [:stars])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:orgas])]
-                              [:th (i/i lang [:Stars])]]])]]
+                             [:th (i/i lang [:Stars])]]])]]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table (i/i lang [:top-forges])
                     (top-clean-up-repos top_forges "platform")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:forge])]
-                              [:th (i/i lang [:Repos])]]])]
+                             [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-table (i/i lang [:top-ministries])
                     (top-clean-up-orgas top_ministries "ministry")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:ministry])]
-                              [:th (i/i lang [:Repos])]]])]]
+                             [:th (i/i lang [:Repos])]]])]]
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :sill-stats sill_cnt)
       (stats-tile lang :sill-stats papillon_cnt)
@@ -1617,7 +1586,6 @@
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
     [:header.fr-header {:role "banner"}
-     ;; Header body
      [:div.fr-header__body
       [:div.fr-container
        [:div.fr-header__body-row
@@ -1689,13 +1657,13 @@
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/sill") "page")
-            :title (i/i lang [:sill-stats])
+            :title        (i/i lang [:sill-stats])
             :href         "#/sill"}
            (i/i lang [:Sill])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/papillon") "page")
-            :title (i/i lang [:papillon-title])
+            :title        (i/i lang [:papillon-title])
             :href         "#/services"}
            (i/i lang [:Papillon])]]
          [:li.fr-nav__item
@@ -1715,13 +1683,11 @@
    [:div.fr-container
     [:div.fr-grid-row
      [:div.fr-col-12.fr-col-md-4
-      ;; Contact by email
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
         [:div.fr-text--sm.fr-follow__desc
          (to-hiccup (i/i lang [:contact-title]))]]]]
-     ;; Subscribe to he newsletter
      [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
        [:div
@@ -1910,10 +1876,6 @@
        "fr" (inline-resource "public/md/feeds.fr.md")
        (inline-resource "public/md/feeds.en.md")))]])
 
-;; #00AC8C
-;; #FF8D7E
-;; #FDCF41
-;; #484D7A
 (defn home-page [lang]
   [:div.fr-grid
    [:div.fr-grid-row.fr-grid-row--center
@@ -2005,33 +1967,19 @@
       {:role "main"}
       [main-menu q lang view]
       (condp = view
-        ;; Default page
         :home     [home-page lang]
-        ;; Table to display organizations
         :orgas    [orgas-page lang ministry]
-        ;; Table to display repositories
         :repos    [repos-page-class lang license language platform]
-        ;; Table to display libraries
         :libs     [libs-page-class lang]
-        ;; Table to display sill entries
         :sill     [sill-page-class lang]
-        ;; Table to display papillon entries
         :papillon [papillon-page-class lang]
-        ;; Table to display statistics
         :stats    [stats-page-class lang]
-        ;; Table to display all dependencies
         :deps     [deps-page lang]
-        ;; Page for legal mentions
         :legal    [legal-page lang]
-        ;; Page for accessibility mentions
         :a11y     [a11y-page lang]
-        ;; About page
         :about    [about-page lang]
-        ;; Sitemap
         :sitemap  [sitemap-page lang]
-        ;; Feeds
         :feeds    [feeds-page lang]
-        ;; Error
         :error    [error-page lang]
         ;; Fall back on the error page
         [error-page lang])]
