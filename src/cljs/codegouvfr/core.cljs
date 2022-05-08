@@ -792,10 +792,12 @@
                       :href   (str r "/network/dependents")}
                      re]]])))]])))
 
-(defn repos-page [lang license language platform]
+(defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all repos-per-page repos))
+        f              @(re-frame/subscribe [:filter?])
+        platform       (:platform f)
         first-disabled (zero? repos-pages)
         last-disabled  (= repos-pages (dec count-pages))
         mapping        (:repos mappings)]
@@ -848,11 +850,11 @@
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
-       {:value (or @platform "")
+       {:value (or platform "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! platform ev)
+            (re-frame/dispatch [:filter! {:platform ev}])
             (async/go
               (async/>! display-filter-chan {:platform ev})
               (async/<! (async/timeout timeout))
@@ -906,7 +908,7 @@
      ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
-(defn repos-page-class [lang license language platform]
+(defn repos-page-class [lang license language]
   (reagent/create-class
    {:display-name   "repos-page-class"
     :component-did-mount
@@ -914,7 +916,7 @@
       (GET "/data/repos.json"
            :handler
            #(reset! repos (map (comp bean clj->js) %))))
-    :reagent-render (fn [] (repos-page lang license language platform))}))
+    :reagent-render (fn [] (repos-page lang license language))}))
 
 ;; Main structure - libs
 
@@ -1973,7 +1975,7 @@
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
        [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
-(defn main-page [q license language platform]
+(defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
@@ -1984,7 +1986,7 @@
       (condp = view
         :home     [home-page lang]
         :orgas    [orgas-page lang]
-        :repos    [repos-page-class lang license language platform]
+        :repos    [repos-page-class lang license language]
         :libs     [libs-page-class lang]
         :sill     [sill-page-class lang]
         :papillon [papillon-page-class lang]
@@ -2005,8 +2007,7 @@
 (defn main-class []
   (let [q        (reagent/atom nil)
         license  (reagent/atom nil)
-        language (reagent/atom nil)
-        platform (reagent/atom nil)]
+        language (reagent/atom nil)]
     (reagent/create-class
      {:display-name   "main-class"
       :component-did-mount
@@ -2020,7 +2021,7 @@
         (GET "/data/orgas.json"
              :handler
              #(reset! orgas (map (comp bean clj->js) %))))
-      :reagent-render (fn [] (main-page q license language platform))})))
+      :reagent-render (fn [] (main-page q license language))})))
 
 ;; Setup router and init
 
