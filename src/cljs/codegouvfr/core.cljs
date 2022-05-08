@@ -2011,7 +2011,7 @@
   (let [page (keyword (:name (:data match)))]
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
-    (re-frame/dispatch [:filter {:q nil}])
+    (re-frame/dispatch [:filter! {:q ""}])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
 
