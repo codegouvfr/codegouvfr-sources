@@ -38,6 +38,7 @@
 
 (defonce timeout 100)
 
+;; FIXME
 (def dp-filter (reagent/atom nil))
 
 (def unix-epoch "1970-01-01T00:00:00Z")
@@ -360,10 +361,6 @@
    (assoc db :path path)))
 
 (re-frame/reg-event-db
- :update-platforms!
- (fn [db [_ platforms]] (assoc db :platforms platforms)))
-
-(re-frame/reg-event-db
  :update-repos!
  (fn [db [_ repos]] (assoc db :repos repos)))
 
@@ -507,9 +504,7 @@
  :path?
  (fn [db _] (:path db)))
 
-(re-frame/reg-sub
- :platforms?
- (fn [db _] (:platforms db)))
+(def platforms (reagent/atom nil))
 
 (re-frame/reg-sub
  :sort-repos-by?
@@ -918,7 +913,7 @@
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:platform ev}))))}
        [:option {:value "all"} (i/i lang [:all-forges])]
-       (for [x @(re-frame/subscribe [:platforms?])]
+       (for [x @platforms]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
@@ -2103,9 +2098,7 @@
       (fn []
         (GET "/data/platforms.csv"
              :handler
-             #(re-frame/dispatch
-               [:update-platforms! (conj (map first (next (js->clj (csv/parse %))))
-                                         "sr.ht")]))
+             #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
         (GET "/data/deps.json"
              :handler
              #(re-frame/dispatch
