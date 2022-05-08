@@ -33,7 +33,7 @@
 (defonce deps-per-page 100)
 (defonce timeout 100)
 
-;; FIXME
+;; FIXME: Setting this here is a hack
 (def dp-filter (reagent/atom nil))
 
 (defonce init-filter
@@ -188,9 +188,7 @@
                    (gstring/format "%.2f" (* (/ v total) 100)))
                   v)]))
       (map #(let [[k v] %]
-              [[:a
-                {;; FIXME: Should reset the parameter globally
-                 :href (rfe/href :repos {} {param k})} k] v])))
+              [[:a {:href (rfe/href :repos {} {param k})} k] v])))
      data)))
 
 (defn top-clean-up-orgas [data param]
@@ -198,9 +196,7 @@
    (comp
     (map #(let [[k v] %
                 k0    (s/replace k #" \([^)]+\)" "")]
-            [[:a
-              {;; FIXME: Should reset the parameter globally
-               :href (rfe/href :orgas {} {param k0})} k] v])))
+            [[:a {:href (rfe/href :orgas {} {param k0})} k] v])))
    data))
 
 ;; Filters
@@ -215,7 +211,6 @@
         @(re-frame/subscribe [:filter?])]
     (filter
      #(and
-       ;; FIXME: dp-filter here is a hack
        (if (and d @dp-filter) (some @dp-filter [(:r %)]) true)
        (ntaf is-esr (:e? %))
        (ntaf is-fork (:f? %))
@@ -390,7 +385,6 @@
 (re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
-   ;; FIXME: necessary?
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
