@@ -1299,8 +1299,9 @@
                    [:td {:style {:text-align "center"}}
                     (to-locale-date c)]])))]])))
 
-(defn orgas-page [lang ministry]
+(defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
+        ministry       (:ministry @(re-frame/subscribe [:filter?]))
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all orgas-per-page orgas))
@@ -1333,11 +1334,11 @@
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or @ministry "")
+       {:value (or ministry "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (reset! ministry ev)
+            (re-frame/dispatch [:filter! {:ministry ev}])
             (async/go
               (async/>! display-filter-chan {:ministry ev})
               (async/<! (async/timeout timeout))
@@ -1972,7 +1973,7 @@
         [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
        [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
-(defn main-page [q license language platform ministry]
+(defn main-page [q license language platform]
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
@@ -1982,7 +1983,7 @@
       [main-menu q lang view]
       (condp = view
         :home     [home-page lang]
-        :orgas    [orgas-page lang ministry]
+        :orgas    [orgas-page lang]
         :repos    [repos-page-class lang license language platform]
         :libs     [libs-page-class lang]
         :sill     [sill-page-class lang]
@@ -2005,8 +2006,7 @@
   (let [q        (reagent/atom nil)
         license  (reagent/atom nil)
         language (reagent/atom nil)
-        platform (reagent/atom nil)
-        ministry (reagent/atom nil)]
+        platform (reagent/atom nil)]
     (reagent/create-class
      {:display-name   "main-class"
       :component-did-mount
@@ -2020,7 +2020,7 @@
         (GET "/data/orgas.json"
              :handler
              #(reset! orgas (map (comp bean clj->js) %))))
-      :reagent-render (fn [] (main-page q license language platform ministry))})))
+      :reagent-render (fn [] (main-page q license language platform))})))
 
 ;; Setup router and init
 
