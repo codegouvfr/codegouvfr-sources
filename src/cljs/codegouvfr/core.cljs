@@ -1907,7 +1907,7 @@
          (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/keyboard.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/repositories.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1918,7 +1918,7 @@
          (i/i lang [:orgas])]]
        [:div.fr-card__desc (i/i lang [:home-groups-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/window.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/organizations.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1928,7 +1928,7 @@
          (i/i lang [:Libraries])]]
        [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/library.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/libraries.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1939,7 +1939,7 @@
          (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/rocks.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/dependencies.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1949,7 +1949,7 @@
          (i/i lang [:sill-stats])]]
        [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/compass.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/sill.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1959,7 +1959,7 @@
          (i/i lang [:papillon-title])]]
        [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
       [:div.fr-card__img
-       [:img.fr-responsive-img {:src "/img/directions.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "/img/services.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
