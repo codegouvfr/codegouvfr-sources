@@ -21,7 +21,7 @@ Libraries referenced on this web are those distributed on dedicated platforms (n
 
 Dependencies are libraries, from the French public sector or not, required by the referenced repositories.  We only list first-level dependencies, not dependencies of dependencies.
 
-# Recommended free software and services
+## Recommended free software and services
 
 The list of recommended free software is a list of software currently in use in the French administration.  Each software in this list has a public servant who can help other administrations use this software.
 
@@ -43,10 +43,10 @@ You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodo
 
 ## How are the data collected?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges;
-2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list;
-3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidate the data and add the list of dependencies;
-4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose the data.
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
+2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list.
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidates the data and enrich them.
+4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) exposes the data.
 
 **Warning**: We don't reference personal accounts.
 
