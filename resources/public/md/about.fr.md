@@ -15,6 +15,18 @@ Le code source est la version lisible d'un programme informatique.
 
 Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
 
+# Bibliothèques et dépendances
+
+Les bibliothèques référencées sur ce site sont des bibliothèques logicielles distribuées via des plateformes dédiées (npms.com, pypi.org, etc.) et développées à partir des dépôts référencés.
+
+Les dépendances sont les bibliothèques, du secteur public ou non, qui sont requises par les dépôts référencés.  Nous ne listons que les dépendances de premier niveau, pas les dépendances de dépendances.
+
+## SILL et services
+
+Le socle interministériel de logiciels libres est la liste des logiciels libres recommandés pour toutes les administrations.  Chaque logiciel de cette liste est aujourd'hui en usage dans au moins une administration, et dispose d'un « référent SILL » prêt à aider les autres administrations dans son utilisation.
+
+Les services en ligne référencés sur le site sont tous des instances de logiciels libres mises à la disposition des agents publics.
+
 ## Où télécharger les données ?
 
 Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html).
