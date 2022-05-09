@@ -1160,8 +1160,8 @@
                               ;; p   ; public sector scope
                               a   ; agencyName
                               l   ; serviceUrl
-                              i                                        ; softwareSillId
-                              c   ; softwareComptoirId
+                              i   ; softwareSillId
+                              c   ; comptoirDuLibreId
                               ]} dd]
                   [:tr
                    ;; service name
@@ -1175,8 +1175,9 @@
                                [:span " · "
                                 [:a.fr-link
                                  {:href (str (:cdl-baseurl urls) c)} "Comptoir du Libre"]]]
-                           (when i sill-link)
-                           (when c cdl-link))]]
+                           [:span
+                            (when i sill-link)
+                            (when c cdl-link)])]]
                    ;; Service description
                    [:td d]
                    ;; Agency name
