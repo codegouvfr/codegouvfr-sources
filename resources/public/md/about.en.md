@@ -21,7 +21,7 @@ Libraries referenced on this web are those distributed on dedicated platforms (n
 
 Dependencies are libraries, from the French public sector or not, required by the referenced repositories.  We only list first-level dependencies, not dependencies of dependencies.
 
-# Recommended free software and services
+## Recommended free software and services
 
 The list of recommended free software is a list of software currently in use in the French administration.  Each software in this list has a public servant who can help other administrations use this software.
 

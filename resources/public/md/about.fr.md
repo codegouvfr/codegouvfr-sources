@@ -15,7 +15,7 @@ Le code source est la version lisible d'un programme informatique.
 
 Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
 
-# Bibliothèques et dépendances
+## Bibliothèques et dépendances
 
 Les bibliothèques référencées sur ce site sont des bibliothèques logicielles distribuées via des plateformes dédiées (npms.com, pypi.org, etc.) et développées à partir des dépôts référencés.
 
