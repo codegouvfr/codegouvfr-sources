@@ -48,7 +48,8 @@
   {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
    :swh-baseurl  "https://archive.softwareheritage.org/browse/origin/"
    :cdl-baseurl  "https://comptoir-du-libre.org/fr/softwares/"
-   :sill-baseurl "https://sill.etalab.gouv.fr/"})
+   :sill-baseurl "https://sill.etalab.gouv.fr/"
+   :support-url "https://communs.numerique.gouv.fr/utiliser/marches-interministeriels-support-expertise-logiciels-libres/"})
 
 (defonce filter-chan (async/chan 100))
 
@@ -1044,14 +1045,15 @@
                              (drop (* sill-per-page sill-page) sill))]
                 ^{:key dd}
                 (let [{:keys [n   ; name
-                              id  ; sill id
-                              i   ; image link
+                              id  ; sill_id
+                              i   ; :wikidataDataLogoUrl
                               l   ; license
                               f   ; description
-                              fr  ; from the FR public sector?
-                              u   ; added to the sill
-                              cl  ; Comptoir du libre ID
-                              clp ; Are there providers?
+                              fr  ; :isFromFrenchPublicService
+                              u   ; :referencedSinceTime
+                              cl  ; :comptoirDuLibreSoftwareId
+                              clp ; :comptoirDuLibreSoftwareProviders?
+                              s   ; :isPresentInSupportContract
                               ]} dd]
                   [:tr
                    ;; Logo
@@ -1074,7 +1076,13 @@
                            f]
                           f)]
                    ;; License
-                   [:td l]
+                   [:td (if s
+                          [:a
+                           {:href   (str (:support-url urls) l)
+                            :rel    "noreferrer noopener"
+                            :title  (new-tab (i/i lang [:support]) lang)
+                            :target "_blank"}
+                           l] l)]
                    ;; Date when added
                    [:td (to-locale-date u)]])))]])))
 

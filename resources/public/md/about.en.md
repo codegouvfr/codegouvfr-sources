@@ -5,18 +5,27 @@
 
 ## Why this website?
 
-Source code bought or developed by public agencies are considered
-administrative documents, due to be opened as open data.
+Source code bought or developed by public agencies are considered administrative documents, due to be opened as open data.
 
-Many agencies already publish source code repositories : we are
-listing them on this website to make it easier to find them and to
-encourage administrations to reuse them or to contribute to them.
+Many agencies already publish source code repositories : we are listing them on this website to make it easier to find them and to encourage administrations to reuse them or to contribute to them.
 
 ## What is a "source code"?
 
 The source code is the readable version of a computer program.
 
 For more details on other technical terms, [please check this glossary](https://man.sr.ht/~etalab/logiciels-libres/glossary.en.md).
+
+## Libraries and dependencies
+
+Libraries referenced on this web are those distributed on dedicated platforms (npmjs.com, pypi.org, etc.) and developed from referenced repositories.
+
+Dependencies are libraries, from the French public sector or not, required by the referenced repositories.  We only list first-level dependencies, not dependencies of dependencies.
+
+# Recommended free software and services
+
+The list of recommended free software is a list of software currently in use in the French administration.  Each software in this list has a public servant who can help other administrations use this software.
+
+Referenced services are services for public agents based on a free software.
 
 ## Where to download the data?
 
