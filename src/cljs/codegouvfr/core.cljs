@@ -1541,7 +1541,7 @@
                              [:th (i/i lang [:Repos])]]])]]
      [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
       (stats-tile lang :sill-stats sill_cnt)
-      (stats-tile lang :sill-stats papillon_cnt)
+      (stats-tile lang :papillon-stats papillon_cnt)
       (stats-tile lang :deps-stats deps_cnt)
       (stats-tile lang :libs-stats libs_cnt)]]))
 
