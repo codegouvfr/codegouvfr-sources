@@ -43,9 +43,9 @@ Vous pouvez aussi suivre les annonces du pôle logiciels libres en vous abonnant
 
 ## Comment ces données sont-elles construites ?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) référence les comptes d'organisation ouverts par des organismes publics sur sr.ht (SourceHut), github.com, gitlab.com ou des forges GitLab locales ;
-2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) récupère les données des organisations et des dépôts à partir de cette liste ;
-3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolide les données et y ajoute la liste des dépendances ;
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) référence les comptes d'organisation ouverts par des organismes publics sur sr.ht (SourceHut), github.com, gitlab.com ou des forges GitLab locales.
+2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) récupère les données des organisations et des dépôts à partir de cette liste.
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolide les données en y ajoutant des informations.
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose les données.
 
 **Attention**: Nous ne référençons pas les comptes personnels.
