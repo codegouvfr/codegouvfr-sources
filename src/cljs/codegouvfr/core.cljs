@@ -46,9 +46,9 @@
 
 (defonce urls
   {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
-   :swh-baseurl   "https://archive.softwareheritage.org/browse/origin/"
-   :cdl-providers "https://comptoir-du-libre.org/fr/softwares/servicesProviders/"
-   :sill-baseurl  "https://sill.etalab.gouv.fr/"})
+   :swh-baseurl  "https://archive.softwareheritage.org/browse/origin/"
+   :cdl-baseurl  "https://comptoir-du-libre.org/fr/softwares/"
+   :sill-baseurl "https://sill.etalab.gouv.fr/"})
 
 (defonce filter-chan (async/chan 100))
 
@@ -98,7 +98,8 @@
               :n :serviceName
               :d :description
               :l :serviceUrl
-              :i :softwareSillId}
+              :i :sillId
+              :c :comptoirDuLibreId}
    :libs     {:n :name
               :t :type
               :d :description
@@ -1066,7 +1067,7 @@
                    ;; Description
                    [:td (if clp
                           [:a
-                           {:href   (str (:cdl-providers urls) cl)
+                           {:href   (str (:cdl-baseurl "servicesProviders" urls) cl)
                             :rel    "noreferrer noopener"
                             :title  (new-tab (i/i lang [:providers]) lang)
                             :target "_blank"}
@@ -1154,19 +1155,28 @@
               (for [dd (take papillon-per-page
                              (drop (* papillon-per-page papillon-page) papillon))]
                 ^{:key dd}
-                (let [{:keys [n   ; service name
+                (let [{:keys [n   ; serviceName
                               d   ; description
                               ;; p   ; public sector scope
-                              a   ; agency name
-                              l   ; service url
-                              i   ; sill software id
+                              a   ; agencyName
+                              l   ; serviceUrl
+                              i                                        ; softwareSillId
+                              c   ; softwareComptoirId
                               ]} dd]
                   [:tr
                    ;; service name
-                   [:td [:span [:a.fr-link {:href l} n]
-                         (when i [:span " "
-                                  [:a.fr-link
-                                   {:href (str (:sill-baseurl urls) lang "/software?id=" i)} "(SILL)"]])]]
+                   [:td [:span
+                         [:a.fr-link {:href l} n]
+                         (let [sill-link
+                               [:span " · "
+                                [:a.fr-link
+                                 {:href (str (:sill-baseurl urls) lang "/software?id=" i)} "SILL"]]
+                               cdl-link
+                               [:span " · "
+                                [:a.fr-link
+                                 {:href (str (:cdl-baseurl urls) c)} "Comptoir du Libre"]]]
+                           (when i sill-link)
+                           (when c cdl-link))]]
                    ;; Service description
                    [:td d]
                    ;; Agency name
