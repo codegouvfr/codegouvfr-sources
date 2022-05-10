@@ -1862,56 +1862,6 @@
          :data-fr-opened false}
         (i/i lang [:modal-title])]]]]]])
 
-;; Pages from md
-
-;; (defn legal-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/legal.fr.md")
-;;        (inline-resource "public/md/legal.en.md")))]])
-
-;; (defn a11y-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/a11y.fr.md")
-;;        (inline-resource "public/md/a11y.en.md")))]])
-
-;; (defn about-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/about.fr.md")
-;;        (inline-resource "public/md/about.en.md")))]])
-
-;; (defn sitemap-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/sitemap.fr.md")
-;;        (inline-resource "public/md/sitemap.en.md")))]])
-
-;; (defn error-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/error.fr.md")
-;;        (inline-resource "public/md/error.en.md")))]])
-
-;; (defn feeds-page [lang]
-;;   [:div.fr-container.fr-grid.fr-grid--row
-;;    [:div.fr-col-10.fr-col-md-10
-;;     (to-hiccup
-;;      (condp = lang
-;;        "fr" (inline-resource "public/md/feeds.fr.md")
-;;        (inline-resource "public/md/feeds.en.md")))]])
-
 (defn home-page [lang]
   [:div.fr-grid
    [:div.fr-grid-row.fr-grid-row--center
