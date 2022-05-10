@@ -42,6 +42,7 @@
     :deps                          " dépendances"
     :deps-stats                    "Dépendances identifiées dans tous les dépôts"
     :description                   "Description"
+    :details                       "Détails"
     :download                      "Télécharger"
     :find-us                       "Retrouvez-nous"
     :floss-policy                  "Politique logiciels libres"
@@ -118,6 +119,7 @@
     :papillon-title                "Services en ligne s'appuyant sur un logiciel libre"
     :papillon0                     " service s'appuyant sur un logiciel libre"
     :personal-data                 "Données personnelles et cookies"
+    :providers                     "Prestataires"
     :providers                     "Voir les prestataires via l'Adullact"
     :remove-filter                 "Supprimer le filtre"
     :repo                          " dépôt"
@@ -167,6 +169,7 @@
     :update-short                  "MàJ"
     :with-more-of                  " avec le plus de"
     :with-more-of*                 " avec le plus d'"
+    :workshop                      "Atelier"
     }
    ;; English translation
    :en
@@ -200,6 +203,7 @@
     :deps                          " dependencies"
     :deps-stats                    "Identified dependencies in all repositories"
     :description                   "Description"
+    :details                       "Details"
     :download                      "Download"
     :find-us                       "Follow us"
     :floss-policy                  "Free Software policy"
@@ -277,6 +281,7 @@
     :papillon0                     " service based on a free software"
     :personal-data                 "Personal data and cookies"
     :providers                     "List providers via Adullact"
+    :providers                     "Providers"
     :remove-filter                 "Remove filter"
     :repo                          " repository"
     :repo-archived                 "This is an archived repository"
@@ -325,6 +330,7 @@
     :update-short                  "Updated"
     :with-more-of                  " with the most"
     :with-more-of*                 " with the most "
+    :workshop                      "Workshop"
     }})
 
 (def opts {:dict localization})
