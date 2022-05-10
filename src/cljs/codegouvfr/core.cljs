@@ -1311,7 +1311,7 @@
                              :rel    "noreferrer noopener"
                              :title  (new-tab (i/i lang [:floss-policy]) lang)
                              :href   f}
-                         [:img {:src "/img/floss.jpg" :width "10%"}]]
+                         [:img {:src "/img/floss.png" :width "10%"}]]
                         " "])
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
