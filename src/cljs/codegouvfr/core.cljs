@@ -917,13 +917,13 @@
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col
+          [:th.fr-col-5
            [:button
             {:class    (when (= lib-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
              :title    (i/i lang [:sort-libs-alpha])
              :on-click #(re-frame/dispatch [:sort-libs-by! :name])}
             (i/i lang [:library])]]
-          [:th.fr-col (i/i lang [:lib-type])]
+          [:th.fr-col-1 (i/i lang [:lib-type])]
           [:th.fr-col (i/i lang [:description])]]]
         (into [:tbody]
               (for [dd (take libs-per-page
@@ -1370,18 +1370,8 @@
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
-        [:th.fr-col-1
-         [:button
-          {:class    (when (= dep-f :type) "fr-icon-checkbox-circle-line fr-link--icon-left")
-           :title    (i/i lang [:sort-type])
-           :on-click #(re-frame/dispatch [:sort-deps-by! :type])}
-          (i/i lang [:type])]]
-        [:th.fr-col-5
-         [:button
-          {:class    (when (= dep-f :description) "fr-icon-checkbox-circle-line fr-link--icon-left")
-           :title    (i/i lang [:sort-description-length])
-           :on-click #(re-frame/dispatch [:sort-deps-by! :description])}
-          (i/i lang [:description])]]
+        [:th.fr-col-1 (i/i lang [:type])]
+        [:th.fr-col-5 (i/i lang [:description])]
         (when-not repo
           [:th.fr-col-1
            [:button
