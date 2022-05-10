@@ -1277,6 +1277,7 @@
                               ;; FIXME: Where to use this?
                               ;; h ; website
                               ;; an ; annuaire
+                              f ; floss_policy
                               p ; platform
                               au ; avatar_url
                               c ; creation_date
@@ -1285,10 +1286,20 @@
                   [:tr
                    [:td (when au [:img {:src au :width "100%" :alt ""}])]
                    [:td
-                    [:a {:target "_blank"
-                         :rel    "noreferrer noopener"
-                         :title  (new-tab (i/i lang [:go-to-orga]) lang)
-                         :href   o} (or (not-empty n) l)]]
+                    [:span
+                     (when (not-empty f)
+                       [:span
+                        [:a {:target "new"
+                             :rel    "noreferrer noopener"
+                             :title  (new-tab (i/i lang [:floss-policy]) lang)
+                             :href   f}
+                         [:img {:src "/img/floss.jpg" :width "10%"}]]
+                        " "])
+                     [:a {:target "_blank"
+                          :rel    "noreferrer noopener"
+                          :title  (new-tab (i/i lang [:go-to-orga]) lang)
+                          :href   o}
+                      (or (not-empty n) l)]]]
                    [:td d]
                    [:td
                     {:style {:text-align "center"}}
