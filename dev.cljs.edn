@@ -1,4 +1,4 @@
-^{:watch-dirs   ["src/cljs"]
+^{:watch-dirs   ["src"]
   :css-dirs     ["resources/public"]
   :auto-testing false}
 {:main       codegouvfr.core

@@ -18,9 +18,8 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]
-            [markdown-to-hiccup.core :as md]
             [semantic-csv.core :as sc])
-  (:require-macros [codegouvfr.macros :refer [inline-resource]]))
+  (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Defaults
 
@@ -127,18 +126,18 @@
   [key]
   (.removeItem (.-localStorage js/window) key))
 
-(def to-hiccup-repl
-  {:h2 :h2.fr-h2.fr-mt-3w
-   :p  :p.fr-my-3w
-   :li :li.fr-ml-2w})
+;; (def to-hiccup-repl
+;;   {:h2 :h2.fr-h2.fr-mt-3w
+;;    :p  :p.fr-my-3w
+;;    :li :li.fr-ml-2w})
 
-(defn to-hiccup
-  "Convert a markdown `s` string to hiccup structure."
-  [s]
-  (->> s
-       (md/md->hiccup)
-       (md/component)
-       (walk/prewalk-replace to-hiccup-repl)))
+;; (defn to-hiccup
+;;   "Convert a markdown `s` string to hiccup structure."
+;;   [s]
+;;   (->> s
+;;        (md/md->hiccup)
+;;        (md/component)
+;;        (walk/prewalk-replace to-hiccup-repl)))
 
 (defn to-locale-date [s]
   (when (string? s)
@@ -1724,7 +1723,7 @@
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
         [:div.fr-text--sm.fr-follow__desc
-         (to-hiccup (i/i lang [:contact-title]))]]]]
+         (i/i lang [:contact-title])]]]]
      [:div.fr-col-12.fr-col-md-5
       [:div.fr-follow__newsletter
        [:div
@@ -1865,53 +1864,53 @@
 
 ;; Pages from md
 
-(defn legal-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/legal.fr.md")
-       (inline-resource "public/md/legal.en.md")))]])
+;; (defn legal-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/legal.fr.md")
+;;        (inline-resource "public/md/legal.en.md")))]])
 
-(defn a11y-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/a11y.fr.md")
-       (inline-resource "public/md/a11y.en.md")))]])
+;; (defn a11y-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/a11y.fr.md")
+;;        (inline-resource "public/md/a11y.en.md")))]])
 
-(defn about-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/about.fr.md")
-       (inline-resource "public/md/about.en.md")))]])
+;; (defn about-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/about.fr.md")
+;;        (inline-resource "public/md/about.en.md")))]])
 
-(defn sitemap-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/sitemap.fr.md")
-       (inline-resource "public/md/sitemap.en.md")))]])
+;; (defn sitemap-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/sitemap.fr.md")
+;;        (inline-resource "public/md/sitemap.en.md")))]])
 
-(defn error-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/error.fr.md")
-       (inline-resource "public/md/error.en.md")))]])
+;; (defn error-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/error.fr.md")
+;;        (inline-resource "public/md/error.en.md")))]])
 
-(defn feeds-page [lang]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
-    (to-hiccup
-     (condp = lang
-       "fr" (inline-resource "public/md/feeds.fr.md")
-       (inline-resource "public/md/feeds.en.md")))]])
+;; (defn feeds-page [lang]
+;;   [:div.fr-container.fr-grid.fr-grid--row
+;;    [:div.fr-col-10.fr-col-md-10
+;;     (to-hiccup
+;;      (condp = lang
+;;        "fr" (inline-resource "public/md/feeds.fr.md")
+;;        (inline-resource "public/md/feeds.en.md")))]])
 
 (defn home-page [lang]
   [:div.fr-grid
@@ -2012,14 +2011,22 @@
         :papillon [papillon-page-class lang]
         :stats    [stats-page-class lang]
         :deps     [deps-page lang]
-        :legal    [legal-page lang]
-        :a11y     [a11y-page lang]
-        :about    [about-page lang]
-        :sitemap  [sitemap-page lang]
-        :feeds    [feeds-page lang]
-        :error    [error-page lang]
-        ;; Fall back on the error page
-        [error-page lang])]
+        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
+                         (inline-page "legal.en.md"))
+        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
+                         (inline-page "a11y.en.md"))
+        :about    (condp = lang "fr" (inline-page "about.fr.md")
+                         (inline-page "about.en.md"))
+        :about    (condp = lang "fr" (inline-page "about.fr.md")
+                         (inline-page "about.en.md"))
+        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
+                         (inline-page "sitemap.en.md"))
+        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
+                         (inline-page "feeds.en.md"))
+        :error    (condp = lang "fr" (inline-page "error.fr.md")
+                         (inline-page "error.en.md"))
+        (condp = lang "fr" (inline-page "error.fr.md")
+               (inline-page "error.en.md")))]
      (subscribe lang)
      (footer lang)
      (display-parameters-modal lang)]))
