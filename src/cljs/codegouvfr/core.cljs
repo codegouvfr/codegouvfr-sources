@@ -583,10 +583,8 @@
  (fn []
    (let [deps0 @deps
          deps  (case @(re-frame/subscribe [:sort-deps-by?])
-                 :name        (reverse (sort-by :n deps0))
-                 :type        (reverse (sort-by :t deps0))
-                 :description (sort-by :d deps0)
-                 :repos       (sort-by #(count (:r %)) deps0)
+                 :name  (reverse (sort-by :n deps0))
+                 :repos (sort-by #(count (:r %)) deps0)
                  deps0)]
      (apply-deps-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -1061,7 +1059,7 @@
                   [:tr
                    ;; Logo
                    [:td [:img {:src i :width "100%" :alt ""}]]
-                   ;; Lib
+                   ;; Name
                    [:td
                     [:a.fr-link
                      {:href   (str (:sill-baseurl urls) lang "/software?id=" id)
@@ -1069,6 +1067,25 @@
                       :title  (new-tab (i/i lang [:more-info]) lang)
                       :target "_blank"}
                      (if fr (str "🇫🇷 " n) n)]]
+                   ;; Description
+                   [:td
+                    [:span
+                     f ; Function or description
+                     (when clp
+                       [:span " · "
+                        [:a
+                         {:href   (str (:cdl-baseurl urls) "servicesProviders/" cl)
+                          :title  (i/i lang [:providers-adullact])
+                          :rel    "noreferrer noopener"
+                          :target "new"}
+                         (i/i lang [:providers])]])
+                     (when-let [c-url (first c)]
+                       [:span " · "
+                        [:a
+                         {:href   c-url
+                          :rel    "noreferrer noopener"
+                          :target "new"}
+                         (i/i lang [:details])]])]]
                    ;; Workshop
                    [:td (when-let [w-url (not-empty (first w))]
                           [:a.fr-link
@@ -1076,25 +1093,6 @@
                             :rel    "noreferrer noopener"
                             :target "_blank"}
                            (i/i lang [:workshop])])]
-                   ;; Description
-                   [:td
-                    [:span
-                     (when clp
-                       [:span
-                        [:a
-                         {:href   (str (:cdl-baseurl "servicesProviders" urls) cl)
-                          :rel    "noreferrer noopener"
-                          :target "new"}
-                         (i/i lang [:providers])]
-                        " · "])
-                     (when-let [c-url (first c)]
-                       [:span
-                        [:a
-                         {:href   c-url
-                          :rel    "noreferrer noopener"
-                          :target "new"}
-                         (i/i lang [:details])]
-                        " · "])]]
                    ;; License
                    [:td (if s
                           [:a
