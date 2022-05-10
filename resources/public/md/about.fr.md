@@ -17,7 +17,7 @@ Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](ht
 
 ## Bibliothèques et dépendances
 
-Les bibliothèques référencées sur ce site sont des bibliothèques logicielles distribuées via des plateformes dédiées (npms.com, pypi.org, etc.) et développées à partir des dépôts référencés.
+Les bibliothèques référencées sur ce site sont des bibliothèques logicielles distribuées via des plateformes dédiées (npmjs.com, pypi.org, etc.) et développées à partir des dépôts référencés.
 
 Les dépendances sont les bibliothèques, du secteur public ou non, qui sont requises par les dépôts référencés.  Nous ne listons que les dépendances de premier niveau, pas les dépendances de dépendances.
 
