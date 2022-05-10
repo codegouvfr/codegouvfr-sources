@@ -1033,6 +1033,7 @@
              :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
             (i/i lang [:library])]]
           [:th.fr-col (i/i lang [:description])]
+          [:th.fr-col-1 (i/i lang [:workshop])]
           [:th.fr-col-2 (i/i lang [:license])]
           [:th.fr-col-1
            [:button
@@ -1046,13 +1047,15 @@
                 ^{:key dd}
                 (let [{:keys [n   ; name
                               id  ; sill_id
-                              i   ; :wikidataDataLogoUrl
+                              i   ; wikidataDataLogoUrl
                               l   ; license
                               f   ; description
-                              fr  ; :isFromFrenchPublicService
-                              u   ; :referencedSinceTime
-                              cl  ; :comptoirDuLibreSoftwareId
-                              clp ; :comptoirDuLibreSoftwareProviders?
+                              fr  ; isFromFrenchPublicService
+                              u   ; referencedSinceTime
+                              cl  ; comptoirDuLibreSoftwareId
+                              clp ; comptoirDuLibreSoftwareProviders?
+                              c   ; useCaseUrls
+                              w   ; workShopUrls
                               s   ; :isPresentInSupportContract
                               ]} dd]
                   [:tr
@@ -1066,15 +1069,32 @@
                       :title  (new-tab (i/i lang [:more-info]) lang)
                       :target "_blank"}
                      (if fr (str "🇫🇷 " n) n)]]
-                   ;; Description
-                   [:td (if clp
-                          [:a
-                           {:href   (str (:cdl-baseurl "servicesProviders" urls) cl)
+                   ;; Workshop
+                   [:td (when-let [w-url (not-empty (first w))]
+                          [:a.fr-link
+                           {:href   w-url
                             :rel    "noreferrer noopener"
-                            :title  (new-tab (i/i lang [:providers]) lang)
                             :target "_blank"}
-                           f]
-                          f)]
+                           (i/i lang [:workshop])])]
+                   ;; Description
+                   [:td
+                    [:span
+                     (when clp
+                       [:span
+                        [:a
+                         {:href   (str (:cdl-baseurl "servicesProviders" urls) cl)
+                          :rel    "noreferrer noopener"
+                          :target "new"}
+                         (i/i lang [:providers])]
+                        " · "])
+                     (when-let [c-url (first c)]
+                       [:span
+                        [:a
+                         {:href   c-url
+                          :rel    "noreferrer noopener"
+                          :target "new"}
+                         (i/i lang [:details])]
+                        " · "])]]
                    ;; License
                    [:td (if s
                           [:a
