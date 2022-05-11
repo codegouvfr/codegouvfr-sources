@@ -9,23 +9,32 @@ Tout code source obtenu ou développé par un organisme remplissant une mission 
 
 De nombreux organismes publient déjà des codes sources : nous les présentons sur ce site de façon à faciliter leur découverte et à encourager les administrations à les réutiliser ou à y contribuer.
 
-## Qu'est-ce qu'un « code source » ?
+### Qu'est-ce qu'un « dépôt de code source » ?
 
-Le code source est la version lisible d'un programme informatique.
+Le *code source* est la version lisible par un humain d'un programme informatique.  Un *dépôt de code source* est l'ensemble des fichiers d'un programme.  Tous les dépôts référencés sur ce site utilisent le logiciel de gestion de versions Git.
 
-Pour d'autres précisions sur des termes techniques, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
+Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
 
-## Bibliothèques et dépendances
+### Bibliothèques et dépendances
 
 Les bibliothèques référencées sur ce site sont des bibliothèques logicielles distribuées via des plateformes dédiées (npmjs.com, pypi.org, etc.) et développées à partir des dépôts référencés.
 
-Les dépendances sont les bibliothèques, du secteur public ou non, qui sont requises par les dépôts référencés.  Nous ne listons que les dépendances de premier niveau, pas les dépendances de dépendances.
+Les dépendances sont les bibliothèques, venant du secteur public ou non, requises par les dépôts référencés.  Nous ne listons que les dépendances de premier niveau, pas les dépendances de dépendances.
 
-## SILL et services
+### Logiciels libres du SILL et services en ligne
 
 Le socle interministériel de logiciels libres est la liste des logiciels libres recommandés pour toutes les administrations.  Chaque logiciel de cette liste est aujourd'hui en usage dans au moins une administration, et dispose d'un « référent SILL » prêt à aider les autres administrations dans son utilisation.
 
+Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://sill.etalab.gouv.fr).
+
 Les services en ligne référencés sur le site sont tous des instances de logiciels libres mises à la disposition des agents publics.
+
+
+## Comment contribuer ?
+
+Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, écrivez à [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr) ou envoyez un correctif sur [ce dépôt](https://git.sr.ht/~etalab/codegouvfr-sources/).
+
+**Attention**: Nous ne référençons pas les comptes personnels.
 
 ## Où télécharger les données ?
 
@@ -47,7 +56,5 @@ Vous pouvez aussi suivre les annonces du pôle logiciels libres en vous abonnant
 2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) récupère les données des organisations et des dépôts à partir de cette liste.
 3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolide les données en y ajoutant des informations.
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) expose les données.
-
-**Attention**: Nous ne référençons pas les comptes personnels.
 
 Nous ne référençons pour l'instant que les comptes de sr.ht (SourceHut), github.com, gitlab.com et des instances GitLab locales : si vous pouvez aider à référencer des comptes qui publient sur d'autres forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), instances [Gogs](https://gogs.io) ou [Gitea](https://gitea.io), etc.), n'hésitez pas à [contribuer](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
