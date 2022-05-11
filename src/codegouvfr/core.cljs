@@ -1894,7 +1894,7 @@
         [:a.fr-card__link
          {:href "#/libs"}
          (i/i lang [:Libraries])]]
-       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
+       [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
       [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/libraries.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
