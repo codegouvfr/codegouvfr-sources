@@ -1507,7 +1507,8 @@
                 top_licenses top_languages top_topics
                 top_forges top_ministries]} stats]
     [:div
-     [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
+     [:div.fr-grid-row.fr-grid-row--center
+      {:style {:height "180px" :margin-bottom "2em"}}
       (stats-tile lang :orgas-or-groups orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
@@ -1562,7 +1563,8 @@
                     (top-clean-up-orgas top_ministries "ministry")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:ministry])]
                              [:th (i/i lang [:Repos])]]])]]
-     [:div.fr-grid-row.fr-grid-row--center {:style {:height "180px"}}
+     [:div.fr-grid-row.fr-grid-row--center
+      {:style {:height "180px" :margin-bottom "3em"}}
       (stats-tile lang :sill-stats sill_cnt)
       (stats-tile lang :papillon-stats papillon_cnt)
       (stats-tile lang :deps-stats deps_cnt)
