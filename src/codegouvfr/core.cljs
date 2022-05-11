@@ -1655,15 +1655,15 @@
            (i/i lang [:home])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/groups") "page")
-            :href         "#/groups"}
-           (i/i lang [:orgas-or-groups])]]
-         [:li.fr-nav__item
-          [:a.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
             :href         "#/repos"}
            (i/i lang [:Repos])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/groups") "page")
+            :href         "#/groups"}
+           (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
