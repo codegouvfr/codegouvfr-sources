@@ -126,19 +126,6 @@
   [key]
   (.removeItem (.-localStorage js/window) key))
 
-;; (def to-hiccup-repl
-;;   {:h2 :h2.fr-h2.fr-mt-3w
-;;    :p  :p.fr-my-3w
-;;    :li :li.fr-ml-2w})
-
-;; (defn to-hiccup
-;;   "Convert a markdown `s` string to hiccup structure."
-;;   [s]
-;;   (->> s
-;;        (md/md->hiccup)
-;;        (md/component)
-;;        (walk/prewalk-replace to-hiccup-repl)))
-
 (defn to-locale-date [s]
   (when (string? s)
     (.toLocaleDateString
@@ -346,8 +333,7 @@
 
 (re-frame/reg-event-db
  :display-filter!
- (fn [db [_ s]]
-   (update-in db [:display-filter] merge s)))
+ (fn [db [_ s]] (update-in db [:display-filter] merge s)))
 
 (re-frame/reg-event-db
  :repos-page!
@@ -1669,15 +1655,15 @@
            (i/i lang [:home])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/groups") "page")
-            :href         "#/groups"}
-           (i/i lang [:orgas-or-groups])]]
-         [:li.fr-nav__item
-          [:a.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
             :href         "#/repos"}
            (i/i lang [:Repos])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/groups") "page")
+            :href         "#/groups"}
+           (i/i lang [:orgas-or-groups])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
@@ -1874,7 +1860,7 @@
           :title (i/i lang [:repos-of-source-code])}
          (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
-      [:div.fr-card__img
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/repositories.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
@@ -1885,7 +1871,7 @@
           :title (i/i lang [:orgas-or-groups])}
          (i/i lang [:orgas])]]
        [:div.fr-card__desc (i/i lang [:home-groups-desc])]]
-      [:div.fr-card__img
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/organizations.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
@@ -1894,8 +1880,8 @@
         [:a.fr-card__link
          {:href "#/libs"}
          (i/i lang [:Libraries])]]
-       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
-      [:div.fr-card__img
+       [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/libraries.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
@@ -1906,7 +1892,7 @@
           :title (i/i lang [:deps-stats])}
          (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
-      [:div.fr-card__img
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/dependencies.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
@@ -1916,7 +1902,7 @@
          {:href "#/sill"}
          (i/i lang [:sill-stats])]]
        [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
-      [:div.fr-card__img
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/sill.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
@@ -1926,7 +1912,7 @@
          {:href "#/services"}
          (i/i lang [:papillon-title])]]
        [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
-      [:div.fr-card__img
+      [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/services.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
