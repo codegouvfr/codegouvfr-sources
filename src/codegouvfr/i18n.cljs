@@ -89,7 +89,7 @@
     :modal-title                   "Paramètres d’affichage"
     :more-info                     "Plus d'informations"
     :most-used-identified-licenses "Licences identifiées les plus utilisées"
-    :most-used-languages           "Les 10 languages les plus utilisés"
+    :most-used-languages           "Langages de programmation les plus utilisés"
     :most-used-licenses            "Licences les plus utilisées"
     :name                          "Nom"
     :new-modal                     "S'ouvre dans une fenêtre modale"
