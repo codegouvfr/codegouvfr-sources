@@ -1189,21 +1189,21 @@
                    [:td [:span
                          [:a.fr-link
                           {:href   l
-                           :title  (i/i lang [:service-visit])
+                           :title  (str (i/i lang [:service-visit])  " " n " (" a ")")
                            :rel    "noreferrer noopener"
                            :target "new"} n]
                          (let [sill-link
                                [:span " · "
                                 [:a.fr-link
                                  {:href   (str (:sill-baseurl urls) lang "/software?id=" i)
-                                  :title  (i/i lang [:sill-visit])
+                                  :title  (gstring/format (i/i lang [:sill-visit]) n)
                                   :rel    "noreferrer noopener"
-                                  :target "new"}"SILL"]]
+                                  :target "new"} "SILL"]]
                                cdl-link
                                [:span " · "
                                 [:a.fr-link
                                  {:href   (str (:cdl-baseurl urls) c)
-                                  :title  (i/i lang [:cdl-visit])
+                                  :title  (gstring/format (i/i lang [:cdl-visit]) n)
                                   :rel    "noreferrer noopener"
                                   :target "new"} "Comptoir du Libre"]]]
                            [:span
