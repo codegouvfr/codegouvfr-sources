@@ -38,6 +38,8 @@
 (defonce init-filter
   {:d        nil
    :g        nil
+   :license  nil
+   :language nil
    :platform ""
    :ministry ""
    :dep-type ""
