@@ -1975,8 +1975,6 @@
                          (inline-page "a11y.en.md"))
         :about    (condp = lang "fr" (inline-page "about.fr.md")
                          (inline-page "about.en.md"))
-        :about    (condp = lang "fr" (inline-page "about.fr.md")
-                         (inline-page "about.en.md"))
         :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
                          (inline-page "sitemap.en.md"))
         :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
@@ -2011,7 +2009,28 @@
 ;; Setup router and init
 
 (defn on-navigate [match]
-  (let [page (keyword (:name (:data match)))]
+  (let [title-prefix  "code.gouv.fr ─ "
+        title-default "Codes sources du secteur public ─ Source code from the French public sector"
+        title-error   "Erreur ─ Error"
+        page          (keyword (:name (:data match)))]
+    (set! (. js/document -title)
+          (str title-prefix
+               (condp = page
+                 :libs     "Bibliothèques ─ Libraries"
+                 :orgas    "Organisations ─ Organizations"
+                 :repos    "Dépôts de code source ─ Source code repositories"
+                 :error    title-error
+                 :home     title-default
+                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
+                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
+                 :legal    "Mentions légales ─ Legal mentions"
+                 :about    "À propos ─ About"
+                 :deps     "Dépendances ─ Dependencis"
+                 :stats    "Chiffres ─ Stats"
+                 :a11y     "Accessibilité ─ Accessibility"
+                 :feeds    "Flux RSS ─ RSS Feeds"
+                 :sitemap  "Pages du site ─ Sitemap"
+                 title-error)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
     (re-frame/dispatch [:filter! {:q ""}])
