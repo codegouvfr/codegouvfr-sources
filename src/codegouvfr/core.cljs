@@ -1187,15 +1187,25 @@
                   [:tr
                    ;; service name
                    [:td [:span
-                         [:a.fr-link {:href l} n]
+                         [:a.fr-link
+                          {:href   l
+                           :title  (i/i lang [:service-visit])
+                           :rel    "noreferrer noopener"
+                           :target "new"} n]
                          (let [sill-link
                                [:span " · "
                                 [:a.fr-link
-                                 {:href (str (:sill-baseurl urls) lang "/software?id=" i)} "SILL"]]
+                                 {:href   (str (:sill-baseurl urls) lang "/software?id=" i)
+                                  :title  (i/i lang [:sill-visit])
+                                  :rel    "noreferrer noopener"
+                                  :target "new"}"SILL"]]
                                cdl-link
                                [:span " · "
                                 [:a.fr-link
-                                 {:href (str (:cdl-baseurl urls) c)} "Comptoir du Libre"]]]
+                                 {:href   (str (:cdl-baseurl urls) c)
+                                  :title  (i/i lang [:cdl-visit])
+                                  :rel    "noreferrer noopener"
+                                  :target "new"} "Comptoir du Libre"]]]
                            [:span
                             (when i sill-link)
                             (when c cdl-link)])]]
