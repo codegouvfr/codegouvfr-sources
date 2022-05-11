@@ -38,6 +38,8 @@
 (defonce init-filter
   {:d        nil
    :g        nil
+   :license  nil
+   :language nil
    :platform ""
    :ministry ""
    :dep-type ""
@@ -141,7 +143,15 @@
 
 (defn s-includes? [s sub]
   (when (and (string? s) (string? sub))
-    (s/includes? (s/lower-case s) (s/lower-case sub))))
+    (let [sub (-> sub
+                  s/trim
+                  (s/replace #"\s+" " ")
+                  (s/replace #"(?i)[éèëêe]" "[éèëêe]")
+                  (s/replace #"(?i)[æàâa]" "[æàâa]")
+                  (s/replace #"(?i)[œöôo]" "[œöôo]")
+                  (s/replace #"(?i)[çc]" "[çc]")
+                  (s/replace #"(?i)[ûùu]" "[ûùu]"))]
+      (re-find (re-pattern (s/lower-case sub)) (s/lower-case s)))))
 
 (defn vec-to-csv-string [data]
   (->> data
