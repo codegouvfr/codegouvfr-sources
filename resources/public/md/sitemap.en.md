@@ -1,10 +1,14 @@
 ## Sitemap
 
 - [Home](/)
-- [Organizations or groups](#/groups)
 - [Source code repositories](#/repos)
-- [Identified dependencies](#/deps)
+- [Organizations or groups](#/groups)
+- [Libraries](#/libs)
+- [Dependencies](#/deps)
+- [Recommended Free Software](#/sill)
+- [Online services based on Free Software](#/services)
 - [Stats](#/stats)
 - [About](#/about)
 - [Legal mentions](#/legal)
-- [RSS feed](/data/latest.xml)
+- [Accessibility](#/a11y)
+- [RSS feed](#/feeds)
