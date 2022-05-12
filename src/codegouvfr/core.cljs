@@ -1650,7 +1650,12 @@
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
-           [:li [:a.fr-link {:href "https://twitter.com/codegouvfr"} "@codegouvfr"]]
+           [:li [:a.fr-link.fr-icon-mastodon-line
+                 {:href  "https://mastodon.social/@codegouvfr"
+                  :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
+           [:li [:a.fr-link.fr-icon-twitter-line
+                 {:href  "https://twitter.com/codegouvfr"
+                  :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
            [:li [:a.fr-link {:href "/#/feeds"} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
