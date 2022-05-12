@@ -1,10 +1,14 @@
 ## Pages du site
 
 - [Accueil](/)
-- [Organisations ou groupes](#/groups)
 - [Dépôts de code source](#/repos)
-- [Dépendances identifiées](#/deps)
+- [Organisations ou groupes](#/groups)
+- [Bibliothèques](#/libs)
+- [Dépendances](#/deps)
+- [Socle interministériel de logiciels libres](#/sill)
+- [Services instanciant un logiciel libre](#/services)
 - [Chiffres](#/stats)
 - [À propos](#/about)
 - [Mentions légales](#/legal)
-- [Flux RSS](/data/latest.xml)
+- [Déclaration d'accessibilité](#/a11y)
+- [Flux RSS](#/feeds)
