@@ -669,7 +669,7 @@
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
           repos      @(re-frame/subscribe [:repos?])]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
@@ -902,7 +902,7 @@
     (let [lib-f     @(re-frame/subscribe [:sort-libs-by?])
           libs-page @(re-frame/subscribe [:libs-page?])
           libs      @(re-frame/subscribe [:libs?])]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
@@ -1010,7 +1010,7 @@
           sill-page @(re-frame/subscribe [:sill-page?])
           sill      ((if sill-f identity shuffle)
                      @(re-frame/subscribe [:sill?]))]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
@@ -1151,7 +1151,7 @@
     (let [papillon-f    @(re-frame/subscribe [:sort-papillon-by?])
           papillon-page @(re-frame/subscribe [:papillon-page?])
           papillon      @(re-frame/subscribe [:papillon?])]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:Papillon])]
         [:thead.fr-grid.fr-col-12
@@ -1260,7 +1260,7 @@
     [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]]
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
           orgas @(re-frame/subscribe [:orgas?])]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:orgas-or-groups])]
         [:thead.fr-grid.fr-col-12
@@ -1313,7 +1313,7 @@
                              :rel    "noreferrer noopener"
                              :title  (new-tab (i/i lang [:floss-policy]) lang)
                              :href   f}
-                         [:img {:src "/img/floss.png" :width "10%"}]]
+                         [:img {:src "/img/floss.png"}]]
                         " "])
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
@@ -1390,7 +1390,7 @@
 (defn deps-table [lang deps repo]
   (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
         deps-page @(re-frame/subscribe [:deps-page?])]
-    [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+    [:div.fr-table.fr-table--no-caption
      [:table
       [:caption (i/i lang [:deps])]
       [:thead.fr-grid.fr-col-12
@@ -1501,7 +1501,7 @@
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
    [:h4.fr-h4 heading]
-   [:div.fr-table.fr-table--layout-fixed
+   [:div.fr-table.fr-table--no-caption
     [:table
      thead
      [:tbody
