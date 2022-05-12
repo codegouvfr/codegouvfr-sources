@@ -902,7 +902,7 @@
     (let [lib-f     @(re-frame/subscribe [:sort-libs-by?])
           libs-page @(re-frame/subscribe [:libs-page?])
           libs      @(re-frame/subscribe [:libs?])]
-      [:div.fr-table.fr-table--no-caption
+      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
        [:table
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
@@ -1395,14 +1395,14 @@
       [:caption (i/i lang [:deps])]
       [:thead.fr-grid.fr-col-12
        [:tr
-        [:th.fr-col-3
+        [:th.fr-col-4
          [:button
           {:class    (when (= dep-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
         [:th.fr-col-1 (i/i lang [:type])]
-        [:th.fr-col-5 (i/i lang [:description])]
+        [:th.fr-col-3 (i/i lang [:description])]
         (when-not repo
           [:th.fr-col-1
            [:button
