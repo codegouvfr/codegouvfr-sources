@@ -128,15 +128,12 @@
   [key]
   (.removeItem (.-localStorage js/window) key))
 
-(defn to-locale-date [s]
+(defn to-locale-date [^String s lang]
   (when (string? s)
-    (.toLocaleDateString
-     (js/Date. (.parse js/Date s)))))
+    (.toLocaleDateString (js/Date. (.parse js/Date s)) lang)))
 
-(defn todays-date []
-  (s/replace
-   (.toLocaleDateString (js/Date.))
-   "/" "-"))
+(defn todays-date [lang]
+  (s/replace (.toLocaleDateString (js/Date.) lang) "/" "-"))
 
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
@@ -756,7 +753,7 @@
                     [:span (if a? [:em d] d)]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
-                    (or (to-locale-date u) "N/A")]
+                    (or (to-locale-date u lang) "N/A")]
                    ;; Forks
                    [:td {:style {:text-align "center"}} f]
                    ;; Stars
@@ -794,7 +791,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      repos)
-                    (str "codegouvfr-repositories-" (todays-date) ".csv"))}
+                    (str "codegouvfr-repositories-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -963,7 +960,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      libs)
-                    (str "codegouvfr-libraries-" (todays-date) ".csv"))}
+                    (str "codegouvfr-libraries-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -1097,7 +1094,7 @@
                             :target "_blank"}
                            l] l)]
                    ;; Date when added
-                   [:td (to-locale-date u)]])))]])))
+                   [:td (to-locale-date u lang)]])))]])))
 
 (defn sill-page [lang]
   (let [sill           @(re-frame/subscribe [:sill?])
@@ -1120,7 +1117,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      sill)
-                    (str "codegouvfr-sill-" (todays-date) ".csv"))}
+                    (str "codegouvfr-sill-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -1230,7 +1227,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      papillon)
-                    (str "codegouvfr-papillon-" (todays-date) ".csv"))}
+                    (str "codegouvfr-papillon-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -1335,7 +1332,7 @@
                                                 "GitLab"    (s/replace o "/groups/" "/"))})}
                      r]]
                    [:td {:style {:text-align "center"}}
-                    (to-locale-date c)]])))]])))
+                    (to-locale-date c lang)]])))]])))
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
@@ -1360,7 +1357,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      orgas)
-                    (str "codegouvfr-organizations-" (todays-date) ".csv"))}
+                    (str "codegouvfr-organizations-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       [:strong.fr-m-auto
@@ -1467,7 +1464,7 @@
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
                      deps)
-                    (str "codegouvfr-dependencies-" (todays-date) ".csv"))}
+                    (str "codegouvfr-dependencies-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General informations
       [:strong.fr-m-auto
