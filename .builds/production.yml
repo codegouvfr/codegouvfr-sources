@@ -13,11 +13,7 @@ tasks:
       sudo ./linux-install-1.10.3.998.sh
   - build: |
       cd code.gouv.fr
-<<<<<<< HEAD:.builds/production.yml
       git checkout production
-=======
-      git checkout preproduction
->>>>>>> preproduction:.builds/preproduction.yml
       clojure -M:js
   - upload: |
       cd code.gouv.fr/resources/public/
