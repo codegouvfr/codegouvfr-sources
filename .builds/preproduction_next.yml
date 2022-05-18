@@ -1,0 +1,24 @@
+image: archlinux
+packages:
+  - rlwrap
+  - jre
+  - curl
+  - rsync
+secrets:
+  - b2fbc53c-abc0-4d2a-b00e-15b6a2681788
+tasks:
+  - prepare: |
+      curl -O https://download.clojure.org/install/linux-install-1.10.3.998.sh
+      chmod +x linux-install-1.10.3.998.sh
+      sudo ./linux-install-1.10.3.998.sh
+  - build: |
+      cd code.gouv.fr
+      git checkout preproduction
+      clojure -M:js
+  - upload: |
+      cd code.gouv.fr/resources/public/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_preprod/
+triggers:
+  - action: email
+    condition: failure
+    to: bastien.guerry@data.gouv.fr
