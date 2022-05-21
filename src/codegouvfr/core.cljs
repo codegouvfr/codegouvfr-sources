@@ -675,33 +675,33 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col
-           [:button
-            {:class    (when (= rep-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-repos-alpha])
              :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
             (i/i lang [:orga-repo])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= rep-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :date) "fr-btn--secondary")
              :title    (i/i lang [:sort-update-date])
              :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
             (i/i lang [:update-short])]]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= rep-f :forks) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :forks) "fr-btn--secondary")
              :title    (i/i lang [:sort-forks])
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
             (i/i lang [:forks])]]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= rep-f :stars) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :stars) "fr-btn--secondary")
              :title    (i/i lang [:sort-stars])
              :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
             (i/i lang [:Stars])]]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= rep-f :reused) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :reused) "fr-btn--secondary")
              :title    (i/i lang [:sort-reused])
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
             (i/i lang [:reused])]]]]
@@ -908,8 +908,8 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-5
-           [:button
-            {:class    (when (= lib-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= lib-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-libs-alpha])
              :on-click #(re-frame/dispatch [:sort-libs-by! :name])}
             (i/i lang [:library])]]
@@ -949,12 +949,12 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-link
+      [:button.fr-btn--tertiary
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-libraries.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
-      [:button.fr-link.fr-m-1w
+      [:button.fr-btn--tertiary.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
@@ -1017,8 +1017,8 @@
          [:tr
           [:th.fr-col-1 "Logo"]
           [:th.fr-col-3
-           [:button
-            {:class    (when (= sill-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= sill-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-sill-alpha])
              :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
             (i/i lang [:library])]]
@@ -1026,8 +1026,8 @@
           [:th.fr-col-1 (i/i lang [:workshop])]
           [:th.fr-col-2 (i/i lang [:license])]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= sill-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= sill-f :date) "fr-btn--secondary")
              :title    (i/i lang [:sort-sill-date])
              :on-click #(re-frame/dispatch [:sort-sill-by! :date])}
             (i/i lang [:added])]]]]
@@ -1157,15 +1157,15 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-3
-           [:button
-            {:class    (when (= papillon-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= papillon-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-papillon-alpha])
              :on-click #(re-frame/dispatch [:sort-papillon-by! :name])}
             (i/i lang [:service])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col
-           [:button
-            {:class    (when (= papillon-f :agency) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= papillon-f :agency) "fr-btn--secondary")
              :title    (i/i lang [:sort-papillon-agency])
              :on-click #(re-frame/dispatch [:sort-papillon-by! :agency])}
             (i/i lang [:papillon-agency])]]]]
@@ -1267,21 +1267,21 @@
          [:tr
           [:th.fr-col-1 "Image"]
           [:th.fr-col-2
-           [:button
-            {:class    (when (= org-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= org-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-orgas-alpha])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
             (i/i lang [:orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= org-f :repos) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= org-f :repos) "fr-btn--secondary")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
             (i/i lang [:Repos])]]
           [:th.fr-col-1
-           [:button
-            {:class    (when (= org-f :date) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= org-f :date) "fr-btn--secondary")
              :title    (i/i lang [:sort-orgas-creation])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
             (i/i lang [:created-at])]]]]
@@ -1396,8 +1396,8 @@
       [:thead.fr-grid.fr-col-12
        [:tr
         [:th.fr-col-4
-         [:button
-          {:class    (when (= dep-f :name) "fr-icon-checkbox-circle-line fr-link--icon-left")
+         [:button.fr-btn.fr-btn--tertiary-no-outline
+          {:class    (when (= dep-f :name) "fr-btn--secondary")
            :title    (i/i lang [:sort-name])
            :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
           (i/i lang [:name])]]
@@ -1405,8 +1405,8 @@
         [:th.fr-col-3 (i/i lang [:description])]
         (when-not repo
           [:th.fr-col-1
-           [:button
-            {:class    (when (= dep-f :repos) "fr-icon-checkbox-circle-line fr-link--icon-left")
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= dep-f :repos) "fr-btn--secondary")
              :title    (i/i lang [:sort-repos])
              :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
             (i/i lang [:Repos])]])]]
@@ -1432,7 +1432,7 @@
             [:td d]
             (when-not repo
               [:td {:style {:text-align "center"}}
-               [:button.fr-link
+               [:button.fr-btn--tertiary
                 {:title    (i/i lang [:list-repos-depending-on-dep])
                  :on-click #(do (reset! dp-filter (into #{} (js->clj r)))
                                 (rfe/push-state :repos {:lang l} {:d n}))}
