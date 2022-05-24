@@ -902,7 +902,7 @@
     (let [lib-f     @(re-frame/subscribe [:sort-libs-by?])
           libs-page @(re-frame/subscribe [:libs-page?])
           libs      @(re-frame/subscribe [:libs?])]
-      [:div.fr-table.fr-table--no-caption.fr-table--layout-fixed
+      [:div.fr-table.fr-table--no-caption
        [:table
         [:caption (i/i lang [:Libraries])]
         [:thead.fr-grid.fr-col-12
