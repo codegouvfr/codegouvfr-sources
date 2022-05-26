@@ -37,10 +37,14 @@ To submit a new organization account, send us an email at [logiciels-libres@data
 
 ## Where to download the data?
 
-All data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html).
+These data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html):
 
 - The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json).
 - The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json).
+- Data from the [SILL](https://sill.etalab.gouv.fr) and the catalog of services: [sill-data.json](https://code.gouv.fr/data/sill-data.json).
+
+These data, collected from [libraries.io](https://libraries.io/terms), are published under the [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) license:
+
 - The list of libraries as [csv](/data/libraries/csv/all.csv) and [json](/data/libraries/json/all.json).
 
 ## How to get updates?
