@@ -38,10 +38,14 @@ Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, éc
 
 ## Où télécharger les données ?
 
-Toutes les données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html).
+Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html) :
 
 * La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json).
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json).
+* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill-data.json](https://code.gouv.fr/data/sill-data.json).
+
+Ces données, collectées depuis [libraries.io](https://libraries.io/terms), sont publiées sous licence [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) :
+
 * La liste des bibliothèques en [csv](/data/libraries/csv/all.csv) et [json](/data/libraries/json/all.json).
 
 ## Comment suivre les mises à jour ?
