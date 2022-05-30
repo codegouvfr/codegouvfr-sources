@@ -142,6 +142,8 @@
   (when (and (string? s) (string? sub))
     (let [sub (-> sub
                   s/trim
+                  (s/replace #"[\(\)\*\!\+\?\[\]\\]" #(str "\\" %1))
+                  (s/replace #"\s+" " ")
                   (s/replace #"\s+" " ")
                   (s/replace #"(?i)[éèëêe]" "[éèëêe]")
                   (s/replace #"(?i)[æàâa]" "[æàâa]")
