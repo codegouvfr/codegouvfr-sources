@@ -1014,7 +1014,7 @@
                      @(re-frame/subscribe [:sill?]))]
       [:div.fr-table.fr-table--no-caption
        [:table
-        [:caption (i/i lang [:Libraries])]
+        [:caption (i/i lang [:sill-stats])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Logo"]
@@ -1023,7 +1023,7 @@
             {:class    (when (= sill-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-sill-alpha])
              :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
-            (i/i lang [:library])]]
+            (i/i lang [:software])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1 (i/i lang [:workshop])]
           [:th.fr-col-2 (i/i lang [:license])]
