@@ -1055,7 +1055,7 @@
                    [:td [:img {:src i :width "100%" :alt ""}]]
                    ;; Name
                    [:td
-                    [:a.fr-link
+                    [:a.fr-raw-link.fr-link
                      {:href   (str (:sill-baseurl urls) lang "/software?id=" id)
                       :rel    "noreferrer noopener"
                       :title  (new-tab (i/i lang [:more-info]) lang)
