@@ -735,7 +735,7 @@
                       [:img {:width "18px" :src "/img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:span " "]
-                     [:a.fr-link
+                     [:a.fr-raw-link.fr-link
                       {:href   r
                        :target "new"
                        :rel    "noreferrer noopener"
@@ -745,7 +745,7 @@
                                  (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
-                     [:a.fr-link
+                     [:a.fr-raw-link.fr-link
                       {:href  (rfe/href :repos {:lang lang} {:g group})
                        :title (i/i lang [:browse-repos-orga])}
                       o]
