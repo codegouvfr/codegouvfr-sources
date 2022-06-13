@@ -1309,15 +1309,15 @@
                    [:td (if au
                           (if (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title (i/i lang [:homepage])
+                             {:title (i/i lang [:orga-homepage])
                               :href  h}
                              [:img {:src au :width "100%" :alt ""}]]
                             [:img {:src au :width "100%" :alt ""}])
-                          (if (not-empty h)
+                          (when (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title (i/i lang [:homepage])
+                             {:title (i/i lang [:orga-homepage])
                               :href  h}
-                             (i/i lang [:homepage])]))]
+                             (i/i lang [:website])]))]
                    [:td
                     [:span
                      (when (not-empty f)
