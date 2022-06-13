@@ -1297,7 +1297,7 @@
                               d ; description
                               o ; organization_url
                               ;; FIXME: Where to use this?
-                              ;; h ; website
+                              h ; website
                               ;; an ; annuaire
                               f ; floss_policy
                               p ; platform
@@ -1306,16 +1306,28 @@
                               r ; repositories_count
                               ]} dd]
                   [:tr
-                   [:td (when au [:img {:src au :width "100%" :alt ""}])]
+                   [:td (if au
+                          (if (not-empty h)
+                            [:a.fr-raw-link.fr-link
+                             {:title (i/i lang [:homepage])
+                              :href  h}
+                             [:img {:src au :width "100%" :alt ""}]]
+                            [:img {:src au :width "100%" :alt ""}])
+                          (if (not-empty h)
+                            [:a.fr-raw-link.fr-link
+                             {:title (i/i lang [:homepage])
+                              :href  h}
+                             (i/i lang [:homepage])]))]
                    [:td
                     [:span
                      (when (not-empty f)
                        [:span
-                        [:a {:target "new"
-                             :rel    "noreferrer noopener"
-                             :title  (new-tab (i/i lang [:floss-policy]) lang)
-                             :href   f}
-                         [:img {:src "/img/floss.png"}]]
+                        [:a.fr-raw-link
+                         {:target "new"
+                          :rel    "noreferrer noopener"
+                          :title  (new-tab (i/i lang [:floss-policy]) lang)
+                          :href   f}
+                         [:img {:src "/img/floss.png" :width "25px"}]]
                         " "])
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
