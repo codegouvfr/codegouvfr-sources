@@ -728,7 +728,7 @@
                    ;; Repo (orga)
                    [:td
                     [:div
-                     [:a.fr-link
+                     [:a.fr-raw-link.fr-link
                       {:href  (str (:swh-baseurl urls) r)
                        :title (new-tab (i/i lang [:swh-link]) lang)
                        :rel   "noreferrer noopener"}
