@@ -4,7 +4,6 @@ figwheel_server.log
 .nrepl-port
 .rebel_readline_history
 .dir-locals.el
-*txt
 .lsp/*
 .eastwood
 *csv
