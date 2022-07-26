@@ -1,7 +1,7 @@
-image: archlinux
+image: debian/unstable
 packages:
   - rlwrap
-  - jre
+  - default-jre
   - curl
   - rsync
   - unzip
