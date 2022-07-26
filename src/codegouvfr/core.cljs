@@ -951,12 +951,12 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-btn--tertiary
+      [:a.fr-raw-link.fr-link.fr-m-1w
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-libraries.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
-      [:button.fr-btn--tertiary.fr-m-1w
+      [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
                     (map
