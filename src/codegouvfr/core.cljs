@@ -782,7 +782,7 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-link
+      [:a.fr-raw-link.fr-link.fr-m-1w
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
@@ -1108,7 +1108,7 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-link
+      [:a.fr-raw-link.fr-link.fr-m-1w
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-sill.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
@@ -1360,7 +1360,7 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-link
+      [:a.fr-raw-link.fr-link.fr-m-1w
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-organizations.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
@@ -1467,7 +1467,7 @@
     [:div.fr-grid
      [:div.fr-grid-row
       ;; RSS feed
-      [:button.fr-link
+      [:a.fr-raw-link.fr-link.fr-m-1w
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-dependencies.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
