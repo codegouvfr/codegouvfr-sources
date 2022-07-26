@@ -10,3 +10,4 @@ figwheel_server.log
 resources/public/data/
 .cpcache/
 *org
+.clj-kondo/
