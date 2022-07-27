@@ -1995,10 +1995,7 @@
                          (inline-page "sitemap.en.md"))
         :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
                          (inline-page "feeds.en.md"))
-        :error    (condp = lang "fr" (inline-page "error.fr.md")
-                         (inline-page "error.en.md"))
-        (condp = lang "fr" (inline-page "error.fr.md")
-               (inline-page "error.en.md")))]
+        nil)]
      (subscribe lang)
      (footer lang)
      (display-parameters-modal lang)]))
@@ -2027,15 +2024,15 @@
 (defn on-navigate [match]
   (let [title-prefix  "code.gouv.fr ─ "
         title-default "Codes sources du secteur public ─ Source code from the French public sector"
-        title-error   "Erreur ─ Error"
         page          (keyword (:name (:data match)))]
+    ;; Rely on the server to handle /not-found as a 404
+    (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
                  :libs     "Bibliothèques ─ Libraries"
                  :orgas    "Organisations ─ Organizations"
                  :repos    "Dépôts de code source ─ Source code repositories"
-                 :error    title-error
                  :home     title-default
                  :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
                  :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
@@ -2046,7 +2043,7 @@
                  :a11y     "Accessibilité ─ Accessibility"
                  :feeds    "Flux RSS ─ RSS Feeds"
                  :sitemap  "Pages du site ─ Sitemap"
-                 title-error)))
+                 nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
     (re-frame/dispatch [:filter! {:q ""}])
@@ -2067,8 +2064,7 @@
    ["a11y" :a11y]
    ["about" :about]
    ["sitemap" :sitemap]
-   ["feeds" :feeds]
-   ["error" :error]])
+   ["feeds" :feeds]])
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
