@@ -2,7 +2,7 @@
 
 - [Accueil](/)
 - [Dépôts de code source](#/repos)
-- [Organisations ou groupes](#/groups)
+- [Organisations](#/groups)
 - [Bibliothèques](#/libs)
 - [Dépendances](#/deps)
 - [Socle interministériel de logiciels libres](#/sill)
