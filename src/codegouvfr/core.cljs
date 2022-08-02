@@ -182,11 +182,21 @@
    data))
 
 (defn- table-header [lang what k]
-  [:strong.fr-m-auto
-   (let [rps (count what)]
-     (if (< rps 2)
-       (str rps (i/i lang [k]))
-       (str rps (i/i lang [(keyword (str (name k) "s"))]))))])
+  (let [glossary-url
+        (str "https://man.sr.ht/~etalab/logiciels-libres/glossary."
+             lang ".md#" (name k))]
+    [:strong.fr-m-auto
+     (let [rps (count what)]
+       (if (< rps 2)
+         (str rps (i/i lang [k]))
+         (str rps (i/i lang [(keyword (str (name k) "s"))]))))
+     " "
+     [:a.fr-raw-link.fr-link
+      {:href   glossary-url
+       :target "new"
+       :rel    "noreferrer noopener"
+       :title  (i/i lang [:glossary])}
+      [:span.fr-icon-question-fill]]]))
 
 ;; Filters
 
