@@ -181,6 +181,13 @@
             [[:a {:href (rfe/href :orgas {} {param k0})} k] v])))
    data))
 
+(defn- table-header [lang what k]
+  [:strong.fr-m-auto
+   (let [rps (count what)]
+     (if (< rps 2)
+       (str rps (i/i lang [k]))
+       (str rps (i/i lang [(keyword (str (name k) "s"))]))))])
+
 ;; Filters
 
 (defn ntaf
@@ -786,11 +793,7 @@
                     (str "codegouvfr-repositories-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count repos)]
-         (if (< rps 2)
-           (str rps (i/i lang [:repo]))
-           (str rps (i/i lang [:repos]))))]
+      (table-header lang repos :repo)
       ;; Top pagination block
       [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
@@ -955,11 +958,7 @@
                     (str "codegouvfr-libraries-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count libs)]
-         (if (< rps 2)
-           (str rps (i/i lang [:lib]))
-           (str rps (i/i lang [:libs]))))]
+      (table-header lang libs :lib)
       ;; Top pagination block
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
@@ -1112,11 +1111,7 @@
                     (str "codegouvfr-sill-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count sill)]
-         (if (< rps 2)
-           (str rps (i/i lang [:sill0]))
-           (str rps (i/i lang [:sill]))))]
+      (table-header lang sill :sill)
       ;; Top pagination block
       [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]
      ;; Specific sill search filters and options
@@ -1222,11 +1217,7 @@
                     (str "codegouvfr-papillon-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count papillon)]
-         (if (< rps 2)
-           (str rps (i/i lang [:papillon0]))
-           (str rps (i/i lang [:papillon]))))]
+      (table-header lang papillon :papillon)
       ;; Top pagination block
       [navigate-pagination :papillon first-disabled last-disabled papillon-pages count-pages]]
      ;; Specific papillon search filters and options
@@ -1364,11 +1355,7 @@
                     (str "codegouvfr-organizations-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [orgs (count orgas)]
-         (if (< orgs 2)
-           (str orgs (i/i lang [:orga]))
-           (str orgs (i/i lang [:orgas]))))]
+      (table-header lang orgas :orga)      
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
@@ -1471,11 +1458,7 @@
                     (str "codegouvfr-dependencies-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General informations
-      [:strong.fr-m-auto
-       (let [deps (count deps)]
-         (if (< deps 2)
-           (str deps (i/i lang [:dep]))
-           (str deps (i/i lang [:deps]))))]
+      (table-header lang deps :dep)
       ;; Top pagination block
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
