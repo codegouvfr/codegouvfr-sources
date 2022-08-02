@@ -8,7 +8,7 @@ Web application to explore the source code from the french public sector.
 
 # Get the data
 
-The list of organizations/groups accounts is maintained on
+The list of organizations accounts is maintained on
 [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources).
 
 From these sources, data are then fetched by

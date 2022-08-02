@@ -1264,7 +1264,7 @@
           orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-table.fr-table--no-caption
        [:table
-        [:caption (i/i lang [:orgas-or-groups])]
+        [:caption (i/i lang [:orgas])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Image"]
@@ -1377,8 +1377,8 @@
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
-           (str orgs (i/i lang [:one-group]))
-           (str orgs (i/i lang [:groups]))))]
+           (str orgs (i/i lang [:one-orga]))
+           (str orgs (i/i lang [:several-orgas]))))]
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
@@ -1540,7 +1540,7 @@
     [:div
      [:div.fr-grid-row.fr-grid-row--center
       {:style {:height "180px" :margin-bottom "2em"}}
-      (stats-tile lang :orgas-or-groups orgas_cnt)
+      (stats-tile lang :orgas orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
       (stats-tile lang :median-repos-by-orga median_repos_cnt)]
@@ -1701,7 +1701,7 @@
           [:a.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
             :href         "#/groups"}
-           (i/i lang [:orgas-or-groups])]]
+           (i/i lang [:orgas])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
@@ -1906,9 +1906,9 @@
        [:div.fr-card__title
         [:a.fr-card__link
          {:href  "#/groups"
-          :title (i/i lang [:orgas-or-groups])}
+          :title (i/i lang [:orgas])}
          (i/i lang [:orgas])]]
-       [:div.fr-card__desc (i/i lang [:home-groups-desc])]]
+       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
       [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/organizations.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w

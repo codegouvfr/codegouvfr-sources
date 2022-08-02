@@ -55,7 +55,7 @@ You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodo
 
 ## How are the data collected?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
 2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list.
 3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidates the data and enrich them.
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) exposes the data.
