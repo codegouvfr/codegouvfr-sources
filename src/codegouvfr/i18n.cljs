@@ -28,7 +28,7 @@
     :all-dep-types                 "Tous les types de dépendances"
     :all-forges                    "Toutes les forges"
     :all-lib-types                 "Tous les types de bibliothèques"
-    :all-ministries                "Tous les ministères et institutions de rattachement"
+    :all-ministries                "Toutes les institutions"
     :archive                       "SWH"
     :archive-on                    "Archive sur "
     :bluehats                      "Gazette BlueHats 🧢"
