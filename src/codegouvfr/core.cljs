@@ -118,16 +118,6 @@
   [key val]
   (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val))))
 
-(defn get-item
-  "Return the value of `key` from browser's localStorage."
-  [key]
-  (js->clj (.parse js/JSON (.getItem (.-localStorage js/window) key))))
-
-(defn remove-item!
-  "Remove the browser's localStorage value for the given `key`."
-  [key]
-  (.removeItem (.-localStorage js/window) key))
-
 (defn to-locale-date [^String s lang]
   (when (string? s)
     (.toLocaleDateString (js/Date. (.parse js/Date s)) lang)))
@@ -190,6 +180,23 @@
                 k0    (s/replace k #" \([^)]+\)" "")]
             [[:a {:href (rfe/href :orgas {} {param k0})} k] v])))
    data))
+
+(defn- table-header [lang what k]
+  (let [glossary-url
+        (str "https://man.sr.ht/~etalab/logiciels-libres/glossary."
+             lang ".md#" (name k))]
+    [:strong.fr-m-auto
+     (let [rps (count what)]
+       (if (< rps 2)
+         (str rps (i/i lang [k]))
+         (str rps (i/i lang [(keyword (str (name k) "s"))]))))
+     " "
+     [:a.fr-raw-link.fr-link
+      {:href   glossary-url
+       :target "new"
+       :rel    "noreferrer noopener"
+       :title  (i/i lang [:glossary])}
+      [:span.fr-icon-question-fill]]]))
 
 ;; Filters
 
@@ -796,11 +803,7 @@
                     (str "codegouvfr-repositories-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count repos)]
-         (if (< rps 2)
-           (str rps (i/i lang [:repo]))
-           (str rps (i/i lang [:repos]))))]
+      (table-header lang repos :repo)
       ;; Top pagination block
       [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
@@ -965,11 +968,7 @@
                     (str "codegouvfr-libraries-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count libs)]
-         (if (< rps 2)
-           (str rps (i/i lang [:lib]))
-           (str rps (i/i lang [:libs]))))]
+      (table-header lang libs :lib)
       ;; Top pagination block
       [navigate-pagination :libs first-disabled last-disabled libs-pages count-pages]]
      [:div.fr-grid-row
@@ -1122,11 +1121,7 @@
                     (str "codegouvfr-sill-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count sill)]
-         (if (< rps 2)
-           (str rps (i/i lang [:sill0]))
-           (str rps (i/i lang [:sill]))))]
+      (table-header lang sill :sill)
       ;; Top pagination block
       [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]
      ;; Specific sill search filters and options
@@ -1232,11 +1227,7 @@
                     (str "codegouvfr-papillon-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [rps (count papillon)]
-         (if (< rps 2)
-           (str rps (i/i lang [:papillon0]))
-           (str rps (i/i lang [:papillon]))))]
+      (table-header lang papillon :papillon)
       ;; Top pagination block
       [navigate-pagination :papillon first-disabled last-disabled papillon-pages count-pages]]
      ;; Specific papillon search filters and options
@@ -1264,7 +1255,7 @@
           orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-table.fr-table--no-caption
        [:table
-        [:caption (i/i lang [:orgas])]
+        [:caption (i/i lang [:Orgas])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Image"]
@@ -1273,7 +1264,7 @@
             {:class    (when (= org-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-orgas-alpha])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
-            (i/i lang [:orgas])]]
+            (i/i lang [:Orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
@@ -1374,11 +1365,7 @@
                     (str "codegouvfr-organizations-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      [:strong.fr-m-auto
-       (let [orgs (count orgas)]
-         (if (< orgs 2)
-           (str orgs (i/i lang [:one-orga]))
-           (str orgs (i/i lang [:several-orgas]))))]
+      (table-header lang orgas :orga)      
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
@@ -1481,11 +1468,7 @@
                     (str "codegouvfr-dependencies-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General informations
-      [:strong.fr-m-auto
-       (let [deps (count deps)]
-         (if (< deps 2)
-           (str deps (i/i lang [:dep]))
-           (str deps (i/i lang [:deps]))))]
+      (table-header lang deps :dep)
       ;; Top pagination block
       [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
      [:div.fr-grid-row
@@ -1540,7 +1523,7 @@
     [:div
      [:div.fr-grid-row.fr-grid-row--center
       {:style {:height "180px" :margin-bottom "2em"}}
-      (stats-tile lang :orgas orgas_cnt)
+      (stats-tile lang :Orgas orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
       (stats-tile lang :median-repos-by-orga median_repos_cnt)]
@@ -1701,7 +1684,7 @@
           [:a.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
             :href         "#/groups"}
-           (i/i lang [:orgas])]]
+           (i/i lang [:Orgas])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
