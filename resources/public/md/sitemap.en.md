@@ -2,7 +2,7 @@
 
 - [Home](/)
 - [Source code repositories](#/repos)
-- [Organizations or groups](#/groups)
+- [Organizations](#/groups)
 - [Libraries](#/libs)
 - [Dependencies](#/deps)
 - [Recommended Free Software](#/sill)

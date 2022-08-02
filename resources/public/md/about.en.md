@@ -41,7 +41,7 @@ These data are published under the [Open License 2.0](https://spdx.org/licenses/
 
 - The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json).
 - The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json).
-- Data from the [SILL](https://sill.etalab.gouv.fr) and the catalog of services: [sill-data.json](https://code.gouv.fr/data/sill-data.json).
+- Data from the [SILL](https://sill.etalab.gouv.fr) and the catalog of services: [sill.json](https://sill.etalab.gouv.fr/api/sill.json).
 
 These data, collected from [libraries.io](https://libraries.io/terms), are published under the [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) license:
 
@@ -55,7 +55,7 @@ You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodo
 
 ## How are the data collected?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization/group accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
+1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
 2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list.
 3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidates the data and enrich them.
 4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) exposes the data.
