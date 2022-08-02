@@ -1090,7 +1090,7 @@
                    ;; License
                    [:td (if s
                           [:a
-                           {:href   (str (:support-url urls) l)
+                           {:href   (:support-url urls)
                             :rel    "noreferrer noopener"
                             :title  (new-tab (i/i lang [:support]) lang)
                             :target "_blank"}
