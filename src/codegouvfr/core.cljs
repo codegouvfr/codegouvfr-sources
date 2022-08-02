@@ -1254,7 +1254,7 @@
           orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-table.fr-table--no-caption
        [:table
-        [:caption (i/i lang [:orgas])]
+        [:caption (i/i lang [:Orgas])]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Image"]
@@ -1263,7 +1263,7 @@
             {:class    (when (= org-f :name) "fr-btn--secondary")
              :title    (i/i lang [:sort-orgas-alpha])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
-            (i/i lang [:orgas])]]
+            (i/i lang [:Orgas])]]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
@@ -1367,8 +1367,8 @@
       [:strong.fr-m-auto
        (let [orgs (count orgas)]
          (if (< orgs 2)
-           (str orgs (i/i lang [:one-orga]))
-           (str orgs (i/i lang [:several-orgas]))))]
+           (str orgs (i/i lang [:orga]))
+           (str orgs (i/i lang [:orgas]))))]
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
@@ -1530,7 +1530,7 @@
     [:div
      [:div.fr-grid-row.fr-grid-row--center
       {:style {:height "180px" :margin-bottom "2em"}}
-      (stats-tile lang :orgas orgas_cnt)
+      (stats-tile lang :Orgas orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
       (stats-tile lang :median-repos-by-orga median_repos_cnt)]
@@ -1691,7 +1691,7 @@
           [:a.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
             :href         "#/groups"}
-           (i/i lang [:orgas])]]
+           (i/i lang [:Orgas])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
