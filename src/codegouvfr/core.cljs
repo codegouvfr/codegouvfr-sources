@@ -1520,7 +1520,7 @@
       [:tbody]
       (for [dd @tags]
         ^{:key dd}
-        (let [{:keys [repo_name repository url title name date]} dd]
+        (let [{:keys [repo_name repository title name date]} dd]
           [:tr
            [:td
             [:a.fr-link
