@@ -1531,7 +1531,7 @@
            [:td title]
            [:td
             [:a.fr-link
-             {:href   url
+             {:href   (str repository "/releases/tag/" name)
               :target "_blank"
               :title  (i/i lang [:Tag])
               :rel    "noreferrer noopener"} name]]
