@@ -316,6 +316,7 @@
 (def deps (reagent/atom nil))
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
+(def tags (reagent/atom nil))
 (def ministries (filter not-empty (distinct (map :m @orgas))))
 
 (re-frame/reg-sub
@@ -1493,6 +1494,46 @@
      ;; Bottom pagination block
      [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]))
 
+;; Main structure - tags
+
+(defn tags-table [lang]
+  [:div.fr-table.fr-table--no-caption
+   [:table
+    [:caption (i/i lang [:Tags])]
+    [:thead.fr-grid.fr-col-12
+     [:tr
+      [:th.fr-col-1 (i/i lang [:Repo])]
+      [:th.fr-col-2 (i/i lang [:description])]
+      [:th.fr-col-1 (i/i lang [:Tagname])]
+      [:th.fr-col-1 (i/i lang [:update-short])]]]
+    (into
+     [:tbody]
+     (for [dd @tags]
+       ^{:key dd}
+       (let [{:keys [repo_name url title name date]} dd]
+         [:tr
+          [:td repo_name]
+          [:td title]
+          [:td
+           [:a.fr-link
+            {:href   url
+             :target "_blank"
+             :rel    "noreferrer noopener"} name]]
+          [:td (to-locale-date date lang)]])))]])
+
+(defn tags-page [lang]
+  [:div.fr-grid
+   [:div.fr-grid-row
+    ;; RSS feed
+    [:a.fr-raw-link.fr-link.fr-m-1w
+     {:title (i/i lang [:rss-feed])
+      :href  "/data/latest-tags.xml"}
+     [:span.fr-icon-rss-line {:aria-hidden true}]]
+    ;; General informations
+    (table-header lang @tags :tag)]
+   ;; Main deps display
+   [tags-table lang]])
+
 ;; Main structure - stats
 
 (defn stats-table [heading data thead]
@@ -1697,6 +1738,12 @@
             :title        (i/i lang [:deps-stats])
             :href         "#/deps"}
            (i/i lang [:Deps])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
+           {:aria-current (when (= path "/tags") "page")
+            :title        (i/i lang [:Tags])
+            :href         "#/tags"}
+           (i/i lang [:Tags])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/sill") "page")
@@ -1968,6 +2015,7 @@
         :papillon [papillon-page-class lang]
         :stats    [stats-page-class lang]
         :deps     [deps-page lang]
+        :tags     [tags-page lang]
         :legal    (condp = lang "fr" (inline-page "legal.fr.md")
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
@@ -1997,6 +2045,9 @@
         (GET "/data/deps.json"
              :handler
              #(reset! deps (map (comp bean clj->js) %)))
+        (GET "/data/tags.json"
+             :handler
+             #(reset! tags (map (comp bean clj->js) %)))
         (GET "/data/orgas.json"
              :handler
              #(reset! orgas (map (comp bean clj->js) %))))
@@ -2021,7 +2072,8 @@
                  :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
                  :legal    "Mentions légales ─ Legal mentions"
                  :about    "À propos ─ About"
-                 :deps     "Dépendances ─ Dependencis"
+                 :deps     "Dépendances ─ Dependencies"
+                 :tags     "Versions"
                  :stats    "Chiffres ─ Stats"
                  :a11y     "Accessibilité ─ Accessibility"
                  :feeds    "Flux RSS ─ RSS Feeds"
@@ -2040,6 +2092,7 @@
    ["repos" :repos]
    ["libs" :libs]
    ["sill" :sill]
+   ["tags" :tags]
    ["services" :papillon]
    ["stats" :stats]
    ["deps" :deps]
