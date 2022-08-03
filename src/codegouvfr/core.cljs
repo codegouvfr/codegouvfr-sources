@@ -1496,31 +1496,6 @@
 
 ;; Main structure - tags
 
-(defn tags-table [lang]
-  [:div.fr-table.fr-table--no-caption
-   [:table
-    [:caption (i/i lang [:Tags])]
-    [:thead.fr-grid.fr-col-12
-     [:tr
-      [:th.fr-col-1 (i/i lang [:Repo])]
-      [:th.fr-col-2 (i/i lang [:description])]
-      [:th.fr-col-1 (i/i lang [:Tagname])]
-      [:th.fr-col-1 (i/i lang [:update-short])]]]
-    (into
-     [:tbody]
-     (for [dd @tags]
-       ^{:key dd}
-       (let [{:keys [repo_name url title name date]} dd]
-         [:tr
-          [:td repo_name]
-          [:td title]
-          [:td
-           [:a.fr-link
-            {:href   url
-             :target "_blank"
-             :rel    "noreferrer noopener"} name]]
-          [:td (to-locale-date date lang)]])))]])
-
 (defn tags-page [lang]
   [:div.fr-grid
    [:div.fr-grid-row
@@ -1532,7 +1507,35 @@
     ;; General informations
     (table-header lang @tags :tag)]
    ;; Main deps display
-   [tags-table lang]])
+   [:div.fr-table.fr-table--no-caption
+    [:table
+     [:caption (i/i lang [:Tags])]
+     [:thead.fr-grid.fr-col-12
+      [:tr
+       [:th.fr-col-1 (i/i lang [:Repo])]
+       [:th.fr-col-2 (i/i lang [:description])]
+       [:th.fr-col-1 (i/i lang [:Tagname])]
+       [:th.fr-col-1 (i/i lang [:update-short])]]]
+     (into
+      [:tbody]
+      (for [dd @tags]
+        ^{:key dd}
+        (let [{:keys [repo_name repository url title name date]} dd]
+          [:tr
+           [:td
+            [:a.fr-link
+             {:href   repository
+              :target "_blank"
+              :title  (i/i lang [:Repo])
+              :rel    "noreferrer noopener"} repo_name]]
+           [:td title]
+           [:td
+            [:a.fr-link
+             {:href   url
+              :target "_blank"
+              :title  (i/i lang [:Tag])
+              :rel    "noreferrer noopener"} name]]
+           [:td (to-locale-date date lang)]])))]]])
 
 ;; Main structure - stats
 
