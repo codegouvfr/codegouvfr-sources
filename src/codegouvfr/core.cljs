@@ -1775,13 +1775,13 @@
   [:div.fr-follow
    [:div.fr-container
     [:div.fr-grid-row
-     [:div.fr-col-12.fr-col-md-4
+     [:div.fr-col-12.fr-col-md-2
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
         [:div.fr-text--sm.fr-follow__desc
          (i/i lang [:contact-title])]]]]
-     [:div.fr-col-12.fr-col-md-5
+     [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__newsletter
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
@@ -1789,19 +1789,23 @@
          (i/i lang [:bluehats-desc])]
         [:a.fr-btn
          {:type "button"
-          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"} (i/i lang [:subscribe])]]]]
+          :href "https://infolettres.etalab.gouv.fr/subscribe/bluehats@mail.etalab.studio"}
+         (i/i lang [:subscribe])]]]]
+     [:div.fr-col-12.fr-col-md-4
+      [:div.fr-follow__newsletter
+       [:div
+        [:h1.fr-h5.fr-follow__title (i/i lang [:cio-floss])]
+        [:p.fr-text--sm.fr-follow__desc
+         (i/i lang [:cio-floss-desc])]
+        [:a.fr-btn
+         {:type "button"
+          :href "https://infolettres.etalab.gouv.fr/subscribe/logiciels-libres-dsi@mail.etalab.studio"}
+         (i/i lang [:subscribe])]]]]
      ;; Follow elsewhere
-     [:div.fr-col-12.fr-col-md-3
+     [:div.fr-col-12.fr-col-md-2
       [:div.fr-share
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:div.fr-share__group
-        [:a.fr-share__link
-         {:href       "https://sr.ht/~etalab/"
-          :aria-label (i/i lang [:sourcehut-link])
-          :title      (new-tab (i/i lang [:sourcehut-link]) lang)
-          :rel        "noreferrer noopener"
-          :target     "_blank"}
-         "SourceHut"]
         [:a.fr-share__link
          {:href       "https://mastodon.social/@codegouvfr"
           :aria-label (i/i lang [:mastodon-follow])
