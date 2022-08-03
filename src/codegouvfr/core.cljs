@@ -1026,6 +1026,8 @@
             (i/i lang [:software])]]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1 (i/i lang [:workshop])]
+          [:th.fr-col-2 [:span {:title (i/i lang [:Version-min])}
+                         (i/i lang [:Version])]]
           [:th.fr-col-2 (i/i lang [:license])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
@@ -1048,6 +1050,7 @@
                               clp ; comptoirDuLibreSoftwareProviders?
                               c   ; useCaseUrls
                               w   ; workShopUrls
+                              v   ; versionMin
                               s   ; :isPresentInSupportContract
                               ]} dd]
                   [:tr
@@ -1087,6 +1090,8 @@
                             :rel    "noreferrer noopener"
                             :target "_blank"}
                            (i/i lang [:workshop])])]
+                   ;; Version min
+                   [:td v]
                    ;; License
                    [:td (if s
                           [:a
