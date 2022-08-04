@@ -1148,7 +1148,7 @@
     (fn []
       (GET "/data/sill.json"
            :handler
-           #(reset! sill (filter #(nil? (:dereferencing %))
+           #(reset! sill (filter (fn [e] (nil? (:d e)))
                                  (map (comp bean clj->js) %)))))
     :reagent-render (fn [] (sill-page lang))}))
 
