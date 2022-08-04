@@ -1148,7 +1148,8 @@
     (fn []
       (GET "/data/sill.json"
            :handler
-           #(reset! sill (map (comp bean clj->js) %))))
+           #(reset! sill (filter #(nil? (:dereferencing %))
+                                 (map (comp bean clj->js) %)))))
     :reagent-render (fn [] (sill-page lang))}))
 
 ;; Main structure - papillon
