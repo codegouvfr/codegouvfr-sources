@@ -42,7 +42,7 @@ Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses
 
 * La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json).
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json).
-* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://sill.etalab.gouv.fr/api/sill.json), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
+* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://sill.etalab.gouv.fr/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
 
 Ces données, collectées depuis [libraries.io](https://libraries.io/terms), sont publiées sous licence [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) :
 
