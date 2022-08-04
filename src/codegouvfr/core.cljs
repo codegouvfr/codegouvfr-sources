@@ -252,7 +252,7 @@
 (defn apply-sill-filters [m]
   (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
     (filter
-     #(ntaf q (s-includes? (s/join " " [(:n %) (:f %)]) q))
+     #(ntaf q (s-includes? (s/join " " [(:n %) (:f %) (:t %)]) q))
      m)))
 
 (defn apply-papillon-filters [m]
