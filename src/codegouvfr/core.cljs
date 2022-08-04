@@ -1117,7 +1117,12 @@
        {:title (i/i lang [:rss-feed])
         :href  "/data/latest-sill.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
-      ;; Download link
+      ;; Download PDF link
+      [:a.fr-link.fr-raw-link.fr-m-1w
+       {:title (i/i lang [:download-pdf])
+        :href  "/data/sill.pdf"}
+       [:span.fr-icon-file-pdf-line {:aria-hidden true}]]
+      ;; Download csv link
       [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
         :on-click #(download-as-csv!
