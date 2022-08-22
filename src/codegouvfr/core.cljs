@@ -1954,7 +1954,7 @@
        [:div.fr-card__title
         [:a.fr-card__link
          {:href  "#/groups"
-          :title (i/i lang [:orgas])}
+          :title (i/i lang [:Orgas])}
          (i/i lang [:orgas])]]
        [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
       [:div.fr-card__img.fr-col-3
