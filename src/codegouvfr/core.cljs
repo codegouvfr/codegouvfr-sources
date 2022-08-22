@@ -1955,7 +1955,7 @@
         [:a.fr-card__link
          {:href  "#/groups"
           :title (i/i lang [:Orgas])}
-         (i/i lang [:orgas])]]
+         (i/i lang [:Orgas])]]
        [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
       [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "/img/organizations.jpg" :alt ""}]]]]
