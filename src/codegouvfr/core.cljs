@@ -1077,7 +1077,7 @@
                    [:td
                     [:span
                      f ; Function or description
-                     (when clp
+                     (when (seq clp)
                        [:span " · "
                         [:a
                          {:href  (str "/#/sill/" id)
