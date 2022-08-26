@@ -1055,7 +1055,7 @@
                               f   ; description
                               fr  ; isFromFrenchPublicService
                               u   ; referencedSinceTime
-                              cl  ; comptoirDuLibreSoftwareId
+                              ;; cl  ; comptoirDuLibreSoftwareId
                               clp ; comptoirDuLibreSoftwareProviders
                               c   ; useCaseUrls
                               w   ; workShopUrls
