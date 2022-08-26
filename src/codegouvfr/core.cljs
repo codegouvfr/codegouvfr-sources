@@ -433,6 +433,11 @@
    (assoc db :sort-orgas-by k)))
 
 (re-frame/reg-event-db
+ :sill-id!
+ (fn [db [_ sill-id]]
+   (assoc db :sill-id sill-id)))
+
+(re-frame/reg-event-db
  :sort-deps-by!
  (fn [db [_ k]]
    (re-frame/dispatch [:deps-page! 0])
@@ -501,6 +506,10 @@
 (re-frame/reg-sub
  :filter?
  (fn [db _] (:filter db)))
+
+(re-frame/reg-sub
+ :sill-id?
+ (fn [db _] (:sill-id db)))
 
 (re-frame/reg-sub
  :display-filter?
@@ -1047,7 +1056,7 @@
                               fr  ; isFromFrenchPublicService
                               u   ; referencedSinceTime
                               cl  ; comptoirDuLibreSoftwareId
-                              clp ; comptoirDuLibreSoftwareProviders?
+                              clp ; comptoirDuLibreSoftwareProviders
                               c   ; useCaseUrls
                               w   ; workShopUrls
                               v   ; versionMin
@@ -1071,10 +1080,9 @@
                      (when clp
                        [:span " · "
                         [:a
-                         {:href   (str (:cdl-baseurl urls) "servicesProviders/" cl)
-                          :title  (i/i lang [:providers-adullact])
-                          :rel    "noreferrer noopener"
-                          :target "new"}
+                         {:href  (str "/#/sill/" id)
+                          :title (i/i lang [:providers])
+                          :rel   "noreferrer noopener"}
                          (i/i lang [:providers])]])
                      (when-let [c-url (first c)]
                        [:span " · "
@@ -1140,17 +1148,6 @@
      [sill-table lang (count sill)]
      ;; Bottom pagination block
      [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]))
-
-(defn sill-page-class [lang]
-  (reagent/create-class
-   {:display-name   "sill-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/sill.json"
-           :handler
-           #(reset! sill (filter (fn [e] (nil? (:d e)))
-                                 (map (comp bean clj->js) %)))))
-    :reagent-render (fn [] (sill-page lang))}))
 
 ;; Main structure - papillon
 
@@ -1397,6 +1394,25 @@
          [:option {:value x} x])]]
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
+
+(defn sill-software-page [lang]
+  (let [sill-id                @(re-frame/subscribe [:sill-id?])
+        {:keys [n f i cl clp]} (filter #(= (:id %) (js/parseInt sill-id)) @sill)
+        clp                    (walk/keywordize-keys (js->clj clp))]
+    [:div.fr-grid
+     [:div
+      [:img {:src i :max-width 200 :align "right"}]
+      [:h1.fr-h1 n]
+      [:h3.fr-h5 f]
+      [:p [:a {:href (str "https://sill.etalab.gouv.fr/software?name=" n)}
+           (gstring/format (i/i lang [:sill-visit]) n)]]
+      [:p [:a {:href (str (:cdl-baseurl urls) "servicesProviders/" cl)}
+           (gstring/format (i/i lang [:cdl-providers-visit]) n)]]
+      [:h3.fr-h5 (i/i lang [:providers])]
+      [:ul
+       (for [p clp]
+         ^{key p}
+         [:li [:a {:href (:website (:external_resources p))} (:name p)]])]]]))
 
 ;; Main structure - deps
 
@@ -2029,11 +2045,12 @@
         :orgas    [orgas-page lang]
         :repos    [repos-page-class lang license language]
         :libs     [libs-page-class lang]
-        :sill     [sill-page-class lang]
+        :sill     [sill-page lang]
         :papillon [papillon-page-class lang]
         :stats    [stats-page-class lang]
         :deps     [deps-page lang]
         :tags     [tags-page lang]
+        :sill-id  [sill-software-page lang]
         :legal    (condp = lang "fr" (inline-page "legal.fr.md")
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
@@ -2057,6 +2074,10 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
+        (GET "/data/sill.json"
+             :handler
+             #(reset! sill (filter (fn [e] (nil? (:d e)))
+                                   (map (comp bean clj->js) %))))
         (GET "/data/platforms.csv"
              :handler
              #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
@@ -2076,7 +2097,8 @@
 (defn on-navigate [match]
   (let [title-prefix  "code.gouv.fr ─ "
         title-default "Codes sources du secteur public ─ Source code from the French public sector"
-        page          (keyword (:name (:data match)))]
+        page          (keyword (:name (:data match)))
+        sill-id       (:sill-id (:path (:parameters match)))]
     ;; Rely on the server to handle /not-found as a 404
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (set! (. js/document -title)
@@ -2099,6 +2121,7 @@
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
+    (re-frame/dispatch [:sill-id! sill-id])
     (re-frame/dispatch [:filter! {:q ""}])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
@@ -2109,7 +2132,9 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["libs" :libs]
-   ["sill" :sill]
+   ["sill"
+    ["" :sill]
+    ["/:sill-id" :sill-id]]
    ["tags" :tags]
    ["services" :papillon]
    ["stats" :stats]
