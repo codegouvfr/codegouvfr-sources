@@ -206,7 +206,8 @@
 
 (defn apply-repos-filters [m]
   (let [{:keys [d q g language platform license
-                is-esr is-contrib is-lib is-fork is-licensed]}
+                is-esr is-contrib is-publiccode
+                is-lib is-fork is-licensed]}
         @(re-frame/subscribe [:filter?])]
     (filter
      #(and
@@ -214,6 +215,7 @@
        (ntaf is-esr (:e? %))
        (ntaf is-fork (:f? %))
        (ntaf is-contrib (:c? %))
+       (ntaf is-publiccode (:p? %))
        (ntaf is-lib (:l? %))
        (ntaf is-licensed (let [l (:li %)] (and l (not= l "Other"))))
        (ntaf license (s-includes? (:li %) license))
@@ -893,7 +895,15 @@
                                 (re-frame/dispatch [:filter! {:is-contrib v}]))}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
-        (i/i lang [:only-contrib])]]]
+        (i/i lang [:only-contrib])]]
+      [:div.fr-checkbox-group.fr-col.fr-m-1w
+       [:input#6 {:type      "checkbox" :name "6"
+                  :on-change #(let [v (.-checked (.-target %))]
+                                (set-item! :is-publiccode v)
+                                (re-frame/dispatch [:filter! {:is-publiccode v}]))}]
+       [:label.fr-label
+        {:for "6" :title (i/i lang [:only-publiccode-title])}
+        (i/i lang [:only-publiccode])]]]
      ;; Main repos table display
      [repos-table lang (count repos)]
      ;; Bottom pagination block
