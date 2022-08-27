@@ -1056,6 +1056,7 @@
                               fr  ; isFromFrenchPublicService
                               u   ; referencedSinceTime
                               ;; cl  ; comptoirDuLibreSoftwareId
+                              ac  ; annuaireCnllsoftwareproviders
                               clp ; comptoirDuLibreSoftwareProviders
                               c   ; useCaseUrls
                               w   ; workShopUrls
@@ -1077,7 +1078,7 @@
                    [:td
                     [:span
                      f ; Function or description
-                     (when (seq clp)
+                     (when (or (seq ac) (seq clp))
                        [:span " · "
                         [:a
                          {:href  (str "/#/sill/" id)
@@ -1396,9 +1397,10 @@
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
 (defn sill-software-page [lang]
-  (let [sill-id                @(re-frame/subscribe [:sill-id?])
-        {:keys [n f i cl clp]} (filter #(= (:id %) (js/parseInt sill-id)) @sill)
-        clp                    (walk/keywordize-keys (js->clj clp))]
+  (let [sill-id                   @(re-frame/subscribe [:sill-id?])
+        {:keys [n f i cl clp ac]} (filter #(= (:id %) (js/parseInt sill-id)) @sill)
+        ac                        (walk/keywordize-keys (js->clj ac))
+        clp                       (walk/keywordize-keys (js->clj clp))]
     [:div.fr-grid
      [:div
       [:img {:src i :max-width 200 :align "right"}]
@@ -1406,13 +1408,23 @@
       [:h3.fr-h5 f]
       [:p [:a {:href (str "https://sill.etalab.gouv.fr/software?name=" n)}
            (gstring/format (i/i lang [:sill-visit]) n)]]
-      [:p [:a {:href (str (:cdl-baseurl urls) "servicesProviders/" cl)}
-           (gstring/format (i/i lang [:cdl-providers-visit]) n)]]
-      [:h3.fr-h5 (i/i lang [:providers])]
-      [:ul
-       (for [p clp]
-         ^{key p}
-         [:li [:a {:href (:website (:external_resources p))} (:name p)]])]]]))
+      (when (seq clp)
+        [:p [:a {:href (str (:cdl-baseurl urls) "servicesProviders/" cl)}
+             (gstring/format (i/i lang [:cdl-providers-visit]) n)]]
+        [:div
+         [:h3.fr-h5 (i/i lang [:cdl-providers])]
+         [:ul
+          (for [p clp]
+            ^{key p}
+            [:li [:a {:href (:website (:external_resources p))} (:name p)]])]])
+      (when (seq ac)
+        [:div
+         [:br]
+         [:h3.fr-h5 (i/i lang [:cnll-providers])]
+         [:ul
+          (for [a ac]
+            ^{key a}
+            [:li [:a {:href (:url a)} (:nom a)]])]])]]))
 
 ;; Main structure - deps
 
