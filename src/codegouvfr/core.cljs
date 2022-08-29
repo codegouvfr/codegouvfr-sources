@@ -1645,19 +1645,19 @@
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span
-                     (i/i lang [:orgas])
+                     (i/i lang [:Orgas])
                      (i/i lang [:with-more-of])
                      (i/i lang [:repos])]
                     (top-clean-up-orgas top_orgs_by_repos "q")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:orgas])]
+                    [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6
        (stats-table [:span
-                     (i/i lang [:orgas])
+                     (i/i lang [:Orgas])
                      (i/i lang [:with-more-of*])
                      (i/i lang [:stars])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:orgas])]
+                    [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]
      [:div.fr-grid-row
       [:div.fr-col-6
