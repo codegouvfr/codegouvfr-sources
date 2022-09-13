@@ -1426,7 +1426,7 @@
          [:ul
           (for [p clp]
             ^{key p}
-            [:li [:a {:href (:website (:external_resources p))} (:name p)]])]])
+            [:li [:a {:href (:url p)} (:name p)]])]])
       (when (seq ac)
         [:div
          [:br]
