@@ -113,11 +113,6 @@
 (defn new-tab [s lang]
   (str s " - " (i/i lang [:new-tab])))
 
-(defn set-item!
-  "Set `key` in browser's localStorage to `val`."
-  [key val]
-  (.setItem (.-localStorage js/window) key (.stringify js/JSON (clj->js val))))
-
 (defn to-locale-date [^String s lang]
   (when (string? s)
     (.toLocaleDateString (js/Date. (.parse js/Date s)) lang)))
@@ -859,7 +854,6 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#1 {:type      "checkbox" :name "1"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-fork v)
                                 (re-frame/dispatch [:filter! {:is-fork v}]))}]
        [:label.fr-label
         {:for   "1"
@@ -868,14 +862,12 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#2 {:type      "checkbox" :name "2"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-licensed v)
                                 (re-frame/dispatch [:filter! {:is-licensed v}]))}]
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#3 {:type      "checkbox" :name "3"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-esr v)
                                 (re-frame/dispatch [:filter! {:is-esr v}]))}]
        [:label.fr-label
         {:for "3" :title (i/i lang [:only-her-title])}
@@ -883,7 +875,6 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#4 {:type      "checkbox" :name "4"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-lib v)
                                 (re-frame/dispatch [:filter! {:is-lib v}]))}]
        [:label.fr-label
         {:for "4" :title (i/i lang [:only-lib-title])}
@@ -891,7 +882,6 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#5 {:type      "checkbox" :name "5"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-contrib v)
                                 (re-frame/dispatch [:filter! {:is-contrib v}]))}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
@@ -899,7 +889,6 @@
       [:div.fr-checkbox-group.fr-col.fr-m-1w
        [:input#6 {:type      "checkbox" :name "6"
                   :on-change #(let [v (.-checked (.-target %))]
-                                (set-item! :is-publiccode v)
                                 (re-frame/dispatch [:filter! {:is-publiccode v}]))}]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
@@ -1705,7 +1694,9 @@
                             (async/>! display-filter-chan {:q ev})
                             (async/<! (async/timeout timeout))
                             (async/>! filter-chan {:q ev}))))}])]
-    (when-let [flt @(re-frame/subscribe [:filter?])]
+    (when-let [flt (-> @(re-frame/subscribe [:filter?])
+                       (dissoc :is-fork :is-publiccode :is-contrib
+                               :is-lib :is-licensed :is-esr))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
          (close-filter-button lang ff :repos (merge flt {:g nil})))
