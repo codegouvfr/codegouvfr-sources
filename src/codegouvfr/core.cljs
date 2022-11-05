@@ -1736,7 +1736,8 @@
                   :href  "https://mastodon.social/@codegouvfr"
                   :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
            [:li [:a.fr-link.fr-icon-twitter-line
-                 {:href  "https://twitter.com/codegouvfr"
+                 {:rel   "me"
+                  :href  "https://twitter.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
            [:li [:a.fr-link {:href "/#/feeds"} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
@@ -1848,18 +1849,17 @@
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:div.fr-share__group
         [:a.fr-share__link
-         {:rel        "me"
-          :href       "https://mastodon.social/@codegouvfr"
+         {:href       "https://mastodon.social/@codegouvfr"
           :aria-label (i/i lang [:mastodon-follow])
           :title      (new-tab (i/i lang [:mastodon-follow]) lang)
-          :rel        "noreferrer noopener"
+          :rel        "noreferrer noopener me"
           :target     "_blank"}
          "Mastodon"]
         [:a.fr-share__link
          {:href       "https://twitter.com/codegouvfr"
           :aria-label (i/i lang [:twitter-follow])
           :title      (new-tab (i/i lang [:twitter-follow]) lang)
-          :rel        "noreferrer noopener"
+          :rel        "noreferrer noopener me"
           :target     "_blank"}
          "Twitter"]]]]]]])
 
