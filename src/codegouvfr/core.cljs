@@ -1745,7 +1745,10 @@
                   :title          (str (i/i lang [:modal-title]) " - "
                                        (i/i lang [:new-modal]))
                   :data-fr-opened false}
-                 (i/i lang [:modal-title])]]]]]]]]
+                 (i/i lang [:modal-title])]]]]]]
+       [:div.fr-alert.fr-alert--info.fr-alert--sm
+        [:p [:a.fr-link {:href "https://framaforms.org/enquete-sur-codegouvfr-1669136466"}
+             "Prenez 10 minutes pour nous faire des retours sur code.gouv.fr"]]]]]
      ;; Header menu
      [:div#modal-833.fr-header__menu.fr-modal
       {:aria-labelledby "fr-btn-menu-mobile"}
