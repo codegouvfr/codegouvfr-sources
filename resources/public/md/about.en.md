@@ -13,6 +13,8 @@ Many agencies already publish source code repositories : we are listing them on
 
 The *source code* is the human-readable version of a computer program.  A *source code repository* is the set of files for a computer program.  All source code repositories listed on this website use Git as their versioning system.
 
+This website only references repositories from organizational accounts (GitHub) or public groups (gitlab.com or GitLab instances) : repositories on personal accounts are not listed.
+
 For more details on other technical terms, [please check this glossary](https://man.sr.ht/~etalab/logiciels-libres/glossary.en.md).
 
 ### Libraries and dependencies
