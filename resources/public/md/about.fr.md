@@ -13,6 +13,8 @@ De nombreux organismes publient déjà des codes sources : nous les présentons
 
 Le *code source* est la version lisible par un humain d'un programme informatique.  Un *dépôt de code source* est l'ensemble des fichiers d'un programme.  Tous les dépôts référencés sur ce site utilisent le logiciel de gestion de versions Git.
 
+Ce site ne référence que les dépôts publiés via un *compte d'organisation* GitHub ou un groupe public sur gitlab.com ou une instance GitLab : les dépôts publiés via des comptes personnels ne sont pas pris en compte.
+
 Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://man.sr.ht/~etalab/logiciels-libres/glossary.fr.md).
 
 ### Bibliothèques et dépendances
@@ -28,7 +30,6 @@ Le socle interministériel de logiciels libres est la liste des logiciels libres
 Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://sill.etalab.gouv.fr).
 
 Les services en ligne référencés sur le site sont tous des instances de logiciels libres mises à la disposition des agents publics.
-
 
 ## Comment contribuer ?
 
