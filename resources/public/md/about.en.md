@@ -53,7 +53,7 @@ These data, collected from [libraries.io](https://libraries.io/terms), are publi
 
 Check our [list of RSS feeds](/#/feeds).
 
-You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodon](https://mastodon.social/@codegouvfr).
+You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodon](https://mastodon.social/@CodeGouvFr).
 
 ## How are the data collected?
 
