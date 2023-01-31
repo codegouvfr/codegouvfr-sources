@@ -6,11 +6,11 @@
 
  :deps
  {cljs-ajax/cljs-ajax                   {:mvn/version "0.8.4"}
-  cljs-bean/cljs-bean                   {:mvn/version "1.8.0"}
+  cljs-bean/cljs-bean                   {:mvn/version "1.9.0"}
   com.bhauman/figwheel-main             {:mvn/version "0.2.18"}
   com.bhauman/rebel-readline-cljs       {:mvn/version "0.1.4"}
   com.taoensso/tempura                  {:mvn/version "1.5.3"}
-  com.taoensso/timbre                   {:mvn/version "6.0.1"}
+  com.taoensso/timbre                   {:mvn/version "6.0.4"}
   markdown-to-hiccup/markdown-to-hiccup {:mvn/version "0.6.2"}
   metosin/reitit-frontend               {:mvn/version "0.5.18"}
   org.clojure/clojure                   {:mvn/version "1.11.1"}
