@@ -1,4 +1,4 @@
-;; Copyright (c) 2019-2022 DINUM, Bastien Guerry <bastien.guerry@data.gouv.fr>
+;; Copyright (c) 2019-2023 DINUM, Bastien Guerry <bastien.guerry@code.gouv.fr>
 ;; SPDX-License-Identifier: EPL-2.0
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
@@ -50,7 +50,7 @@
     :cnll-providers                "Prestataires recensés dans l'annuaire du CNLL"
     :cnll-providers-visit          "Voir les prestataires pour %s dans l'annuaire du CNLL"
     :contact                       "Contact"
-    :contact-title                 "Vous pouvez nous contacter en utilisant l'adresse électronique logiciels-libres@data.gouv.fr"
+    :contact-title                 "Vous pouvez nous contacter en utilisant l'adresse électronique contact@code.gouv.fr"
     :created-at                    "Création"
     :dep                           " dépendance"
     :deps                          " dépendances"
@@ -233,7 +233,7 @@
     :cnll-providers                "Providers from CNLL directory"
     :cnll-providers-visit          "See %s providers in CNLL directory"
     :contact                       "Contact"
-    :contact-title                 "You can reach us by email at logiciels-libres@data.gouv.fr"
+    :contact-title                 "You can reach us by email at contact@code.gouv.fr"
     :created-at                    "Created"
     :dep                           " dependency"
     :deps                          " dependencies"

@@ -1,5 +1,5 @@
 <div class="fr-highlight">
-  <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ?  <a href="mailto:logiciels-libres@data.gouv.fr">Écrivez-nous !</a>
+  <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ?  <a href="mailto:contact@code.gouv.fr">Écrivez-nous !</a>
   </p>
 </div>
 
@@ -33,7 +33,7 @@ Les services en ligne référencés sur le site sont tous des instances de logic
 
 ## Comment contribuer ?
 
-Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, écrivez à [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr) ou envoyez un correctif sur [ce dépôt](https://git.sr.ht/~etalab/codegouvfr-sources/).
+Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, écrivez à [contact@code.gouv.fr](mailto:contact@code.gouv.fr) ou envoyez un correctif sur [ce dépôt](https://git.sr.ht/~etalab/codegouvfr-sources/).
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
