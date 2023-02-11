@@ -1,5 +1,5 @@
 <div class="fr-highlight">
-  <p>If you are a French public agency and want to add new source code repositories, please <a href="mailto:logiciels-libres@data.gouv.fr">send us an email</a>.
+  <p>If you are a French public agency and want to add new source code repositories, please <a href="mailto:contact@code.gouv.fr">send us an email</a>.
   </p>
 </div>
 
@@ -33,7 +33,7 @@ Referenced services are services for public agents based on a free software.
 
 ## How to contribute?
 
-To submit a new organization account, send us an email at [logiciels-libres@data.gouv.fr](mailto:logiciels-libres@data.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~etalab/codegouvfr-sources/).
+To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~etalab/codegouvfr-sources/).
 
 **Warning**: We don't reference personal accounts.
 
