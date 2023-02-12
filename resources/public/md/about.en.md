@@ -15,7 +15,7 @@ The *source code* is the human-readable version of a computer program.  A *sourc
 
 This website only references repositories from organizational accounts (GitHub) or public groups (gitlab.com or GitLab instances) : repositories on personal accounts are not listed.
 
-For more details on other technical terms, [please check this glossary](https://man.sr.ht/~etalab/logiciels-libres/glossary.en.md).
+For more details on other technical terms, [please check this glossary](https://man.sr.ht/~codegouvfr/logiciels-libres/glossary.en.md).
 
 ### Libraries and dependencies
 
@@ -33,7 +33,7 @@ Referenced services are services for public agents based on a free software.
 
 ## How to contribute?
 
-To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~etalab/codegouvfr-sources/).
+To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-sources/).
 
 **Warning**: We don't reference personal accounts.
 
@@ -57,9 +57,9 @@ You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodo
 
 ## How are the data collected?
 
-1. [codegouvfr-sources](https://git.sr.ht/~etalab/codegouvfr-sources) contains the list of organization accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
-2. [codegouvfr-fetch-data](https://git.sr.ht/~etalab/codegouvfr-fetch-data) fetches data from organizations and repositories from this list.
-3. [codegouvfr-consolidate-data](https://git.sr.ht/~etalab/codegouvfr-consolidate-data) consolidates the data and enrich them.
-4. [code.gouv.fr](https://git.sr.ht/~etalab/code.gouv.fr) exposes the data.
+1. [codegouvfr-sources](https://git.sr.ht/~codegouvfr/codegouvfr-sources) contains the list of organization accounts on sr.ht (SourceHut) github.com, gitlab.com or local GitLab forges.
+2. [codegouvfr-fetch-data](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data) fetches data from organizations and repositories from this list.
+3. [codegouvfr-consolidate-data](https://git.sr.ht/~codegouvfr/codegouvfr-consolidate-data) consolidates the data and enrich them.
+4. [code.gouv.fr](https://git.sr.ht/~codegouvfr/code.gouv.fr) exposes the data.
 
-So far, we only reference accounts on sr.ht (SourceHut), github.com, gitlab.com and local GitLab instances: if you can help referencing accounts that publish code on other forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), [Gogs](https://gogs.io) or [Gitea](https://gitea.io) instances, etc.), please see how to [contribute](https://git.sr.ht/~etalab/codegouvfr-fetch-data).
+So far, we only reference accounts on sr.ht (SourceHut), github.com, gitlab.com and local GitLab instances: if you can help referencing accounts that publish code on other forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), [Gogs](https://gogs.io) or [Gitea](https://gitea.io) instances, etc.), please see how to [contribute](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data).
