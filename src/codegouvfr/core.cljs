@@ -178,7 +178,7 @@
 
 (defn- table-header [lang what k]
   (let [glossary-url
-        (str "https://man.sr.ht/~etalab/logiciels-libres/glossary."
+        (str "https://man.sr.ht/~codegouvfr/logiciels-libres/glossary."
              lang ".md#" (name k))]
     [:strong.fr-m-auto
      (let [rps (count what)]
