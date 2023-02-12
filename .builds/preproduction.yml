@@ -21,4 +21,4 @@ tasks:
 triggers:
   - action: email
     condition: failure
-    to: bastien.guerry@data.gouv.fr
+    to: bastien.guerry@code.gouv.fr
