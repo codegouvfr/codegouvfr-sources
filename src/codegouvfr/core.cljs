@@ -746,7 +746,7 @@
                       {:href  (str (:swh-baseurl urls) r)
                        :title (new-tab (i/i lang [:swh-link]) lang)
                        :rel   "noreferrer noopener"}
-                      [:img {:width "18px" :src "/img/swh-logo.png"
+                      [:img {:width "18px" :src "./img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:span " "]
                      [:a.fr-raw-link.fr-link
@@ -1327,7 +1327,7 @@
                           :rel    "noreferrer noopener"
                           :title  (new-tab (i/i lang [:floss-policy]) lang)
                           :href   f}
-                         [:img {:src "/img/floss.png" :width "25px"}]]
+                         [:img {:src "./img/floss.png" :width "25px"}]]
                         " "])
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
@@ -1887,21 +1887,21 @@
             [:label.fr-label {:for "fr-radios-theme-light"}
              (i/i lang [:modal-theme-light])]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "/img/artwork/light.svg"}]]]
+             [:img {:src "./img/artwork/light.svg"}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-dark
              {:type "radio" :name "fr-radios-theme" :value "dark"}]
             [:label.fr-label {:for "fr-radios-theme-dark"}
              (i/i lang [:modal-theme-dark])]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "/img/artwork/dark.svg"}]]]
+             [:img {:src "./img/artwork/dark.svg"}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-system
              {:type "radio" :name "fr-radios-theme" :value "system"}]
             [:label.fr-label {:for "fr-radios-theme-system"}
              (i/i lang [:modal-theme-system])]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "/img/artwork/system.svg"}]]]]]]]]]]]])
+             [:img {:src "./img/artwork/system.svg"}]]]]]]]]]]]])
 
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
@@ -1978,7 +1978,7 @@
          (i/i lang [:Repos])]]
        [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/repositories.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1989,7 +1989,7 @@
          (i/i lang [:Orgas])]]
        [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/organizations.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -1999,7 +1999,7 @@
          (i/i lang [:Libraries])]]
        [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/libraries.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/libraries.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -2010,7 +2010,7 @@
          (i/i lang [:Deps])]]
        [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/dependencies.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/dependencies.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -2020,7 +2020,7 @@
          (i/i lang [:sill-stats])]]
        [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/sill.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/sill.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
       [:div.fr-card__body
@@ -2030,7 +2030,7 @@
          (i/i lang [:papillon-title])]]
        [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
       [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "/img/services.jpg" :alt ""}]]]]
+       [:img.fr-responsive-img {:src "./img/services.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
