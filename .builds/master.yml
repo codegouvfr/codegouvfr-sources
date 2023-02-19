@@ -23,9 +23,6 @@ tasks:
   - build: |
       cd code.gouv.fr
       clojure -M:js
-  - upload: |
-      cd code.gouv.fr/resources/public/
-      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
 triggers:
   - action: email
     condition: failure
