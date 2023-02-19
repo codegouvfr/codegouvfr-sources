@@ -1080,7 +1080,7 @@
                      (when (or (seq ac) (seq clp))
                        [:span " · "
                         [:a
-                         {:href  (str "/#/sill/" id)
+                         {:href  (str "./#/sill/" id)
                           :title (i/i lang [:providers])
                           :rel   "noreferrer noopener"}
                          (i/i lang [:providers])]])
@@ -1739,7 +1739,7 @@
                  {:rel   "me"
                   :href  "https://twitter.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link {:href "/#/feeds"} (i/i lang [:rss-feed])]]
+           [:li [:a.fr-link {:href "./#/feeds"} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
