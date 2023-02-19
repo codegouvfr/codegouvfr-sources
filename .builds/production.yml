@@ -4,20 +4,29 @@ packages:
   - default-jre
   - curl
   - rsync
+  - unzip
 secrets:
   - eefc72cb-a612-4b95-a3e4-dae77d4f1fcf
+sources:
+  - https://git.sr.ht/~codegouvfr/code.gouv.fr
 tasks:
   - prepare: |
-      curl -O https://download.clojure.org/install/linux-install-1.11.1.1149.sh
-      chmod +x linux-install-1.11.1.1149.sh
-      sudo ./linux-install-1.11.1.1149.sh
+      curl -O https://download.clojure.org/install/linux-install-1.11.1.1224.sh
+      chmod +x linux-install-1.11.1.1224.sh
+      sudo ./linux-install-1.11.1.1224.sh
+      curl -sLO https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo
+      chmod +x install-clj-kondo
+      sudo ./install-clj-kondo
+  - lint: |
+      cd code.gouv.fr
+      clj-kondo --lint src
   - build: |
       cd code.gouv.fr
       git checkout production
       clojure -M:js
   - upload: |
       cd code.gouv.fr/resources/public/
-      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
 triggers:
   - action: email
     condition: failure
