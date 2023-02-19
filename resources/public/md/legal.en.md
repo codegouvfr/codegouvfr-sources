@@ -1,6 +1,6 @@
 ## Publisher
 
-The `code.gouv.fr` website is published by the free software pole
+The `code.gouv.fr` website is published by the free software unit
 within the interministerial directorate of digital affairs.
 
 `Location : DINUM, 20 avenue de Ségur, 75007 Paris`
