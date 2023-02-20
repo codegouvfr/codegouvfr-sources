@@ -18,10 +18,10 @@ tasks:
       chmod +x install-clj-kondo
       sudo ./install-clj-kondo
   - lint: |
-      cd code.gouv.fr
+      cd code.gouv.fr_public
       clj-kondo --lint src
   - build: |
-      cd code.gouv.fr
+      cd code.gouv.fr_public
       git checkout production
       clojure -M:js
   - upload: |
