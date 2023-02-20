@@ -18,14 +18,14 @@ tasks:
       chmod +x install-clj-kondo
       sudo ./install-clj-kondo
   - lint: |
-      cd code.gouv.fr
+      cd code.gouv.fr_public
       clj-kondo --lint src
   - build: |
-      cd code.gouv.fr
+      cd code.gouv.fr_public
       git checkout preproduction
       clojure -M:js
   - upload: |
-      cd code.gouv.fr/resources/public/
+      cd code.gouv.fr_public/resources/public/
       rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
 triggers:
   - action: email
