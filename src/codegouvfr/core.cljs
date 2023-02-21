@@ -1809,8 +1809,7 @@
            (i/i lang [:Stats])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/about") "page")
-            :href         "#/about"}
+           {:href "/mission"}
            (i/i lang [:About])]]]]]]]))
 
 (defn subscribe [lang]
@@ -2044,7 +2043,7 @@
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
-        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
+        [:a.fr-card__link {:href "/mission"} (i/i lang [:About])]]
        [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
 (defn main-page [q license language]
@@ -2070,8 +2069,6 @@
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
                          (inline-page "a11y.en.md"))
-        :about    (condp = lang "fr" (inline-page "about.fr.md")
-                         (inline-page "about.en.md"))
         :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
                          (inline-page "sitemap.en.md"))
         :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
@@ -2126,7 +2123,6 @@
                  :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
                  :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
                  :legal    "Mentions légales ─ Legal mentions"
-                 :about    "À propos ─ About"
                  :deps     "Dépendances ─ Dependencies"
                  :tags     "Versions"
                  :stats    "Chiffres ─ Stats"
@@ -2156,7 +2152,6 @@
    ["deps" :deps]
    ["legal" :legal]
    ["a11y" :a11y]
-   ["about" :about]
    ["sitemap" :sitemap]
    ["feeds" :feeds]])
 
