@@ -13,7 +13,7 @@
   ;; French translation
   {:fr
    {
-    :About                         "À propos"
+    :About                         "Mission"
     :Deps                          "Dépendances"
     :Libraries                     "Bibliothèques"
     :Library                       "Bibliothèque"
@@ -196,7 +196,7 @@
    ;; English translation
    :en
    {
-    :About                         "About"
+    :About                         "Mission"
     :Deps                          "Dependencies"
     :Libraries                     "Libraries"
     :Library                       "Library"
