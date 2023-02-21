@@ -8,7 +8,6 @@
 - [Socle interministériel de logiciels libres](#/sill)
 - [Services instanciant un logiciel libre](#/services)
 - [Chiffres](#/stats)
-- [À propos](#/about)
 - [Mentions légales](#/legal)
 - [Déclaration d'accessibilité](#/a11y)
 - [Flux RSS](#/feeds)
