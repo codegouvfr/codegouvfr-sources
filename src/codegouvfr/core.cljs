@@ -2038,13 +2038,7 @@
          {:href  "#/stats"
           :title (i/i lang [:stats-expand])}
          (i/i lang [:Stats])]]
-       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link {:href "/mission"} (i/i lang [:About])]]
-       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
+       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]]])
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
