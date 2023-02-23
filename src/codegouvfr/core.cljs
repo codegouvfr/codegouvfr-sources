@@ -49,7 +49,7 @@
   {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
    :swh-baseurl  "https://archive.softwareheritage.org/browse/origin/"
    :cdl-baseurl  "https://comptoir-du-libre.org/fr/softwares/"
-   :sill-baseurl "https://sill.etalab.gouv.fr/"
+   :sill-baseurl "https://sill.code.gouv.fr/"
    :support-url "https://communs.numerique.gouv.fr/utiliser/marches-interministeriels-support-expertise-logiciels-libres/"})
 
 (defonce filter-chan (async/chan 100))
@@ -1405,7 +1405,7 @@
       [:img {:src i :max-width 200 :align "right"}]
       [:h1.fr-h1 n]
       [:h3.fr-h5 f]
-      [:p [:a {:href (str "https://sill.etalab.gouv.fr/software?name=" n)}
+      [:p [:a {:href (str "https://sill.code.gouv.fr/software?name=" n)}
            (gstring/format (i/i lang [:sill-visit]) n)]]
       (when (seq clp)
         [:p [:a {:href (str (:cdl-baseurl urls) "servicesProviders/" cl)}
