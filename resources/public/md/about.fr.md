@@ -27,7 +27,7 @@ Les dépendances sont les bibliothèques, venant du secteur public ou non, requi
 
 Le socle interministériel de logiciels libres est la liste des logiciels libres recommandés pour toutes les administrations.  Chaque logiciel de cette liste est aujourd'hui en usage dans au moins une administration, et dispose d'un « référent SILL » prêt à aider les autres administrations dans son utilisation.
 
-Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://sill.etalab.gouv.fr).
+Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://sill.code.gouv.fr).
 
 Les services en ligne référencés sur le site sont tous des instances de logiciels libres mises à la disposition des agents publics.
 
@@ -43,7 +43,7 @@ Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses
 
 * La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json).
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json).
-* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://sill.etalab.gouv.fr/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
+* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://sill.code.gouv.fr/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
 
 Ces données, collectées depuis [libraries.io](https://libraries.io/terms), sont publiées sous licence [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) :
 
