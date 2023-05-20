@@ -26,8 +26,6 @@
 (defonce unix-epoch "1970-01-01T00:00:00Z")
 (defonce repos-per-page 100)
 (defonce libs-per-page 100)
-(defonce sill-per-page 100)
-(defonce papillon-per-page 100)
 (defonce orgas-per-page 20)
 (defonce deps-per-page 100)
 (defonce timeout 100)
@@ -47,10 +45,9 @@
 
 (defonce urls
   {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
-   :swh-baseurl  "https://archive.softwareheritage.org/browse/origin/"
-   :cdl-baseurl  "https://comptoir-du-libre.org/fr/softwares/"
-   :sill-baseurl "https://sill.code.gouv.fr/"
-   :support-url "https://communs.numerique.gouv.fr/utiliser/marches-interministeriels-support-expertise-logiciels-libres/"})
+   :swh-baseurl "https://archive.softwareheritage.org/browse/origin/"
+   :cdl-baseurl "https://comptoir-du-libre.org/fr/softwares/"
+   :support-url "https://code.gouv.fr/utiliser/marches-interministeriels-support-expertise-logiciels-libres/"})
 
 (defonce filter-chan (async/chan 100))
 
@@ -58,55 +55,44 @@
 
 ;; Mappings used when exporting displayed data to csv files
 (defonce mappings
-  {:repos    {:u  :last_update
-              :d  :description
-              :a? :is_archived
-              :f? :is_fork
-              :e? :is_esr
-              :l? :is_lib
-              :l  :language
-              :li :license
-              :n  :name
-              :f  :forks_count
-              :s  :stars_count
-              :o  :organization_name
-              :p  :platform
-              :re :reuses
-              :r  :repository_url}
-   :orgas    {:d  :description
-              :a  :location
-              :e  :email
-              :n  :name
-              :p  :platform
-              :h  :website
-              :v? :is_verified
-              :l  :login
-              :c  :creation_date
-              :r  :repositories_count
-              :o  :organization_url
-              :au :avatar_url}
-   :deps     {:n :name
-              :t :type
-              :d :description
-              :l :link
-              :u :updated
-              :r :repositories}
-   :sill     {:n :name
-              :f :description
-              :l :license
-              :u :added}
-   :papillon {:a :agencyName
-              :p :publicSector
-              :n :serviceName
-              :d :description
-              :l :serviceUrl
-              :i :sillId
-              :c :comptoirDuLibreId}
-   :libs     {:n :name
-              :t :type
-              :d :description
-              :l :link
-              :u :updated}})
+  {:repos {:u  :last_update
+           :d  :description
+           :a? :is_archived
+           :f? :is_fork
+           :e? :is_esr
+           :l? :is_lib
+           :l  :language
+           :li :license
+           :n  :name
+           :f  :forks_count
+           :s  :stars_count
+           :o  :organization_name
+           :p  :platform
+           :re :reuses
+           :r  :repository_url}
+   :orgas {:d  :description
+           :a  :location
+           :e  :email
+           :n  :name
+           :p  :platform
+           :h  :website
+           :v? :is_verified
+           :l  :login
+           :c  :creation_date
+           :r  :repositories_count
+           :o  :organization_url
+           :au :avatar_url}
+   :deps  {:n :name
+           :t :type
+           :d :description
+           :l :link
+           :u :updated
+           :r :repositories}
+   :libs  {:n :name
+           :t :type
+           :d :description
+           :l :link
+           :u :updated}})
 
 ;; Utility functions
 
@@ -289,27 +275,22 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
-   {:repos-page       0
-    :orgas-page       0
-    :libs-page        0
-    :deps-page        0
-    :sill-page        0
-    :papillon-page    0
-    :sort-repos-by    :reused
-    :sort-orgas-by    :repos
-    :sort-deps-by     :repos
-    :sort-libs-by     :name
-    :sort-papillon-by :agency
-    :reverse-sort     false
-    :filter           init-filter
-    :display-filter   init-filter
-    :lang             "en"
-    :path             ""}))
+   {:repos-page     0
+    :orgas-page     0
+    :libs-page      0
+    :deps-page      0
+    :sort-repos-by  :reused
+    :sort-orgas-by  :repos
+    :sort-deps-by   :repos
+    :sort-libs-by   :name
+    :reverse-sort   false
+    :filter         init-filter
+    :display-filter init-filter
+    :lang           "en"
+    :path           ""}))
 
 (def repos (reagent/atom nil))
 (def libs (reagent/atom nil))
-(def sill (reagent/atom nil))
-(def papillon (reagent/atom nil))
 (def deps (reagent/atom nil))
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
@@ -341,8 +322,6 @@
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
-   (re-frame/dispatch [:sill-page! 0])
-   (re-frame/dispatch [:papillon-page! 0])
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
@@ -356,14 +335,6 @@
 (re-frame/reg-event-db
  :libs-page!
  (fn [db [_ n]] (assoc db :libs-page n)))
-
-(re-frame/reg-event-db
- :sill-page!
- (fn [db [_ n]] (assoc db :sill-page n)))
-
-(re-frame/reg-event-db
- :papillon-page!
- (fn [db [_ n]] (assoc db :papillon-page n)))
 
 (re-frame/reg-event-db
  :orgas-page!
@@ -380,7 +351,6 @@
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
-   (re-frame/dispatch [:papillon-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
@@ -406,33 +376,12 @@
    (assoc db :sort-libs-by k)))
 
 (re-frame/reg-event-db
- :sort-sill-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:sill-page! 0])
-   (when (= k (:sort-sill-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-sill-by k)))
-
-(re-frame/reg-event-db
- :sort-papillon-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:papillon-page! 0])
-   (when (= k (:sort-papillon-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-papillon-by k)))
-
-(re-frame/reg-event-db
  :sort-orgas-by!
  (fn [db [_ k]]
    (re-frame/dispatch [:orgas-page! 0])
    (when (= k (:sort-orgas-by db))
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-orgas-by k)))
-
-(re-frame/reg-event-db
- :sill-id!
- (fn [db [_ sill-id]]
-   (assoc db :sill-id sill-id)))
 
 (re-frame/reg-event-db
  :sort-deps-by!
@@ -461,14 +410,6 @@
  (fn [db _] (:sort-libs-by db)))
 
 (re-frame/reg-sub
- :sort-sill-by?
- (fn [db _] (:sort-sill-by db)))
-
-(re-frame/reg-sub
- :sort-papillon-by?
- (fn [db _] (:sort-papillon-by db)))
-
-(re-frame/reg-sub
  :sort-orgas-by?
  (fn [db _] (:sort-orgas-by db)))
 
@@ -485,14 +426,6 @@
  (fn [db _] (:libs-page db)))
 
 (re-frame/reg-sub
- :sill-page?
- (fn [db _] (:sill-page db)))
-
-(re-frame/reg-sub
- :papillon-page?
- (fn [db _] (:papillon-page db)))
-
-(re-frame/reg-sub
  :deps-page?
  (fn [db _] (:deps-page db)))
 
@@ -503,10 +436,6 @@
 (re-frame/reg-sub
  :filter?
  (fn [db _] (:filter db)))
-
-(re-frame/reg-sub
- :sill-id?
- (fn [db _] (:sill-id db)))
 
 (re-frame/reg-sub
  :display-filter?
@@ -561,32 +490,6 @@
                            (reverse libs))))))
 
 (re-frame/reg-sub
- :sill?
- (fn []
-   (let [sill0 @sill
-         sill  (case @(re-frame/subscribe [:sort-sill-by?])
-                 :name (reverse (sort-by :n sill0))
-                 :date (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                       (js/Date. (.parse js/Date (:u %2))))
-                             sill0)
-                 sill0)]
-     (apply-sill-filters (if @(re-frame/subscribe [:reverse-sort?])
-                           sill
-                           (reverse sill))))))
-
-(re-frame/reg-sub
- :papillon?
- (fn []
-   (let [papillon0 @papillon
-         papillon  (case @(re-frame/subscribe [:sort-papillon-by?])
-                     :name   (reverse (sort-by :n papillon0))
-                     :agency (reverse (sort-by :a papillon0))
-                     papillon0)]
-     (apply-papillon-filters (if @(re-frame/subscribe [:reverse-sort?])
-                               papillon
-                               (reverse papillon))))))
-
-(re-frame/reg-sub
  :deps?
  (fn []
    (let [deps0 @deps
@@ -624,18 +527,14 @@
 (defn change-page [type next]
   (let [conf
         (condp = type
-          :repos    {:sub :repos-page? :evt      :repos-page!
-                     :cnt :repos?      :per-page repos-per-page}
-          :libs     {:sub :libs-page? :evt      :libs-page!
-                     :cnt :libs?      :per-page libs-per-page}
-          :sill     {:sub :sill-page? :evt      :sill-page!
-                     :cnt :sill?      :per-page sill-per-page}
-          :papillon {:sub :papillon-page? :evt      :papillon-page!
-                     :cnt :papillon?      :per-page papillon-per-page}
-          :deps     {:sub :deps-page? :evt      :deps-page!
-                     :cnt :deps?      :per-page deps-per-page}
-          :orgas    {:sub :orgas-page? :evt      :orgas-page!
-                     :cnt :orgas?      :per-page orgas-per-page})
+          :repos {:sub :repos-page? :evt      :repos-page!
+                  :cnt :repos?      :per-page repos-per-page}
+          :libs  {:sub :libs-page? :evt      :libs-page!
+                  :cnt :libs?      :per-page libs-per-page}
+          :deps  {:sub :deps-page? :evt      :deps-page!
+                  :cnt :deps?      :per-page deps-per-page}
+          :orgas {:sub :orgas-page? :evt      :orgas-page!
+                  :cnt :orgas?      :per-page orgas-per-page})
         evt         (:evt conf)
         per-page    (:per-page conf)
         cnt         @(re-frame/subscribe [(:cnt conf)])
@@ -1011,250 +910,6 @@
            #(reset! libs (map (comp bean clj->js) %))))
     :reagent-render (fn [] (libs-page lang))}))
 
-;; Main structure - sill
-
-(defn sill-table [lang sill-cnt]
-  (if (zero? sill-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-lib-found])]]
-    (let [sill-f    @(re-frame/subscribe [:sort-sill-by?])
-          sill-page @(re-frame/subscribe [:sill-page?])
-          sill      ((if sill-f identity shuffle)
-                     @(re-frame/subscribe [:sill?]))]
-      [:div.fr-table.fr-table--no-caption
-       [:table
-        [:caption (i/i lang [:sill-stats])]
-        [:thead.fr-grid.fr-col-12
-         [:tr
-          [:th.fr-col-1 "Logo"]
-          [:th.fr-col-3
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= sill-f :name) "fr-btn--secondary")
-             :title    (i/i lang [:sort-sill-alpha])
-             :on-click #(re-frame/dispatch [:sort-sill-by! :name])}
-            (i/i lang [:software])]]
-          [:th.fr-col (i/i lang [:description])]
-          [:th.fr-col-1 (i/i lang [:workshop])]
-          [:th.fr-col-2 [:span {:title (i/i lang [:Version-min])}
-                         (i/i lang [:Version])]]
-          [:th.fr-col-2 (i/i lang [:license])]
-          [:th.fr-col-1
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= sill-f :date) "fr-btn--secondary")
-             :title    (i/i lang [:sort-sill-date])
-             :on-click #(re-frame/dispatch [:sort-sill-by! :date])}
-            (i/i lang [:added])]]]]
-        (into [:tbody]
-              (for [dd (take sill-per-page
-                             (drop (* sill-per-page sill-page) sill))]
-                ^{:key dd}
-                (let [{:keys [n   ; name
-                              id  ; sill_id
-                              i   ; wikidataDataLogoUrl
-                              l   ; license
-                              f   ; description
-                              fr  ; isFromFrenchPublicService
-                              u   ; referencedSinceTime
-                              ;; cl  ; comptoirDuLibreSoftwareId
-                              ac  ; annuaireCnllsoftwareproviders
-                              clp ; comptoirDuLibreSoftwareProviders
-                              c   ; useCaseUrls
-                              w   ; workShopUrls
-                              v   ; versionMin
-                              s   ; :isPresentInSupportContract
-                              ]} dd]
-                  [:tr
-                   ;; Logo
-                   [:td [:img {:src i :width "100%" :alt ""}]]
-                   ;; Name
-                   [:td
-                    [:a.fr-raw-link.fr-link
-                     {:href   (str (:sill-baseurl urls) lang "/software?id=" id)
-                      :rel    "noreferrer noopener"
-                      :title  (new-tab (i/i lang [:more-info]) lang)
-                      :target "_blank"}
-                     (if fr (str "🇫🇷 " n) n)]]
-                   ;; Description
-                   [:td
-                    [:span
-                     f ; Function or description
-                     (when (or (seq ac) (seq clp))
-                       [:span " · "
-                        [:a
-                         {:href  (str "./#/sill/" id)
-                          :title (i/i lang [:providers])
-                          :rel   "noreferrer noopener"}
-                         (i/i lang [:providers])]])
-                     (when-let [c-url (first c)]
-                       [:span " · "
-                        [:a
-                         {:href   c-url
-                          :rel    "noreferrer noopener"
-                          :target "new"}
-                         (i/i lang [:details])]])]]
-                   ;; Workshop
-                   [:td (when-let [w-url (not-empty (first w))]
-                          [:a.fr-link
-                           {:href   w-url
-                            :rel    "noreferrer noopener"
-                            :target "_blank"}
-                           (i/i lang [:workshop])])]
-                   ;; Version min
-                   [:td v]
-                   ;; License
-                   [:td (if s
-                          [:a
-                           {:href   (:support-url urls)
-                            :rel    "noreferrer noopener"
-                            :title  (new-tab (i/i lang [:support]) lang)
-                            :target "_blank"}
-                           l] l)]
-                   ;; Date when added
-                   [:td (to-locale-date u lang)]])))]])))
-
-(defn sill-page [lang]
-  (let [sill           @(re-frame/subscribe [:sill?])
-        sill-pages     @(re-frame/subscribe [:sill-page?])
-        count-pages    (count (partition-all sill-per-page sill))
-        first-disabled (zero? sill-pages)
-        last-disabled  (= sill-pages (dec count-pages))
-        mapping        (:sill mappings)]
-    [:div.fr-grid
-     [:div.fr-grid-row
-      ;; RSS feed
-      [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i lang [:rss-feed])
-        :href  "/data/latest-sill.xml"}
-       [:span.fr-icon-rss-line {:aria-hidden true}]]
-      ;; Download PDF link
-      [:a.fr-link.fr-raw-link.fr-m-1w
-       {:title (i/i lang [:download-pdf])
-        :href  "/data/sill.pdf"}
-       [:span.fr-icon-file-pdf-line {:aria-hidden true}]]
-      ;; Download csv link
-      [:button.fr-link.fr-m-1w
-       {:title    (i/i lang [:download])
-        :on-click #(download-as-csv!
-                    (map
-                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
-                     sill)
-                    (str "codegouvfr-sill-" (todays-date lang) ".csv"))}
-       [:span.fr-icon-download-line {:aria-hidden true}]]
-      ;; General information
-      (table-header lang sill :sill)
-      ;; Top pagination block
-      [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]
-     ;; Specific sill search filters and options
-     ;; Main sill table display
-     [sill-table lang (count sill)]
-     ;; Bottom pagination block
-     [navigate-pagination :sill first-disabled last-disabled sill-pages count-pages]]))
-
-;; Main structure - papillon
-
-(defn papillon-table [lang papillon-cnt]
-  (if (zero? papillon-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-lib-found])]]
-    (let [papillon-f    @(re-frame/subscribe [:sort-papillon-by?])
-          papillon-page @(re-frame/subscribe [:papillon-page?])
-          papillon      @(re-frame/subscribe [:papillon?])]
-      [:div.fr-table.fr-table--no-caption
-       [:table
-        [:caption (i/i lang [:Papillon])]
-        [:thead.fr-grid.fr-col-12
-         [:tr
-          [:th.fr-col-3
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= papillon-f :name) "fr-btn--secondary")
-             :title    (i/i lang [:sort-papillon-alpha])
-             :on-click #(re-frame/dispatch [:sort-papillon-by! :name])}
-            (i/i lang [:service])]]
-          [:th.fr-col (i/i lang [:description])]
-          [:th.fr-col
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= papillon-f :agency) "fr-btn--secondary")
-             :title    (i/i lang [:sort-papillon-agency])
-             :on-click #(re-frame/dispatch [:sort-papillon-by! :agency])}
-            (i/i lang [:papillon-agency])]]]]
-        (into [:tbody]
-              (for [dd (take papillon-per-page
-                             (drop (* papillon-per-page papillon-page) papillon))]
-                ^{:key dd}
-                (let [{:keys [n   ; serviceName
-                              d   ; description
-                              ;; p   ; public sector scope
-                              a   ; agencyName
-                              l   ; serviceUrl
-                              i   ; softwareSillId
-                              c   ; comptoirDuLibreId
-                              ]} dd]
-                  [:tr
-                   ;; service name
-                   [:td [:span
-                         [:a.fr-link
-                          {:href   l
-                           :title  (str (i/i lang [:service-visit])  " " n " (" a ")")
-                           :rel    "noreferrer noopener"
-                           :target "new"} n]
-                         (let [sill-link
-                               [:span " · "
-                                [:a.fr-link
-                                 {:href   (str (:sill-baseurl urls) lang "/software?id=" i)
-                                  :title  (gstring/format (i/i lang [:sill-visit]) n)
-                                  :rel    "noreferrer noopener"
-                                  :target "new"} "SILL"]]
-                               cdl-link
-                               [:span " · "
-                                [:a.fr-link
-                                 {:href   (str (:cdl-baseurl urls) c)
-                                  :title  (gstring/format (i/i lang [:cdl-visit]) n)
-                                  :rel    "noreferrer noopener"
-                                  :target "new"} "Comptoir du Libre"]]]
-                           [:span
-                            (when i sill-link)
-                            (when c cdl-link)])]]
-                   ;; Service description
-                   [:td d]
-                   ;; Agency name
-                   [:td a]])))]])))
-
-(defn papillon-page [lang]
-  (let [papillon       @(re-frame/subscribe [:papillon?])
-        papillon-pages @(re-frame/subscribe [:papillon-page?])
-        count-pages    (count (partition-all papillon-per-page papillon))
-        first-disabled (zero? papillon-pages)
-        last-disabled  (= papillon-pages (dec count-pages))
-        mapping        (:papillon mappings)]
-    [:div.fr-grid
-     [:div.fr-grid-row
-      ;; Download link
-      [:button.fr-link.fr-m-1w
-       {:title    (i/i lang [:download])
-        :on-click #(download-as-csv!
-                    (map
-                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
-                     papillon)
-                    (str "codegouvfr-papillon-" (todays-date lang) ".csv"))}
-       [:span.fr-icon-download-line {:aria-hidden true}]]
-      ;; General information
-      (table-header lang papillon :papillon)
-      ;; Top pagination block
-      [navigate-pagination :papillon first-disabled last-disabled papillon-pages count-pages]]
-     ;; Specific papillon search filters and options
-     ;; Main papillon table display
-     [papillon-table lang (count papillon)]
-     ;; Bottom pagination block
-     [navigate-pagination :papillon first-disabled last-disabled papillon-pages count-pages]]))
-
-(defn papillon-page-class [lang]
-  (reagent/create-class
-   {:display-name   "papillon-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/papillon.json"
-           :handler
-           #(reset! papillon (map (comp bean clj->js) %))))
-    :reagent-render (fn [] (papillon-page lang))}))
-
 ;; Main structure - orgas
 
 (defn orgas-table [lang orgas-cnt]
@@ -1394,36 +1049,6 @@
          [:option {:value x} x])]]
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
-
-(defn sill-software-page [lang]
-  (let [sill-id                   @(re-frame/subscribe [:sill-id?])
-        {:keys [n f i cl clp ac]} (filter #(= (:id %) (js/parseInt sill-id)) @sill)
-        ac                        (walk/keywordize-keys (js->clj ac))
-        clp                       (walk/keywordize-keys (js->clj clp))]
-    [:div.fr-grid
-     [:div
-      [:img {:src i :max-width 200 :align "right"}]
-      [:h1.fr-h1 n]
-      [:h3.fr-h5 f]
-      [:p [:a {:href (str "https://sill.code.gouv.fr/software?name=" n)}
-           (gstring/format (i/i lang [:sill-visit]) n)]]
-      (when (seq clp)
-        [:p [:a {:href (str (:cdl-baseurl urls) "servicesProviders/" cl)}
-             (gstring/format (i/i lang [:cdl-providers-visit]) n)]]
-        [:div
-         [:h3.fr-h5 (i/i lang [:cdl-providers])]
-         [:ul
-          (for [p clp]
-            ^{key p}
-            [:li [:a {:href (:url p)} (:name p)]])]])
-      (when (seq ac)
-        [:div
-         [:br]
-         [:h3.fr-h5 (i/i lang [:cnll-providers])]
-         [:ul
-          (for [a ac]
-            ^{key a}
-            [:li [:a {:href (:url a)} (:nom a)]])]])]]))
 
 ;; Main structure - deps
 
@@ -1597,8 +1222,8 @@
 
 (defn stats-page
   [lang stats]
-  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt sill_cnt
-                papillon_cnt avg_repos_cnt median_repos_cnt
+  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt
+                avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
                 top_forges top_ministries]} stats]
@@ -1661,8 +1286,6 @@
                              [:th (i/i lang [:Repos])]]])]]
      [:div.fr-grid-row.fr-grid-row--center
       {:style {:height "180px" :margin-bottom "3em"}}
-      (stats-tile lang :sill-stats sill_cnt)
-      (stats-tile lang :papillon-stats papillon_cnt)
       (stats-tile lang :deps-stats deps_cnt)
       (stats-tile lang :libs-stats libs_cnt)]]))
 
@@ -1682,7 +1305,7 @@
   [:div
    [:div.fr-grid-row.fr-mt-2w
     [:div.fr-col-12
-     (when (some #{:repos :orgas :deps :libs :sill :papillon} [view])
+     (when (some #{:repos :orgas :deps :libs} [view])
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
@@ -1789,18 +1412,6 @@
             :title        (i/i lang [:Tags])
             :href         "#/tags"}
            (i/i lang [:Tags])]]
-         [:li.fr-nav__item
-          [:a.fr-nav__link
-           {:aria-current (when (= path "/sill") "page")
-            :title        (i/i lang [:sill-stats])
-            :href         "#/sill"}
-           (i/i lang [:Sill])]]
-         [:li.fr-nav__item
-          [:a.fr-nav__link
-           {:aria-current (when (= path "/services") "page")
-            :title        (i/i lang [:papillon-title])
-            :href         "#/services"}
-           (i/i lang [:Papillon])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
@@ -2011,26 +1622,6 @@
       [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "./img/dependencies.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href "#/sill"}
-         (i/i lang [:sill-stats])]]
-       [:div.fr-card__desc (i/i lang [:home-sill-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/sill.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href "#/services"}
-         (i/i lang [:papillon-title])]]
-       [:div.fr-card__desc (i/i lang [:home-papillon-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/services.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
@@ -2049,24 +1640,21 @@
       {:role "main"}
       [main-menu q lang view]
       (condp = view
-        :home     [home-page lang]
-        :orgas    [orgas-page lang]
-        :repos    [repos-page-class lang license language]
-        :libs     [libs-page-class lang]
-        :sill     [sill-page lang]
-        :papillon [papillon-page-class lang]
-        :stats    [stats-page-class lang]
-        :deps     [deps-page lang]
-        :tags     [tags-page lang]
-        :sill-id  [sill-software-page lang]
-        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
-                         (inline-page "legal.en.md"))
-        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
-                         (inline-page "a11y.en.md"))
-        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
-                         (inline-page "sitemap.en.md"))
-        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
-                         (inline-page "feeds.en.md"))
+        :home    [home-page lang]
+        :orgas   [orgas-page lang]
+        :repos   [repos-page-class lang license language]
+        :libs    [libs-page-class lang]
+        :stats   [stats-page-class lang]
+        :deps    [deps-page lang]
+        :tags    [tags-page lang]
+        :legal   (condp = lang "fr" (inline-page "legal.fr.md")
+                        (inline-page "legal.en.md"))
+        :a11y    (condp = lang "fr" (inline-page "a11y.fr.md")
+                        (inline-page "a11y.en.md"))
+        :sitemap (condp = lang "fr" (inline-page "sitemap.fr.md")
+                        (inline-page "sitemap.en.md"))
+        :feeds   (condp = lang "fr" (inline-page "feeds.fr.md")
+                        (inline-page "feeds.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -2080,10 +1668,6 @@
      {:display-name   "main-class"
       :component-did-mount
       (fn []
-        (GET "/data/sill.json"
-             :handler
-             #(reset! sill (filter (fn [e] (nil? (:d e)))
-                                   (map (comp bean clj->js) %))))
         (GET "/data/platforms.csv"
              :handler
              #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
@@ -2103,30 +1687,26 @@
 (defn on-navigate [match]
   (let [title-prefix  "code.gouv.fr ─ "
         title-default "Codes sources du secteur public ─ Source code from the French public sector"
-        page          (keyword (:name (:data match)))
-        sill-id       (:sill-id (:path (:parameters match)))]
+        page          (keyword (:name (:data match)))]
     ;; Rely on the server to handle /not-found as a 404
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
-                 :libs     "Bibliothèques ─ Libraries"
-                 :orgas    "Organisations ─ Organizations"
-                 :repos    "Dépôts de code source ─ Source code repositories"
-                 :home     title-default
-                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
-                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
-                 :legal    "Mentions légales ─ Legal mentions"
-                 :deps     "Dépendances ─ Dependencies"
-                 :tags     "Versions"
-                 :stats    "Chiffres ─ Stats"
-                 :a11y     "Accessibilité ─ Accessibility"
-                 :feeds    "Flux RSS ─ RSS Feeds"
-                 :sitemap  "Pages du site ─ Sitemap"
+                 :libs    "Bibliothèques ─ Libraries"
+                 :orgas   "Organisations ─ Organizations"
+                 :repos   "Dépôts de code source ─ Source code repositories"
+                 :home    title-default
+                 :legal   "Mentions légales ─ Legal mentions"
+                 :deps    "Dépendances ─ Dependencies"
+                 :tags    "Versions"
+                 :stats   "Chiffres ─ Stats"
+                 :a11y    "Accessibilité ─ Accessibility"
+                 :feeds   "Flux RSS ─ RSS Feeds"
+                 :sitemap "Pages du site ─ Sitemap"
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
-    (re-frame/dispatch [:sill-id! sill-id])
     (re-frame/dispatch [:filter! {:q ""}])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
@@ -2137,11 +1717,7 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["libs" :libs]
-   ["sill"
-    ["" :sill]
-    ["/:sill-id" :sill-id]]
    ["tags" :tags]
-   ["services" :papillon]
    ["stats" :stats]
    ["deps" :deps]
    ["legal" :legal]
