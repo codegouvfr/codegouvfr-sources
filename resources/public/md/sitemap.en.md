@@ -8,6 +8,7 @@
 - [Recommended Free Software](#/sill)
 - [Online services based on Free Software](#/services)
 - [Stats](#/stats)
+- [About](#/about)
 - [Legal mentions](#/legal)
 - [Accessibility](#/a11y)
 - [RSS feed](#/feeds)

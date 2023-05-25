@@ -1420,8 +1420,13 @@
            (i/i lang [:Stats])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
+           {:aria-current (when (= path "/about") "page")
+            :href         "#/about"}
+           (i/i lang [:About])]]
+         [:li.fr-nav__item
+          [:a.fr-nav__link
            {:href "/mission"}
-           (i/i lang [:About])]]]]]]]))
+           (i/i lang [:Mission])]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
@@ -1629,7 +1634,13 @@
          {:href  "#/stats"
           :title (i/i lang [:stats-expand])}
          (i/i lang [:Stats])]]
-       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]]])
+       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
+       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
@@ -1640,6 +1651,7 @@
       {:role "main"}
       [main-menu q lang view]
       (condp = view
+        <<<<<<< HEAD
         :home    [home-page lang]
         :orgas   [orgas-page lang]
         :repos   [repos-page-class lang license language]
@@ -1655,6 +1667,47 @@
                         (inline-page "sitemap.en.md"))
         :feeds   (condp = lang "fr" (inline-page "feeds.fr.md")
                         (inline-page "feeds.en.md"))
+        ||||||| 9fbedbc (Update about links)
+        :home     [home-page lang]
+        :orgas    [orgas-page lang]
+        :repos    [repos-page-class lang license language]
+        :libs     [libs-page-class lang]
+        :sill     [sill-page lang]
+        :papillon [papillon-page-class lang]
+        :stats    [stats-page-class lang]
+        :deps     [deps-page lang]
+        :tags     [tags-page lang]
+        :sill-id  [sill-software-page lang]
+        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
+                         (inline-page "legal.en.md"))
+        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
+                         (inline-page "a11y.en.md"))
+        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
+                         (inline-page "sitemap.en.md"))
+        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
+                         (inline-page "feeds.en.md"))
+        =======
+        :home     [home-page lang]
+        :orgas    [orgas-page lang]
+        :repos    [repos-page-class lang license language]
+        :libs     [libs-page-class lang]
+        :sill     [sill-page lang]
+        :papillon [papillon-page-class lang]
+        :stats    [stats-page-class lang]
+        :deps     [deps-page lang]
+        :tags     [tags-page lang]
+        :sill-id  [sill-software-page lang]
+        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
+                         (inline-page "legal.en.md"))
+        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
+                         (inline-page "a11y.en.md"))
+        :about    (condp = lang "fr" (inline-page "about.fr.md")
+                         (inline-page "about.en.md"))
+        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
+                         (inline-page "sitemap.en.md"))
+        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
+                         (inline-page "feeds.en.md"))
+        >>>>>>> parent of 9fbedbc (Update about links)
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1693,6 +1746,7 @@
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
+<<<<<<< HEAD
                  :libs    "Bibliothèques ─ Libraries"
                  :orgas   "Organisations ─ Organizations"
                  :repos   "Dépôts de code source ─ Source code repositories"
@@ -1704,6 +1758,36 @@
                  :a11y    "Accessibilité ─ Accessibility"
                  :feeds   "Flux RSS ─ RSS Feeds"
                  :sitemap "Pages du site ─ Sitemap"
+||||||| 9fbedbc (Update about links)
+                 :libs     "Bibliothèques ─ Libraries"
+                 :orgas    "Organisations ─ Organizations"
+                 :repos    "Dépôts de code source ─ Source code repositories"
+                 :home     title-default
+                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
+                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
+                 :legal    "Mentions légales ─ Legal mentions"
+                 :deps     "Dépendances ─ Dependencies"
+                 :tags     "Versions"
+                 :stats    "Chiffres ─ Stats"
+                 :a11y     "Accessibilité ─ Accessibility"
+                 :feeds    "Flux RSS ─ RSS Feeds"
+                 :sitemap  "Pages du site ─ Sitemap"
+=======
+                 :libs     "Bibliothèques ─ Libraries"
+                 :orgas    "Organisations ─ Organizations"
+                 :repos    "Dépôts de code source ─ Source code repositories"
+                 :home     title-default
+                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
+                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
+                 :legal    "Mentions légales ─ Legal mentions"
+                 :about    "À propos ─ About"
+                 :deps     "Dépendances ─ Dependencies"
+                 :tags     "Versions"
+                 :stats    "Chiffres ─ Stats"
+                 :a11y     "Accessibilité ─ Accessibility"
+                 :feeds    "Flux RSS ─ RSS Feeds"
+                 :sitemap  "Pages du site ─ Sitemap"
+>>>>>>> parent of 9fbedbc (Update about links)
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
@@ -1722,6 +1806,7 @@
    ["deps" :deps]
    ["legal" :legal]
    ["a11y" :a11y]
+   ["about" :about]
    ["sitemap" :sitemap]
    ["feeds" :feeds]])
 
