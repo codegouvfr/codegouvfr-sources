@@ -1651,7 +1651,6 @@
       {:role "main"}
       [main-menu q lang view]
       (condp = view
-        <<<<<<< HEAD
         :home    [home-page lang]
         :orgas   [orgas-page lang]
         :repos   [repos-page-class lang license language]
@@ -1667,47 +1666,8 @@
                         (inline-page "sitemap.en.md"))
         :feeds   (condp = lang "fr" (inline-page "feeds.fr.md")
                         (inline-page "feeds.en.md"))
-        ||||||| 9fbedbc (Update about links)
-        :home     [home-page lang]
-        :orgas    [orgas-page lang]
-        :repos    [repos-page-class lang license language]
-        :libs     [libs-page-class lang]
-        :sill     [sill-page lang]
-        :papillon [papillon-page-class lang]
-        :stats    [stats-page-class lang]
-        :deps     [deps-page lang]
-        :tags     [tags-page lang]
-        :sill-id  [sill-software-page lang]
-        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
-                         (inline-page "legal.en.md"))
-        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
-                         (inline-page "a11y.en.md"))
-        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
-                         (inline-page "sitemap.en.md"))
-        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
-                         (inline-page "feeds.en.md"))
-        =======
-        :home     [home-page lang]
-        :orgas    [orgas-page lang]
-        :repos    [repos-page-class lang license language]
-        :libs     [libs-page-class lang]
-        :sill     [sill-page lang]
-        :papillon [papillon-page-class lang]
-        :stats    [stats-page-class lang]
-        :deps     [deps-page lang]
-        :tags     [tags-page lang]
-        :sill-id  [sill-software-page lang]
-        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
-                         (inline-page "legal.en.md"))
-        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
-                         (inline-page "a11y.en.md"))
         :about    (condp = lang "fr" (inline-page "about.fr.md")
                          (inline-page "about.en.md"))
-        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
-                         (inline-page "sitemap.en.md"))
-        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
-                         (inline-page "feeds.en.md"))
-        >>>>>>> parent of 9fbedbc (Update about links)
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1746,7 +1706,6 @@
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
-<<<<<<< HEAD
                  :libs    "Bibliothèques ─ Libraries"
                  :orgas   "Organisations ─ Organizations"
                  :repos   "Dépôts de code source ─ Source code repositories"
@@ -1758,36 +1717,7 @@
                  :a11y    "Accessibilité ─ Accessibility"
                  :feeds   "Flux RSS ─ RSS Feeds"
                  :sitemap "Pages du site ─ Sitemap"
-||||||| 9fbedbc (Update about links)
-                 :libs     "Bibliothèques ─ Libraries"
-                 :orgas    "Organisations ─ Organizations"
-                 :repos    "Dépôts de code source ─ Source code repositories"
-                 :home     title-default
-                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
-                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
-                 :legal    "Mentions légales ─ Legal mentions"
-                 :deps     "Dépendances ─ Dependencies"
-                 :tags     "Versions"
-                 :stats    "Chiffres ─ Stats"
-                 :a11y     "Accessibilité ─ Accessibility"
-                 :feeds    "Flux RSS ─ RSS Feeds"
-                 :sitemap  "Pages du site ─ Sitemap"
-=======
-                 :libs     "Bibliothèques ─ Libraries"
-                 :orgas    "Organisations ─ Organizations"
-                 :repos    "Dépôts de code source ─ Source code repositories"
-                 :home     title-default
-                 :sill     "Socle Interministériel De Logiciels Libres ─ Recommended Free Software"
-                 :papillon "Services instanciant des logiciels libres ─ Online services based on Free Software"
-                 :legal    "Mentions légales ─ Legal mentions"
                  :about    "À propos ─ About"
-                 :deps     "Dépendances ─ Dependencies"
-                 :tags     "Versions"
-                 :stats    "Chiffres ─ Stats"
-                 :a11y     "Accessibilité ─ Accessibility"
-                 :feeds    "Flux RSS ─ RSS Feeds"
-                 :sitemap  "Pages du site ─ Sitemap"
->>>>>>> parent of 9fbedbc (Update about links)
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
