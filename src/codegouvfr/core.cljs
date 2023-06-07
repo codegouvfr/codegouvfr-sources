@@ -1425,7 +1425,7 @@
            (i/i lang [:About])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:href "/mission"}
+           {:href "/fr/mission"}
            (i/i lang [:Mission])]]]]]]]))
 
 (defn subscribe [lang]
