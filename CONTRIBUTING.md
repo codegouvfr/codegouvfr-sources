@@ -2,11 +2,9 @@
 
 The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~codegouvfr/code.gouv.fr).
 
-The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers, but *we do not accept pull requests on GitHub*.
-
 For confidential feedback, use [contact@code.gouv.fr](mailto:contact@code.gouv.fr).
 
-For bug reports, patches, feature requests and general questions, send an email to the public mailing list [~codegouvfr/codegouvfr-devel@lists.sr.ht](mailto:~codegouvfr/codegouvfr-devel@lists.sr.ht).
+For bug reports, patches, feature requests and general questions, send an email to the public mailing list [~codegouvfr/dev@lists.sr.ht](mailto:~codegouvfr/dev@lists.sr.ht).
 
 To send a *patch* to the mailing list, please configure your local copy of the repository like this:
 
