@@ -6,7 +6,7 @@ packages:
   - rsync
   - unzip
 sources:
-  - https://git.sr.ht/~codegouvfr/code.gouv.fr_public
+  - https://git.sr.ht/~codegouvfr/codegouvfr-public
 secrets:
   - eefc72cb-a612-4b95-a3e4-dae77d4f1fcf
 tasks:
@@ -18,14 +18,14 @@ tasks:
       chmod +x install-clj-kondo
       sudo ./install-clj-kondo
   - lint: |
-      cd code.gouv.fr_public
+      cd codegouvfr-public
       clj-kondo --lint src
   - build: |
-      cd code.gouv.fr_public
+      cd codegouvfr-public
       git checkout preproduction
       clojure -M:js
   - upload: |
-      cd code.gouv.fr_public/resources/public/
+      cd codegouvfr-public/resources/public/
       rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
 triggers:
   - action: email
