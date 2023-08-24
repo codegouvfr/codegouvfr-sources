@@ -6,7 +6,7 @@ packages:
   - rsync
   - unzip
 sources:
-  - https://git.sr.ht/~codegouvfr/code.gouv.fr_public
+  - https://git.sr.ht/~codegouvfr/codegouvfr-public
 secrets:
   - eefc72cb-a612-4b95-a3e4-dae77d4f1fcf
 tasks:
