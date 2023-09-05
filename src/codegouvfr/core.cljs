@@ -580,7 +580,9 @@
 
 (defn repos-table [lang repos-cnt]
   (if (zero? repos-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-repo-found])]]
+    (if (zero? (count @repos))
+      [:div.fr-m-3w [:p (i/i lang [:Loading])]]
+      [:div.fr-m-3w [:p (i/i lang [:no-repo-found])]])
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
           repos      @(re-frame/subscribe [:repos?])]
@@ -811,7 +813,9 @@
 
 (defn libs-table [lang libs-cnt]
   (if (zero? libs-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-lib-found])]]
+    (if (zero? (count @libs))
+      [:div.fr-m-3w [:p (i/i lang [:Loading])]]
+      [:div.fr-m-3w [:p (i/i lang [:no-lib-found])]])
     (let [lib-f     @(re-frame/subscribe [:sort-libs-by?])
           libs-page @(re-frame/subscribe [:libs-page?])
           libs      @(re-frame/subscribe [:libs?])]
@@ -914,7 +918,9 @@
 
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
-    [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]]
+    (if (zero? (count @orgas))
+      [:div.fr-m-3w [:p (i/i lang [:Loading])]]
+      [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]])
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
           orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-table.fr-table--no-caption
@@ -1425,8 +1431,10 @@
            (i/i lang [:About])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:href "/fr/mission"}
-           (i/i lang [:Mission])]]]]]]]))
+           {:href   "/fr/mission"
+            :target "_blank"
+            :rel    "noreferrer noopener"}
+           (i/i lang [:codegouvfr])]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
