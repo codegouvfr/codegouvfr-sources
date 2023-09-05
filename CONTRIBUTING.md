@@ -2,6 +2,14 @@
 
 The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~codegouvfr/code.gouv.fr).
 
+<<<<<<< HEAD
+The code is also published on [GitHub](https://github.com/codegouvfr/code.etalab.gouv.fr) to reach more developers, but *we do not accept pull requests on GitHub*.
+
+||||||| 8cd19ae
+The code is also published on [GitHub](https://github.com/etalab/code.etalab.gouv.fr) to reach more developers, but *we do not accept pull requests on GitHub*.
+
+=======
+>>>>>>> preproduction
 For confidential feedback, use [contact@code.gouv.fr](mailto:contact@code.gouv.fr).
 
 For bug reports, patches, feature requests and general questions, send an email to the public mailing list [~codegouvfr/dev@lists.sr.ht](mailto:~codegouvfr/dev@lists.sr.ht).

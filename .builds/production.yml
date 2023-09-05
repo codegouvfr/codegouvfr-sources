@@ -22,11 +22,11 @@ tasks:
       clj-kondo --lint src
   - build: |
       cd codegouvfr-public
-      git checkout preproduction
+      git checkout production
       clojure -M:js
   - upload: |
       cd codegouvfr-public/resources/public/
-      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@libre-01.infra.data.gouv.fr:/home/web/websites/code.gouv.fr_public/production/
 triggers:
   - action: email
     condition: failure
