@@ -1425,8 +1425,10 @@
            (i/i lang [:About])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:href "/fr/mission"}
-           (i/i lang [:Mission])]]]]]]]))
+           {:href   "/fr/mission"
+            :target "_blank"
+            :rel    "noreferrer noopener"}
+           (i/i lang [:codegouvfr])]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
