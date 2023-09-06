@@ -177,7 +177,7 @@
        :target "new"
        :rel    "noreferrer noopener"
        :title  (i/i lang [:glossary])}
-      [:span.fr-icon-question-fill]]]))
+      [:span.fr-icon-info-line]]]))
 
 ;; Filters
 
