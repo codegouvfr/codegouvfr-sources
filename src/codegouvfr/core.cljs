@@ -1454,7 +1454,7 @@
          (i/i lang [:bluehats-desc])]
         [:a.fr-btn
          {:type "button"
-          :href "https://code.gouv.fr/newsletters/subscribe/bluehats@mail.etalab.studio"}
+          :href "https://code.gouv.fr/newsletters/subscribe/bluehats@mail.codegouv.fr"}
          (i/i lang [:subscribe])]]]]
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__newsletter
@@ -1464,7 +1464,7 @@
          (i/i lang [:cio-floss-desc])]
         [:a.fr-btn
          {:type "button"
-          :href "https://code..gouv.fr/newsletters/subscribe/logiciels-libres-dsi@mail.etalab.studio"}
+          :href "https://code.gouv.fr/newsletters/subscribe/logiciels-libres-dsi@mail.codegouv.fr"}
          (i/i lang [:subscribe])]]]]
      ;; Follow elsewhere
      [:div.fr-col-12.fr-col-md-2
