@@ -1,4 +1,4 @@
-[![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg?style=flat-square)](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/master/item/LICENSES)
+[![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg?style=flat-square)](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/main/item/LICENSES)
 
 # code.gouv.fr
 
@@ -46,4 +46,4 @@ If you like Clojure(script), please consider supporting maintainers by donating 
 
 This application is published under the [EPL 2.0 license](LICENSES/LICENSE.EPL-2.0.txt).
 
-The data referenced in this `README.md` and exposed on `code.gouv.fr` are published under the [Etalab 2.0 license](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/master/item/LICENSES/LICENSE.Etalab-2.0.md).
+The data referenced in this `README.md` and exposed on `code.gouv.fr` are published under the [Etalab 2.0 license](LICENSES/LICENSE.Etalab-2.0.md).
