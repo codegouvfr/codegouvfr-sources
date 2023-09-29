@@ -468,11 +468,11 @@
                   ;; :issues (sort-by :i repos0)
                   :reused (sort-by :re repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                          (js/Date. (.parse js/Date (:u %2))))
-                                repos0)
+                                        (js/Date. (.parse js/Date (:u %2))))
+                              repos0)
                   :desc   (sort #(compare (count (:d %1))
-                                          (count (:d %2)))
-                                repos0)
+                                        (count (:d %2)))
+                              repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             repos
@@ -508,14 +508,14 @@
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
                  :date  (sort
-                         #(compare
-                           (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
-                           (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
-                         orgs)
+                        #(compare
+                          (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
+                          (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
+                        orgs)
                  :name  (reverse
-                         (sort #(compare (or-kwds %1 [:n :l])
-                                         (or-kwds %2 [:n :l]))
-                               orgs))
+                        (sort #(compare (or-kwds %1 [:n :l])
+                                        (or-kwds %2 [:n :l]))
+                              orgs))
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -576,6 +576,70 @@
        {:on-click #(change-page type "last")
         :disabled last-disabled}]]]]])
 
+;; Home page
+
+(defn home-page [lang]
+  [:div.fr-grid
+   [:div.fr-grid-row.fr-grid-row--center
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href  "#/repos"
+          :title (i/i lang [:repos-of-source-code])}
+         (i/i lang [:Repos])]]
+       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
+      [:div.fr-card__img.fr-col-3
+       [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href  "#/groups"
+          :title (i/i lang [:Orgas])}
+         (i/i lang [:Orgas])]]
+       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
+      [:div.fr-card__img.fr-col-3
+       [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href "#/libs"}
+         (i/i lang [:Libraries])]]
+       [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
+      [:div.fr-card__img.fr-col-3
+       [:img.fr-responsive-img {:src "./img/libraries.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href  "#/deps"
+          :title (i/i lang [:deps-stats])}
+         (i/i lang [:Deps])]]
+       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
+      [:div.fr-card__img.fr-col-3
+       [:img.fr-responsive-img {:src "./img/dependencies.jpg" :alt ""}]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link
+         {:href  "#/stats"
+          :title (i/i lang [:stats-expand])}
+         (i/i lang [:Stats])]]
+       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
+    [:div.fr-col-6.fr-p-2w
+     [:div.fr-card.fr-enlarge-link
+      [:div.fr-card__body
+       [:div.fr-card__title
+        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
+       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
+
 ;; Main structure - repos
 
 (defn repos-table [lang repos-cnt]
@@ -626,16 +690,16 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a? ; is_archived
-                              d  ; description
-                              f  ; forks_count
-                              li ; license
-                              n  ; name
-                              o  ; organization_name
-                              r  ; repository_url
-                              s  ; stars_count
-                              u  ; last_update
-                              re ; reuses
+                (let [{:keys [a?                                        ; is_archived
+                              d                                        ; description
+                              f                                        ; forks_count
+                              li                                        ; license
+                              n                                        ; name
+                              o                                        ; organization_name
+                              r                                        ; repository_url
+                              s                                        ; stars_count
+                              u                                        ; last_update
+                              re                                        ; reuses
                               ]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
@@ -655,9 +719,9 @@
                        :target "new"
                        :rel    "noreferrer noopener"
                        :title  (new-tab
-                                (str
-                                 (i/i lang [:go-to-repo])
-                                 (when li (str (i/i lang [:under-license]) li))) lang)}
+                               (str
+                                (i/i lang [:go-to-repo])
+                                (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
                      [:a.fr-raw-link.fr-link
@@ -719,25 +783,25 @@
       [:input.fr-input.fr-col.fr-m-1w
        {:placeholder (i/i lang [:license])
         :value       (or @license
-                         (:license @(re-frame/subscribe [:display-filter?])))
+                   (:license @(re-frame/subscribe [:display-filter?])))
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
-                         (reset! license ev)
-                         (async/go
-                           (async/>! display-filter-chan {:license ev})
-                           (async/<! (async/timeout timeout))
-                           (async/>! filter-chan {:license ev}))))}]
+                       (reset! license ev)
+                       (async/go
+                         (async/>! display-filter-chan {:license ev})
+                         (async/<! (async/timeout timeout))
+                         (async/>! filter-chan {:license ev}))))}]
       [:input.fr-input.fr-col.fr-m-1w
        {:value       (or @language
-                         (:language @(re-frame/subscribe [:display-filter?])))
+                   (:language @(re-frame/subscribe [:display-filter?])))
         :placeholder (i/i lang [:language])
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
-                         (reset! language ev)
-                         (async/go
-                           (async/>! display-filter-chan {:language ev})
-                           (async/<! (async/timeout timeout))
-                           (async/>! filter-chan {:language ev}))))}]
+                       (reset! language ev)
+                       (async/go
+                         (async/>! display-filter-chan {:language ev})
+                         (async/<! (async/timeout timeout))
+                         (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
        {:value (or platform "")
         :on-change
@@ -1113,8 +1177,8 @@
   (let [{:keys [repo]} @(re-frame/subscribe [:filter?])
         deps0          @(re-frame/subscribe [:deps?])
         deps           (if-let [s repo]
-                         (filter #(s-includes? (s/join " " (:r %)) s) deps0)
-                         deps0)
+               (filter #(s-includes? (s/join " " (:r %)) s) deps0)
+               deps0)
         deptypes       @(re-frame/subscribe [:deps-types?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
@@ -1163,7 +1227,7 @@
      ;; Bottom pagination block
      [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]))
 
-;; Main structure - tags
+;; Tags page
 
 (defn tags-page [lang]
   [:div.fr-grid
@@ -1206,7 +1270,7 @@
               :rel    "noreferrer noopener"} name]]
            [:td (to-locale-date date lang)]])))]]])
 
-;; Main structure - stats
+;; Stats page
 
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
@@ -1305,34 +1369,7 @@
              :handler #(reset! stats (walk/keywordize-keys %))))
       :reagent-render (fn [] (stats-page lang @stats))})))
 
-;; Main structure - menu, banner
-
-(defn main-menu [q lang view]
-  [:div
-   [:div.fr-grid-row.fr-mt-2w
-    [:div.fr-col-12
-     (when (some #{:repos :orgas :deps :libs} [view])
-       [:input.fr-input
-        {:placeholder (i/i lang [:free-search])
-         :aria-label  (i/i lang [:free-search])
-         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
-         :on-change   (fn [e]
-                        (let [ev (.-value (.-target e))]
-                          (reset! q ev)
-                          (async/go
-                            (async/>! display-filter-chan {:q ev})
-                            (async/<! (async/timeout timeout))
-                            (async/>! filter-chan {:q ev}))))}])]
-    (when-let [flt (-> @(re-frame/subscribe [:filter?])
-                       (dissoc :is-fork :is-publiccode :is-contrib
-                               :is-lib :is-licensed :is-esr))]
-      [:div.fr-col-8.fr-grid-row.fr-m-1w
-       (when-let [ff (not-empty (:g flt))]
-         (close-filter-button lang ff :repos (merge flt {:g nil})))
-       (when-let [ff (not-empty (:d flt))]
-         (close-filter-button lang ff :deps (merge flt {:d nil})))
-       (when-let [ff (not-empty (:repo flt))]
-         (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
+;; Main structure elements
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
@@ -1372,7 +1409,7 @@
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
-                                       (i/i lang [:new-modal]))
+                              (i/i lang [:new-modal]))
                   :data-fr-opened false}
                  (i/i lang [:modal-title])]]]]]]]]
      ;; Header menu
@@ -1486,46 +1523,6 @@
           :target     "_blank"}
          "Twitter"]]]]]]])
 
-(defn display-parameters-modal [lang]
-  [:dialog#fr-theme-modal.fr-modal
-   {:role "dialog" :aria-labelledby "fr-theme-modal-title"}
-   [:div.fr-container.fr-container--fluid.fr-container-md
-    [:div.fr-grid-row.fr-grid-row--center
-     [:div.fr-col-12.fr-col-md-6.fr-col-lg-4
-      [:div.fr-modal__body
-       [:div.fr-modal__header
-        [:button.fr-link--close.fr-link {:aria-controls "fr-theme-modal"}
-         (i/i lang [:modal-close])]]
-       [:div.fr-modal__content
-        [:h1#fr-theme-modal-title.fr-modal__title
-         (i/i lang [:modal-title])]
-        [:div#fr-display.fr-form-group.fr-display
-         [:fieldset.fr-fieldset
-          [:legend#-legend.fr-fieldset__legend.fr-text--regular
-           (i/i lang [:modal-select-theme])]
-          [:div.fr-fieldset__content
-           [:div.fr-radio-group.fr-radio-rich
-            [:input#fr-radios-theme-light
-             {:type "radio" :name "fr-radios-theme" :value "light"}]
-            [:label.fr-label {:for "fr-radios-theme-light"}
-             (i/i lang [:modal-theme-light])]
-            [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/light.svg"}]]]
-           [:div.fr-radio-group.fr-radio-rich
-            [:input#fr-radios-theme-dark
-             {:type "radio" :name "fr-radios-theme" :value "dark"}]
-            [:label.fr-label {:for "fr-radios-theme-dark"}
-             (i/i lang [:modal-theme-dark])]
-            [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/dark.svg"}]]]
-           [:div.fr-radio-group.fr-radio-rich
-            [:input#fr-radios-theme-system
-             {:type "radio" :name "fr-radios-theme" :value "system"}]
-            [:label.fr-label {:for "fr-radios-theme-system"}
-             (i/i lang [:modal-theme-system])]
-            [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/system.svg"}]]]]]]]]]]]])
-
 (defn footer [lang]
   [:footer.fr-footer {:role "contentinfo"}
    [:div.fr-container
@@ -1584,71 +1581,78 @@
        [:button.fr-footer__bottom-link.fr-icon-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
          :title          (str (i/i lang [:modal-title]) " - "
-                              (i/i lang [:new-modal]))
+                     (i/i lang [:new-modal]))
          :data-fr-opened false}
         (i/i lang [:modal-title])]]]]]])
 
-(defn home-page [lang]
-  [:div.fr-grid
-   [:div.fr-grid-row.fr-grid-row--center
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/repos"
-          :title (i/i lang [:repos-of-source-code])}
-         (i/i lang [:Repos])]]
-       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/groups"
-          :title (i/i lang [:Orgas])}
-         (i/i lang [:Orgas])]]
-       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href "#/libs"}
-         (i/i lang [:Libraries])]]
-       [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/libraries.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/deps"
-          :title (i/i lang [:deps-stats])}
-         (i/i lang [:Deps])]]
-       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/dependencies.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/stats"
-          :title (i/i lang [:stats-expand])}
-         (i/i lang [:Stats])]]
-       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
-       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
+(defn display-parameters-modal [lang]
+  [:dialog#fr-theme-modal.fr-modal
+   {:role "dialog" :aria-labelledby "fr-theme-modal-title"}
+   [:div.fr-container.fr-container--fluid.fr-container-md
+    [:div.fr-grid-row.fr-grid-row--center
+     [:div.fr-col-12.fr-col-md-6.fr-col-lg-4
+      [:div.fr-modal__body
+       [:div.fr-modal__header
+        [:button.fr-link--close.fr-link {:aria-controls "fr-theme-modal"}
+         (i/i lang [:modal-close])]]
+       [:div.fr-modal__content
+        [:h1#fr-theme-modal-title.fr-modal__title
+         (i/i lang [:modal-title])]
+        [:div#fr-display.fr-form-group.fr-display
+         [:fieldset.fr-fieldset
+          [:legend#-legend.fr-fieldset__legend.fr-text--regular
+           (i/i lang [:modal-select-theme])]
+          [:div.fr-fieldset__content
+           [:div.fr-radio-group.fr-radio-rich
+            [:input#fr-radios-theme-light
+             {:type "radio" :name "fr-radios-theme" :value "light"}]
+            [:label.fr-label {:for "fr-radios-theme-light"}
+             (i/i lang [:modal-theme-light])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "./img/artwork/light.svg"}]]]
+           [:div.fr-radio-group.fr-radio-rich
+            [:input#fr-radios-theme-dark
+             {:type "radio" :name "fr-radios-theme" :value "dark"}]
+            [:label.fr-label {:for "fr-radios-theme-dark"}
+             (i/i lang [:modal-theme-dark])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "./img/artwork/dark.svg"}]]]
+           [:div.fr-radio-group.fr-radio-rich
+            [:input#fr-radios-theme-system
+             {:type "radio" :name "fr-radios-theme" :value "system"}]
+            [:label.fr-label {:for "fr-radios-theme-system"}
+             (i/i lang [:modal-theme-system])]
+            [:div.fr-radio-rich__img {:data-fr-inject true}
+             [:img {:src "./img/artwork/system.svg"}]]]]]]]]]]]])
+
+;; Main pages functions
+
+(defn main-menu [q lang view]
+  [:div
+   [:div.fr-grid-row.fr-mt-2w
+    [:div.fr-col-12
+     (when (some #{:repos :orgas :deps :libs} [view])
+       [:input.fr-input
+        {:placeholder (i/i lang [:free-search])
+         :aria-label  (i/i lang [:free-search])
+         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+         :on-change   (fn [e]
+                        (let [ev (.-value (.-target e))]
+                        (reset! q ev)
+                        (async/go
+                          (async/>! display-filter-chan {:q ev})
+                          (async/<! (async/timeout timeout))
+                          (async/>! filter-chan {:q ev}))))}])]
+    (when-let [flt (-> @(re-frame/subscribe [:filter?])
+                       (dissoc :is-fork :is-publiccode :is-contrib
+                               :is-lib :is-licensed :is-esr))]
+      [:div.fr-col-8.fr-grid-row.fr-m-1w
+       (when-let [ff (not-empty (:g flt))]
+         (close-filter-button lang ff :repos (merge flt {:g nil})))
+       (when-let [ff (not-empty (:d flt))]
+         (close-filter-button lang ff :deps (merge flt {:d nil})))
+       (when-let [ff (not-empty (:repo flt))]
+         (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
 
 (defn main-page [q license language]
   (let [lang @(re-frame/subscribe [:lang?])
@@ -1674,8 +1678,8 @@
                         (inline-page "sitemap.en.md"))
         :feeds   (condp = lang "fr" (inline-page "feeds.fr.md")
                         (inline-page "feeds.en.md"))
-        :about    (condp = lang "fr" (inline-page "about.fr.md")
-                         (inline-page "about.en.md"))
+        :about   (condp = lang "fr" (inline-page "about.fr.md")
+                        (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1725,7 +1729,7 @@
                  :a11y    "Accessibilité ─ Accessibility"
                  :feeds   "Flux RSS ─ RSS Feeds"
                  :sitemap "Pages du site ─ Sitemap"
-                 :about    "À propos ─ About"
+                 :about   "À propos ─ About"
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
