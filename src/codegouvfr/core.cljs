@@ -51,8 +51,6 @@
 
 (defonce filter-chan (async/chan 100))
 
-(defonce display-filter-chan (async/chan 100))
-
 ;; Mappings used when exporting displayed data to csv files
 (defonce mappings
   {:repos {:u  :last_update
@@ -251,12 +249,6 @@
      :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
     [:span ff]]])
 
-(defn start-display-filter-loop []
-  (async/go
-    (loop [f (async/<! display-filter-chan)]
-      (re-frame/dispatch [:display-filter! f])
-      (recur (async/<! display-filter-chan)))))
-
 (defn start-filter-loop []
   (async/go
     (loop [f (async/<! filter-chan)]
@@ -275,19 +267,18 @@
 (re-frame/reg-event-db
  :initialize-db!
  (fn [_ _]
-   {:repos-page     0
-    :orgas-page     0
-    :libs-page      0
-    :deps-page      0
-    :sort-repos-by  :reused
-    :sort-orgas-by  :repos
-    :sort-deps-by   :repos
-    :sort-libs-by   :name
-    :reverse-sort   false
-    :filter         init-filter
-    :display-filter init-filter
-    :lang           "en"
-    :path           ""}))
+   {:repos-page    0
+    :orgas-page    0
+    :libs-page     0
+    :deps-page     0
+    :sort-repos-by :reused
+    :sort-orgas-by :repos
+    :sort-deps-by  :repos
+    :sort-libs-by  :name
+    :reverse-sort  false
+    :filter        init-filter
+    :lang          "en"
+    :path          ""}))
 
 (def repos (reagent/atom nil))
 (def libs (reagent/atom nil))
@@ -325,10 +316,6 @@
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
- :display-filter!
- (fn [db [_ s]] (update-in db [:display-filter] merge s)))
-
-(re-frame/reg-event-db
  :repos-page!
  (fn [db [_ n]] (assoc db :repos-page n)))
 
@@ -352,7 +339,6 @@
    (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
-   (re-frame/dispatch [:display-filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
 (re-frame/reg-event-db
@@ -438,10 +424,6 @@
  (fn [db _] (:filter db)))
 
 (re-frame/reg-sub
- :display-filter?
- (fn [db _] (:display-filter db)))
-
-(re-frame/reg-sub
  :view?
  (fn [db _] (:view db)))
 
@@ -468,11 +450,11 @@
                   ;; :issues (sort-by :i repos0)
                   :reused (sort-by :re repos0)
                   :date   (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                        (js/Date. (.parse js/Date (:u %2))))
-                              repos0)
+                                          (js/Date. (.parse js/Date (:u %2))))
+                                repos0)
                   :desc   (sort #(compare (count (:d %1))
-                                        (count (:d %2)))
-                              repos0)
+                                          (count (:d %2)))
+                                repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             repos
@@ -508,14 +490,14 @@
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
                  :date  (sort
-                        #(compare
-                          (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
-                          (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
-                        orgs)
+                         #(compare
+                           (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
+                           (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
+                         orgs)
                  :name  (reverse
-                        (sort #(compare (or-kwds %1 [:n :l])
-                                        (or-kwds %2 [:n :l]))
-                              orgs))
+                         (sort #(compare (or-kwds %1 [:n :l])
+                                         (or-kwds %2 [:n :l]))
+                               orgs))
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -719,9 +701,9 @@
                        :target "new"
                        :rel    "noreferrer noopener"
                        :title  (new-tab
-                               (str
-                                (i/i lang [:go-to-repo])
-                                (when li (str (i/i lang [:under-license]) li))) lang)}
+                                (str
+                                 (i/i lang [:go-to-repo])
+                                 (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
                      [:a.fr-raw-link.fr-link
@@ -782,26 +764,22 @@
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-1w
        {:placeholder (i/i lang [:license])
-        :value       (or @license
-                   (:license @(re-frame/subscribe [:display-filter?])))
+        :value       @license
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
-                       (reset! license ev)
-                       (async/go
-                         (async/>! display-filter-chan {:license ev})
-                         (async/<! (async/timeout timeout))
-                         (async/>! filter-chan {:license ev}))))}]
+                         (reset! license ev)
+                         (async/go
+                           (async/<! (async/timeout timeout))
+                           (async/>! filter-chan {:license ev}))))}]
       [:input.fr-input.fr-col.fr-m-1w
-       {:value       (or @language
-                   (:language @(re-frame/subscribe [:display-filter?])))
+       {:value       @language
         :placeholder (i/i lang [:language])
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
-                       (reset! language ev)
-                       (async/go
-                         (async/>! display-filter-chan {:language ev})
-                         (async/<! (async/timeout timeout))
-                         (async/>! filter-chan {:language ev}))))}]
+                         (reset! language ev)
+                         (async/go
+                           (async/<! (async/timeout timeout))
+                           (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
        {:value (or platform "")
         :on-change
@@ -809,7 +787,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:platform ev}])
             (async/go
-              (async/>! display-filter-chan {:platform ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:platform ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
@@ -955,7 +932,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:lib-type ev}])
             (async/go
-              (async/>! display-filter-chan {:lib-type ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:lib-type ev}))))}
        [:option#default {:value ""} (i/i lang [:all-lib-types])]
@@ -1110,7 +1086,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:ministry ev}])
             (async/go
-              (async/>! display-filter-chan {:ministry ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:ministry ev}))))}
        [:option#default {:value ""} (i/i lang [:all-ministries])]
@@ -1177,8 +1152,8 @@
   (let [{:keys [repo]} @(re-frame/subscribe [:filter?])
         deps0          @(re-frame/subscribe [:deps?])
         deps           (if-let [s repo]
-               (filter #(s-includes? (s/join " " (:r %)) s) deps0)
-               deps0)
+                         (filter #(s-includes? (s/join " " (:r %)) s) deps0)
+                         deps0)
         deptypes       @(re-frame/subscribe [:deps-types?])
         deps-pages     @(re-frame/subscribe [:deps-page?])
         count-pages    (count (partition-all deps-per-page deps))
@@ -1213,7 +1188,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:dep-type ev}])
             (async/go
-              (async/>! display-filter-chan {:dep-type ev})
               (async/<! (async/timeout timeout))
               (async/>! filter-chan {:dep-type ev}))))}
        [:option#default {:value ""} (i/i lang [:all-dep-types])]
@@ -1409,7 +1383,7 @@
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
-                              (i/i lang [:new-modal]))
+                                       (i/i lang [:new-modal]))
                   :data-fr-opened false}
                  (i/i lang [:modal-title])]]]]]]]]
      ;; Header menu
@@ -1427,10 +1401,10 @@
             :on-click     #(rfe/push-state :home)}
            (i/i lang [:home])]]
          [:li.fr-nav__item
-          [:a.fr-nav__link
+          [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
-            :href         "#/repos"}
+            :on-click     #(rfe/push-state :repos {:lang lang} {:q ""})}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -1581,7 +1555,7 @@
        [:button.fr-footer__bottom-link.fr-icon-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
          :title          (str (i/i lang [:modal-title]) " - "
-                     (i/i lang [:new-modal]))
+                              (i/i lang [:new-modal]))
          :data-fr-opened false}
         (i/i lang [:modal-title])]]]]]])
 
@@ -1635,14 +1609,13 @@
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
-         :value       (or @q (:q @(re-frame/subscribe [:display-filter?])))
+         :value       @q
          :on-change   (fn [e]
                         (let [ev (.-value (.-target e))]
-                        (reset! q ev)
-                        (async/go
-                          (async/>! display-filter-chan {:q ev})
-                          (async/<! (async/timeout timeout))
-                          (async/>! filter-chan {:q ev}))))}])]
+                          (reset! q ev)
+                          (async/go
+                            (async/<! (async/timeout timeout))
+                            (async/>! filter-chan {:q ev}))))}])]
     (when-let [flt (-> @(re-frame/subscribe [:filter?])
                        (dissoc :is-fork :is-publiccode :is-contrib
                                :is-lib :is-licensed :is-esr))]
@@ -1733,7 +1706,6 @@
                  nil)))
     ;; FIXME: When returning to :deps, ensure dp-filter is nil
     (when (= page :deps) (reset! dp-filter nil))
-    (re-frame/dispatch [:filter! {:q ""}])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
 
@@ -1766,7 +1738,6 @@
      on-navigate
      {:use-fragment true})
     (start-filter-loop)
-    (start-display-filter-loop)
     (reagent.dom/render
      [main-class]
      (.getElementById js/document "app"))))
