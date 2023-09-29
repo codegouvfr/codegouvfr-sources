@@ -1345,6 +1345,17 @@
 
 ;; Main structure elements
 
+(def q (reagent/atom nil))
+(def license (reagent/atom nil))
+(def language (reagent/atom nil))
+
+(defn reset-queries []
+  (reset! q nil)
+  (reset! license nil)
+  (reset! language nil)
+  (reset! dp-filter nil)
+  (re-frame/dispatch [:filter! {:q "" :license "" :language ""}]))
+
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
     [:header.fr-header {:role "banner"}
@@ -1404,24 +1415,28 @@
           [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
-            :on-click     #(rfe/push-state :repos {:lang lang} {:q ""})}
+            :on-click
+            #(do (reset-queries) (rfe/push-state :repos {:lang lang}))}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
-          [:a.fr-nav__link
+          [:button.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
-            :href         "#/groups"}
+            :on-click
+            #(do (reset-queries) (rfe/push-state :orgas {:lang lang}))}
            (i/i lang [:Orgas])]]
          [:li.fr-nav__item
-          [:a.fr-nav__link
+          [:button.fr-nav__link
            {:aria-current (when (= path "/libs") "page")
             :title        (i/i lang [:Libraries])
-            :href         "#/libs"}
+            :on-click
+            #(do (reset-queries) (rfe/push-state :libs {:lang lang}))}
            (i/i lang [:Libraries])]]
          [:li.fr-nav__item
-          [:a.fr-nav__link
+          [:button.fr-nav__link
            {:aria-current (when (= path "/deps") "page")
             :title        (i/i lang [:deps-stats])
-            :href         "#/deps"}
+            :on-click
+            #(do (reset-queries) (rfe/push-state :deps {:lang lang}))}
            (i/i lang [:Deps])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -1601,7 +1616,7 @@
 
 ;; Main pages functions
 
-(defn main-menu [q lang view]
+(defn main-menu [lang view]
   [:div
    [:div.fr-grid-row.fr-mt-2w
     [:div.fr-col-12
@@ -1627,14 +1642,14 @@
        (when-let [ff (not-empty (:repo flt))]
          (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
 
-(defn main-page [q license language]
+(defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
     [:div
      (banner lang)
      [:main#main.fr-container.fr-container--fluid.fr-mb-3w
       {:role "main"}
-      [main-menu q lang view]
+      [main-menu lang view]
       (condp = view
         :home    [home-page lang]
         :orgas   [orgas-page lang]
@@ -1659,26 +1674,23 @@
      (display-parameters-modal lang)]))
 
 (defn main-class []
-  (let [q        (reagent/atom nil)
-        license  (reagent/atom nil)
-        language (reagent/atom nil)]
-    (reagent/create-class
-     {:display-name   "main-class"
-      :component-did-mount
-      (fn []
-        (GET "/data/platforms.csv"
-             :handler
-             #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
-        (GET "/data/deps.json"
-             :handler
-             #(reset! deps (map (comp bean clj->js) %)))
-        (GET "/data/tags.json"
-             :handler
-             #(reset! tags (map (comp bean clj->js) %)))
-        (GET "/data/orgas.json"
-             :handler
-             #(reset! orgas (map (comp bean clj->js) %))))
-      :reagent-render (fn [] (main-page q license language))})))
+  (reagent/create-class
+   {:display-name   "main-class"
+    :component-did-mount
+    (fn []
+      (GET "/data/platforms.csv"
+           :handler
+           #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
+      (GET "/data/deps.json"
+           :handler
+           #(reset! deps (map (comp bean clj->js) %)))
+      (GET "/data/tags.json"
+           :handler
+           #(reset! tags (map (comp bean clj->js) %)))
+      (GET "/data/orgas.json"
+           :handler
+           #(reset! orgas (map (comp bean clj->js) %))))
+    :reagent-render (fn [] (main-page))}))
 
 ;; Setup router and init
 
@@ -1704,8 +1716,6 @@
                  :sitemap "Pages du site ─ Sitemap"
                  :about   "À propos ─ About"
                  nil)))
-    ;; FIXME: When returning to :deps, ensure dp-filter is nil
-    (when (= page :deps) (reset! dp-filter nil))
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
 
