@@ -123,7 +123,7 @@
 
 (defn vec-to-csv-string [data]
   (->> data
-       ;; FIXME: Take care of escaping quotes?
+       (map #(map (fn [s] (gstring/replaceAll (str s) "\"" "\"\"")) %))
        (map #(map (fn [s] (gstring/format "\"%s\"" s)) %))
        (map #(s/join ", " %))
        (s/join "\n")))
