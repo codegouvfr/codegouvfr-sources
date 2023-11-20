@@ -1,20 +1,18 @@
 [![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg?style=flat-square)](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/main/item/LICENSES)
 
-# code.gouv.fr
+# code.gouv.fr/public
 
-Web application to explore the source code from the french public sector.
+This repository contains the Web application for exploring source code from the french public sector.  Its official instance is available on [code.gouv.fr/public](https://code.gouv.fr/public/).
+
+*If you are looking for the source code of the main `code.gouv.fr` website, check [codegouvfr-website](https://github.com/codegouvfr/codegouvfr-website.)*
 
 ![img](codegouvfr.png)
 
 # Get the data
 
-The list of organizations accounts is maintained on
-[codegouvfr-sources](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
+The list of organizations accounts is maintained on [codegouvfr-sources](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
 
-From these sources, data are then fetched by
-[codegouvfr-fetch-data](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data)
-and consolidated with
-[codegouvfr-consolidate-data](https://git.sr.ht/~codegouvfr/codegouvfr-consolidate-data).
+From these sources, data are then fetched by [codegouvfr-fetch-data](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data) and consolidated with [codegouvfr-consolidate-data](https://git.sr.ht/~codegouvfr/codegouvfr-consolidate-data).
 
 - Organizations: as [csv](https://code.gouv.fr/data/organizations/csv/all.csv) or [json](https://code.gouv.fr/data/organizations/json/all.json)
 - Repositories: as [csv](https://code.gouv.fr/data/repositories/csv/all.csv) or [json](https://code.gouv.fr/data/repositories/json/all.json)
@@ -26,13 +24,9 @@ and consolidated with
     ~$ cd code.gouv.fr/
     ~$ clj -M:fig
 
-This will open you browser at `http://localhost:9500` where you can
-see your changes as you hack.
+This will open you browser at `http://localhost:9500` where you can see your changes as you hack.
 
-**Note**: if you don't have the `clj` executable, try `apt install
-clojure` or [follow the
-instructions](https://clojure.org/guides/getting_started) on
-clojure.org.
+**Note**: if you don't have the `clj` executable, try `apt install clojure` or [follow the instructions](https://clojure.org/guides/getting_started) on clojure.org.
 
 # [Contributing](CONTRIBUTING.md)
 
