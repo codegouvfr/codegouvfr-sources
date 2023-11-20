@@ -1386,7 +1386,7 @@
                  {:rel   "me"
                   :href  "https://mastodon.social/@CodeGouvFr"
                   :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link.fr-icon-twitter-line
+           [:li [:a.fr-link.fr-icon-twitter-x-line
                  {:rel   "me"
                   :href  "https://twitter.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
