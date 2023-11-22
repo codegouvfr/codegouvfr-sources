@@ -1258,11 +1258,10 @@
         [:tr [:td k] [:td v]])]]]])
 
 (defn stats-tile [l i s]
-  [:div.fr-tile.fr-col-2.fr-m-1w
+  [:div.fr-tile.fr-col-3
    [:div.fr-tile__body
     [:p.fr-tile__title (i/i l [i])]
-    [:div.fr-tile__desc
-     [:p.fr-h4 s]]]])
+    [:div.fr-tile__desc [:p.fr-h4 s]]]])
 
 (defn stats-page
   [lang stats]
@@ -1273,7 +1272,7 @@
                 top_forges top_ministries]} stats]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
-      {:style {:height "180px" :margin-bottom "2em"}}
+      {:style {:height "180px"}}
       (stats-tile lang :Orgas orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
       (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
@@ -1386,7 +1385,7 @@
                  {:rel   "me"
                   :href  "https://mastodon.social/@CodeGouvFr"
                   :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link.fr-icon-twitter-line
+           [:li [:a.fr-link.fr-icon-twitter-x-line
                  {:rel   "me"
                   :href  "https://twitter.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
