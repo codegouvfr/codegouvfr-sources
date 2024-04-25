@@ -1526,16 +1526,16 @@
       [:ul.fr-footer__content-list
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
-         {:href "https://data.gouv.fr"} "data.gouv.fr"]]
+         {:href "https://info.gouv.fr"} "info.gouv.fr"]]
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
-         {:href "https://etalab.gouv.fr"} "etalab.gouv.fr"]]
+         {:href "https://service-public.fr"} "service-public.fr"]]
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
-         {:href "https://numerique.gouv.fr"} "numerique.gouv.fr"]]
+         {:href "https://legifrance.gouv.fr"} "legifrance.gouv.fr"]]
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
-         {:href "https://gouvernement.fr"} "gouvernement.fr"]]]]]
+         {:href "https://data.gouv.fr"} "data.gouv.fr"]]]]]
     [:div.fr-footer__bottom
      [:ul.fr-footer__bottom-list
       [:li.fr-footer__bottom-item
