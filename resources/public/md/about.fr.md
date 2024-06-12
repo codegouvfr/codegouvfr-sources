@@ -51,7 +51,7 @@ Ces données, collectées depuis [libraries.io](https://libraries.io/terms), son
 
 ## Comment suivre les mises à jour ?
 
-Voir notre [page avec tous les flux RSS](/#/feeds).
+Voir notre [page avec tous les flux RSS](#/feeds).
 
 Vous pouvez aussi suivre les annonces de la mission logiciels libres en vous abonnant à la [gazette BlueHats](https://communs.numerique.gouv.fr/gazette/) ou en nous suivant sur [Twitter](https://twitter.com/codegouvfr) et [Mastodon](https://mastodon.social/@CodeGouvFr).
 

@@ -51,7 +51,7 @@ These data, collected from [libraries.io](https://libraries.io/terms), are publi
 
 ## How to get updates?
 
-Check our [list of RSS feeds](/#/feeds).
+Check our [list of RSS feeds](#/feeds).
 
 You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodon](https://mastodon.social/@CodeGouvFr).
 
