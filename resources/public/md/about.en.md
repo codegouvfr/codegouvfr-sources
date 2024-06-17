@@ -27,7 +27,7 @@ Dependencies are libraries, from the French public sector or not, required by th
 
 The list of recommended free software is a list of software currently in use in the French administration.  Each software in this list has a public servant who can help other administrations use this software.
 
-If you want to contribute new Free Software used in your administration, please contribute to [sill.code.gouv.fr](https://sill.code.gouv.fr).
+If you want to contribute new Free Software used in your administration, please contribute to [code.gouv.fr/sill](https://code.gouv.fr/sill).
 
 Referenced services are services for public agents based on a free software.
 
@@ -37,13 +37,15 @@ To submit a new organization account, send us an email at [contact@code.gouv.fr]
 
 **Warning**: We don't reference personal accounts.
 
+To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+
 ## Where to download the data?
 
 These data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html):
 
 - The list of organizations as [csv](/data/organizations/csv/all.csv) and [json](/data/organizations/json/all.json).
 - The list of repositories as [csv](/data/repositories/csv/all.csv) and [json](/data/repositories/json/all.json).
-- Data from the [SILL](https://sill.code.gouv.fr) and the catalog of services: [sill.json](https://sill.code.gouv.fr/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) and [sill.org](/data/sill.org).
+- Data from the [SILL](https://code.gouv.fr/sill) and the catalog of services: [sill.json](https://code.gouv.fr/sill/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) and [sill.org](/data/sill.org).
 
 These data, collected from [libraries.io](https://libraries.io/terms), are published under the [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) license:
 
