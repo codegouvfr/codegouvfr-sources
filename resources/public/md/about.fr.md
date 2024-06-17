@@ -27,7 +27,7 @@ Les dépendances sont les bibliothèques, venant du secteur public ou non, requi
 
 Le socle interministériel de logiciels libres est la liste des logiciels libres recommandés pour toutes les administrations.  Chaque logiciel de cette liste est aujourd'hui en usage dans au moins une administration, et dispose d'un « référent SILL » prêt à aider les autres administrations dans son utilisation.
 
-Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://sill.code.gouv.fr).
+Si vous souhaitez référencer de nouveaux logiciels libres utilisés dans vos administrations, rendez-vous sur [le site de gestion du SILL](https://code.gouv.fr/sill).
 
 Les services en ligne référencés sur le site sont tous des instances de logiciels libres mises à la disposition des agents publics.
 
@@ -37,13 +37,15 @@ Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, éc
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
+Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+
 ## Où télécharger les données ?
 
 Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html) :
 
 * La liste des organisations en [csv](/data/organizations/csv/all.csv) et [json](/data/organizations/json/all.json).
 * La liste des dépôts en [csv](/data/repositories/csv/all.csv) et [json](/data/repositories/json/all.json).
-* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://sill.code.gouv.fr/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
+* Les données du socle interministériel de logiciels libres  et du catalogue de services : [sill.json](https://code.gouv.fr/sill/api/sill.json), [sill.tsv](/data/sill.tsv), [sill.pdf](/data/sill.pdf), [sill.md](/data/sill.md) et [sill.org](/data/sill.org).
 
 Ces données, collectées depuis [libraries.io](https://libraries.io/terms), sont publiées sous licence [Creative Commons BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) :
 
