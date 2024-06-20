@@ -39,6 +39,8 @@ To submit a new organization account, send us an email at [contact@code.gouv.fr]
 
 To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-public)
 
+More generally, you can find more information on how to contribute to free and open source software in this living [documentation](https://code.gouv.fr/documentation/#/publier).
+
 ## Where to download the data?
 
 These data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html):
@@ -65,3 +67,8 @@ You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodo
 4. [code.gouv.fr](https://git.sr.ht/~codegouvfr/code.gouv.fr) exposes the data.
 
 So far, we only reference accounts on sr.ht (SourceHut), github.com, gitlab.com and local GitLab instances: if you can help referencing accounts that publish code on other forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), [Gogs](https://gogs.io) or [Gitea](https://gitea.io) instances, etc.), please see how to [contribute](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data).
+
+
+## Who are we ?
+
+This site is managed and published by DINUM's Free Software Unit (an OSPO). You can find out more [here](https://code.gouv.fr/en/mission/).

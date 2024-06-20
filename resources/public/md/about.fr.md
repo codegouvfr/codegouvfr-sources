@@ -39,6 +39,8 @@ Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, éc
 
 Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-public)
 
+Plus généralement, vous trouverez plus d'informations sur comment contribuer aux logiciels libres dans cette [documentation](https://code.gouv.fr/documentation/#/publier).
+
 ## Où télécharger les données ?
 
 Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses/etalab-2.0.html) :
@@ -65,3 +67,7 @@ Vous pouvez aussi suivre les annonces de la mission logiciels libres en vous abo
 4. [code.gouv.fr](https://git.sr.ht/~codegouvfr/code.gouv.fr) expose les données.
 
 Nous ne référençons pour l'instant que les comptes de sr.ht (SourceHut), github.com, gitlab.com et des instances GitLab locales : si vous pouvez aider à référencer des comptes qui publient sur d'autres forges ([SourceHut](https://sourcehut.org/), [BitBucket](https://bitbucket.org), instances [Gogs](https://gogs.io) ou [Gitea](https://gitea.io), etc.), n'hésitez pas à [contribuer](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data).
+
+## Qui sommes-nous ?
+
+Ce site est géré et publié par la Mission logiciels libres de la DINUM. Vous pouvez en savoir plus à ce propos [ici](https://code.gouv.fr/fr/mission/).
