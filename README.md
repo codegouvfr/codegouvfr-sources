@@ -1,8 +1,8 @@
 [![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg?style=flat-square)](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/main/item/LICENSES)
 
-# code.gouv.fr/public
+# code.gouv.fr/sources
 
-This repository contains the Web application for exploring source code from the french public sector.  Its official instance is available on [code.gouv.fr/public](https://code.gouv.fr/public/).
+This repository contains the Web application for exploring source code from the french public sector.  Its official instance is available on [code.gouv.fr/sources](https://code.gouv.fr/sources/).
 
 *If you are looking for the source code of the main `code.gouv.fr` website, check [codegouvfr-website](https://github.com/codegouvfr/codegouvfr-website.)*
 

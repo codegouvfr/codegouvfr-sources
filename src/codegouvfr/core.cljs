@@ -658,12 +658,6 @@
             (i/i lang [:forks])]]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= rep-f :stars) "fr-btn--secondary")
-             :title    (i/i lang [:sort-stars])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :stars])}
-            (i/i lang [:Stars])]]
-          [:th.fr-col-1
-           [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class    (when (= rep-f :reused) "fr-btn--secondary")
              :title    (i/i lang [:sort-reused])
              :on-click #(re-frame/dispatch [:sort-repos-by! :reused])}
@@ -679,7 +673,6 @@
                               n                                        ; name
                               o                                        ; organization_name
                               r                                        ; repository_url
-                              s                                        ; stars_count
                               u                                        ; last_update
                               re                                        ; reuses
                               ]}
@@ -719,8 +712,6 @@
                     (or (to-locale-date u lang) "N/A")]
                    ;; Forks
                    [:td {:style {:text-align "center"}} f]
-                   ;; Stars
-                   [:td {:style {:text-align "center"}} s]
                    ;; Reused
                    [:td
                     {:style {:text-align "center"}}
