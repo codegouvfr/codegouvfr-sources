@@ -586,27 +586,6 @@
       [:div.fr-card__img.fr-col-3
        [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
     [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href "#/libs"}
-         (i/i lang [:Libraries])]]
-       [:div.fr-card__desc (i/i lang [:home-libs-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/libraries.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/deps"
-          :title (i/i lang [:deps-stats])}
-         (i/i lang [:Deps])]]
-       [:div.fr-card__desc (i/i lang [:home-deps-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/dependencies.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
      [:div.fr-card.fr-enlarge-link
       [:div.fr-card__body
        [:div.fr-card__title
