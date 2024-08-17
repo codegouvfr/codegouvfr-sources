@@ -27,7 +27,6 @@
 (defonce repos-per-page 100)
 (defonce libs-per-page 100)
 (defonce orgas-per-page 20)
-(defonce deps-per-page 100)
 (defonce timeout 100)
 
 ;; FIXME: Setting this here is a hack
@@ -40,7 +39,6 @@
    :language nil
    :platform ""
    :ministry ""
-   :dep-type ""
    :lib-type ""})
 
 (defonce urls
@@ -80,12 +78,6 @@
            :r  :repositories_count
            :o  :organization_url
            :au :avatar_url}
-   :deps  {:n :name
-           :t :type
-           :d :description
-           :l :link
-           :u :updated
-           :r :repositories}
    :libs  {:n :name
            :t :type
            :d :description
@@ -207,14 +199,6 @@
        (ntaf q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)))
      m)))
 
-(defn apply-deps-filters [m]
-  (let [{:keys [dep-type q]} @(re-frame/subscribe [:filter?])]
-    (filter
-     #(and
-       (if (= dep-type "") true (= (:t %) dep-type))
-       (ntaf q (s-includes? (s/join " " [(:n %) (:t %) (:d %)]) q)))
-     m)))
-
 (defn apply-orgas-filters [m]
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
     (filter
@@ -270,10 +254,8 @@
    {:repos-page    0
     :orgas-page    0
     :libs-page     0
-    :deps-page     0
     :sort-repos-by :reused
     :sort-orgas-by :repos
-    :sort-deps-by  :repos
     :sort-libs-by  :name
     :reverse-sort  false
     :filter        init-filter
@@ -282,7 +264,6 @@
 
 (def repos (reagent/atom nil))
 (def libs (reagent/atom nil))
-(def deps (reagent/atom nil))
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
 (def tags (reagent/atom nil))
@@ -311,7 +292,6 @@
    ;; FIXME: Necessary?
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
    (update-in db [:filter] merge s)))
 
@@ -328,15 +308,10 @@
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
 (re-frame/reg-event-db
- :deps-page!
- (fn [db [_ n]] (assoc db :deps-page n)))
-
-(re-frame/reg-event-db
  :view!
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:deps-page! 0])
    (re-frame/dispatch [:libs-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (assoc db :view view)))
@@ -369,14 +344,6 @@
      (re-frame/dispatch [:reverse-sort!]))
    (assoc db :sort-orgas-by k)))
 
-(re-frame/reg-event-db
- :sort-deps-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:deps-page! 0])
-   (when (= k (:sort-deps-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-deps-by k)))
-
 ;; Subscriptions
 
 (re-frame/reg-sub
@@ -400,20 +367,12 @@
  (fn [db _] (:sort-orgas-by db)))
 
 (re-frame/reg-sub
- :sort-deps-by?
- (fn [db _] (:sort-deps-by db)))
-
-(re-frame/reg-sub
  :repos-page?
  (fn [db _] (:repos-page db)))
 
 (re-frame/reg-sub
  :libs-page?
  (fn [db _] (:libs-page db)))
-
-(re-frame/reg-sub
- :deps-page?
- (fn [db _] (:deps-page db)))
 
 (re-frame/reg-sub
  :orgas-page?
@@ -430,10 +389,6 @@
 (re-frame/reg-sub
  :reverse-sort?
  (fn [db _] (:reverse-sort db)))
-
-(re-frame/reg-sub
- :deps-types?
- (fn [_ _] (distinct (map :t @deps))))
 
 (re-frame/reg-sub
  :libs-types?
@@ -472,18 +427,6 @@
                            (reverse libs))))))
 
 (re-frame/reg-sub
- :deps?
- (fn []
-   (let [deps0 @deps
-         deps  (case @(re-frame/subscribe [:sort-deps-by?])
-                 :name  (reverse (sort-by :n deps0))
-                 :repos (sort-by #(count (:r %)) deps0)
-                 deps0)]
-     (apply-deps-filters
-      (if @(re-frame/subscribe [:reverse-sort?])
-        deps (reverse deps))))))
-
-(re-frame/reg-sub
  :orgas?
  (fn []
    (let [orgs  @orgas
@@ -513,8 +456,6 @@
                   :cnt :repos?      :per-page repos-per-page}
           :libs  {:sub :libs-page? :evt      :libs-page!
                   :cnt :libs?      :per-page libs-per-page}
-          :deps  {:sub :deps-page? :evt      :deps-page!
-                  :cnt :deps?      :per-page deps-per-page}
           :orgas {:sub :orgas-page? :evt      :orgas-page!
                   :cnt :orgas?      :per-page orgas-per-page})
         evt         (:evt conf)
@@ -1065,112 +1006,6 @@
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
-;; Main structure - deps
-
-(defn deps-table [lang deps repo]
-  (let [dep-f     @(re-frame/subscribe [:sort-deps-by?])
-        deps-page @(re-frame/subscribe [:deps-page?])]
-    [:div.fr-table.fr-table--no-caption
-     [:table
-      [:caption (i/i lang [:deps])]
-      [:thead.fr-grid.fr-col-12
-       [:tr
-        [:th.fr-col-4
-         [:button.fr-btn.fr-btn--tertiary-no-outline
-          {:class    (when (= dep-f :name) "fr-btn--secondary")
-           :title    (i/i lang [:sort-name])
-           :on-click #(re-frame/dispatch [:sort-deps-by! :name])}
-          (i/i lang [:name])]]
-        [:th.fr-col-1 (i/i lang [:type])]
-        [:th.fr-col-3 (i/i lang [:description])]
-        (when-not repo
-          [:th.fr-col-1
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= dep-f :repos) "fr-btn--secondary")
-             :title    (i/i lang [:sort-repos])
-             :on-click #(re-frame/dispatch [:sort-deps-by! :repos])}
-            (i/i lang [:Repos])]])]]
-      (into
-       [:tbody]
-       (for [dd (take deps-per-page
-                      (drop (* deps-per-page deps-page) deps))]
-         ^{:key dd}
-         (let [{:keys [t ; type
-                       n ; name
-                       d ; description
-                       l ; link
-                       r ; repositories
-                       ]} dd]
-           [:tr
-            [:td
-             [:a.fr-link
-              {:href   l
-               :target "_blank"
-               :rel    "noreferrer noopener"
-               :title  (new-tab (i/i lang [:more-info]) lang)} n]]
-            [:td t]
-            [:td d]
-            (when-not repo
-              [:td {:style {:text-align "center"}}
-               [:button.fr-btn--tertiary
-                {:title    (i/i lang [:list-repos-depending-on-dep])
-                 :on-click #(do (reset! dp-filter (into #{} (js->clj r)))
-                                (rfe/push-state :repos {:lang l} {:d n}))}
-                (count r)]])])))]]))
-
-(defn deps-page [lang]
-  (let [{:keys [repo]} @(re-frame/subscribe [:filter?])
-        deps0          @(re-frame/subscribe [:deps?])
-        deps           (if-let [s repo]
-                         (filter #(s-includes? (s/join " " (:r %)) s) deps0)
-                         deps0)
-        deptypes       @(re-frame/subscribe [:deps-types?])
-        deps-pages     @(re-frame/subscribe [:deps-page?])
-        count-pages    (count (partition-all deps-per-page deps))
-        first-disabled (zero? deps-pages)
-        last-disabled  (= deps-pages (dec count-pages))
-        mapping        (:deps mappings)]
-    [:div.fr-grid
-     [:div.fr-grid-row
-      ;; RSS feed
-      [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i lang [:rss-feed])
-        :href  "/data/latest-dependencies.xml"}
-       [:span.fr-icon-rss-line {:aria-hidden true}]]
-      ;; Download link
-      [:button.fr-link.fr-m-1w
-       {:title    (i/i lang [:download])
-        :on-click #(download-as-csv!
-                    (map
-                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
-                     deps)
-                    (str "codegouvfr-dependencies-" (todays-date lang) ".csv"))}
-       [:span.fr-icon-download-line {:aria-hidden true}]]
-      ;; General informations
-      (table-header lang deps :dep)
-      ;; Top pagination block
-      [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]
-     [:div.fr-grid-row
-      [:select.fr-select.fr-col.fr-m-1w
-       {:value (:dep-type @(re-frame/subscribe [:filter?]))
-        :on-change
-        (fn [e]
-          (let [ev (.-value (.-target e))]
-            (re-frame/dispatch [:filter! {:dep-type ev}])
-            (async/go
-              (async/<! (async/timeout timeout))
-              (async/>! filter-chan {:dep-type ev}))))}
-       [:option#default {:value ""} (i/i lang [:all-dep-types])]
-       (for [x deptypes]
-         ^{:key x}
-         [:option {:value x} x])]]
-     ;; Main deps display
-     (if (pos? (count deps))
-       [deps-table lang deps repo]
-       [:div.fr-m-3w [:p (i/i lang [:no-dep-found])]])
-     ;; Bottom pagination block
-     [navigate-pagination :deps first-disabled last-disabled deps-pages count-pages]]))
-
 ;; Tags page
 
 (defn tags-page [lang]
@@ -1183,7 +1018,7 @@
      [:span.fr-icon-rss-line {:aria-hidden true}]]
     ;; General informations
     (table-header lang @tags :tag)]
-   ;; Main deps display
+   ;; Main tags display
    [:div.fr-table.fr-table--no-caption
     [:table
      [:caption (i/i lang [:Tags])]
@@ -1235,7 +1070,7 @@
 
 (defn stats-page
   [lang stats]
-  (let [{:keys [repos_cnt orgas_cnt deps_cnt libs_cnt
+  (let [{:keys [repos_cnt orgas_cnt libs_cnt ;; deps_cnt
                 avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages top_topics
@@ -1299,7 +1134,6 @@
                              [:th (i/i lang [:Repos])]]])]]
      [:div.fr-grid-row.fr-grid-row--center
       {:style {:height "180px" :margin-bottom "3em"}}
-      (stats-tile lang :deps-stats deps_cnt)
       (stats-tile lang :libs-stats libs_cnt)]]))
 
 (defn stats-page-class [lang]
@@ -1400,13 +1234,6 @@
             :on-click
             #(do (reset-queries) (rfe/push-state :libs {:lang lang}))}
            (i/i lang [:Libraries])]]
-         [:li.fr-nav__item
-          [:button.fr-nav__link
-           {:aria-current (when (= path "/deps") "page")
-            :title        (i/i lang [:deps-stats])
-            :on-click
-            #(do (reset-queries) (rfe/push-state :deps {:lang lang}))}
-           (i/i lang [:Deps])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/tags") "page")
@@ -1589,7 +1416,7 @@
   [:div
    [:div.fr-grid-row.fr-mt-2w
     [:div.fr-col-12
-     (when (some #{:repos :orgas :deps :libs} [view])
+     (when (some #{:repos :orgas :libs} [view])
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
@@ -1605,11 +1432,7 @@
                                :is-lib :is-licensed :is-esr))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
-         (close-filter-button lang ff :repos (merge flt {:g nil})))
-       (when-let [ff (not-empty (:d flt))]
-         (close-filter-button lang ff :deps (merge flt {:d nil})))
-       (when-let [ff (not-empty (:repo flt))]
-         (close-filter-button lang ff :deps (merge flt {:repo nil})))])]])
+         (close-filter-button lang ff :repos (merge flt {:g nil})))])]])
 
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
@@ -1625,7 +1448,6 @@
         :repos   [repos-page-class lang license language]
         :libs    [libs-page-class lang]
         :stats   [stats-page-class lang]
-        :deps    [deps-page lang]
         :tags    [tags-page lang]
         :legal   (condp = lang "fr" (inline-page "legal.fr.md")
                         (inline-page "legal.en.md"))
@@ -1650,9 +1472,6 @@
       (GET "/data/platforms.csv"
            :handler
            #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
-      (GET "/data/deps.json"
-           :handler
-           #(reset! deps (map (comp bean clj->js) %)))
       (GET "/data/tags.json"
            :handler
            #(reset! tags (map (comp bean clj->js) %)))
@@ -1677,7 +1496,6 @@
                  :repos   "Dépôts de code source ─ Source code repositories"
                  :home    title-default
                  :legal   "Mentions légales ─ Legal mentions"
-                 :deps    "Dépendances ─ Dependencies"
                  :tags    "Versions"
                  :stats   "Chiffres ─ Stats"
                  :a11y    "Accessibilité ─ Accessibility"
@@ -1696,7 +1514,6 @@
    ["libs" :libs]
    ["tags" :tags]
    ["stats" :stats]
-   ["deps" :deps]
    ["legal" :legal]
    ["a11y" :a11y]
    ["about" :about]
