@@ -15,7 +15,7 @@ Le *code source* est la version lisible par un humain d'un programme informatiqu
 
 Ce site ne référence que les dépôts publiés via un *compte d'organisation* GitHub ou un groupe public sur gitlab.com ou une instance GitLab : les dépôts publiés via des comptes personnels ne sont pas pris en compte.
 
-Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://man.sr.ht/~codegouvfr/logiciels-libres/glossary.fr.md).
+Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://code.gouv.fr/documentation/#glossaire).
 
 ### Bibliothèques et dépendances
 
@@ -37,7 +37,7 @@ Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, éc
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
-Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
 
 Plus généralement, vous trouverez plus d'informations sur comment contribuer aux logiciels libres dans cette [documentation](https://code.gouv.fr/documentation/#/publier).
 

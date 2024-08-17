@@ -144,9 +144,7 @@
    data))
 
 (defn- table-header [lang what k]
-  (let [glossary-url
-        (str "https://man.sr.ht/~codegouvfr/logiciels-libres/glossary."
-             lang ".md#" (name k))]
+  (let [glossary-url "https://code.gouv.fr/documentation/#glossaire"]
     [:strong.fr-m-auto
      (let [rps (count what)]
        (if (< rps 2)

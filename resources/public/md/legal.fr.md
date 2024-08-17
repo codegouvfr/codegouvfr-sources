@@ -31,7 +31,7 @@ Ce site est hébergé par OVH France, 2 rue Kellermann, 59100 Roubaix, France.  
 
 ## Code source
 
-Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~codegouvfr/code.gouv.fr).
+Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
 
 ## Données personnelles et cookies
 

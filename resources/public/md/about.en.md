@@ -15,7 +15,7 @@ The *source code* is the human-readable version of a computer program.  A *sourc
 
 This website only references repositories from organizational accounts (GitHub) or public groups (gitlab.com or GitLab instances) : repositories on personal accounts are not listed.
 
-For more details on other technical terms, [please check this glossary](https://man.sr.ht/~codegouvfr/logiciels-libres/glossary.en.md).
+For more details on other technical terms, [please check this glossary](https://code.gouv.fr/documentation/#glossaire).
 
 ### Libraries and dependencies
 
@@ -37,7 +37,7 @@ To submit a new organization account, send us an email at [contact@code.gouv.fr]
 
 **Warning**: We don't reference personal accounts.
 
-To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
 
 More generally, you can find more information on how to contribute to free and open source software in this living [documentation](https://code.gouv.fr/documentation/#/publier).
 
