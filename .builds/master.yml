@@ -6,7 +6,7 @@ packages:
   - rsync
   - unzip
 sources:
-  - https://git.sr.ht/~codegouvfr/codegouvfr-public
+  - https://git.sr.ht/~codegouvfr/codegouvfr-sources
 tasks:
   - prepare: |
       curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
@@ -16,10 +16,10 @@ tasks:
       chmod +x install-clj-kondo
       sudo ./install-clj-kondo
   - lint: |
-      cd codegouvfr-public
+      cd codegouvfr-sources
       clj-kondo --lint src
   - build: |
-      cd codegouvfr-public
+      cd codegouvfr-sources
       clojure -M:js
 triggers:
   - action: email
