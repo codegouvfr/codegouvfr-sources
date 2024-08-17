@@ -37,7 +37,7 @@ To submit a new organization account, send us an email at [contact@code.gouv.fr]
 
 **Warning**: We don't reference personal accounts.
 
-To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
 
 More generally, you can find more information on how to contribute to free and open source software in this living [documentation](https://code.gouv.fr/documentation/#/publier).
 

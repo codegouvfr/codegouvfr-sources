@@ -37,7 +37,7 @@ Pour ajouter une forge, un compte d'organisation GitHub ou un groupe GitLab, éc
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
-Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-public)
+Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
 
 Plus généralement, vous trouverez plus d'informations sur comment contribuer aux logiciels libres dans cette [documentation](https://code.gouv.fr/documentation/#/publier).
 
