@@ -19,6 +19,7 @@ tasks:
       sudo ./install-clj-kondo
   - lint: |
       cd codegouvfr-sources
+      git checkout preproduction
       clj-kondo --lint src
   - build: |
       cd codegouvfr-sources
