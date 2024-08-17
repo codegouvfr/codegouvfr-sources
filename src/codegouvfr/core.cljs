@@ -518,14 +518,14 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a?                                        ; is_archived
-                              d                                        ; description
-                              f                                        ; forks_count
-                              li                                        ; license
-                              n                                        ; name
-                              o                                        ; organization_name
-                              r                                        ; repository_url
-                              u                                        ; last_update                              
+                (let [{:keys [a?                 ; is_archived
+                              d                  ; description
+                              f                  ; forks_count
+                              li                 ; license
+                              n                  ; name
+                              o                  ; organization_name
+                              r                  ; repository_url
+                              u                  ; last_update
                               ]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
@@ -553,7 +553,7 @@
                      [:a.fr-raw-link.fr-link
                       {:href  (rfe/href :repos {:lang lang} {:g group})
                        :title (i/i lang [:browse-repos-orga])}
-                      o]
+                      (or (last (re-matches #".+/([^/]+)/?" o)) "")]
                      ")"]]
                    ;; Description
                    [:td {:title (when a? (i/i lang [:repo-archived]))}
@@ -799,7 +799,7 @@
                     (str "codegouvfr-organizations-" (todays-date lang) ".csv"))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
-      (table-header lang orgas :orga)      
+      (table-header lang orgas :orga)
       ;; Top pagination block
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
