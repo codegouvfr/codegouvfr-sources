@@ -997,7 +997,7 @@
           [:ul.fr-links-group
            [:li [:a.fr-link.fr-icon-mastodon-line
                  {:rel   "me"
-                  :href  "https://mastodon.social/@CodeGouvFr"
+                  :href  "https://social.numerique.gouv.fr/@codegouvfr"
                   :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
            [:li [:a.fr-link.fr-icon-twitter-x-line
                  {:rel   "me"
@@ -1097,7 +1097,7 @@
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:div.fr-share__group
         [:a.fr-share__link
-         {:href       "https://mastodon.social/@CodeGouvFr"
+         {:href       "https://social.numerique.gouv.fr/@codegouvfr"
           :aria-label (i/i lang [:mastodon-follow])
           :title      (new-tab (i/i lang [:mastodon-follow]) lang)
           :rel        "noreferrer noopener me"
