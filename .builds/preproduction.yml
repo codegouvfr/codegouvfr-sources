@@ -8,7 +8,7 @@ packages:
 secrets:
   - bdd50953-add5-4ddb-9f34-9f0781900b7e
 sources:
-  - https://git.sr.ht/~codegouvfr/codegouvfr-public
+  - https://git.sr.ht/~codegouvfr/codegouvfr-sources
 tasks:
   - prepare: |
       curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
@@ -18,15 +18,15 @@ tasks:
       chmod +x install-clj-kondo
       sudo ./install-clj-kondo
   - lint: |
-      cd codegouvfr-public
+      cd codegouvfr-sources
       clj-kondo --lint src
   - build: |
-      cd codegouvfr-public
+      cd codegouvfr-sources
       git checkout preproduction
       clojure -M:js
   - upload: |
-      cd codegouvfr-public/resources/public/
-      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@code.gouv.fr:/home/web/websites/code.gouv.fr_public/preproduction/
+      cd codegouvfr-sources/resources/public/
+      rsync -e "ssh -o StrictHostKeyChecking=no" -av * web@code.gouv.fr:/home/web/websites/code.gouv.fr_sources/preproduction/
 triggers:
   - action: email
     condition: failure
