@@ -15,7 +15,7 @@ The *source code* is the human-readable version of a computer program.  A *sourc
 
 This website only references repositories from organizational accounts (GitHub) or public groups (gitlab.com or GitLab instances) : repositories on personal accounts are not listed.
 
-For more details on other technical terms, [please check this glossary](https://man.sr.ht/~codegouvfr/logiciels-libres/glossary.en.md).
+For more details on other technical terms, [please check this glossary](https://code.gouv.fr/documentation/#glossaire).
 
 ### Libraries and dependencies
 

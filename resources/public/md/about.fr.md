@@ -15,7 +15,7 @@ Le *code source* est la version lisible par un humain d'un programme informatiqu
 
 Ce site ne référence que les dépôts publiés via un *compte d'organisation* GitHub ou un groupe public sur gitlab.com ou une instance GitLab : les dépôts publiés via des comptes personnels ne sont pas pris en compte.
 
-Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://man.sr.ht/~codegouvfr/logiciels-libres/glossary.fr.md).
+Pour d'autres précisions sur les termes techniques de ce site, [consultez ce glossaire](https://code.gouv.fr/documentation/#glossaire).
 
 ### Bibliothèques et dépendances
 
