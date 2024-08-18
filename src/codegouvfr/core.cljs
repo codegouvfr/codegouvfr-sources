@@ -1001,7 +1001,7 @@
                   :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
            [:li [:a.fr-link.fr-icon-twitter-x-line
                  {:rel   "me"
-                  :href  "https://twitter.com/codegouvfr"
+                  :href  "https://x.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
            [:li [:a.fr-link {:href "#/feeds"} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
@@ -1104,7 +1104,7 @@
           :target     "_blank"}
          "Mastodon"]
         [:a.fr-share__link
-         {:href       "https://twitter.com/codegouvfr"
+         {:href       "https://x.com/codegouvfr"
           :aria-label (i/i lang [:twitter-follow])
           :title      (new-tab (i/i lang [:twitter-follow]) lang)
           :rel        "noreferrer noopener me"
