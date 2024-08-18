@@ -41,10 +41,7 @@
    })
 
 (defonce urls
-  {;; :annuaire-prefix "https://lannuaire.service-public.fr/"
-   :swh-baseurl "https://archive.softwareheritage.org/browse/origin/"
-   :cdl-baseurl "https://comptoir-du-libre.org/fr/softwares/"
-   :support-url "https://code.gouv.fr/utiliser/marches-interministeriels-support-expertise-logiciels-libres/"})
+  {:swh-baseurl "https://archive.softwareheritage.org/browse/origin/"})
 
 (defonce filter-chan (async/chan 100))
 
@@ -52,7 +49,6 @@
 (defonce mappings
   {:repos {:u  :last_update
            :d  :description
-           :a? :is_archived
            :f? :is_fork
            :t? :is_template
            :l  :language
@@ -518,8 +514,7 @@
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
-                (let [{:keys [a?                 ; is_archived
-                              d                  ; description
+                (let [{:keys [d                  ; description
                               f                  ; forks_count
                               li                 ; license
                               n                  ; name
@@ -556,8 +551,7 @@
                       (or (last (re-matches #".+/([^/]+)/?" o)) "")]
                      ")"]]
                    ;; Description
-                   [:td {:title (when a? (i/i lang [:repo-archived]))}
-                    [:span (if a? [:em d] d)]]
+                   [:td [:span d]]
                    ;; Update
                    [:td {:style {:text-align "center"}}
                     (or (to-locale-date u lang) "N/A")]
