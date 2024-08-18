@@ -1,7 +1,4 @@
-<div class="fr-highlight">
-  <p>If you are a French public agency and want to add new source code repositories, please <a href="mailto:contact@code.gouv.fr">send us an email</a>.
-  </p>
-</div>
+<div class="fr-highlight"> <p>If you are a French public agency and want to add new source code repositories, please read our <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> and <a href="mailto:contact@code.gouv.fr">do send us an email</a>. </p> </div>
 
 ## Why this website?
 

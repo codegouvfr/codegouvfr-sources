@@ -1,7 +1,4 @@
-<div class="fr-highlight">
-  <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ?  <a href="mailto:contact@code.gouv.fr">Écrivez-nous !</a>
-  </p>
-</div>
+<div class="fr-highlight"> <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ? Consultez notre <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> et <a href="mailto:contact@code.gouv.fr">écrivez-nous !</a> </p> </div>
 
 ## Pourquoi ce site ?
 
