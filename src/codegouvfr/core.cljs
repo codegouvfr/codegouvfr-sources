@@ -529,9 +529,10 @@
                    [:td
                     [:div
                      [:a.fr-raw-link.fr-link
-                      {:href  (str (:swh-baseurl urls) r)
-                       :title (new-tab (i/i lang [:swh-link]) lang)
-                       :rel   "noreferrer noopener"}
+                      {:href   (str (:swh-baseurl urls) r)
+                       :target "new"
+                       :title  (new-tab (i/i lang [:swh-link]) lang)
+                       :rel    "noreferrer noopener"}
                       [:img {:width "18px" :src "./img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:span " "]
