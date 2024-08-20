@@ -524,14 +524,13 @@
                       [:img {:width "18px" :src "./img/swh-logo.png"
                              :alt   "Software Heritage logo"}]]
                      [:span " "]
-                     [:a.fr-raw-link.fr-link
-                      {:href   r
-                       :target "new"
-                       :rel    "noreferrer noopener"
-                       :title  (new-tab
-                                (str
-                                 (i/i lang [:go-to-repo])
-                                 (when li (str (i/i lang [:under-license]) li))) lang)}
+                     [:a {:href   r
+                          :target "new"
+                          :rel    "noreferrer noopener"
+                          :title  (new-tab
+                                   (str
+                                    (i/i lang [:go-to-repo])
+                                    (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]
                      " ("
                      [:a.fr-raw-link.fr-link
