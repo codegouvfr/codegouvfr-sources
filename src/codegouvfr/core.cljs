@@ -1266,7 +1266,7 @@
    {:display-name   "main-class"
     :component-did-mount
     (fn []
-      (GET "/data/platforms.csv"
+      (GET "/data/forges.csv"
            :handler
            #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
       (GET "/data/tags.json"
