@@ -37,8 +37,7 @@
    :license  nil
    :language nil
    :platform ""
-   :ministry ""
-   })
+   :ministry ""})
 
 (defonce urls
   {:swh-baseurl "https://archive.softwareheritage.org/browse/origin/"})
@@ -516,14 +515,6 @@
                    ;; Repo (orga)
                    [:td
                     [:div
-                     [:a.fr-raw-link.fr-link
-                      {:href   (str (:swh-baseurl urls) r)
-                       :target "new"
-                       :title  (new-tab (i/i lang [:swh-link]) lang)
-                       :rel    "noreferrer noopener"}
-                      [:img {:width "18px" :src "./img/swh-logo.png"
-                             :alt   "Software Heritage logo"}]]
-                     [:span " "]
                      [:a {:href   r
                           :target "new"
                           :rel    "noreferrer noopener"
@@ -541,11 +532,20 @@
                    ;; Description
                    [:td [:span d]]
                    ;; Update
-                   [:td {:style {:text-align "center"}}
-                    (or (to-locale-date u lang) "N/A")]
+                   [:td
+                    {:style {:text-align "center"}}
+                    [:div
+                     (or (to-locale-date u lang) "N/A")
+                     [:span " "]
+                     [:a.fr-raw-link.fr-link
+                      {:href   (str (:swh-baseurl urls) r)
+                       :target "new"
+                       :title  (new-tab (i/i lang [:swh-link]) lang)
+                       :rel    "noreferrer noopener"}
+                      [:img {:width "18px" :src "./img/swh-logo.png"
+                             :alt   "Software Heritage logo"}]]]]
                    ;; Forks
-                   [:td {:style {:text-align "center"}} f]
-                   ])))]])))
+                   [:td {:style {:text-align "center"}} f]])))]])))
 
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
