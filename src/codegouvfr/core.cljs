@@ -37,8 +37,7 @@
    :license  nil
    :language nil
    :platform ""
-   :ministry ""
-   })
+   :ministry ""})
 
 (defonce urls
   {:swh-baseurl "https://archive.softwareheritage.org/browse/origin/"})
@@ -229,7 +228,7 @@
  (fn [_ _]
    {:repos-page    0
     :orgas-page    0
-    :sort-repos-by :subscribers_count
+    :sort-repos-by :forks
     :sort-orgas-by :repos
     :reverse-sort  false
     :filter        init-filter
@@ -346,17 +345,14 @@
  (fn []
    (let [repos0 @repos
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :name              (reverse (sort-by :n repos0))
-                  :forks             (sort-by :f repos0)
-                  :stars             (sort-by :s repos0)
+                  :forks (sort-by :f repos0)
+                  ;; FIXME: remove useless
+                  ;; :stars             (sort-by :s repos0)
                   ;; :issues (sort-by :i repos0)
-                  :subscribers_count (sort-by :s repos0)
-                  :date              (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                                     (js/Date. (.parse js/Date (:u %2))))
-                                           repos0)
-                  :desc              (sort #(compare (count (:d %1))
-                                                     (count (:d %2)))
-                                           repos0)
+                  ;; :subscribers_count (sort-by :s repos0)
+                  :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                         (js/Date. (.parse js/Date (:u %2))))
+                               repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             repos
@@ -373,10 +369,6 @@
                            (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
                            (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
                          orgs)
-                 :name  (reverse
-                         (sort #(compare (or-kwds %1 [:n :l])
-                                         (or-kwds %2 [:n :l]))
-                               orgs))
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -491,12 +483,8 @@
         [:caption (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= rep-f :name) "fr-btn--secondary")
-             :title    (i/i lang [:sort-repos-alpha])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :name])}
-            (i/i lang [:orga-repo])]]
+          [:th.fr-col (i/i lang [:Repos])]
+          [:th.fr-col (i/i lang [:Orgas])]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
@@ -527,38 +515,35 @@
                   [:tr
                    ;; Repo (orga)
                    [:td
+                    [:a {:href   r
+                         :target "_blank"
+                         :rel    "noreferrer noopener"
+                         :title  (new-tab
+                                  (str
+                                   (i/i lang [:go-to-repo])
+                                   (when li (str (i/i lang [:under-license]) li))) lang)}
+                     n]]
+                   [:td [:a.fr-raw-link.fr-link
+                         {:href  (rfe/href :repos {:lang lang} {:g group})
+                          :title (i/i lang [:browse-repos-orga])}
+                         (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
+                   ;; Description
+                   [:td [:span d]]
+                   ;; Update
+                   [:td
+                    {:style {:text-align "center"}}
                     [:div
+                     (or (to-locale-date u lang) "N/A")
+                     [:span " "]
                      [:a.fr-raw-link.fr-link
                       {:href   (str (:swh-baseurl urls) r)
                        :target "new"
                        :title  (new-tab (i/i lang [:swh-link]) lang)
                        :rel    "noreferrer noopener"}
                       [:img {:width "18px" :src "./img/swh-logo.png"
-                             :alt   "Software Heritage logo"}]]
-                     [:span " "]
-                     [:a.fr-raw-link.fr-link
-                      {:href   r
-                       :target "new"
-                       :rel    "noreferrer noopener"
-                       :title  (new-tab
-                                (str
-                                 (i/i lang [:go-to-repo])
-                                 (when li (str (i/i lang [:under-license]) li))) lang)}
-                      n]
-                     " ("
-                     [:a.fr-raw-link.fr-link
-                      {:href  (rfe/href :repos {:lang lang} {:g group})
-                       :title (i/i lang [:browse-repos-orga])}
-                      (or (last (re-matches #".+/([^/]+)/?" o)) "")]
-                     ")"]]
-                   ;; Description
-                   [:td [:span d]]
-                   ;; Update
-                   [:td {:style {:text-align "center"}}
-                    (or (to-locale-date u lang) "N/A")]
+                             :alt   "Software Heritage logo"}]]]]
                    ;; Forks
-                   [:td {:style {:text-align "center"}} f]
-                   ])))]])))
+                   [:td {:style {:text-align "center"}} f]])))]])))
 
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -687,12 +672,7 @@
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 "Image"]
-          [:th.fr-col-2
-           [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= org-f :name) "fr-btn--secondary")
-             :title    (i/i lang [:sort-orgas-alpha])
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :name])}
-            (i/i lang [:Orgas])]]
+          [:th.fr-col-2 (i/i lang [:Orgas])]
           [:th.fr-col-6 (i/i lang [:description])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
