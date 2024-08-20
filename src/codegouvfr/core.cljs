@@ -483,7 +483,8 @@
         [:caption (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col (i/i lang [:orga-repo])]
+          [:th.fr-col (i/i lang [:Repos])]
+          [:th.fr-col (i/i lang [:Orgas])]
           [:th.fr-col (i/i lang [:description])]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
@@ -514,21 +515,18 @@
                   [:tr
                    ;; Repo (orga)
                    [:td
-                    [:div
-                     [:a {:href   r
-                          :target "new"
-                          :rel    "noreferrer noopener"
-                          :title  (new-tab
-                                   (str
-                                    (i/i lang [:go-to-repo])
-                                    (when li (str (i/i lang [:under-license]) li))) lang)}
-                      n]
-                     " ("
-                     [:a.fr-raw-link.fr-link
-                      {:href  (rfe/href :repos {:lang lang} {:g group})
-                       :title (i/i lang [:browse-repos-orga])}
-                      (or (last (re-matches #".+/([^/]+)/?" o)) "")]
-                     ")"]]
+                    [:a {:href   r
+                         :target "_blank"
+                         :rel    "noreferrer noopener"
+                         :title  (new-tab
+                                  (str
+                                   (i/i lang [:go-to-repo])
+                                   (when li (str (i/i lang [:under-license]) li))) lang)}
+                     n]]
+                   [:td [:a.fr-raw-link.fr-link
+                         {:href  (rfe/href :repos {:lang lang} {:g group})
+                          :title (i/i lang [:browse-repos-orga])}
+                         (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    ;; Description
                    [:td [:span d]]
                    ;; Update
