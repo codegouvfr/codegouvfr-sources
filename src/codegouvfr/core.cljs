@@ -507,9 +507,10 @@
                               li                 ; license
                               n                  ; name
                               fn                 ; full-name
-                              o                  ; organization url
+                              o                  ; organization_name
                               r                  ; repository_url
-                              u                  ; updated_at
+                              u                  ; last_update
+                              p                  ; forge
                               ]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
