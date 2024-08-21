@@ -506,23 +506,29 @@
                               f                  ; forks_count
                               li                 ; license
                               n                  ; name
-                              o                  ; organization_name
+                              fn                 ; full-name
+                              o                  ; organization url
                               r                  ; repository_url
-                              u                  ; last_update
+                              u                  ; updated_at
                               ]}
                       dd
                       group (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
                    ;; Repo (orga)
                    [:td
-                    [:a {:href   r
-                         :target "_blank"
-                         :rel    "noreferrer noopener"
-                         :title  (new-tab
-                                  (str
-                                   (i/i lang [:go-to-repo])
-                                   (when li (str (i/i lang [:under-license]) li))) lang)}
-                     n]]
+                    [:span
+                     [:a.fr-raw-link.fr-icon-terminal-box-fill
+                      {:title (i/i lang [:go-to-data])
+                       :href  (str "https://data.code.gouv.fr/api/v1/hosts/" p "/repositories/" fn)}]
+                     [:span " "]
+                     [:a {:href   r
+                          :target "_blank"
+                          :rel    "noreferrer noopener"
+                          :title  (new-tab
+                                   (str
+                                    (i/i lang [:go-to-repo])
+                                    (when li (str (i/i lang [:under-license]) li))) lang)}
+                      n]]]
                    [:td [:a.fr-raw-link.fr-link
                          {:href  (rfe/href :repos {:lang lang} {:g group})
                           :title (i/i lang [:browse-repos-orga])}
@@ -532,16 +538,15 @@
                    ;; Update
                    [:td
                     {:style {:text-align "center"}}
-                    [:div
-                     (or (to-locale-date u lang) "N/A")
-                     [:span " "]
-                     [:a.fr-raw-link.fr-link
-                      {:href   (str (:swh-baseurl urls) r)
-                       :target "new"
-                       :title  (new-tab (i/i lang [:swh-link]) lang)
-                       :rel    "noreferrer noopener"}
-                      [:img {:width "18px" :src "./img/swh-logo.png"
-                             :alt   "Software Heritage logo"}]]]]
+                    [:span
+                     (if-let [d (to-locale-date u lang)]
+                       [:a
+                        {:href   (str (:swh-baseurl urls) r)
+                         :target "new"
+                         :title  (new-tab (i/i lang [:swh-link]) lang)
+                         :rel    "noreferrer noopener"}
+                        d]
+                       "N/A")]]
                    ;; Forks
                    [:td {:style {:text-align "center"}} f]])))]])))
 
@@ -691,17 +696,20 @@
                              (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
-                (let [{:keys [n ; name
-                              l ; login
-                              d ; description
-                              o ; organization_url
+                (let [{:keys [n  ; name
+                              l  ; login
+                              d  ; description
+                              o  ; organization_url
                               ;; FIXME: Where to use this?
-                              h ; website
-                              f ; floss_policy
-                              p ; platform
+                              h  ; website
+                              ;; FIXME: floss_policy missing?
+                              f  ; floss_policy
+                              ;; FIXME: used?
+                              p  ; platform
                               au ; avatar_url
-                              c ; creation_date
-                              r ; repositories_count
+                              c  ; creation_date
+                              r  ; repositories_count
+                              id ; owner_url (data)
                               ]} dd]
                   [:tr
                    [:td (if au
@@ -727,6 +735,10 @@
                           :href   f}
                          [:img {:src "./img/floss.png" :width "25px"}]]
                         " "])
+                     [:a.fr-icon-terminal-box-fill
+                      {:title (i/i lang [:go-to-data])
+                       :href  id}]
+                     [:span " "]
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
                           :title  (new-tab (i/i lang [:go-to-orga]) lang)
