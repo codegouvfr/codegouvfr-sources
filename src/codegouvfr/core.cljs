@@ -532,16 +532,15 @@
                    ;; Update
                    [:td
                     {:style {:text-align "center"}}
-                    [:div
-                     (or (to-locale-date u lang) "N/A")
-                     [:span " "]
-                     [:a.fr-raw-link.fr-link
-                      {:href   (str (:swh-baseurl urls) r)
-                       :target "new"
-                       :title  (new-tab (i/i lang [:swh-link]) lang)
-                       :rel    "noreferrer noopener"}
-                      [:img {:width "18px" :src "./img/swh-logo.png"
-                             :alt   "Software Heritage logo"}]]]]
+                    [:span
+                     (if-let [d (to-locale-date u lang)]
+                       [:a
+                        {:href   (str (:swh-baseurl urls) r)
+                         :target "new"
+                         :title  (new-tab (i/i lang [:swh-link]) lang)
+                         :rel    "noreferrer noopener"}
+                        d]
+                       "N/A")]]
                    ;; Forks
                    [:td {:style {:text-align "center"}} f]])))]])))
 
