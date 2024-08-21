@@ -518,9 +518,10 @@
                    ;; Repo (orga)
                    [:td
                     [:span
-                     [:a.fr-raw-link.fr-icon-terminal-box-fill
-                      {:title (i/i lang [:go-to-data])
-                       :href  (str "https://data.code.gouv.fr/api/v1/hosts/" p "/repositories/" fn)}]
+                     [:a.fr-icon-terminal-box-fill
+                      {:title  (i/i lang [:go-to-data])
+                       :target "new"
+                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/" p "/repositories/" fn)}]
                      [:span " "]
                      [:a {:href   r
                           :target "_blank"
@@ -737,8 +738,9 @@
                          [:img {:src "./img/floss.png" :width "25px"}]]
                         " "])
                      [:a.fr-icon-terminal-box-fill
-                      {:title (i/i lang [:go-to-data])
-                       :href  id}]
+                      {:title  (i/i lang [:go-to-data])
+                       :target "new"
+                       :href   id}]
                      [:span " "]
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
