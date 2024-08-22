@@ -165,21 +165,25 @@
                 is-fork is-licensed]}
         @(re-frame/subscribe [:filter?])]
     (filter
-     #(and
-       (if (and d @dp-filter) (some @dp-filter [(:r %)]) true)
-       (ntaf is-fork (:f? %))
-       (ntaf is-contrib (:c? %))
-       (ntaf is-publiccode (:p? %))
-       (ntaf is-template (:t? %))
-       (ntaf is-licensed (let [l (:li %)] (and l (not= l "Other"))))
-       (ntaf license (s-includes? (:li %) license))
-       (if language
-         (some (into #{} (list (s/lower-case (or (:l %) ""))))
-               (s/split (s/lower-case language) #" +"))
-         true)
-       (if (= platform "") true (s-includes? (:r %) platform))
-       (ntaf g (s-includes? (:r %) g))
-       (ntaf q (s-includes? (s/join " " [(:n %) (:r %) (:o %) (:t %) (:d %)]) q)))
+     #(let [o (:o %)
+            n (:n %)
+            t (:t %)
+            r (str o "/" n)]
+        (and
+         (if (and d @dp-filter) (some @dp-filter [r]) true)
+         (ntaf is-fork (:f? %))
+         (ntaf is-contrib (:c? %))
+         (ntaf is-publiccode (:p? %))
+         (ntaf is-template t)
+         (ntaf is-licensed (let [l (:li %)] (and l (not= l "Other"))))
+         (ntaf license (s-includes? (:li %) license))
+         (if language
+           (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                 (s/split (s/lower-case language) #" +"))
+           true)
+         (if (= platform "") true (s-includes? r platform))
+         (ntaf g (s-includes? r g))
+         (ntaf q (s-includes? (s/join " " [n r o t (:d %)]) q))))
      m)))
 
 (defn apply-orgas-filters [m]
@@ -227,6 +231,7 @@
  :initialize-db!
  (fn [_ _]
    {:repos-page    0
+    :awes-page     0
     :orgas-page    0
     :sort-repos-by :forks
     :sort-orgas-by :repos
@@ -236,6 +241,7 @@
     :path          ""}))
 
 (def repos (reagent/atom nil))
+(def awes (reagent/atom nil))
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
 (def tags (reagent/atom nil))
@@ -271,6 +277,10 @@
  (fn [db [_ n]] (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
+ :awes-page!
+ (fn [db [_ n]] (assoc db :awes-page n)))
+
+(re-frame/reg-event-db
  :orgas-page!
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
@@ -279,6 +289,7 @@
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
+   (re-frame/dispatch [:awes-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
@@ -327,6 +338,10 @@
 (re-frame/reg-sub
  :orgas-page?
  (fn [db _] (:orgas-page db)))
+
+(re-frame/reg-sub
+ :awes-page?
+ (fn [db _] (:awes-page db)))
 
 (re-frame/reg-sub
  :filter?
@@ -663,6 +678,40 @@
            #(reset! repos (map (comp bean clj->js) %))))
     :reagent-render (fn [] (repos-page lang license language))}))
 
+;; Main structure - awesome
+
+(defn awes-table [lang]
+  [:div.fr-table.fr-table--no-caption
+   [:table
+    [:caption "Caption"]
+    [:thead.fr-grid.fr-col-12
+     [:tr [:th.fr-col-5 "Awesome"]]]
+    (into [:tbody]
+          (for [dd @awes]
+            ^{:key dd}
+            (let [{:keys [name url]} dd]
+              [:tr
+               [:td
+                [:div
+                 [:a.fr-link
+                  {:href   url
+                   :rel    "noreferrer noopener"
+                   :target "_blank"}
+                  name]]]])))]])
+
+(defn awes-page [lang]
+  [awes-table lang])
+
+(defn awes-page-class [lang]
+  (reagent/create-class
+   {:display-name   "awes-page-class"
+    :component-did-mount
+    (fn []
+      (GET "/data/awesome-codegouvfr.json"
+           :handler
+           #(reset! awes (map (comp bean clj->js) %))))
+    :reagent-render (fn [] (awes-page lang))}))
+
 ;; Main structure - orgas
 
 (defn orgas-table [lang orgas-cnt]
@@ -697,20 +746,20 @@
                              (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
-                (let [{:keys [n  ; name
-                              l  ; login
-                              d  ; description
-                              o  ; organization_url
+                (let [{:keys [n        ; name
+                              l        ; login
+                              d        ; description
+                              o        ; organization_url
                               ;; FIXME: Where to use this?
-                              h  ; website
+                              h        ; website
                               ;; FIXME: floss_policy missing?
-                              f  ; floss_policy
+                              f         ; floss_policy
                               ;; FIXME: used?
-                              p  ; platform
-                              au ; avatar_url
-                              c  ; creation_date
-                              r  ; repositories_count
-                              id ; owner_url (data)
+                              p         ; platform
+                              au        ; avatar_url
+                              c         ; creation_date
+                              r         ; repositories_count
+                              id        ; owner_url (data)
                               ]} dd]
                   [:tr
                    [:td (if au
@@ -759,8 +808,7 @@
                                                 o)})}
                      r]]
                    [:td {:style {:text-align "center"}}
-                    (to-locale-date c lang)]
-                   ])))]])))
+                    (to-locale-date c lang)]])))]])))
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
@@ -1015,6 +1063,13 @@
            (i/i lang [:home])]]
          [:li.fr-nav__item
           [:button.fr-nav__link
+           {:aria-current (when (= path "/awesome") "page")
+            :title        "Awesome"
+            :on-click
+            #(do (reset-queries) (rfe/push-state :awes {:lang lang}))}
+           "Awesome"]]
+         [:li.fr-nav__item
+          [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
             :on-click
@@ -1238,6 +1293,7 @@
         :home    [home-page lang]
         :orgas   [orgas-page lang]
         :repos   [repos-page-class lang license language]
+        :awes    [awes-page-class lang]
         :stats   [stats-page-class lang]
         :tags    [tags-page lang]
         :legal   (condp = lang "fr" (inline-page "legal.fr.md")
@@ -1282,6 +1338,7 @@
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
+                 :awes    "Awesome"
                  :orgas   "Organisations ─ Organizations"
                  :repos   "Dépôts de code source ─ Source code repositories"
                  :home    title-default
@@ -1301,6 +1358,7 @@
    ["" :home]
    ["groups" :orgas]
    ["repos" :repos]
+   ["awesome" :awes]
    ["tags" :tags]
    ["stats" :stats]
    ["legal" :legal]
