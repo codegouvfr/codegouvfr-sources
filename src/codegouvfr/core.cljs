@@ -508,12 +508,11 @@
                               n                  ; name
                               fn                 ; full-name
                               o                  ; organization_name
-                              r                  ; repository_url
                               u                  ; last_update
                               p                  ; forge
-                              ]}
-                      dd
-                      group (subs r 0 (- (count r) (inc (count n))))]
+                              ]} dd
+                      r          (str o "/" n)
+                      group      (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
                    ;; Repo (orga)
                    [:td
