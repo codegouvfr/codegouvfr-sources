@@ -680,7 +680,7 @@
 
 ;; Main structure - awesome
 
-(defn awes-table [lang]
+(defn awes-table [] ; [lang]
   [:div.fr-table.fr-table--no-caption
    [:table
     [:caption "Caption"]
