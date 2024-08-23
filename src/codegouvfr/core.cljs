@@ -680,27 +680,43 @@
 
 ;; Main structure - awesome
 
-(defn awes-table [] ; [lang]
-  [:div.fr-table.fr-table--no-caption
-   [:table
-    [:caption "Caption"]
-    [:thead.fr-grid.fr-col-12
-     [:tr [:th.fr-col-5 "Awesome"]]]
-    (into [:tbody]
-          (for [dd @awes]
-            ^{:key dd}
-            (let [{:keys [name url]} dd]
-              [:tr
-               [:td
-                [:div
-                 [:a.fr-link
-                  {:href   url
-                   :rel    "noreferrer noopener"
-                   :target "_blank"}
-                  name]]]])))]])
+(defn awes-table [lang]
+  (into
+   [:div.fr-grid-row.fr-grid-row--gutters]
+   (for [dd @awes]
+     ^{:key dd}
+     (let [{:keys [name url logo awesomeShield legal lastUpdated description fundedBy]}
+           dd
+           desc (:shortDescription (get description (keyword lang)))]
+       [:div.fr-col-12.fr-col-md-3
+        [:div.fr-card.fr-enlarge-link
+         [:div.fr-card__header
+          [:div.fr-card__img
+           [:img.fr-responsive-img {:src logo :alt "" :data-fr-js-ratio true}]]
+          [:ul.fr-badges-group
+           [:li [:img {:src awesomeShield :alt "Awesome CodeGouvFr"}]]]]
+         [:div.fr-card__body
+          [:div.fr-card__content
+           [:div.fr-card__start
+            [:ul.fr-tags-group
+             [:li [:p.fr-tag (str "License: " (:license legal))]]
+             [:li [:p.fr-tag (str "Last updated: " lastUpdated)]]]]
+           [:h3.fr-card__title
+            [:a {:href url} name]]
+           [:p.fr-card__desc desc]
+           [:div.fr-card__end
+            (when (not-empty fundedBy)
+              [:p.fr-card__detail.fr-icon-warning-fill
+               (str "Financé par : " (s/join ", " (map :name fundedBy)))])]]]]]))))
 
 (defn awes-page [lang]
-  [awes-table lang])
+  [:div.fr-container.fr-mt-6w
+   [:div.fr-grid-row
+    [:div.fr-col-12
+     [:div.fr-callout
+      [:p.fr-callout__text (i/i lang [:Awesome-callout])]]
+     [:div.fr-my-6w
+      [awes-table lang]]]]])
 
 (defn awes-page-class [lang]
   (reagent/create-class
@@ -709,7 +725,7 @@
     (fn []
       (GET "/data/awesome-codegouvfr.json"
            :handler
-           #(reset! awes (map (comp bean clj->js) %))))
+           #(reset! awes (walk/keywordize-keys %))))
     :reagent-render (fn [] (awes-page lang))}))
 
 ;; Main structure - orgas

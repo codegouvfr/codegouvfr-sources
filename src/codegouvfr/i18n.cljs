@@ -14,6 +14,7 @@
   {:fr
    {
     :About                         "À propos"
+    :Awesome-callout               "Logiciels libres remarquables activement développés et actuellement financés par des organismes publics."
     :Deps                          "Dépendances"
     :Loading                       "Chargement..."
     :Orgas                         "Organisations"
@@ -168,6 +169,7 @@
    :en
    {
     :About                         "About"
+    :Awesome-callout               "Awesome open source projects actively maintained and currently funded by public sector organizations."
     :Deps                          "Dependencies"
     :Loading                       "Loading..."
     :Orgas                         "Organizations"
