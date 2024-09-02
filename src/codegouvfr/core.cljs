@@ -167,7 +167,7 @@
     (filter
      #(let [o (:o %)
             n (:n %)
-            t (:t %)
+            t (:t? %)
             r (str o "/" n)]
         (and
          (if (and d @dp-filter) (some @dp-filter [r]) true)
@@ -183,7 +183,7 @@
            true)
          (if (= platform "") true (s-includes? r platform))
          (ntaf g (s-includes? r g))
-         (ntaf q (s-includes? (s/join " " [n r o t (:d %)]) q))))
+         (ntaf q (s-includes? (s/join " " [n r o (:d %)]) q))))
      m)))
 
 (defn apply-orgas-filters [m]
