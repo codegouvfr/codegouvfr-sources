@@ -684,16 +684,14 @@
    [:div.fr-grid-row.fr-grid-row--gutters]
    (for [dd @awes]
      ^{:key dd}
-     (let [{:keys [name url logo awesomeShield legal lastUpdated description fundedBy]}
+     (let [{:keys [name url logo legal lastUpdated description fundedBy]}
            dd
            desc (:shortDescription (get description (keyword lang)))]
        [:div.fr-col-12.fr-col-md-3
         [:div.fr-card.fr-enlarge-link
          [:div.fr-card__header
           [:div.fr-card__img
-           [:img.fr-responsive-img {:src logo :alt "" :data-fr-js-ratio true}]]
-          [:ul.fr-badges-group
-           [:li [:img {:src awesomeShield :alt "Awesome CodeGouvFr"}]]]]
+           [:img.fr-responsive-img {:src logo :alt "" :data-fr-js-ratio true}]]]
          [:div.fr-card__body
           [:div.fr-card__content
            [:div.fr-card__start
