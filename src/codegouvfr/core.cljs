@@ -233,7 +233,7 @@
    {:repos-page    0
     :awes-page     0
     :orgas-page    0
-    :sort-repos-by :forks
+    :sort-repos-by :awesome
     :sort-orgas-by :repos
     :reverse-sort  false
     :filter        init-filter
@@ -360,14 +360,13 @@
  (fn []
    (let [repos0 @repos
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :forks (sort-by :f repos0)
+                  :forks   (sort-by :f repos0)
+                  :awesome (sort-by :a repos0)
                   ;; FIXME: remove useless
-                  ;; :stars             (sort-by :s repos0)
                   ;; :issues (sort-by :i repos0)
-                  ;; :subscribers_count (sort-by :s repos0)
-                  :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                         (js/Date. (.parse js/Date (:u %2))))
-                               repos0)
+                  :date    (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                           (js/Date. (.parse js/Date (:u %2))))
+                                 repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             repos
