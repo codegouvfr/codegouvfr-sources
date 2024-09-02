@@ -233,7 +233,7 @@
    {:repos-page    0
     :awes-page     0
     :orgas-page    0
-    :sort-repos-by :awesome
+    :sort-repos-by :score
     :sort-orgas-by :repos
     :reverse-sort  false
     :filter        init-filter
@@ -360,11 +360,11 @@
  (fn []
    (let [repos0 @repos
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :forks   (sort-by :f repos0)
-                  :awesome (sort-by :a repos0)
+                  :forks (sort-by :f repos0)
+                  :score (sort-by :a repos0)
                   ;; FIXME: remove useless
                   ;; :issues (sort-by :i repos0)
-                  :date    (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                  :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
                                            (js/Date. (.parse js/Date (:u %2))))
                                  repos0)
                   repos0)]
@@ -511,13 +511,20 @@
             {:class    (when (= rep-f :forks) "fr-btn--secondary")
              :title    (i/i lang [:sort-forks])
              :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
-            (i/i lang [:forks])]]]]
+            (i/i lang [:forks])]]
+          [:th.fr-col-1
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= rep-f :score) "fr-btn--secondary")
+             :title    (i/i lang [:sort-score])
+             :on-click #(re-frame/dispatch [:sort-repos-by! :score])}
+            (i/i lang [:Score])]]]]
         (into [:tbody]
               (for [dd (take repos-per-page
                              (drop (* repos-per-page repos-page) repos))]
                 ^{:key dd}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
+                              a                  ; codegouvfr "awesome" score
                               li                 ; license
                               n                  ; name
                               fn                 ; full-name
@@ -563,7 +570,9 @@
                         d]
                        "N/A")]]
                    ;; Forks
-                   [:td {:style {:text-align "center"}} f]])))]])))
+                   [:td {:style {:text-align "center"}} f]
+                   ;; Awesome codegouvfr score
+                   [:td {:style {:text-align "center"}} a]])))]])))
 
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
