@@ -691,7 +691,7 @@
 (defn awes-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [dd @awes]
+   (for [dd (shuffle @awes)]
      ^{:key dd}
      (let [{:keys [name url logo legal lastUpdated description fundedBy]}
            dd
