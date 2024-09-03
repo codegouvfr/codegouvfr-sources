@@ -691,7 +691,7 @@
 (defn awes-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [dd @awes]
+   (for [dd (shuffle @awes)]
      ^{:key dd}
      (let [{:keys [name url logo legal lastUpdated description fundedBy]}
            dd
@@ -1131,7 +1131,7 @@
   [:div.fr-follow
    [:div.fr-container
     [:div.fr-grid-row
-     [:div.fr-col-12.fr-col-md-2
+     [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__special
        [:div
         [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
@@ -1145,20 +1145,9 @@
          (i/i lang [:bluehats-desc])]
         [:a.fr-btn
          {:type "button"
-          :href "https://code.gouv.fr/newsletters/subscribe/bluehats@mail.codegouv.fr"}
+          :href "https://code.gouv.fr/newsletters"}
          (i/i lang [:subscribe])]]]]
      [:div.fr-col-12.fr-col-md-4
-      [:div.fr-follow__newsletter
-       [:div
-        [:h1.fr-h5.fr-follow__title (i/i lang [:cio-floss])]
-        [:p.fr-text--sm.fr-follow__desc
-         (i/i lang [:cio-floss-desc])]
-        [:a.fr-btn
-         {:type "button"
-          :href "https://code.gouv.fr/newsletters/subscribe/logiciels-libres-dsi@mail.codegouv.fr"}
-         (i/i lang [:subscribe])]]]]
-     ;; Follow elsewhere
-     [:div.fr-col-12.fr-col-md-2
       [:div.fr-share
        [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
        [:div.fr-share__group

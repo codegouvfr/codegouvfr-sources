@@ -14,7 +14,7 @@
   {:fr
    {
     :About                         "À propos"
-    :Awesome-callout               "Logiciels libres remarquables activement développés et actuellement financés par des organismes publics."
+    :Awesome-callout               "Logiciels libres remarquables activement développés et financés par des organismes publics."
     :Deps                          "Dépendances"
     :Loading                       "Chargement..."
     :Orgas                         "Organisations"
@@ -42,8 +42,6 @@
     :cdl-providers                 "Prestataires recensés dans le Comptoir du Libre (ADULLACT)"
     :cdl-providers-visit           "Voir les prestataires pour %s dans le Comptoir du Libre (ADULLACT)"
     :cdl-visit                     "Voir la fiche du logiciel %s dans le Comptoir du Libre (ADULLACT)"
-    :cio-floss                     "Gazette DSI Libre"
-    :cio-floss-desc                "Lettre d'information sur les logiciels libres pour les DSI du secteur public."
     :close                         "Fermer"
     :cnll-providers                "Prestataires recensés dans l'annuaire du CNLL"
     :cnll-providers-visit          "Voir les prestataires pour %s dans l'annuaire du CNLL"
@@ -171,7 +169,7 @@
    :en
    {
     :About                         "About"
-    :Awesome-callout               "Awesome open source projects actively maintained and currently funded by public sector organizations."
+    :Awesome-callout               "Awesome open source projects actively maintained and funded by public sector organizations."
     :Deps                          "Dependencies"
     :Loading                       "Loading..."
     :Orgas                         "Organizations"
@@ -199,8 +197,6 @@
     :cdl-providers                 "Providers from Comptoir du Libre (ADULLACT)"
     :cdl-providers-visit           "See %s providers in Comptoir du Libre (ADULLACT)"    
     :cdl-visit                     "See %s in Comptoir du Libre (ADULLACT)"
-    :cio-floss                     "FLOSS CIO 🧢 newsletter"
-    :cio-floss-desc                "FLOSS Newsletter in French targetting public sector CIO."
     :close                         "Close"
     :cnll-providers                "Providers from CNLL directory"
     :cnll-providers-visit          "See %s providers in CNLL directory"
