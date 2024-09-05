@@ -442,45 +442,44 @@
 ;; Home page
 
 (defn home-page [lang]
-  [:div.fr-grid
-   [:div.fr-grid-row.fr-grid-row--center
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/repos"
-          :title (i/i lang [:repos-of-source-code])}
-         (i/i lang [:Repos])]]
-       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/groups"
-          :title (i/i lang [:Orgas])}
-         (i/i lang [:Orgas])]]
-       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
-      [:div.fr-card__img.fr-col-3
-       [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link
-         {:href  "#/stats"
-          :title (i/i lang [:stats-expand])}
-         (i/i lang [:Stats])]]
-       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
-    [:div.fr-col-6.fr-p-2w
-     [:div.fr-card.fr-enlarge-link
-      [:div.fr-card__body
-       [:div.fr-card__title
-        [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
-       [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]]])
+  [:div.fr-grid-row.fr-grid-row--center
+   [:div.fr-col-6.fr-p-2w
+    [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+     [:div.fr-card__body
+      [:div.fr-card__title
+       [:a.fr-card__link
+        {:href  "#/repos"
+         :title (i/i lang [:repos-of-source-code])}
+        (i/i lang [:Repos])]]
+      [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
+     [:div.fr-card__img.fr-col-3
+      [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
+   [:div.fr-col-6.fr-p-2w
+    [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+     [:div.fr-card__body
+      [:div.fr-card__title
+       [:a.fr-card__link
+        {:href  "#/groups"
+         :title (i/i lang [:Orgas])}
+        (i/i lang [:Orgas])]]
+      [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
+     [:div.fr-card__img.fr-col-3
+      [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
+   [:div.fr-col-6.fr-p-2w
+    [:div.fr-card.fr-enlarge-link
+     [:div.fr-card__body
+      [:div.fr-card__title
+       [:a.fr-card__link
+        {:href  "#/stats"
+         :title (i/i lang [:stats-expand])}
+        (i/i lang [:Stats])]]
+      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
+   [:div.fr-col-6.fr-p-2w
+    [:div.fr-card.fr-enlarge-link
+     [:div.fr-card__body
+      [:div.fr-card__title
+       [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
+      [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]])
 
 ;; Main structure - repos
 
@@ -583,7 +582,7 @@
         first-disabled (zero? repos-pages)
         last-disabled  (= repos-pages (dec count-pages))
         mapping        (:repos mappings)]
-    [:div.fr-grid
+    [:div
      [:div.fr-grid-row
       ;; RSS feed
       [:a.fr-raw-link.fr-link.fr-m-1w
@@ -605,7 +604,7 @@
       [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
      [:div.fr-grid-row
-      [:input.fr-input.fr-col.fr-m-1w
+      [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
         :value       @license
         :on-change   (fn [e]
@@ -614,7 +613,7 @@
                          (async/go
                            (async/<! (async/timeout timeout))
                            (async/>! filter-chan {:license ev}))))}]
-      [:input.fr-input.fr-col.fr-m-1w
+      [:input.fr-input.fr-col.fr-m-2w
        {:value       @language
         :placeholder (i/i lang [:language])
         :on-change   (fn [e]
@@ -636,7 +635,7 @@
        (for [x @platforms]
          ^{:key x}
          [:option {:value x} x])]
-      [:div.fr-checkbox-group.fr-col.fr-m-1w
+      [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#1 {:type      "checkbox" :name "1"
                   :on-change #(let [v (.-checked (.-target %))]
                                 (re-frame/dispatch [:filter! {:is-fork v}]))}]
@@ -644,27 +643,27 @@
         {:for   "1"
          :title (i/i lang [:only-fork-title])}
         (i/i lang [:only-fork])]]
-      [:div.fr-checkbox-group.fr-col.fr-m-1w
+      [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#2 {:type      "checkbox" :name "2"
                   :on-change #(let [v (.-checked (.-target %))]
                                 (re-frame/dispatch [:filter! {:is-licensed v}]))}]
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
-      [:div.fr-checkbox-group.fr-col.fr-m-1w
+      [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#4 {:type      "checkbox" :name "4"
                   :on-change #(let [v (.-checked (.-target %))]
                                 (re-frame/dispatch [:filter! {:is-template v}]))}]
        [:label.fr-label
         {:for "4" :title (i/i lang [:only-template-title])}
         (i/i lang [:only-template])]]
-      [:div.fr-checkbox-group.fr-col.fr-m-1w
+      [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#5 {:type      "checkbox" :name "5"
                   :on-change #(let [v (.-checked (.-target %))]
                                 (re-frame/dispatch [:filter! {:is-contrib v}]))}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
-      [:div.fr-checkbox-group.fr-col.fr-m-1w
+      [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#6 {:type      "checkbox" :name "6"
                   :on-change #(let [v (.-checked (.-target %))]
                                 (re-frame/dispatch [:filter! {:is-publiccode v}]))}]
@@ -841,7 +840,7 @@
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))
         mapping        (:orgas mappings)]
-    [:div.fr-grid
+    [:div
      [:div.fr-grid-row
       ;; RSS feed
       [:a.fr-raw-link.fr-link.fr-m-1w
@@ -881,7 +880,7 @@
 ;; Tags page
 
 (defn tags-page [lang]
-  [:div.fr-grid
+  [:div
    [:div.fr-grid-row
     ;; RSS feed
     [:a.fr-raw-link.fr-link.fr-m-1w
@@ -934,11 +933,11 @@
         ^{:key k}
         [:tr [:td k] [:td v]])]]]])
 
-(defn stats-tile [l i s]
-  [:div.fr-tile.fr-col-3
-   [:div.fr-tile__body
-    [:p.fr-tile__title (i/i l [i])]
-    [:div.fr-tile__desc [:p.fr-h4 s]]]])
+(defn stats-card [l i s]
+  [:div.fr-card.fr-col-4
+   [:div.fr-card__body
+    [:p.fr-card__title (i/i l [i])]
+    [:div.fr-card__desc [:p.fr-h4 s]]]])
 
 (defn stats-page
   [lang stats]
@@ -947,13 +946,13 @@
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages
                 top_forges top_ministries]} stats]
-    [:div
-     [:div.fr-grid-row.fr-grid-row--center
+    [:div.fr-grid
+     [:div.fr-grid-row.fr-grid-row--gutters
       {:style {:height "180px"}}
-      (stats-tile lang :Orgas orgas_cnt)
-      (stats-tile lang :repos-of-source-code repos_cnt)
-      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)]
-     [:div.fr-grid-row
+      (stats-card lang :Orgas orgas_cnt)
+      (stats-card lang :repos-of-source-code repos_cnt)
+      (stats-card lang :mean-repos-by-orga avg_repos_cnt)]
+     [:div.fr-grid-row.fr-grid-row--gutters
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
                     (top-clean-up-repos top_languages "language")
@@ -962,7 +961,7 @@
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
                     (top-clean-up-repos top_licenses "license")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:license])] [:th "%"]]])]]
-     [:div.fr-grid-row
+     [:div.fr-grid-row.fr-grid-row--gutters
       [:div.fr-col-6
        (stats-table [:span
                      (i/i lang [:Orgas])
@@ -979,7 +978,7 @@
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]
-     [:div.fr-grid-row
+     [:div.fr-grid-row.fr-grid-row--gutters
       [:div.fr-col-6
        (stats-table (i/i lang [:top-forges])
                     (top-clean-up-repos top_forges "platform")
