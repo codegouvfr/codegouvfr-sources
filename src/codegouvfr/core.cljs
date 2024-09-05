@@ -977,18 +977,7 @@
                      (i/i lang [:stars])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Stars])]]])]]
-     [:div.fr-grid-row.fr-grid-row--gutters
-      [:div.fr-col-6
-       (stats-table (i/i lang [:top-forges])
-                    (top-clean-up-repos top_forges "platform")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:forge])]
-                             [:th (i/i lang [:Repos])]]])]
-      [:div.fr-col-6
-       (stats-table (i/i lang [:top-ministries])
-                    (top-clean-up-orgas top_ministries "ministry")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:ministry])]
-                             [:th (i/i lang [:Repos])]]])]]]))
+                             [:th (i/i lang [:Stars])]]])]]]))
 
 (defn stats-page-class [lang]
   (let [stats (reagent/atom nil)]
