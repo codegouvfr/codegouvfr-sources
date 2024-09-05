@@ -945,7 +945,7 @@
   (let [{:keys [repos_cnt orgas_cnt ;; libs_cnt deps_cnt
                 avg_repos_cnt median_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
-                top_licenses top_languages top_topics
+                top_licenses top_languages
                 top_forges top_ministries]} stats]
     [:div
      [:div.fr-grid-row.fr-grid-row--center
