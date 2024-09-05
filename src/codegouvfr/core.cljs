@@ -943,7 +943,7 @@
 (defn stats-page
   [lang stats]
   (let [{:keys [repos_cnt orgas_cnt ;; libs_cnt deps_cnt
-                avg_repos_cnt median_repos_cnt
+                avg_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
                 top_licenses top_languages
                 top_forges top_ministries]} stats]
@@ -952,8 +952,7 @@
       {:style {:height "180px"}}
       (stats-tile lang :Orgas orgas_cnt)
       (stats-tile lang :repos-of-source-code repos_cnt)
-      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)
-      (stats-tile lang :median-repos-by-orga median_repos_cnt)]
+      (stats-tile lang :mean-repos-by-orga avg_repos_cnt)]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-languages])]
