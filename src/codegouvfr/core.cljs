@@ -960,22 +960,9 @@
                     (top-clean-up-repos top_languages "language")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:language])] [:th "%"]]])]
       [:div.fr-col-6
-       (stats-table
-        [:span (i/i lang [:topics])]
-        top_topics
-        [:thead [:tr [:th.fr-col-10 (i/i lang [:topics])]
-                 [:th (i/i lang [:occurrences])]]])]]
-     [:div.fr-grid-row
-      [:div.fr-col-6
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
                     (top-clean-up-repos top_licenses "license")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:license])] [:th "%"]]])]
-      [:div.fr-col-6
-       [:div.fr-m-3w
-        [:h4.fr-h4 (i/i lang [:most-used-identified-licenses])]
-        [:img {:src      "/data/top_licenses.svg" :width "100%"
-               :longdesc (i/i lang [:most-used-identified-licenses])
-               :alt      (i/i lang [:most-used-identified-licenses])}]]]]
+                    [:thead [:tr [:th.fr-col-10 (i/i lang [:license])] [:th "%"]]])]]
      [:div.fr-grid-row
       [:div.fr-col-6
        (stats-table [:span
