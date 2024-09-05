@@ -944,8 +944,7 @@
   (let [{:keys [repos_cnt orgas_cnt ;; libs_cnt deps_cnt
                 avg_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
-                top_licenses top_languages
-                top_forges top_ministries]} stats]
+                top_licenses top_languages]} stats]
     [:div.fr-grid
      [:div.fr-grid-row.fr-grid-row--gutters
       {:style {:height "180px"}}
@@ -977,18 +976,7 @@
                      (i/i lang [:stars])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Stars])]]])]]
-     [:div.fr-grid-row.fr-grid-row--gutters
-      [:div.fr-col-6
-       (stats-table (i/i lang [:top-forges])
-                    (top-clean-up-repos top_forges "platform")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:forge])]
-                             [:th (i/i lang [:Repos])]]])]
-      [:div.fr-col-6
-       (stats-table (i/i lang [:top-ministries])
-                    (top-clean-up-orgas top_ministries "ministry")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:ministry])]
-                             [:th (i/i lang [:Repos])]]])]]]))
+                             [:th (i/i lang [:Stars])]]])]]]))
 
 (defn stats-page-class [lang]
   (let [stats (reagent/atom nil)]
