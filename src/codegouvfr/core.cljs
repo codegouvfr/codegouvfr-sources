@@ -244,7 +244,7 @@
 (def awes (reagent/atom nil))
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
-(def tags (reagent/atom nil))
+(def releases (reagent/atom nil))
 (def ministries (filter not-empty (distinct (map :m @orgas))))
 
 (re-frame/reg-sub
@@ -877,48 +877,43 @@
      [orgas-table lang orgas-cnt]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
-;; Tags page
+;; Releases page
 
-(defn tags-page [lang]
+(defn releases-page [lang]
   [:div
    [:div.fr-grid-row
     ;; RSS feed
     [:a.fr-raw-link.fr-link.fr-m-1w
      {:title (i/i lang [:rss-feed])
-      :href  "/data/latest-tags.xml"}
+      :href  "/data/latest-releases.xml"}
      [:span.fr-icon-rss-line {:aria-hidden true}]]
     ;; General informations
-    (table-header lang @tags :tag)]
-   ;; Main tags display
+    (table-header lang @releases :tag)]
+   ;; Main releases display
    [:div.fr-table.fr-table--no-caption
     [:table
-     [:caption (i/i lang [:Tags])]
+     [:caption (i/i lang [:Releases])]
      [:thead.fr-grid.fr-col-12
       [:tr
        [:th.fr-col-1 (i/i lang [:Repo])]
        [:th.fr-col-2 (i/i lang [:description])]
-       [:th.fr-col-1 (i/i lang [:Tagname])]
+       [:th.fr-col-1 (i/i lang [:Releasename])]
        [:th.fr-col-1 (i/i lang [:update-short])]]]
      (into
       [:tbody]
-      (for [dd @tags]
+      (for [dd (reverse (sort-by :published_at @releases))]
         ^{:key dd}
-        (let [{:keys [repo_name repository title name date]} dd]
+        (let [{:keys [repo_name html_url body tag_name published_at]} dd]
           [:tr
            [:td
             [:a.fr-link
-             {:href   repository
+             {:href   html_url
               :target "_blank"
               :title  (i/i lang [:Repo])
               :rel    "noreferrer noopener"} repo_name]]
-           [:td title]
-           [:td
-            [:a.fr-link
-             {:href   (str repository "/releases/tag/" name)
-              :target "_blank"
-              :title  (i/i lang [:Tag])
-              :rel    "noreferrer noopener"} name]]
-           [:td (to-locale-date date lang)]])))]]])
+           [:td (subs body 0 100)]
+           [:td tag_name]
+           [:td (to-locale-date published_at lang)]])))]]])
 
 ;; Stats page
 
@@ -1078,10 +1073,10 @@
            (i/i lang [:Orgas])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
-           {:aria-current (when (= path "/tags") "page")
-            :title        (i/i lang [:Tags])
-            :href         "#/tags"}
-           (i/i lang [:Tags])]]
+           {:aria-current (when (= path "/releases") "page")
+            :title        (i/i lang [:Releases])
+            :href         "#/releases"}
+           (i/i lang [:Releases])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
@@ -1274,22 +1269,22 @@
       {:role "main"}
       [main-menu lang view]
       (condp = view
-        :home    [home-page lang]
-        :orgas   [orgas-page lang]
-        :repos   [repos-page-class lang license language]
-        :awes    [awes-page-class lang]
-        :stats   [stats-page-class lang]
-        :tags    [tags-page lang]
-        :legal   (condp = lang "fr" (inline-page "legal.fr.md")
-                        (inline-page "legal.en.md"))
-        :a11y    (condp = lang "fr" (inline-page "a11y.fr.md")
-                        (inline-page "a11y.en.md"))
-        :sitemap (condp = lang "fr" (inline-page "sitemap.fr.md")
-                        (inline-page "sitemap.en.md"))
-        :feeds   (condp = lang "fr" (inline-page "feeds.fr.md")
-                        (inline-page "feeds.en.md"))
-        :about   (condp = lang "fr" (inline-page "about.fr.md")
-                        (inline-page "about.en.md"))
+        :home     [home-page lang]
+        :orgas    [orgas-page lang]
+        :repos    [repos-page-class lang license language]
+        :awes     [awes-page-class lang]
+        :stats    [stats-page-class lang]
+        :releases [releases-page lang]
+        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
+                         (inline-page "legal.en.md"))
+        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
+                         (inline-page "a11y.en.md"))
+        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
+                         (inline-page "sitemap.en.md"))
+        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
+                         (inline-page "feeds.en.md"))
+        :about    (condp = lang "fr" (inline-page "about.fr.md")
+                         (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1303,9 +1298,9 @@
       (GET "/data/forges.csv"
            :handler
            #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
-      (GET "/data/tags.json"
+      (GET "/data/releases.json"
            :handler
-           #(reset! tags (map (comp bean clj->js) %)))
+           #(reset! releases (map (comp bean clj->js) %)))
       (GET "/data/owners.json"
            :handler
            #(reset! orgas (map (comp bean clj->js) %))))
@@ -1322,17 +1317,17 @@
     (set! (. js/document -title)
           (str title-prefix
                (condp = page
-                 :awes    "Awesome"
-                 :orgas   "Organisations ─ Organizations"
-                 :repos   "Dépôts de code source ─ Source code repositories"
-                 :home    title-default
-                 :legal   "Mentions légales ─ Legal mentions"
-                 :tags    "Versions"
-                 :stats   "Chiffres ─ Stats"
-                 :a11y    "Accessibilité ─ Accessibility"
-                 :feeds   "Flux RSS ─ RSS Feeds"
-                 :sitemap "Pages du site ─ Sitemap"
-                 :about   "À propos ─ About"
+                 :awes     "Awesome"
+                 :orgas    "Organisations ─ Organizations"
+                 :repos    "Dépôts de code source ─ Source code repositories"
+                 :home     title-default
+                 :legal    "Mentions légales ─ Legal mentions"
+                 :releases "Versions"
+                 :stats    "Chiffres ─ Stats"
+                 :a11y     "Accessibilité ─ Accessibility"
+                 :feeds    "Flux RSS ─ RSS Feeds"
+                 :sitemap  "Pages du site ─ Sitemap"
+                 :about    "À propos ─ About"
                  nil)))
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
@@ -1343,7 +1338,7 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["awesome" :awes]
-   ["tags" :tags]
+   ["releases" :releases]
    ["stats" :stats]
    ["legal" :legal]
    ["a11y" :a11y]
