@@ -722,7 +722,8 @@
       [:p.fr-callout__text
        [:span
         (i/i lang [:Awesome-callout])
-        " (" [:a {:href "/#/releases"} (i/i lang [:release-check-latest])] ")"]]]
+        " (" [:a {:href "#/releases"}
+              (i/i lang [:release-check-latest])] ")"]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
 
