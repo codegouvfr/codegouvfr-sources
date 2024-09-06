@@ -23,10 +23,10 @@
 
 ;; Defaults
 
-(defonce unix-epoch "1970-01-01T00:00:00Z")
-(defonce repos-per-page 100)
-(defonce orgas-per-page 20)
-(defonce timeout 100)
+(def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
+(def ^:const REPOS-PER-PAGE 100)
+(def ^:const ORGAS-PER-PAGE 20)
+(def ^:const TIMEOUT 100)
 
 ;; FIXME: Setting this here is a hack
 (def dp-filter (reagent/atom nil))
@@ -380,8 +380,8 @@
                  :repos (sort-by :r orgs)
                  :date  (sort
                          #(compare
-                           (js/Date. (.parse js/Date (or (:c %2) unix-epoch)))
-                           (js/Date. (.parse js/Date (or (:c %1) unix-epoch))))
+                           (js/Date. (.parse js/Date (or (:c %2) UNIX-EPOCH)))
+                           (js/Date. (.parse js/Date (or (:c %1) UNIX-EPOCH))))
                          orgs)
                  orgs)]
      (apply-orgas-filters
@@ -395,9 +395,9 @@
   (let [conf
         (condp = type
           :repos {:sub :repos-page? :evt      :repos-page!
-                  :cnt :repos?      :per-page repos-per-page}
+                  :cnt :repos?      :per-page REPOS-PER-PAGE}
           :orgas {:sub :orgas-page? :evt      :orgas-page!
-                  :cnt :orgas?      :per-page orgas-per-page})
+                  :cnt :orgas?      :per-page ORGAS-PER-PAGE})
         evt         (:evt conf)
         per-page    (:per-page conf)
         cnt         @(re-frame/subscribe [(:cnt conf)])
@@ -518,8 +518,8 @@
              :on-click #(re-frame/dispatch [:sort-repos-by! :score])}
             (i/i lang [:Score])]]]]
         (into [:tbody]
-              (for [dd (take repos-per-page
-                             (drop (* repos-per-page repos-page) repos))]
+              (for [dd (take REPOS-PER-PAGE
+                             (drop (* REPOS-PER-PAGE repos-page) repos))]
                 ^{:key dd}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
@@ -576,7 +576,7 @@
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
-        count-pages    (count (partition-all repos-per-page repos))
+        count-pages    (count (partition-all REPOS-PER-PAGE repos))
         f              @(re-frame/subscribe [:filter?])
         platform       (:platform f)
         first-disabled (zero? repos-pages)
@@ -611,7 +611,7 @@
                        (let [ev (.-value (.-target e))]
                          (reset! license ev)
                          (async/go
-                           (async/<! (async/timeout timeout))
+                           (async/<! (async/timeout TIMEOUT))
                            (async/>! filter-chan {:license ev}))))}]
       [:input.fr-input.fr-col.fr-m-2w
        {:value       @language
@@ -620,7 +620,7 @@
                        (let [ev (.-value (.-target e))]
                          (reset! language ev)
                          (async/go
-                           (async/<! (async/timeout timeout))
+                           (async/<! (async/timeout TIMEOUT))
                            (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
        {:value (or platform "")
@@ -629,7 +629,7 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:platform ev}])
             (async/go
-              (async/<! (async/timeout timeout))
+              (async/<! (async/timeout TIMEOUT))
               (async/>! filter-chan {:platform ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x @platforms]
@@ -767,8 +767,8 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
             (i/i lang [:created-at])]]]]
         (into [:tbody]
-              (for [dd (take orgas-per-page
-                             (drop (* orgas-per-page @(re-frame/subscribe [:orgas-page?]))
+              (for [dd (take ORGAS-PER-PAGE
+                             (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
                 ^{:key dd}
                 (let [{:keys [n        ; name
@@ -839,7 +839,7 @@
         ministry       (:ministry @(re-frame/subscribe [:filter?]))
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
-        count-pages    (count (partition-all orgas-per-page orgas))
+        count-pages    (count (partition-all ORGAS-PER-PAGE orgas))
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))
         mapping        (:orgas mappings)]
@@ -871,7 +871,7 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:ministry ev}])
             (async/go
-              (async/<! (async/timeout timeout))
+              (async/<! (async/timeout TIMEOUT))
               (async/>! filter-chan {:ministry ev}))))}
        [:option#default {:value ""} (i/i lang [:all-ministries])]
        (for [x @(re-frame/subscribe [:ministries?])]
@@ -1242,7 +1242,7 @@
                         (let [ev (.-value (.-target e))]
                           (reset! q ev)
                           (async/go
-                            (async/<! (async/timeout timeout))
+                            (async/<! (async/timeout TIMEOUT))
                             (async/>! filter-chan {:q ev}))))}])]
     (when-let [flt (-> @(re-frame/subscribe [:filter?])
                        (dissoc :is-fork :is-publiccode :is-contrib
@@ -1307,7 +1307,7 @@
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (set! (. js/document -title)
           (str title-prefix
-               (condp = page
+               (case page
                  :awes     "Awesome"
                  :orgas    "Organisations ─ Organizations"
                  :repos    "Dépôts de code source ─ Source code repositories"
