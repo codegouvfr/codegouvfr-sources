@@ -719,7 +719,10 @@
    [:div.fr-grid-row
     [:div.fr-col-12
      [:div.fr-callout
-      [:p.fr-callout__text (i/i lang [:Awesome-callout])]]
+      [:p.fr-callout__text
+       [:span
+        (i/i lang [:Awesome-callout])
+        " (" [:a {:href "/#/releases"} (i/i lang [:release-check-latest])] ")"]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
 
@@ -1070,12 +1073,6 @@
             :on-click
             #(do (reset-queries) (rfe/push-state :orgas {:lang lang}))}
            (i/i lang [:Orgas])]]
-         [:li.fr-nav__item
-          [:a.fr-nav__link
-           {:aria-current (when (= path "/releases") "page")
-            :title        (i/i lang [:Releases])
-            :href         "#/releases"}
-           (i/i lang [:Releases])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
