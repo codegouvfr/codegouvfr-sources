@@ -157,7 +157,7 @@
   [a b] (if a b true))
 
 (defn apply-repos-filters [m]
-  (let [{:keys [d q g language platform license
+  (let [{:keys [q g language platform license
                 is-template is-contrib is-publiccode
                 is-fork is-licensed]}
         @(re-frame/subscribe [:filter?])]
