@@ -376,11 +376,12 @@
    (let [orgs  @orgas
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos (sort-by :r orgs)
-                 :date  (sort
-                         #(compare
-                           (js/Date. (.parse js/Date (or (:c %2) UNIX-EPOCH)))
-                           (js/Date. (.parse js/Date (or (:c %1) UNIX-EPOCH))))
-                         orgs)
+                 :floss (sort-by :f orgs)
+                 ;; :date  (sort
+                 ;;         #(compare
+                 ;;           (js/Date. (.parse js/Date (or (:c %2) UNIX-EPOCH)))
+                 ;;           (js/Date. (.parse js/Date (or (:c %1) UNIX-EPOCH))))
+                 ;;         orgs)
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -766,9 +767,9 @@
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class    (when (= org-f :date) "fr-btn--secondary")
-             :title    (i/i lang [:sort-orgas-creation])
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :date])}
-            (i/i lang [:created-at])]]]]
+             :title    (i/i lang [:sort-orgas-floss-policy])
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :floss])}
+            (i/i lang [:floss])]]]]
         (into [:tbody]
               (for [dd (take ORGAS-PER-PAGE
                              (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
@@ -778,16 +779,13 @@
                               l        ; login
                               d        ; description
                               o        ; organization_url
-                              ;; FIXME: Where to use this?
                               h        ; website
-                              ;; FIXME: floss_policy missing?
                               f         ; floss_policy
                               ;; FIXME: used?
-                              p         ; platform
+                              ;; p         ; platform
                               au        ; avatar_url
-                              c         ; creation_date
                               r         ; repositories_count
-                              id        ; owner_url (data)
+                              id        ; owner_url (json data)
                               ]} dd]
                   [:tr
                    [:td (if au
@@ -818,24 +816,15 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos {:lang lang}
-                                          {:g (condp = p
-                                                "GitHub"    o
-                                                "SourceHut" (s/replace o "//" "//git.")
-                                                ;; FIXME: what's the rationale?
-                                                "GitLab"    (s/replace o "/groups/" "/")
-                                                o)})}
+                         :href  (rfe/href :repos {:lang lang} {:g o})}
                      r]]
                    [:td {:style {:text-align "center"}}
-                    (let [d (to-locale-date c lang)]
-                      (if (not-empty f)
-                        [:a
-                         {:target "new"
-                          :rel    "noreferrer noopener"
-                          :title  (new-tab (i/i lang [:floss-policy]) lang)
-                          :href   f}
-                         d]
-                        d))]])))]])))
+                    (when (not-empty f)
+                      [:a {:target "new"
+                           :rel    "noreferrer noopener"
+                           :title  (new-tab (i/i lang [:floss-policy]) lang)
+                           :href   f}
+                       (i/i lang [:floss])])]])))]])))
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
