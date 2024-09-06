@@ -4,8 +4,8 @@
             [markdown-to-hiccup.core :as md]))
 
 (defmacro inline-page [page]
-  [:div.fr-container.fr-grid.fr-grid--row
-   [:div.fr-col-10.fr-col-md-10
+  [:div.fr-container
+   [:div.fr-col-8.fr-col-md-8
     (->> (str "public/md/" page)
          io/resource
          slurp

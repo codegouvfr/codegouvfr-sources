@@ -27,7 +27,6 @@ Ce site est hébergé par OVH France, 2 rue Kellermann, 59100 Roubaix, France.  
 - *Person holding green and gold compass* © Mariah Hewines, licence [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
 - *White and black street sign* © Shawn Sim, licence [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
 </ul>
-<br>
 
 ## Code source
 

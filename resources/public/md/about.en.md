@@ -6,7 +6,7 @@ Many agencies already publish source code repositories : we are listing them on
 
 Source code bought or developed by public agencies are considered administrative documents, due to be opened as open data.
 
-### What is a "source code repository"?
+## What is a "source code repository"?
 
 The *source code* is the human-readable version of a computer program.  A *source code repository* is the set of files for a computer program.  All source code repositories listed on this website use Git as their versioning system.
 

@@ -6,7 +6,7 @@ De nombreux organismes publics publient les codes sources des logiciels qu'ils d
 
 La publication des codes sources correspond à une obligation légale : Tout code source obtenu ou développé par un organisme remplissant une mission de service public est considéré comme un document administratif, relevant des obligations de publication en open data.
 
-### Qu'est-ce qu'un « dépôt de code source » ?
+## Qu'est-ce qu'un « dépôt de code source » ?
 
 Le *code source* est la version lisible par un humain d'un programme informatique.  Un *dépôt de code source* est l'ensemble des fichiers d'un programme.  Tous les dépôts référencés sur ce site utilisent le logiciel de gestion de versions Git.
 
