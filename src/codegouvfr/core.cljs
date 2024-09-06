@@ -85,7 +85,7 @@
 (defn or-kwds [m ks]
   (first (remove nil? (map #(apply % [m]) ks))))
 
-(defn s-includes? [s sub]
+(defn s-includes? [^String s ^String sub]
   (when (and (string? s) (string? sub))
     (let [sub (-> sub
                   s/trim
@@ -182,7 +182,7 @@
                  (s/split (s/lower-case language) #" +"))
            true)
          (if (= platform "") true (s-includes? r platform))
-         (ntaf g (s-includes? r g))
+         (ntaf g (= (:o %) g))
          (ntaf q (s-includes? (s/join " " [n r o (:d %)]) q))))
      m)))
 
