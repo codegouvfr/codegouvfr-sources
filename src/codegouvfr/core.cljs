@@ -784,7 +784,6 @@
                               ;; FIXME: used?
                               ;; p         ; platform
                               au        ; avatar_url
-                              c         ; creation_date
                               r         ; repositories_count
                               id        ; owner_url (json data)
                               ]} dd]
