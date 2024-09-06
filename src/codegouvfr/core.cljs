@@ -362,11 +362,9 @@
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :forks (sort-by :f repos0)
                   :score (sort-by :a repos0)
-                  ;; FIXME: remove useless
-                  ;; :issues (sort-by :i repos0)
                   :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                           (js/Date. (.parse js/Date (:u %2))))
-                                 repos0)
+                                         (js/Date. (.parse js/Date (:u %2))))
+                               repos0)
                   repos0)]
      (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
                             repos
@@ -949,17 +947,17 @@
       (stats-card lang :Orgas orgas_cnt)
       (stats-card lang :repos-of-source-code repos_cnt)
       (stats-card lang :mean-repos-by-orga avg_repos_cnt)]
-     [:div.fr-grid-row.fr-grid-row--gutters
-      [:div.fr-col-6
+     [:div.fr-grid-row
+      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span (i/i lang [:most-used-languages])]
                     (top-clean-up-repos top_languages "language")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:language])] [:th "%"]]])]
-      [:div.fr-col-6
+      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span (i/i lang [:most-used-identified-licenses])]
                     (top-clean-up-repos top_licenses "license")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:license])] [:th "%"]]])]]
-     [:div.fr-grid-row.fr-grid-row--gutters
-      [:div.fr-col-6
+     [:div.fr-grid-row
+      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
                      (i/i lang [:Orgas])
                      (i/i lang [:with-more-of])
@@ -967,11 +965,8 @@
                     (top-clean-up-orgas top_orgs_by_repos "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Repos])]]])]
-      [:div.fr-col-6
-       (stats-table [:span
-                     (i/i lang [:Orgas])
-                     (i/i lang [:with-more-of*])
-                     (i/i lang [:stars])]
+      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
+       (stats-table [:span (i/i lang [:most-starred-orgas])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]]))
