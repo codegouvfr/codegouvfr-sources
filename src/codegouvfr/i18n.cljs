@@ -14,7 +14,9 @@
   {:fr
    {
     :About                         "À propos"
+    :Awesome                       "Awesome code.gouv.fr"
     :Awesome-callout               "Logiciels libres remarquables activement développés et financés par des organismes publics "
+    :Awesome-title                 "Les projets open source remarquables de l'administration"
     :Loading                       "Chargement..."
     :Orgas                         "Organisations"
     :Releasename                   "Nom de la version"
@@ -135,7 +137,9 @@
    :en
    {
     :About                         "About"
+    :Awesome                       "Awesome code.gouv.fr"
     :Awesome-callout               "Awesome open source projects actively maintained and funded by public sector organizations"
+    :Awesome-title                 "Awesome open source projects from the French public sector"
     :Loading                       "Loading..."
     :Orgas                         "Organizations"
     :Releasename                   "Release name"

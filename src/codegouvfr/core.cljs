@@ -446,6 +446,17 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
+        {:href  "#/awesome"
+         :title (i/i lang [:Awesome-title])}
+        (i/i lang [:Awesome])]]
+      [:div.fr-card__desc (i/i lang [:Awesome-callout])]]
+     [:div.fr-card__img.fr-col-3
+      [:img.fr-responsive-img {:src "./img/awesome.jpg" :alt ""}]]]]
+   [:div.fr-col-6.fr-p-2w
+    [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
+     [:div.fr-card__body
+      [:div.fr-card__title
+       [:a.fr-card__link
         {:href  "#/repos"
          :title (i/i lang [:repos-of-source-code])}
         (i/i lang [:Repos])]]
@@ -471,13 +482,7 @@
         {:href  "#/stats"
          :title (i/i lang [:stats-expand])}
         (i/i lang [:Stats])]]
-      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]
-   [:div.fr-col-6.fr-p-2w
-    [:div.fr-card.fr-enlarge-link
-     [:div.fr-card__body
-      [:div.fr-card__title
-       [:a.fr-card__link {:href "#/about"} (i/i lang [:About])]]
-      [:div.fr-card__desc  (i/i lang [:home-about-desc])]]]]])
+      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]])
 
 ;; Main structure - repos
 
