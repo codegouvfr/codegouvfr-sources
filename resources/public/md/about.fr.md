@@ -30,6 +30,8 @@ Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses
 
 * La liste des organisations en [json](/data/owners.json).
 * La liste des dépôts en [json](/data/repositories.json).
+* La liste des projets Awesome en [json](/data/awesome.json).
+* La liste des versions de projets Awesome en [json](/data/releases.json).
 
 ## Comment suivre les mises à jour ?
 
