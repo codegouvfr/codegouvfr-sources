@@ -26,7 +26,6 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 - *Person holding green and gold compass* © Mariah Hewines, license [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
 - *White and black street sign* © Shawn Sim, license [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
 </ul>
-<br>
 
 ## Source code
 
