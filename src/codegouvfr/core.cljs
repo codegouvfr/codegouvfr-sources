@@ -26,10 +26,7 @@
 (def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
-(def ^:const TIMEOUT 100)
-
-;; FIXME: Setting this here is a hack
-(def dp-filter (reagent/atom nil))
+(def ^:const TIMEOUT 200)
 
 (defonce init-filter
   {:d        nil
@@ -170,7 +167,6 @@
             t (:t? %)
             r (str o "/" n)]
         (and
-         (if (and d @dp-filter) (some @dp-filter [r]) true)
          (ntaf is-fork (:f? %))
          (ntaf is-contrib (:c? %))
          (ntaf is-publiccode (:p? %))
@@ -245,7 +241,6 @@
 (def orgas (reagent/atom nil))
 (def platforms (reagent/atom nil))
 (def releases (reagent/atom nil))
-(def ministries (filter not-empty (distinct (map :m @orgas))))
 
 (re-frame/reg-sub
  :ministries?
@@ -267,9 +262,6 @@
 (re-frame/reg-event-db
  :filter!
  (fn [db [_ s]]
-   ;; FIXME: Necessary?
-   (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:orgas-page! 0])
    (update-in db [:filter] merge s)))
 
 (re-frame/reg-event-db
@@ -610,7 +602,7 @@
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
-        :value       @license
+        :value       (or @license (:license @(re-frame/subscribe [:filter?])))
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
                          (reset! license ev)
@@ -618,7 +610,7 @@
                            (async/<! (async/timeout TIMEOUT))
                            (async/>! filter-chan {:license ev}))))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:value       @language
+       {:value       (or @language (:language @(re-frame/subscribe [:filter?])))
         :placeholder (i/i lang [:language])
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
@@ -781,8 +773,6 @@
                               o        ; organization_url
                               h        ; website
                               f         ; floss_policy
-                              ;; FIXME: used?
-                              ;; p         ; platform
                               au        ; avatar_url
                               r         ; repositories_count
                               id        ; owner_url (json data)
@@ -985,7 +975,6 @@
   (reset! q nil)
   (reset! license nil)
   (reset! language nil)
-  (reset! dp-filter nil)
   (re-frame/dispatch [:filter! {:q "" :license "" :language ""}]))
 
 (defn banner [lang]
@@ -1226,7 +1215,7 @@
        [:input.fr-input
         {:placeholder (i/i lang [:free-search])
          :aria-label  (i/i lang [:free-search])
-         :value       @q
+         :value       (or @q (:q @(re-frame/subscribe [:filter?])))
          :on-change   (fn [e]
                         (let [ev (.-value (.-target e))]
                           (reset! q ev)
