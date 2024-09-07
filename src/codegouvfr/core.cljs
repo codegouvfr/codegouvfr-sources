@@ -196,16 +196,19 @@
      :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
     [:span ff]]])
 
+(defn not-empty-string-or-true [[_ v]]
+  (or (and (boolean? v) (true? v))
+      (and (string? v) (not-empty v))))
+
 (defn start-filter-loop []
   (async/go
     (loop [f (async/<! filter-chan)]
       (let [v  @(re-frame/subscribe [:view?])
             l  @(re-frame/subscribe [:lang?])
             fs @(re-frame/subscribe [:filter?])]
-        (rfe/push-state v {:lang l}
-                        (filter #(and (string? (val %))
-                                      (not-empty (val %)))
-                                (merge fs f))))
+        (rfe/push-state
+         v {:lang l}
+         (filter not-empty-string-or-true (merge fs f))))
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
 
@@ -615,7 +618,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:forge ev}])
             (async/go
-              (async/<! (async/timeout TIMEOUT))
               (async/>! filter-chan {:forge ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x @platforms]
@@ -623,29 +625,45 @@
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#1 {:type      "checkbox" :name "1"
-                  :on-change #(let [v (.-checked (.-target %))]
-                                (re-frame/dispatch [:filter! {:is-fork v}]))}]
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-checked (.-target e))]
+                      (re-frame/dispatch [:filter! {:is-fork ev}])
+                      (async/go
+                        (async/>! filter-chan {:is-fork ev}))))}]
        [:label.fr-label
         {:for   "1"
          :title (i/i lang [:only-fork-title])}
         (i/i lang [:only-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#2 {:type      "checkbox" :name "2"
-                  :on-change #(let [v (.-checked (.-target %))]
-                                (re-frame/dispatch [:filter! {:is-licensed v}]))}]
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-checked (.-target e))]
+                      (re-frame/dispatch [:filter! {:is-licensed ev}])
+                      (async/go
+                        (async/>! filter-chan {:is-licensed ev}))))}]
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#4 {:type      "checkbox" :name "4"
-                  :on-change #(let [v (.-checked (.-target %))]
-                                (re-frame/dispatch [:filter! {:is-template v}]))}]
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-checked (.-target e))]
+                      (re-frame/dispatch [:filter! {:is-template ev}])
+                      (async/go
+                        (async/>! filter-chan {:is-template ev}))))}]
        [:label.fr-label
         {:for "4" :title (i/i lang [:only-template-title])}
         (i/i lang [:only-template])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#5 {:type      "checkbox" :name "5"
-                  :on-change #(let [v (.-checked (.-target %))]
-                                (re-frame/dispatch [:filter! {:is-contrib v}]))}]
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-checked (.-target e))]
+                      (re-frame/dispatch [:filter! {:is-contrib ev}])
+                      (async/go
+                        (async/>! filter-chan {:is-contrib ev}))))}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
@@ -656,11 +674,7 @@
                     (let [ev (.-checked (.-target e))]
                       (re-frame/dispatch [:filter! {:is-publiccode ev}])
                       (async/go
-                        (async/<! (async/timeout TIMEOUT))
-                        (async/>! filter-chan {:is-publiccode ev}))))
-                  ;; #(let [v (.-checked (.-target %))]
-                  ;;    (re-frame/dispatch [:filter! {:is-publiccode v}]))
-                  }]
+                        (async/>! filter-chan {:is-publiccode ev}))))}]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
@@ -851,7 +865,6 @@
           (let [ev (.-value (.-target e))]
             (re-frame/dispatch [:filter! {:ministry ev}])
             (async/go
-              (async/<! (async/timeout TIMEOUT))
               (async/>! filter-chan {:ministry ev}))))}
        [:option#default {:value ""} (i/i lang [:all-ministries])]
        (for [x @(re-frame/subscribe [:ministries?])]
