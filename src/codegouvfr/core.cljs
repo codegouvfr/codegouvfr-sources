@@ -688,7 +688,7 @@
    [:div.fr-grid-row.fr-grid-row--gutters]
    (for [dd (shuffle @awes)]
      ^{:key dd}
-     (let [{:keys [name url logo legal lastUpdated description fundedBy]}
+     (let [{:keys [name url logo legal description fundedBy]}
            dd
            desc (:shortDescription (get description (keyword lang)))]
        [:div.fr-col-12.fr-col-md-3
