@@ -161,17 +161,17 @@
 
 (defn apply-repos-filters [m]
   (let [{:keys [q g language forge license
-                is-template is-contrib is-publiccode
-                is-fork is-licensed]}
+                template with-contributing with-publiccode
+                fork floss]}
         @(re-frame/subscribe [:filter?])]
     (->> m (filter
             #(let [o (:o %) n (:n %) t (:t? %) r (str o "/" n)]
                (and
-                (if-a-b-else-true is-fork (:f? %))
-                (if-a-b-else-true is-contrib (:c? %))
-                (if-a-b-else-true is-publiccode (:p? %))
-                (if-a-b-else-true is-template t)
-                (if-a-b-else-true is-licensed (let [l (:li %)] (and l (not= l "Other"))))
+                (if-a-b-else-true fork (:f? %))
+                (if-a-b-else-true with-contributing (:c? %))
+                (if-a-b-else-true with-publiccode (:p? %))
+                (if-a-b-else-true template t)
+                (if-a-b-else-true floss (let [l (:li %)] (and l (not= l "Other"))))
                 (if-a-b-else-true license (s-includes? (:li %) license))
                 (if language
                   (some (into #{} (list (s/lower-case (or (:l %) ""))))
@@ -628,9 +628,9 @@
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:is-fork ev}])
+                      (re-frame/dispatch [:filter! {:fork ev}])
                       (async/go
-                        (async/>! filter-chan {:is-fork ev}))))}]
+                        (async/>! filter-chan {:fork ev}))))}]
        [:label.fr-label
         {:for   "1"
          :title (i/i lang [:only-fork-title])}
@@ -640,9 +640,9 @@
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:is-licensed ev}])
+                      (re-frame/dispatch [:filter! {:floss ev}])
                       (async/go
-                        (async/>! filter-chan {:is-licensed ev}))))}]
+                        (async/>! filter-chan {:floss ev}))))}]
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
@@ -650,9 +650,9 @@
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:is-template ev}])
+                      (re-frame/dispatch [:filter! {:template ev}])
                       (async/go
-                        (async/>! filter-chan {:is-template ev}))))}]
+                        (async/>! filter-chan {:template ev}))))}]
        [:label.fr-label
         {:for "4" :title (i/i lang [:only-template-title])}
         (i/i lang [:only-template])]]
@@ -661,9 +661,9 @@
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:is-contrib ev}])
+                      (re-frame/dispatch [:filter! {:with-contributing ev}])
                       (async/go
-                        (async/>! filter-chan {:is-contrib ev}))))}]
+                        (async/>! filter-chan {:with-contributing ev}))))}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
@@ -672,9 +672,9 @@
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:is-publiccode ev}])
+                      (re-frame/dispatch [:filter! {:with-publiccode ev}])
                       (async/go
-                        (async/>! filter-chan {:is-publiccode ev}))))}]
+                        (async/>! filter-chan {:with-publiccode ev}))))}]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
@@ -1236,8 +1236,8 @@
                             (async/<! (async/timeout TIMEOUT))
                             (async/>! filter-chan {:q ev}))))}])]
     (when-let [flt (-> @(re-frame/subscribe [:filter?])
-                       (dissoc :is-fork :is-publiccode :is-contrib
-                               :is-template :is-licensed :is-esr))]
+                       (dissoc :fork :with-publiccode :with-contributing
+                               :template :floss))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:g flt))]
          (close-filter-button lang ff :repos (merge flt {:g nil})))])]])
