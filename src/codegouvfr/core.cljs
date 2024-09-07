@@ -28,9 +28,9 @@
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const TIMEOUT 200)
 
-(defonce init-filter
-  {:d        nil
-   :g        nil
+(def init-filter
+  {:q        nil
+   :group    nil
    :license  nil
    :language nil
    :forge    ""
@@ -160,7 +160,7 @@
   (if a b true))
 
 (defn apply-repos-filters [m]
-  (let [{:keys [q g language forge license
+  (let [{:keys [q group language forge license
                 template with-contributing with-publiccode
                 fork floss]}
         @(re-frame/subscribe [:filter?])]
@@ -178,7 +178,7 @@
                         (s/split (s/lower-case language) #" +"))
                   true)
                 (if (= forge "") true (s-includes? r forge))
-                (if-a-b-else-true g (= (:o %) g))
+                (if-a-b-else-true group (= (:o %) group))
                 (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
 
 (defn apply-orgas-filters [m]
@@ -540,7 +540,7 @@
                                     (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]]]
                    [:td [:a.fr-raw-link.fr-link
-                         {:href  (rfe/href :repos {:lang lang} {:g group})
+                         {:href  (rfe/href :repos {:lang lang} {:group group})
                           :title (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    ;; Description
@@ -624,7 +624,7 @@
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#1 {:type      "checkbox" :name "1"
+       [:input#1 {:type "checkbox" :name "1"
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
@@ -636,7 +636,7 @@
          :title (i/i lang [:only-fork-title])}
         (i/i lang [:only-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#2 {:type      "checkbox" :name "2"
+       [:input#2 {:type "checkbox" :name "2"
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
@@ -646,7 +646,7 @@
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#4 {:type      "checkbox" :name "4"
+       [:input#4 {:type "checkbox" :name "4"
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
@@ -657,7 +657,7 @@
         {:for "4" :title (i/i lang [:only-template-title])}
         (i/i lang [:only-template])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#5 {:type      "checkbox" :name "5"
+       [:input#5 {:type "checkbox" :name "5"
                   :on-change
                   (fn [e]
                     (let [ev (.-checked (.-target e))]
@@ -818,7 +818,7 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos {:lang lang} {:g o})}
+                         :href  (rfe/href :repos {:lang lang} {:group o})}
                      r]]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
@@ -1239,8 +1239,8 @@
                        (dissoc :fork :with-publiccode :with-contributing
                                :template :floss))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
-       (when-let [ff (not-empty (:g flt))]
-         (close-filter-button lang ff :repos (merge flt {:g nil})))])]])
+       (when-let [ff (not-empty (:group flt))]
+         (close-filter-button lang ff :repos (merge flt {:group nil})))])]])
 
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
