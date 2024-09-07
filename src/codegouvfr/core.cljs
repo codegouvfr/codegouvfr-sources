@@ -33,7 +33,7 @@
    :g        nil
    :license  nil
    :language nil
-   :platform ""
+   :forge    ""
    :ministry ""})
 
 (defonce urls
@@ -160,7 +160,7 @@
   (if a b true))
 
 (defn apply-repos-filters [m]
-  (let [{:keys [q g language platform license
+  (let [{:keys [q g language forge license
                 is-template is-contrib is-publiccode
                 is-fork is-licensed]}
         @(re-frame/subscribe [:filter?])]
@@ -177,7 +177,7 @@
                   (some (into #{} (list (s/lower-case (or (:l %) ""))))
                         (s/split (s/lower-case language) #" +"))
                   true)
-                (if (= platform "") true (s-includes? r platform))
+                (if (= forge "") true (s-includes? r forge))
                 (if-a-b-else-true g (= (:o %) g))
                 (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
 
@@ -564,7 +564,7 @@
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all REPOS-PER-PAGE repos))
         f              @(re-frame/subscribe [:filter?])
-        platform       (:platform f)
+        forge          (:forge f)
         first-disabled (zero? repos-pages)
         last-disabled  (= repos-pages (dec count-pages))
         mapping        (:repos mappings)]
@@ -609,14 +609,14 @@
                            (async/<! (async/timeout TIMEOUT))
                            (async/>! filter-chan {:language ev}))))}]
       [:select.fr-select.fr-col-3
-       {:value (or platform "")
+       {:value (or forge "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
-            (re-frame/dispatch [:filter! {:platform ev}])
+            (re-frame/dispatch [:filter! {:forge ev}])
             (async/go
               (async/<! (async/timeout TIMEOUT))
-              (async/>! filter-chan {:platform ev}))))}
+              (async/>! filter-chan {:forge ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x @platforms]
          ^{:key x}
@@ -650,9 +650,17 @@
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#6 {:type      "checkbox" :name "6"
-                  :on-change #(let [v (.-checked (.-target %))]
-                                (re-frame/dispatch [:filter! {:is-publiccode v}]))}]
+       [:input#6 {:type "checkbox" :name "6"
+                  :on-change
+                  (fn [e]
+                    (let [ev (.-checked (.-target e))]
+                      (re-frame/dispatch [:filter! {:is-publiccode ev}])
+                      (async/go
+                        (async/<! (async/timeout TIMEOUT))
+                        (async/>! filter-chan {:is-publiccode ev}))))
+                  ;; #(let [v (.-checked (.-target %))]
+                  ;;    (re-frame/dispatch [:filter! {:is-publiccode v}]))
+                  }]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
@@ -960,13 +968,14 @@
 (def q (reagent/atom nil))
 (def license (reagent/atom nil))
 (def language (reagent/atom nil))
+(def forge (reagent/atom nil))
 
 (defn reset-queries []
   (reset! q nil)
   (reset! license nil)
   (reset! language nil)
-  (reset! platforms "")
-  (re-frame/dispatch [:filter! {:q "" :license "" :language "" :platforms ""}]))
+  (reset! forge "")
+  (re-frame/dispatch [:filter! {:q "" :license "" :language "" :forge ""}]))
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
