@@ -1327,7 +1327,7 @@
     (rfe/start!
      (rf/router routes {:conflicts nil})
      on-navigate
-     {:use-fragment true})
+     {:use-fragment false})
     (start-filter-loop)
     (reagent.dom/render
      [main-class]
