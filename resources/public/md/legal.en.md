@@ -22,7 +22,7 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 - *Mechanical Keyboard with dsa keycaps* © Jay Zhang , license [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
 - *Free Turkey Image* © Igor Savelev, license [Unsplash](https://unsplash.com/photos/6yQ-iSQdpcQ)
 - *Colorful glass windows photo* © Max Williams, license [Unsplash](https://unsplash.com/photos/dtYGcdagOm0)
-</ul>
+- *Graph on blue background* © Алекс Арцибашев, licence [Unsplash](https://unsplash.com/photos/vVHXeu0YNbk) </ul>
 
 ## Source code
 

@@ -468,14 +468,16 @@
      [:div.fr-card__img.fr-col-3
       [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
-    [:div.fr-card.fr-enlarge-link
+    [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
         {:href  (rfe/href :stats {:lang lang})
          :title (i/i lang [:stats-expand])}
         (i/i lang [:Stats])]]
-      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]])
+      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]
+     [:div.fr-card__img.fr-col-3
+      [:img.fr-responsive-img {:src "./img/stats.jpg" :alt ""}]]]]])
 
 ;; Main structure - repos
 
