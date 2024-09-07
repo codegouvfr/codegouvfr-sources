@@ -93,8 +93,10 @@
                   (s/replace #"(?i)[æàâa]" "[æàâa]")
                   (s/replace #"(?i)[œöôo]" "[œöôo]")
                   (s/replace #"(?i)[çc]" "[çc]")
-                  (s/replace #"(?i)[ûùu]" "[ûùu]"))]
-      (re-find (re-pattern (s/lower-case sub)) (s/lower-case s)))))
+                  (s/replace #"(?i)[ûùu]" "[ûùu]")
+                  s/lower-case
+                  re-pattern)]
+      (re-find sub (s/lower-case s)))))
 
 (defn vec-to-csv-string [data]
   (->> data
@@ -107,12 +109,12 @@
   [data file-name]
   (let [data-string (-> data sc/vectorize vec-to-csv-string)
         data-blob   (js/Blob. #js [data-string] #js {:type "text/csv"})
-        link        (js/document.createElement "a")]
-    (set! (.-href link) (js/URL.createObjectURL data-blob))
-    (.setAttribute link "download" file-name)
-    (js/document.body.appendChild link)
+        link        (doto (js/document.createElement "a")
+                      (-> .-href (set! (js/URL.createObjectURL data-blob)))
+                      (.setAttribute "download" file-name))]
+    (-> js/document .-body (.appendChild link))
     (.click link)
-    (js/document.body.removeChild link)))
+    (-> js/document .-body (.removeChild link))))
 
 (defn top-clean-up-repos [data param]
   (let [total (reduce + (map last data))]
@@ -152,54 +154,40 @@
 
 ;; Filters
 
-(defn ntaf
+(defn if-a-b-else-true
   "Not a true and b false."
-  [a b] (if a b true))
+  [a b]
+  (if a b true))
 
 (defn apply-repos-filters [m]
   (let [{:keys [q g language platform license
                 is-template is-contrib is-publiccode
                 is-fork is-licensed]}
         @(re-frame/subscribe [:filter?])]
-    (filter
-     #(let [o (:o %)
-            n (:n %)
-            t (:t? %)
-            r (str o "/" n)]
-        (and
-         (ntaf is-fork (:f? %))
-         (ntaf is-contrib (:c? %))
-         (ntaf is-publiccode (:p? %))
-         (ntaf is-template t)
-         (ntaf is-licensed (let [l (:li %)] (and l (not= l "Other"))))
-         (ntaf license (s-includes? (:li %) license))
-         (if language
-           (some (into #{} (list (s/lower-case (or (:l %) ""))))
-                 (s/split (s/lower-case language) #" +"))
-           true)
-         (if (= platform "") true (s-includes? r platform))
-         (ntaf g (= (:o %) g))
-         (ntaf q (s-includes? (s/join " " [n r o (:d %)]) q))))
-     m)))
+    (->> m (filter
+            #(let [o (:o %) n (:n %) t (:t? %) r (str o "/" n)]
+               (and
+                (if-a-b-else-true is-fork (:f? %))
+                (if-a-b-else-true is-contrib (:c? %))
+                (if-a-b-else-true is-publiccode (:p? %))
+                (if-a-b-else-true is-template t)
+                (if-a-b-else-true is-licensed (let [l (:li %)] (and l (not= l "Other"))))
+                (if-a-b-else-true license (s-includes? (:li %) license))
+                (if language
+                  (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                        (s/split (s/lower-case language) #" +"))
+                  true)
+                (if (= platform "") true (s-includes? r platform))
+                (if-a-b-else-true g (= (:o %) g))
+                (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
 
 (defn apply-orgas-filters [m]
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
-    (filter
-     #(and (ntaf q (s-includes? (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %) (:pso %)]) q))
-           (if (= ministry "") true (= (:m %) ministry)))
-     m)))
-
-(defn apply-sill-filters [m]
-  (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
-    (filter
-     #(ntaf q (s-includes? (s/join " " [(:n %) (:f %) (:t %)]) q))
-     m)))
-
-(defn apply-papillon-filters [m]
-  (let [{:keys [q]} @(re-frame/subscribe [:filter?])]
-    (filter
-     #(ntaf q (s-includes? (s/join " " [(:n %) (:a %) (:d %)]) q))
-     m)))
+    (->> m (filter
+            #(and (if-a-b-else-true q
+                    (s-includes?
+                     (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %) (:pso %)]) q))
+                  (if (= ministry "") true (= (:m %) ministry)))))))
 
 (defn close-filter-button [lang ff t reinit]
   [:span
@@ -516,9 +504,9 @@
              :on-click #(re-frame/dispatch [:sort-repos-by! :score])}
             (i/i lang [:Score])]]]]
         (into [:tbody]
-              (for [dd (take REPOS-PER-PAGE
-                             (drop (* REPOS-PER-PAGE repos-page) repos))]
-                ^{:key dd}
+              (for [repo (take REPOS-PER-PAGE
+                               (drop (* REPOS-PER-PAGE repos-page) repos))]
+                ^{:key (str (:o repo) "/" (:n repo))}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
                               a                  ; codegouvfr "awesome" score
@@ -528,7 +516,7 @@
                               o                  ; organization_name
                               u                  ; last_update
                               p                  ; forge
-                              ]} dd
+                              ]} repo
                       r          (str o "/" n)
                       group      (subs r 0 (- (count r) (inc (count n))))]
                   [:tr
@@ -689,7 +677,7 @@
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
    (for [dd (shuffle @awes)]
-     ^{:key dd}
+     ^{:key (:name dd)}
      (let [{:keys [name url logo legal description fundedBy]}
            dd
            desc (:shortDescription (get description (keyword lang)))]
@@ -768,7 +756,7 @@
               (for [dd (take ORGAS-PER-PAGE
                              (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
                                    orgas))]
-                ^{:key dd}
+                ^{:key (:l dd)}
                 (let [{:keys [n        ; name
                               l        ; login
                               d        ; description
@@ -888,9 +876,9 @@
        [:th.fr-col-1 (i/i lang [:update-short])]]]
      (into
       [:tbody]
-      (for [dd (reverse (sort-by :published_at @releases))]
-        ^{:key dd}
-        (let [{:keys [repo_name html_url body tag_name published_at]} dd]
+      (for [release (reverse (sort-by :published_at @releases))]
+        ^{:key (:html_url release)}
+        (let [{:keys [repo_name html_url body tag_name published_at]} release]
           [:tr
            [:td
             [:a.fr-link
@@ -977,7 +965,8 @@
   (reset! q nil)
   (reset! license nil)
   (reset! language nil)
-  (re-frame/dispatch [:filter! {:q "" :license "" :language ""}]))
+  (reset! platforms "")
+  (re-frame/dispatch [:filter! {:q "" :license "" :language "" :platforms ""}]))
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
