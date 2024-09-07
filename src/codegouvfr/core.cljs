@@ -700,8 +700,7 @@
           [:div.fr-card__content
            [:div.fr-card__start
             [:ul.fr-tags-group
-             [:li [:p.fr-tag (str (i/i lang [:license]) ": " (:license legal))]]
-             [:li [:p.fr-tag (str (i/i lang [:update-short]) ": " lastUpdated)]]]]
+             [:li [:p.fr-tag (str (i/i lang [:license]) ": " (:license legal))]]]]
            [:h3.fr-card__title
             [:a {:href url} name]]
            [:p.fr-card__desc desc]
