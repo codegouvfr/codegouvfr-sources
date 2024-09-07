@@ -6,7 +6,7 @@
   (:require [cljs.core.async :as async]
             [re-frame.core :as re-frame]
             [reagent.core :as reagent]
-            [reagent.dom]
+            [reagent.dom.client :as rdc]
             [cljs-bean.core :refer [bean]]
             [clojure.browser.dom :as dom]
             [goog.string :as gstring]
@@ -230,6 +230,7 @@
 (def repos (reagent/atom nil))
 (def awes (reagent/atom nil))
 (def orgas (reagent/atom nil))
+(def stats (reagent/atom nil))
 (def platforms (reagent/atom nil))
 (def releases (reagent/atom nil))
 
@@ -683,15 +684,11 @@
      ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
-(defn repos-page-class [lang license language]
-  (reagent/create-class
-   {:display-name   "repos-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/repositories.json"
-           :handler
-           #(reset! repos (map (comp bean clj->js) %))))
-    :reagent-render (fn [] (repos-page lang license language))}))
+(defn repos-page-main [lang license language]
+  (fn []
+    (GET "/data/repositories.json"
+         :handler #(reset! repos (map (comp bean clj->js) %)))
+    (repos-page lang license language)))
 
 ;; Main structure - awesome
 
@@ -734,16 +731,6 @@
               (i/i lang [:release-check-latest])] ")"]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
-
-(defn awes-page-class [lang]
-  (reagent/create-class
-   {:display-name   "awes-page-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/awesome-codegouvfr.json"
-           :handler
-           #(reset! awes (walk/keywordize-keys %))))
-    :reagent-render (fn [] (awes-page lang))}))
 
 ;; Main structure - orgas
 
@@ -930,8 +917,7 @@
     [:p.fr-card__title (i/i l [i])]
     [:div.fr-card__desc [:p.fr-h4 s]]]])
 
-(defn stats-page
-  [lang stats]
+(defn stats-page [lang stats]
   (let [{:keys [repos_cnt orgas_cnt ;; libs_cnt deps_cnt
                 avg_repos_cnt
                 top_orgs_by_repos top_orgs_by_stars
@@ -965,16 +951,6 @@
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]]))
-
-(defn stats-page-class [lang]
-  (let [stats (reagent/atom nil)]
-    (reagent/create-class
-     {:display-name   "stats-page-class"
-      :component-did-mount
-      (fn []
-        (GET "/data/stats.json"
-             :handler #(reset! stats (walk/keywordize-keys %))))
-      :reagent-render (fn [] (stats-page lang @stats))})))
 
 ;; Main structure elements
 
@@ -1242,6 +1218,12 @@
        (when-let [ff (not-empty (:group flt))]
          (close-filter-button lang ff :repos (merge flt {:group nil})))])]])
 
+(defn orgas-page-main [lang]
+  (fn []
+    (GET "/data/owners.json"
+         :handler #(reset! orgas (map (comp bean clj->js) %)))
+    (orgas-page lang)))
+
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
@@ -1252,11 +1234,11 @@
       [main-menu lang view]
       (condp = view
         :home     [home-page lang]
-        :orgas    [orgas-page lang]
-        :repos    [repos-page-class lang license language]
-        :awes     [awes-page-class lang]
-        :stats    [stats-page-class lang]
+        :orgas    [orgas-page-main lang]
+        :repos    [repos-page-main lang license language]
         :releases [releases-page lang]
+        :awes     [awes-page lang]
+        :stats    [stats-page lang @stats]
         :legal    (condp = lang "fr" (inline-page "legal.fr.md")
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
@@ -1271,22 +1253,6 @@
      (subscribe lang)
      (footer lang)
      (display-parameters-modal lang)]))
-
-(defn main-class []
-  (reagent/create-class
-   {:display-name   "main-class"
-    :component-did-mount
-    (fn []
-      (GET "/data/forges.csv"
-           :handler
-           #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
-      (GET "/data/releases.json"
-           :handler
-           #(reset! releases (map (comp bean clj->js) %)))
-      (GET "/data/owners.json"
-           :handler
-           #(reset! orgas (map (comp bean clj->js) %))))
-    :reagent-render (fn [] (main-page))}))
 
 ;; Setup router and init
 
@@ -1328,20 +1294,31 @@
    ["sitemap" :sitemap]
    ["feeds" :feeds]])
 
+(defonce root (atom nil))
+
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
+  (GET "/data/awesome-codegouvfr.json"
+       :handler #(reset! awes (walk/keywordize-keys %)))
+  (GET "/data/releases.json"
+       :handler
+       #(reset! releases (map (comp bean clj->js) %)))
+  (GET "/data/forges.csv"
+       :handler
+       #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
+  (GET "/data/stats.json"
+       :handler #(reset! stats (walk/keywordize-keys %)))
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
     (re-frame/dispatch
      [:lang!
       (if (contains? i/supported-languages browser-lang)
         browser-lang
-        "en")])
-    (rfe/start!
-     (rf/router routes {:conflicts nil})
-     on-navigate
-     {:use-fragment true})
-    (start-filter-loop)
-    (reagent.dom/render
-     [main-class]
-     (.getElementById js/document "app"))))
+        "en")]))
+  (rfe/start! (rf/router routes {:conflicts nil})
+              on-navigate
+              {:use-fragment true})
+  (start-filter-loop)
+  (when (nil? @root)
+    (reset! root (rdc/create-root (js/document.getElementById "app"))))
+  (rdc/render @root [main-page]))
