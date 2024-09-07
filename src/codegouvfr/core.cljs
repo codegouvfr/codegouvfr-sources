@@ -439,7 +439,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  "#/awesome"
+        {:href  (rfe/href :awes {:lang lang})
          :title (i/i lang [:Awesome-title])}
         (i/i lang [:Awesome])]]
       [:div.fr-card__desc (i/i lang [:Awesome-callout])]]
@@ -450,7 +450,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  "#/repos"
+        {:href  (rfe/href :repos {:lang lang})
          :title (i/i lang [:repos-of-source-code])}
         (i/i lang [:Repos])]]
       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
@@ -461,7 +461,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  "#/groups"
+        {:href  (rfe/href :orgas {:lang lang})
          :title (i/i lang [:Orgas])}
         (i/i lang [:Orgas])]]
       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
@@ -472,7 +472,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  "#/stats"
+        {:href  (rfe/href :stats {:lang lang})
          :title (i/i lang [:stats-expand])}
         (i/i lang [:Stats])]]
       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]]]])
@@ -718,7 +718,7 @@
       [:p.fr-callout__text
        [:span
         (i/i lang [:Awesome-callout])
-        " (" [:a {:href "#/releases"}
+        " (" [:a {:href (rfe/href :releases {:lang lang})}
               (i/i lang [:release-check-latest])] ")"]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
@@ -1011,7 +1011,7 @@
                  {:rel   "me"
                   :href  "https://x.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link {:href "#/feeds"} (i/i lang [:rss-feed])]]
+           [:li [:a.fr-link {:href (rfe/href :feeds {:lang lang})} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
@@ -1056,12 +1056,12 @@
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
             :title        (i/i lang [:stats-expand])
-            :href         "#/stats"}
+            :href         (rfe/href :stats {:lang lang})}
            (i/i lang [:Stats])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/about") "page")
-            :href         "#/about"}
+            :href         (rfe/href :about {:lang lang})}
            (i/i lang [:About])]]]]]]]))
 
 (defn subscribe [lang]
@@ -1138,23 +1138,23 @@
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "#/a11y"}
+        {:href (rfe/href :a11y {:lang lang})}
         (i/i lang [:accessibility])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "#/legal"}
+        {:href (rfe/href :legal {:lang lang})}
         (i/i lang [:legal])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "#/legal"}
+        {:href (rfe/href :legal {:lang lang})}
         (i/i lang [:personal-data])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href "#/sitemap"}
+        {:href (rfe/href :sitemap {:lang lang})}
         (i/i lang [:sitemap])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href  "#/feeds"
+        {:href  (rfe/href :feeds {:lang lang})
          :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
@@ -1327,7 +1327,7 @@
     (rfe/start!
      (rf/router routes {:conflicts nil})
      on-navigate
-     {:use-fragment true})
+     {:use-fragment false})
     (start-filter-loop)
     (reagent.dom/render
      [main-class]
