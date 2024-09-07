@@ -688,7 +688,7 @@
    [:div.fr-grid-row.fr-grid-row--gutters]
    (for [dd (shuffle @awes)]
      ^{:key dd}
-     (let [{:keys [name url logo legal lastUpdated description fundedBy]}
+     (let [{:keys [name url logo legal description fundedBy]}
            dd
            desc (:shortDescription (get description (keyword lang)))]
        [:div.fr-col-12.fr-col-md-3
@@ -700,15 +700,16 @@
           [:div.fr-card__content
            [:div.fr-card__start
             [:ul.fr-tags-group
-             [:li [:p.fr-tag (str "License: " (:license legal))]]
-             [:li [:p.fr-tag (str "Last updated: " lastUpdated)]]]]
+             [:li [:p.fr-tag (str (i/i lang [:license]) ": " (:license legal))]]
+             [:li [:p.fr-tag (str (i/i lang [:update-short]) ": " lastUpdated)]]]]
            [:h3.fr-card__title
             [:a {:href url} name]]
            [:p.fr-card__desc desc]
            [:div.fr-card__end
             (when (not-empty fundedBy)
               [:p.fr-card__detail.fr-icon-warning-fill
-               (str "Financé par : " (s/join ", " (map :name fundedBy)))])]]]]]))))
+               (str (i/i lang [:Funded-by]) ": "
+                    (s/join ", " (map :name fundedBy)))])]]]]]))))
 
 (defn awes-page [lang]
   [:div.fr-container.fr-mt-6w
