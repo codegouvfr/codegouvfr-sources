@@ -261,10 +261,6 @@
  (fn [db [_ n]] (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
- :awes-page!
- (fn [db [_ n]] (assoc db :awes-page n)))
-
-(re-frame/reg-event-db
  :orgas-page!
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
@@ -273,7 +269,6 @@
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:awes-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
@@ -1116,8 +1111,7 @@
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link
         {:lang     (if (= lang "fr") "en" "fr")
-         :on-click #(re-frame/dispatch
-                     [:lang! (if (= lang "fr") "en" "fr")])}
+         :on-click #(re-frame/dispatch [:lang! (if (= lang "fr") "en" "fr")])}
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
