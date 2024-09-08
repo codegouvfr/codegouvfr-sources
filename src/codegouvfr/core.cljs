@@ -684,12 +684,6 @@
      ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
-(defn repos-page-main [lang license language]
-  (fn []
-    (GET "/data/repositories.json"
-         :handler #(reset! repos (map (comp bean clj->js) %)))
-    (repos-page lang license language)))
-
 ;; Main structure - awesome
 
 (defn awes-table [lang]
@@ -1218,12 +1212,6 @@
        (when-let [ff (not-empty (:group flt))]
          (close-filter-button lang ff :repos (merge flt {:group nil})))])]])
 
-(defn orgas-page-main [lang]
-  (fn []
-    (GET "/data/owners.json"
-         :handler #(reset! orgas (map (comp bean clj->js) %)))
-    (orgas-page lang)))
-
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
         view @(re-frame/subscribe [:view?])]
@@ -1234,8 +1222,8 @@
       [main-menu lang view]
       (condp = view
         :home     [home-page lang]
-        :orgas    [orgas-page-main lang]
-        :repos    [repos-page-main lang license language]
+        :orgas    [orgas-page lang]
+        :repos    [repos-page lang license language]
         :releases [releases-page lang]
         :awes     [awes-page lang]
         :stats    [stats-page lang @stats]
@@ -1299,6 +1287,10 @@
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
+  (GET "/data/repositories.json"
+       :handler #(reset! repos (map (comp bean clj->js) %)))
+  (GET "/data/owners.json"
+       :handler #(reset! orgas (map (comp bean clj->js) %)))
   (GET "/data/awesome-codegouvfr.json"
        :handler #(reset! awes (walk/keywordize-keys %)))
   (GET "/data/releases.json"
