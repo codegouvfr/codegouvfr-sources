@@ -218,7 +218,6 @@
  :initialize-db!
  (fn [_ _]
    {:repos-page    0
-    :awes-page     0
     :orgas-page    0
     :sort-repos-by :score
     :sort-orgas-by :repos
@@ -317,10 +316,6 @@
 (re-frame/reg-sub
  :orgas-page?
  (fn [db _] (:orgas-page db)))
-
-(re-frame/reg-sub
- :awes-page?
- (fn [db _] (:awes-page db)))
 
 (re-frame/reg-sub
  :filter?
