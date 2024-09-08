@@ -436,7 +436,7 @@
         (i/i lang [:Awesome])]]
       [:div.fr-card__desc (i/i lang [:Awesome-callout])]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/awesome.jpg" :alt ""}]]]]
+      [:img.fr-responsive-img {:src "./img/awesome.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -447,7 +447,7 @@
         (i/i lang [:Repos])]]
       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/repositories.jpg" :alt ""}]]]]
+      [:img.fr-responsive-img {:src "./img/repositories.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -458,7 +458,7 @@
         (i/i lang [:Orgas])]]
       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/organizations.jpg" :alt ""}]]]]
+      [:img.fr-responsive-img {:src "./img/organizations.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -469,7 +469,7 @@
         (i/i lang [:Stats])]]
       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/stats.jpg" :alt ""}]]]]])
+      [:img.fr-responsive-img {:src "./img/stats.webp" :alt ""}]]]]])
 
 ;; Main structure - repos
 
