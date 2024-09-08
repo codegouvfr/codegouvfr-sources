@@ -177,7 +177,7 @@
                   (some (into #{} (list (s/lower-case (or (:l %) ""))))
                         (s/split (s/lower-case language) #" +"))
                   true)
-                (if (= forge "") true (s-includes? r forge))
+                (if (= forge "") true (= (:p %) forge))
                 (if-a-b-else-true group (= (:o %) group))
                 (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
 
@@ -261,10 +261,6 @@
  (fn [db [_ n]] (assoc db :repos-page n)))
 
 (re-frame/reg-event-db
- :awes-page!
- (fn [db [_ n]] (assoc db :awes-page n)))
-
-(re-frame/reg-event-db
  :orgas-page!
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
@@ -273,7 +269,6 @@
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:awes-page! 0])
    (re-frame/dispatch [:filter! (merge init-filter query-params)])
    (assoc db :view view)))
 
@@ -689,10 +684,10 @@
 (defn awes-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [dd (shuffle @awes)]
-     ^{:key (:name dd)}
+   (for [awesome (shuffle @awes)]
+     ^{:key (:name awesome)}
      (let [{:keys [name url logo legal description fundedBy]}
-           dd
+           awesome
            desc (:shortDescription (get description (keyword lang)))]
        [:div.fr-col-12.fr-col-md-3
         [:div.fr-card.fr-enlarge-link
@@ -756,10 +751,10 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :floss])}
             (i/i lang [:floss])]]]]
         (into [:tbody]
-              (for [dd (take ORGAS-PER-PAGE
-                             (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
-                                   orgas))]
-                ^{:key (:l dd)}
+              (for [orga (take ORGAS-PER-PAGE
+                               (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
+                                     orgas))]
+                ^{:key (:l orga)}
                 (let [{:keys [n        ; name
                               l        ; login
                               d        ; description
@@ -769,7 +764,7 @@
                               au        ; avatar_url
                               r         ; repositories_count
                               id        ; owner_url (json data)
-                              ]} dd]
+                              ]} orga]
                   [:tr
                    [:td (if au
                           (if (not-empty h)
@@ -1116,8 +1111,7 @@
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link
         {:lang     (if (= lang "fr") "en" "fr")
-         :on-click #(re-frame/dispatch
-                     [:lang! (if (= lang "fr") "en" "fr")])}
+         :on-click #(re-frame/dispatch [:lang! (if (= lang "fr") "en" "fr")])}
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
