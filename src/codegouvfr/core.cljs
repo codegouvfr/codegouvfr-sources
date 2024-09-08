@@ -177,7 +177,7 @@
                   (some (into #{} (list (s/lower-case (or (:l %) ""))))
                         (s/split (s/lower-case language) #" +"))
                   true)
-                (if (= forge "") true (s-includes? r forge))
+                (if (= forge "") true (= (:p %) forge))
                 (if-a-b-else-true group (= (:o %) group))
                 (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
 
@@ -689,10 +689,10 @@
 (defn awes-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [dd (shuffle @awes)]
-     ^{:key (:name dd)}
+   (for [awesome (shuffle @awes)]
+     ^{:key (:name awesome)}
      (let [{:keys [name url logo legal description fundedBy]}
-           dd
+           awesome
            desc (:shortDescription (get description (keyword lang)))]
        [:div.fr-col-12.fr-col-md-3
         [:div.fr-card.fr-enlarge-link
@@ -756,10 +756,10 @@
              :on-click #(re-frame/dispatch [:sort-orgas-by! :floss])}
             (i/i lang [:floss])]]]]
         (into [:tbody]
-              (for [dd (take ORGAS-PER-PAGE
-                             (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
-                                   orgas))]
-                ^{:key (:l dd)}
+              (for [orga (take ORGAS-PER-PAGE
+                               (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
+                                     orgas))]
+                ^{:key (:l orga)}
                 (let [{:keys [n        ; name
                               l        ; login
                               d        ; description
@@ -769,7 +769,7 @@
                               au        ; avatar_url
                               r         ; repositories_count
                               id        ; owner_url (json data)
-                              ]} dd]
+                              ]} orga]
                   [:tr
                    [:td (if au
                           (if (not-empty h)
