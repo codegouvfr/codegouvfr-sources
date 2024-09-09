@@ -160,9 +160,8 @@
   (if a b true))
 
 (defn apply-repos-filters [m]
-  (let [{:keys [q group language forge license
-                template with-contributing with-publiccode
-                fork floss]}
+  (let [{:keys [q group language forge license template
+                with-contributing with-publiccode fork floss]}
         @(re-frame/subscribe [:filter?])]
     (->> m (filter
             #(let [o (:o %) n (:n %) t (:t? %) r (str o "/" n)]
@@ -203,6 +202,12 @@
 (defn start-filter-loop []
   (async/go
     (loop [f (async/<! filter-chan)]
+      (let [v  @(re-frame/subscribe [:view?])
+            l  @(re-frame/subscribe [:lang?])
+            fs @(re-frame/subscribe [:filter?])]
+        (rfe/push-state
+         v {:lang l}
+         (filter not-empty-string-or-true (merge fs f))))
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
 
@@ -795,7 +800,6 @@
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
-        ministry       (:ministry @(re-frame/subscribe [:filter?]))
         orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all ORGAS-PER-PAGE orgas))
@@ -824,7 +828,7 @@
       [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or ministry "")
+       {:value (or (:ministry @(re-frame/subscribe [:filter?])) "")
         :on-change
         (fn [e]
           (let [ev (.-value (.-target e))]
