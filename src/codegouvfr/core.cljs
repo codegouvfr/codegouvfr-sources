@@ -29,12 +29,16 @@
 (def ^:const TIMEOUT 200)
 
 (def init-filter
-  {:q        nil
-   :group    nil
-   :license  nil
-   :language nil
-   :forge    ""
-   :ministry ""})
+  {:q                 nil
+   :group             nil
+   :license           nil
+   :language          nil
+   :forge             ""
+   :fork              false
+   :floss             false
+   :with-publiccode   false
+   :with-contributing false
+   :ministry          ""})
 
 (defonce urls
   {:swh-baseurl "https://archive.softwareheritage.org/browse/origin/"})
@@ -192,7 +196,7 @@
   [:span
    [:a.fr-link.fr-icon-close-circle-line.fr-link--icon-right
     {:title (i/i lang [:remove-filter])
-     :href  (rfe/href t {:lang lang} (filter #(not-empty (val %)) reinit))}
+     :href  (rfe/href t  (filter #(not-empty (val %)) reinit))}
     [:span ff]]])
 
 (defn not-empty-string-or-true [[_ v]]
@@ -203,11 +207,8 @@
   (async/go
     (loop [f (async/<! filter-chan)]
       (let [v  @(re-frame/subscribe [:view?])
-            l  @(re-frame/subscribe [:lang?])
             fs @(re-frame/subscribe [:filter?])]
-        (rfe/push-state
-         v {:lang l}
-         (filter not-empty-string-or-true (merge fs f))))
+        (rfe/push-state v nil (filter not-empty-string-or-true (merge fs f))))
       (re-frame/dispatch [:filter! f])
       (recur (async/<! filter-chan)))))
 
@@ -420,7 +421,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :awes {:lang lang})
+        {:href  (rfe/href :awes)
          :title (i/i lang [:Awesome-title])}
         (i/i lang [:Awesome])]]
       [:div.fr-card__desc (i/i lang [:Awesome-callout])]]
@@ -431,7 +432,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :repos {:lang lang})
+        {:href  (rfe/href :repos)
          :title (i/i lang [:repos-of-source-code])}
         (i/i lang [:Repos])]]
       [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
@@ -442,7 +443,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :orgas {:lang lang})
+        {:href  (rfe/href :orgas)
          :title (i/i lang [:Orgas])}
         (i/i lang [:Orgas])]]
       [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
@@ -453,7 +454,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :stats {:lang lang})
+        {:href  (rfe/href :stats)
          :title (i/i lang [:stats-expand])}
         (i/i lang [:Stats])]]
       [:div.fr-card__desc (i/i lang [:home-stats-desc])]]
@@ -530,7 +531,7 @@
                                     (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]]]
                    [:td [:a.fr-raw-link.fr-link
-                         {:href  (rfe/href :repos {:lang lang} {:group group})
+                         {:href  (rfe/href :repos  {:group group})
                           :title (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    ;; Description
@@ -710,7 +711,7 @@
       [:p.fr-callout__text
        [:span
         (i/i lang [:Awesome-callout])
-        " (" [:a {:href (rfe/href :releases {:lang lang})}
+        " (" [:a {:href (rfe/href :releases)}
               (i/i lang [:release-check-latest])] ")"]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
@@ -788,7 +789,7 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos {:lang lang} {:group o})}
+                         :href  (rfe/href :repos  {:group o})}
                      r]]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
@@ -982,7 +983,7 @@
                  {:rel   "me"
                   :href  "https://x.com/codegouvfr"
                   :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link {:href (rfe/href :feeds {:lang lang})} (i/i lang [:rss-feed])]]
+           [:li [:a.fr-link {:href (rfe/href :feeds)} (i/i lang [:rss-feed])]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
                   :title          (str (i/i lang [:modal-title]) " - "
@@ -1008,31 +1009,31 @@
            {:aria-current (when (= path "/awesome") "page")
             :title        "Awesome"
             :on-click
-            #(do (reset-queries) (rfe/push-state :awes {:lang lang}))}
+            #(do (reset-queries) (rfe/push-state :awes))}
            "Awesome"]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
             :on-click
-            #(do (reset-queries) (rfe/push-state :repos {:lang lang}))}
+            #(do (reset-queries) (rfe/push-state :repos  {:floss "true"}))}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
             :on-click
-            #(do (reset-queries) (rfe/push-state :orgas {:lang lang}))}
+            #(do (reset-queries) (rfe/push-state :orgas))}
            (i/i lang [:Orgas])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
             :title        (i/i lang [:stats-expand])
-            :href         (rfe/href :stats {:lang lang})}
+            :href         (rfe/href :stats)}
            (i/i lang [:Stats])]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/about") "page")
-            :href         (rfe/href :about {:lang lang})}
+            :href         (rfe/href :about)}
            (i/i lang [:About])]]]]]]]))
 
 (defn subscribe [lang]
@@ -1108,23 +1109,23 @@
         (i/i lang [:switch-lang])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href (rfe/href :a11y {:lang lang})}
+        {:href (rfe/href :a11y)}
         (i/i lang [:accessibility])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href (rfe/href :legal {:lang lang})}
+        {:href (rfe/href :legal)}
         (i/i lang [:legal])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href (rfe/href :legal {:lang lang})}
+        {:href (rfe/href :legal)}
         (i/i lang [:personal-data])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href (rfe/href :sitemap {:lang lang})}
+        {:href (rfe/href :sitemap)}
         (i/i lang [:sitemap])]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
-        {:href  (rfe/href :feeds {:lang lang})
+        {:href  (rfe/href :feeds)
          :title (i/i lang [:subscribe-rss-flux])}
         (i/i lang [:rss-feed])]]
       [:li.fr-footer__bottom-item
