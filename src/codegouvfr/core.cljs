@@ -220,7 +220,7 @@
    {:repos-page    0
     :orgas-page    0
     :sort-repos-by :score
-    :sort-orgas-by :repos
+    :sort-orgas-by :subscribers
     :reverse-sort  false
     :filter        init-filter
     :lang          "en"
@@ -349,8 +349,9 @@
  (fn []
    (let [orgs  @orgas
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
-                 :repos (sort-by :r orgs)
-                 :floss (sort-by :f orgs)
+                 :repos       (sort-by :r orgs)
+                 :floss       (sort-by :f orgs)
+                 :subscribers (sort-by :s orgs)
                  ;; :date  (sort
                  ;;         #(compare
                  ;;           (js/Date. (.parse js/Date (or (:c %2) UNIX-EPOCH)))
@@ -741,7 +742,13 @@
             (i/i lang [:Repos])]]
           [:th.fr-col-1
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= org-f :date) "fr-btn--secondary")
+            {:class    (when (= org-f :subscribers) "fr-btn--secondary")
+             :title    (i/i lang [:sort-subscribers])
+             :on-click #(re-frame/dispatch [:sort-orgas-by! :subscribers])}
+            (i/i lang [:Subscribers])]]
+          [:th.fr-col-1
+           [:button.fr-btn.fr-btn--tertiary-no-outline
+            {:class    (when (= org-f :floss) "fr-btn--secondary")
              :title    (i/i lang [:sort-orgas-floss-policy])
              :on-click #(re-frame/dispatch [:sort-orgas-by! :floss])}
             (i/i lang [:floss])]]]]
@@ -758,6 +765,7 @@
                               f         ; floss_policy
                               au        ; avatar_url
                               r         ; repositories_count
+                              s         ; subscribers
                               id        ; owner_url (json data)
                               ]} orga]
                   [:tr
@@ -791,6 +799,7 @@
                     [:a {:title (i/i lang [:go-to-repos])
                          :href  (rfe/href :repos  {:group o})}
                      r]]
+                   [:td {:style {:text-align "center"}} s]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
                       [:a {:target "new"
