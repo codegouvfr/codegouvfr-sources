@@ -189,7 +189,7 @@
     (->> m (filter
             #(and (if-a-b-else-true q
                     (s-includes?
-                     (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %) (:pso %)]) q))
+                     (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %) (:ps %) (:os %)]) q))
                   (if (= ministry "") true (= (:m %) ministry)))))))
 
 (defn close-filter-button [lang ff t reinit]
