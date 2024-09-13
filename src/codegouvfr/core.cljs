@@ -130,7 +130,7 @@
                    (gstring/format "%.2f" (* (/ v total) 100)))
                   v)]))
       (map #(let [[k v] %]
-              [[:a {:href (rfe/href :repos {} {param k})} k] v])))
+              [[:a {:href (rfe/href :repos nil {param k})} k] v])))
      data)))
 
 (defn top-clean-up-orgas [data param]
@@ -138,7 +138,7 @@
    (comp
     (map #(let [[k v] %
                 k0    (s/replace k #" \([^)]+\)" "")]
-            [[:a {:href (rfe/href :orgas {} {param k0})} k] v])))
+            [[:a {:href (rfe/href :orgas nil {param k0})} k] v])))
    data))
 
 (defn- table-header [lang what k]
@@ -196,7 +196,7 @@
   [:span
    [:a.fr-link.fr-icon-close-circle-line.fr-link--icon-right
     {:title (i/i lang [:remove-filter])
-     :href  (rfe/href t  (filter #(not-empty (val %)) reinit))}
+     :href  (rfe/href t nil (filter #(not-empty (val %)) reinit))}
     [:span ff]]])
 
 (defn not-empty-string-or-true [[_ v]]
@@ -532,7 +532,7 @@
                                     (when li (str (i/i lang [:under-license]) li))) lang)}
                       n]]]
                    [:td [:a.fr-raw-link.fr-link
-                         {:href  (rfe/href :repos  {:group group})
+                         {:href  (rfe/href :repos nil {:group group})
                           :title (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    ;; Description
@@ -797,7 +797,7 @@
                    [:td
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos  {:group o})}
+                         :href  (rfe/href :repos nil {:group o})}
                      r]]
                    [:td {:style {:text-align "center"}} s]
                    [:td {:style {:text-align "center"}}
