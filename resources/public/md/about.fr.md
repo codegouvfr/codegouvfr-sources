@@ -1,8 +1,8 @@
-<div class="fr-highlight"> <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ? Consultez notre <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> et <a href="mailto:contact@code.gouv.fr">écrivez-nous !</a> </p> </div>
-
 ## Pourquoi ce site ?
 
 De nombreux organismes publics publient les codes sources des logiciels qu'ils développent ou font développer : ce site permet de les explorer. Le but est de faciliter leur découverte et d'encourager les administrations et les agents publics à les réutiliser et à y contribuer.
+
+<div class="fr-highlight"> <p>Vous êtes une mission de service public et souhaitez référencer vos dépôts de code source ? Consultez notre <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> et <a href="mailto:contact@code.gouv.fr">écrivez-nous !</a> </p> </div>
 
 La publication des codes sources correspond à une obligation légale : Tout code source obtenu ou développé par un organisme remplissant une mission de service public est considéré comme un document administratif, relevant des obligations de publication en open data.
 
