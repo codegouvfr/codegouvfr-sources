@@ -578,40 +578,48 @@
 (defn repos-table [lang repos-cnt]
   (if (zero? repos-cnt)
     (if (zero? (count @(re-frame/subscribe [:repos?])))
-      [:div.fr-m-3w [:p (i/i lang [:Loading])]]
-      [:div.fr-m-3w [:p (i/i lang [:no-repo-found])]])
+      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:Loading])]]
+      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-repo-found])]])
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])
           repos      @(re-frame/subscribe [:repos?])]
       [:div.fr-table.fr-table--no-caption
+       {:role "region" :aria-label (i/i lang [:repos-of-source-code])}
        [:table
-        [:caption (i/i lang [:repos-of-source-code])]
+        [:caption {:id "repos-table-caption"} (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col (i/i lang [:Repos])]
-          [:th.fr-col (i/i lang [:Orgas])]
-          [:th.fr-col (i/i lang [:description])]
-          [:th.fr-col-1
+          [:th.fr-col {:scope "col"} (i/i lang [:Repos])]
+          [:th.fr-col {:scope "col"} (i/i lang [:Orgas])]
+          [:th.fr-col {:scope "col"} (i/i lang [:description])]
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= rep-f :date) "fr-btn--secondary")
-             :title    (i/i lang [:sort-update-date])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :date])}
+            {:class        (when (= rep-f :date) "fr-btn--secondary")
+             :title        (i/i lang [:sort-update-date])
+             :on-click     #(re-frame/dispatch [:sort-repos-by! :date])
+             :aria-pressed (if (= rep-f :date) "true" "false")
+             :aria-label   (i/i lang [:sort-update-date])}
             (i/i lang [:update-short])]]
-          [:th.fr-col-1
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= rep-f :forks) "fr-btn--secondary")
-             :title    (i/i lang [:sort-forks])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :forks])}
+            {:class        (when (= rep-f :forks) "fr-btn--secondary")
+             :title        (i/i lang [:sort-forks])
+             :on-click     #(re-frame/dispatch [:sort-repos-by! :forks])
+             :aria-pressed (if (= rep-f :forks) "true" "false")
+             :aria-label   (i/i lang [:sort-forks])}
             (i/i lang [:forks])]]
-          [:th.fr-col-1
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= rep-f :score) "fr-btn--secondary")
-             :title    (i/i lang [:sort-score])
-             :on-click #(re-frame/dispatch [:sort-repos-by! :score])}
+            {:class        (when (= rep-f :score) "fr-btn--secondary")
+             :title        (i/i lang [:sort-score])
+             :on-click     #(re-frame/dispatch [:sort-repos-by! :score])
+             :aria-pressed (if (= rep-f :score) "true" "false")
+             :aria-label   (i/i lang [:sort-score])}
             (i/i lang [:Score])]]]]
         (into [:tbody]
-              (for [repo (take REPOS-PER-PAGE
-                               (drop (* REPOS-PER-PAGE repos-page) repos))]
+              (for [repo (->> repos
+                              (drop (* REPOS-PER-PAGE repos-page))
+                              (take REPOS-PER-PAGE))]
                 ^{:key (str (:o repo) "/" (:n repo))}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
@@ -626,46 +634,43 @@
                               ]} repo
                       group      (subs id 0 (- (count id) (inc (count n))))]
                   [:tr
-                   ;; Repo (orga)
                    [:td
                     [:span
                      [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title  (i/i lang [:go-to-data])
-                       :target "new"
-                       :href   (str ecosystem-prefix-url
-                                    (if (= p "github.com") "github" p)
-                                    "/repositories/" fn)}]
-                     [:span " "]
-                     [:a {:href   id
-                          :target "_blank"
-                          :rel    "noreferrer noopener"
-                          :title  (new-tab
-                                   (str
-                                    (i/i lang [:go-to-repo])
-                                    (when li (str (i/i lang [:under-license]) li))) lang)}
+                      {:title      (i/i lang [:go-to-data])
+                       :target     "new"
+                       :href       (str ecosystem-prefix-url
+                                        (if (= p "github.com") "github" p)
+                                        "/repositories/" fn)
+                       :aria-label (str (i/i lang [:go-to-data]) " " n)}]
+                     [:span " "]
+                     [:a {:href       id
+                          :target     "_blank"
+                          :rel        "noreferrer noopener"
+                          :aria-label (str n " - " (i/i lang [:go-to-repo])
+                                           (when li (str " " (i/i lang [:under-license]) " " li)))}
                       n]]]
                    [:td [:a.fr-raw-link.fr-link
-                         {:href  (rfe/href :repos nil {:group group})
-                          :title (i/i lang [:browse-repos-orga])}
+                         {:href       (rfe/href :repos nil {:group group})
+                          :aria-label (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
-                   ;; Description
-                   [:td [:span d]]
-                   ;; Update
+                   [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)} d]]
                    [:td
                     {:style {:text-align "center"}}
                     [:span
                      (if-let [d (to-locale-date u lang)]
                        [:a
-                        {:href   (str swh-baseurl id)
-                         :target "new"
-                         :title  (new-tab (i/i lang [:swh-link]) lang)
-                         :rel    "noreferrer noopener"}
+                        {:href       (str swh-baseurl id)
+                         :target     "new"
+                         :title      (new-tab (i/i lang [:swh-link]) lang)
+                         :rel        "noreferrer noopener"
+                         :aria-label (i/i lang [:swh-link])}
                         d]
                        "N/A")]]
-                   ;; Forks
-                   [:td {:style {:text-align "center"}} f]
-                   ;; Awesome codegouvfr score
-                   [:td {:style {:text-align "center"}} a]])))]])))
+                   [:td {:style      {:text-align "center"}
+                         :aria-label (str (i/i lang [:forks]) ": " f)} f]
+                   [:td {:style      {:text-align "center"}
+                         :aria-label (str (i/i lang [:Score]) ": " a)} a]])))]])))
 
 (defn repos-page [lang license language]
   (let [repos          @(re-frame/subscribe [:repos?])
@@ -835,92 +840,96 @@
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
     (if (zero? (count @(re-frame/subscribe [:orgas?])))
-      [:div.fr-m-3w [:p (i/i lang [:Loading])]]
-      [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]])
+      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:Loading])]]
+      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-orga-found])]])
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
           orgas @(re-frame/subscribe [:orgas?])]
       [:div.fr-table.fr-table--no-caption
+       {:role "region" :aria-label (i/i lang [:Orgas])}
        [:table
-        [:caption (i/i lang [:Orgas])]
+        [:caption {:id "orgas-table-caption"} (i/i lang [:Orgas])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col-1 "Image"]
-          [:th.fr-col-2 (i/i lang [:Orgas])]
-          [:th.fr-col-6 (i/i lang [:description])]
-          [:th.fr-col-1
+          [:th.fr-col-1 {:scope "col"} "Image"]
+          [:th.fr-col-2 {:scope "col"} (i/i lang [:Orgas])]
+          [:th.fr-col-6 {:scope "col"} (i/i lang [:description])]
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= org-f :repos) "fr-btn--secondary")
-             :title    (i/i lang [:sort-repos])
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :repos])}
+            {:class        (when (= org-f :repos) "fr-btn--secondary")
+             :title        (i/i lang [:sort-repos])
+             :on-click     #(re-frame/dispatch [:sort-orgas-by! :repos])
+             :aria-pressed (if (= org-f :repos) "true" "false")
+             :aria-label   (i/i lang [:sort-repos])}
             (i/i lang [:Repos])]]
-          [:th.fr-col-1
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= org-f :subscribers) "fr-btn--secondary")
-             :title    (i/i lang [:sort-subscribers])
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :subscribers])}
+            {:class        (when (= org-f :subscribers) "fr-btn--secondary")
+             :title        (i/i lang [:sort-subscribers])
+             :on-click     #(re-frame/dispatch [:sort-orgas-by! :subscribers])
+             :aria-pressed (if (= org-f :subscribers) "true" "false")
+             :aria-label   (i/i lang [:sort-subscribers])}
             (i/i lang [:Subscribers])]]
-          [:th.fr-col-1
+          [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
-            {:class    (when (= org-f :floss) "fr-btn--secondary")
-             :title    (i/i lang [:sort-orgas-floss-policy])
-             :on-click #(re-frame/dispatch [:sort-orgas-by! :floss])}
+            {:class        (when (= org-f :floss) "fr-btn--secondary")
+             :title        (i/i lang [:sort-orgas-floss-policy])
+             :on-click     #(re-frame/dispatch [:sort-orgas-by! :floss])
+             :aria-pressed (if (= org-f :floss) "true" "false")
+             :aria-label   (i/i lang [:sort-orgas-floss-policy])}
             (i/i lang [:floss])]]]]
         (into [:tbody]
               (for [orga (take ORGAS-PER-PAGE
                                (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
                                      orgas))]
                 ^{:key (:l orga)}
-                (let [{:keys [n        ; name
-                              l        ; login
-                              d        ; description
-                              id       ; organization_url
-                              h        ; website
-                              f        ; floss_policy
-                              au       ; avatar_url
-                              r        ; repositories_count
-                              s        ; subscribers
-                              ]} orga]
+                (let [{:keys [n l d id h f au r s]} orga]
                   [:tr
                    [:td (if au
                           (if (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title (i/i lang [:orga-homepage])
-                              :href  h}
-                             [:img {:src au :width "100%" :alt ""}]]
-                            [:img {:src au :width "100%" :alt ""}])
+                             {:title      (i/i lang [:orga-homepage])
+                              :href       h
+                              :aria-label (str (i/i lang [:orga-homepage]) " " n)}
+                             [:img {:src au :width "100%" :alt (str n " " (i/i lang [:logo]))}]]
+                            [:img {:src au :width "100%" :alt (str n " " (i/i lang [:logo]))}])
                           (when (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title (i/i lang [:orga-homepage])
-                              :href  h}
+                             {:title      (i/i lang [:orga-homepage])
+                              :href       h
+                              :aria-label (str (i/i lang [:orga-homepage]) " " n)}
                              (i/i lang [:website])]))]
                    [:td
                     [:span
                      [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title  (i/i lang [:go-to-data])
-                       :target "new"
-                       :href   (str ecosystem-prefix-url
-                                    (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
-                                      (if (re-matches #"^github.*" p) "GitHub" p))
-                                    "/owners/" l)}]
-                     [:span " "]
-                     [:a {:target "_blank"
-                          :rel    "noreferrer noopener"
-                          :title  (new-tab (i/i lang [:go-to-orga]) lang)
-                          :href   id}
+                      {:title      (i/i lang [:go-to-data])
+                       :target     "new"
+                       :href       (str ecosystem-prefix-url
+                                        (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
+                                          (if (re-matches #"^github.*" p) "GitHub" p))
+                                        "/owners/" l)
+                       :aria-label (str (i/i lang [:go-to-data]) " " (or (not-empty n) l))}]
+                     [:span " "]
+                     [:a {:target     "_blank"
+                          :rel        "noreferrer noopener"
+                          :href       id
+                          :aria-label (str (i/i lang [:go-to-orga]) " " (or (not-empty n) l))}
                       (or (not-empty n) l)]]]
-                   [:td d]
+                   [:td {:aria-label (str (i/i lang [:description]) ": " d)} d]
                    [:td
                     {:style {:text-align "center"}}
-                    [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos nil {:group id})}
+                    [:a {:title      (i/i lang [:go-to-repos])
+                         :href       (rfe/href :repos nil {:group id})
+                         :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))}
                      r]]
-                   [:td {:style {:text-align "center"}} s]
+                   [:td {:style      {:text-align "center"}
+                         :aria-label (str s " " (i/i lang [:Subscribers]))}
+                    s]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
-                      [:a {:target "new"
-                           :rel    "noreferrer noopener"
-                           :title  (new-tab (i/i lang [:floss-policy]) lang)
-                           :href   f}
+                      [:a {:target     "new"
+                           :rel        "noreferrer noopener"
+                           :href       f
+                           :aria-label (str (i/i lang [:floss-policy]) " " (i/i lang [:for]) " " (or (not-empty n) l))}
                        (i/i lang [:floss])])]])))]])))
 
 (defn orgas-page [lang]
