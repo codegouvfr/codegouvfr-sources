@@ -47,29 +47,30 @@
 
 ;; Mappings used when exporting displayed data to csv files
 (defonce mappings
-  {:repos {:u  :last_update
+  {:repos {
            :d  :description
+           :f  :forks_count
            :f? :is_fork
-           :t? :is_template
            :l  :language
            :li :license
            :n  :name
-           :f  :forks_count
-           :s  :subscribers_count
-           :o  :organization_name
-           :p  :platform
-           :r  :repository_url}
-   :orgas {:d  :description
-           :a  :location
-           :e  :email
-           :n  :name
-           :p  :platform
-           :h  :website
-           :l  :login
-           :c  :creation_date
-           :r  :repositories_count
            :o  :organization_url
-           :au :avatar_url}})
+           :id :repository_url
+           :s  :subscribers_count
+           :t? :is_template
+           :u  :last_update
+           }
+   :orgas {
+           :a  :location
+           :au :avatar_url
+           :d  :description
+           :e  :email
+           :id :organization_url
+           :m  :ministry
+           :n  :name
+           :r  :repositories_count
+           :s  :subscribers_count
+           }})
 
 ;; Utility functions
 
@@ -168,29 +169,30 @@
                 with-contributing with-publiccode fork floss]}
         @(re-frame/subscribe [:filter?])]
     (->> m (filter
-            #(let [o (:o %) n (:n %) t (:t? %) r (str o "/" n)]
-               (and
-                (if-a-b-else-true fork (:f? %))
-                (if-a-b-else-true with-contributing (:c? %))
-                (if-a-b-else-true with-publiccode (:p? %))
-                (if-a-b-else-true template t)
-                (if-a-b-else-true floss (let [l (:li %)] (and l (not= l "Other"))))
-                (if-a-b-else-true license (s-includes? (:li %) license))
-                (if language
-                  (some (into #{} (list (s/lower-case (or (:l %) ""))))
-                        (s/split (s/lower-case language) #" +"))
-                  true)
-                (if (= forge "") true (= (:p %) forge))
-                (if-a-b-else-true group (= (:o %) group))
-                (if-a-b-else-true q (s-includes? (s/join " " [n r o (:d %)]) q))))))))
+            #(and
+              (if-a-b-else-true fork (:f? %))
+              (if-a-b-else-true with-contributing (:c? %))
+              (if-a-b-else-true with-publiccode (:p? %))
+              (if-a-b-else-true template (:t? %))
+              (if-a-b-else-true floss
+                (let [l (:li %)] (and (not-empty l) (not= l "Other"))))
+              (if-a-b-else-true license (s-includes? (:li %) license))
+              (if language
+                (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                      (s/split (s/lower-case language) #" +"))
+                true)
+              (if (= forge "") true (= (:p %) forge))
+              (if-a-b-else-true group (= (:o %) group))
+              (if-a-b-else-true q (s-includes? (s/join " " [(:id %) (:d %)]) q)))))))
 
 (defn apply-orgas-filters [m]
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
     (->> m (filter
-            #(and (if-a-b-else-true q
-                    (s-includes?
-                     (s/join " " [(:n %) (:l %) (:d %) (:h %) (:o %) (:ps %) (:os %)]) q))
-                  (if (= ministry "") true (= (:m %) ministry)))))))
+            #(and
+              (if-a-b-else-true q
+                (s-includes?
+                 (s/join " " [(:id %) (:d %) (:ps %) (:os %)]) q))
+              (if (= ministry "") true (= (:m %) ministry)))))))
 
 (defn close-filter-button [lang ff t reinit]
   [:span
