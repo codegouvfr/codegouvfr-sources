@@ -27,8 +27,10 @@
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const TIMEOUT 200)
+(def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
+(def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
 
-(def init-filter
+(defonce init-filter
   {:q                 nil
    :group             nil
    :license           nil
@@ -39,9 +41,6 @@
    :with-publiccode   false
    :with-contributing false
    :ministry          ""})
-
-(defonce urls
-  {:swh-baseurl "https://archive.softwareheritage.org/browse/origin/"})
 
 (defonce filter-chan (async/chan 100))
 
@@ -523,7 +522,7 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title  (i/i lang [:go-to-data])
                        :target "new"
-                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/"
+                       :href   (str ecosystem-prefix-url
                                     (if (= p "github.com") "github" p)
                                     "/repositories/" fn)}]
                      [:span " "]
@@ -547,7 +546,7 @@
                     [:span
                      (if-let [d (to-locale-date u lang)]
                        [:a
-                        {:href   (str (:swh-baseurl urls) id)
+                        {:href   (str swh-baseurl id)
                          :target "new"
                          :title  (new-tab (i/i lang [:swh-link]) lang)
                          :rel    "noreferrer noopener"}
@@ -789,7 +788,7 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title  (i/i lang [:go-to-data])
                        :target "new"
-                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/"
+                       :href   (str ecosystem-prefix-url
                                     (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
                                       (if (re-matches #"^github.*" p) "GitHub" p))
                                     "/owners/" l)}]
