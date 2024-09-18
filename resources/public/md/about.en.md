@@ -1,8 +1,8 @@
-<div class="fr-highlight"> <p>If you are a French public agency and want to add new source code repositories, please read our <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> and <a href="mailto:contact@code.gouv.fr">do send us an email</a>. </p> </div>
-
 ## Why this website?
 
 Many agencies already publish source code repositories : we are listing them on this website to make it easier to find them and to encourage administrations to reuse them or to contribute to them.
+
+<div class="fr-highlight"> <p>If you are a French public agency and want to add new source code repositories, please read our <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> and <a href="mailto:contact@code.gouv.fr">do send us an email</a>. </p> </div>
 
 Source code bought or developed by public agencies are considered administrative documents, due to be opened as open data.
 
