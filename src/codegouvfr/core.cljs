@@ -631,8 +631,7 @@
                               o                  ; owner
                               u                  ; last_update
                               p                  ; forge
-                              ]} repo
-                      group      (subs id 0 (- (count id) (inc (count n))))]
+                              ]} repo]
                   [:tr
                    [:td
                     [:span
@@ -651,7 +650,7 @@
                                            (when li (str " " (i/i lang [:under-license]) " " li)))}
                       n]]]
                    [:td [:a.fr-raw-link.fr-link
-                         {:href       (rfe/href :repos nil {:group group})
+                         {:href       (rfe/href :repos nil {:group o})
                           :aria-label (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)} d]]
