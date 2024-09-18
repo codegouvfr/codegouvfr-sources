@@ -10,7 +10,6 @@
             [cljs-bean.core :refer [bean]]
             [clojure.browser.dom :as dom]
             [goog.string :as gstring]
-            [ajax.core :refer [GET]]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
             [clojure.set :as set]
@@ -18,7 +17,9 @@
             [reitit.frontend :as rf]
             [reitit.frontend.easy :as rfe]
             [goog.labs.format.csv :as csv]
-            [semantic-csv.core :as sc])
+            [semantic-csv.core :as sc]
+            [day8.re-frame.http-fx]
+            [ajax.core :as ajax])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Defaults
@@ -234,17 +235,99 @@
     :lang          "en"
     :path          ""}))
 
-(def repos (reagent/atom nil))
-(def awes (reagent/atom nil))
-(def orgas (reagent/atom nil))
-(def stats (reagent/atom nil))
-(def platforms (reagent/atom nil))
-(def releases (reagent/atom nil))
+;; Define events for each API call
+(re-frame/reg-event-fx
+ :fetch-repositories
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/repositories.json"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-repositories]
+                 :on-failure      [:api-request-error :repositories]}}))
 
-(re-frame/reg-sub
- :ministries?
- (fn [] (filter not-empty (distinct (map :m @orgas)))))
+(re-frame/reg-event-fx
+ :fetch-owners
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/owners.json"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-owners]
+                 :on-failure      [:api-request-error :owners]}}))
 
+(re-frame/reg-event-fx
+ :fetch-awesome
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/awesome-codegouvfr.json"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-awesome]
+                 :on-failure      [:api-request-error :awesome]}}))
+
+(re-frame/reg-event-fx
+ :fetch-releases
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/releases.json"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-releases]
+                 :on-failure      [:api-request-error :releases]}}))
+
+(re-frame/reg-event-fx
+ :fetch-platforms
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/forges.csv"
+                 :response-format (ajax/raw-response-format)
+                 :on-success      [:set-platforms]
+                 :on-failure      [:api-request-error :platforms]}}))
+
+(re-frame/reg-event-fx
+ :fetch-stats
+ (fn [_ _]
+   {:http-xhrio {:method          :get
+                 :uri             "/data/stats.json"
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-stats]
+                 :on-failure      [:api-request-error :stats]}}))
+
+;; Define events to handle successful responses
+(re-frame/reg-event-db
+ :set-repositories
+ (fn [db [_ response]]
+   (assoc db :repositories (map (comp bean clj->js) response))))
+
+(re-frame/reg-event-db
+ :set-owners
+ (fn [db [_ response]]
+   (assoc db :owners (map (comp bean clj->js) response))))
+
+(re-frame/reg-event-db
+ :set-awesome
+ (fn [db [_ response]]
+   (assoc db :awesome response)))
+
+(re-frame/reg-event-db
+ :set-releases
+ (fn [db [_ response]]
+   (assoc db :releases (map (comp bean clj->js) response))))
+
+(re-frame/reg-event-db
+ :set-platforms
+ (fn [db [_ response]]
+   (assoc db :platforms (map first (next (js->clj (csv/parse response)))))))
+
+(re-frame/reg-event-db
+ :set-stats
+ (fn [db [_ response]]
+   (assoc db :stats response)))
+
+;; Define an event to handle API request errors
+(re-frame/reg-event-db
+ :api-request-error
+ (fn [db [_ request-type response]]
+   (assoc-in db [:errors request-type] response)))
+
+;; Define other reframe events
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
@@ -302,6 +385,10 @@
 ;; Subscriptions
 
 (re-frame/reg-sub
+ :ministries?
+ (fn [] (filter not-empty (distinct (map :m @(re-frame/subscribe [:orgas?]))))))
+
+(re-frame/reg-sub
  :lang?
  (fn [db _] (:lang db)))
 
@@ -338,9 +425,25 @@
  (fn [db _] (:reverse-sort db)))
 
 (re-frame/reg-sub
+ :stats?
+ (fn [db _] (:stats db)))
+
+(re-frame/reg-sub
+ :awes?
+ (fn [db _] (:awesome db)))
+
+(re-frame/reg-sub
+ :platforms?
+ (fn [db _] (:platforms db)))
+
+(re-frame/reg-sub
+ :releases?
+ (fn [db _] (:releases db)))
+
+(re-frame/reg-sub
  :repos?
- (fn []
-   (let [repos0 @repos
+ (fn [db]
+   (let [repos0 (:repositories db)
          repos  (case @(re-frame/subscribe [:sort-repos-by?])
                   :forks (sort-by :f repos0)
                   :score (sort-by :a repos0)
@@ -354,8 +457,8 @@
 
 (re-frame/reg-sub
  :orgas?
- (fn []
-   (let [orgs  @orgas
+ (fn [db]
+   (let [orgs  (:owners db)
          orgas (case @(re-frame/subscribe [:sort-orgas-by?])
                  :repos       (sort-by :r orgs)
                  :floss       (sort-by :f orgs)
@@ -474,7 +577,7 @@
 
 (defn repos-table [lang repos-cnt]
   (if (zero? repos-cnt)
-    (if (zero? (count @repos))
+    (if (zero? (count @(re-frame/subscribe [:repos?])))
       [:div.fr-m-3w [:p (i/i lang [:Loading])]]
       [:div.fr-m-3w [:p (i/i lang [:no-repo-found])]])
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
@@ -622,7 +725,7 @@
             (async/go
               (async/>! filter-chan {:forge ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
-       (for [x @platforms]
+       (for [x @(re-frame/subscribe [:platforms?])]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
@@ -690,7 +793,7 @@
 (defn awes-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [awesome (shuffle @awes)]
+   (for [awesome (shuffle @(re-frame/subscribe [:awes?]))]
      ^{:key (:name awesome)}
      (let [{:keys [name url logo legal description fundedBy]}
            awesome
@@ -731,7 +834,7 @@
 
 (defn orgas-table [lang orgas-cnt]
   (if (zero? orgas-cnt)
-    (if (zero? (count @orgas))
+    (if (zero? (count @(re-frame/subscribe [:orgas?])))
       [:div.fr-m-3w [:p (i/i lang [:Loading])]]
       [:div.fr-m-3w [:p (i/i lang [:no-orga-found])]])
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
@@ -867,40 +970,41 @@
 ;; Releases page
 
 (defn releases-page [lang]
-  [:div
-   [:div.fr-grid-row
-    ;; RSS feed
-    [:a.fr-raw-link.fr-link.fr-m-1w
-     {:title (i/i lang [:rss-feed])
-      :href  "/data/latest-releases.xml"}
-     [:span.fr-icon-rss-line {:aria-hidden true}]]
-    ;; General informations
-    (table-header lang @releases :release)]
-   ;; Main releases display
-   [:div.fr-table.fr-table--no-caption
-    [:table
-     [:caption (i/i lang [:Releases])]
-     [:thead.fr-grid.fr-col-12
-      [:tr
-       [:th.fr-col-1 (i/i lang [:Repo])]
-       [:th.fr-col-2 (i/i lang [:description])]
-       [:th.fr-col-1 (i/i lang [:Releasename])]
-       [:th.fr-col-1 (i/i lang [:update-short])]]]
-     (into
-      [:tbody]
-      (for [release (reverse (sort-by :published_at @releases))]
-        ^{:key (:html_url release)}
-        (let [{:keys [repo_name html_url body tag_name published_at]} release]
-          [:tr
-           [:td
-            [:a.fr-link
-             {:href   html_url
-              :target "_blank"
-              :title  (i/i lang [:Repo])
-              :rel    "noreferrer noopener"} repo_name]]
-           [:td (subs body 0 100)]
-           [:td tag_name]
-           [:td (to-locale-date published_at lang)]])))]]])
+  (let [releases @(re-frame/subscribe [:releases?])]
+    [:div
+     [:div.fr-grid-row
+      ;; RSS feed
+      [:a.fr-raw-link.fr-link.fr-m-1w
+       {:title (i/i lang [:rss-feed])
+        :href  "/data/latest-releases.xml"}
+       [:span.fr-icon-rss-line {:aria-hidden true}]]
+      ;; General informations
+      (table-header lang releases :release)]
+     ;; Main releases display
+     [:div.fr-table.fr-table--no-caption
+      [:table
+       [:caption (i/i lang [:Releases])]
+       [:thead.fr-grid.fr-col-12
+        [:tr
+         [:th.fr-col-1 (i/i lang [:Repo])]
+         [:th.fr-col-2 (i/i lang [:description])]
+         [:th.fr-col-1 (i/i lang [:Releasename])]
+         [:th.fr-col-1 (i/i lang [:update-short])]]]
+       (into
+        [:tbody]
+        (for [release (reverse (sort-by :published_at releases))]
+          ^{:key (:html_url release)}
+          (let [{:keys [repo_name html_url body tag_name published_at]} release]
+            [:tr
+             [:td
+              [:a.fr-link
+               {:href   html_url
+                :target "_blank"
+                :title  (i/i lang [:Repo])
+                :rel    "noreferrer noopener"} repo_name]]
+             [:td (subs body 0 100)]
+             [:td tag_name]
+             [:td (to-locale-date published_at lang)]])))]]]))
 
 ;; Stats page
 
@@ -1235,7 +1339,7 @@
         :repos    [repos-page lang license language]
         :releases [releases-page lang]
         :awes     [awes-page lang]
-        :stats    [stats-page lang @stats]
+        :stats    [stats-page lang @(re-frame/subscribe [:stats?])]
         :legal    (condp = lang "fr" (inline-page "legal.fr.md")
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
@@ -1296,20 +1400,12 @@
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
   (re-frame/dispatch-sync [:initialize-db!])
-  (GET "/data/repositories.json"
-       :handler #(reset! repos (map (comp bean clj->js) %)))
-  (GET "/data/owners.json"
-       :handler #(reset! orgas (map (comp bean clj->js) %)))
-  (GET "/data/awesome-codegouvfr.json"
-       :handler #(reset! awes (walk/keywordize-keys %)))
-  (GET "/data/releases.json"
-       :handler
-       #(reset! releases (map (comp bean clj->js) %)))
-  (GET "/data/forges.csv"
-       :handler
-       #(reset! platforms (conj (map first (next (js->clj (csv/parse %)))) "sr.ht")))
-  (GET "/data/stats.json"
-       :handler #(reset! stats (walk/keywordize-keys %)))
+  (re-frame/dispatch [:fetch-repositories])
+  (re-frame/dispatch [:fetch-owners])
+  (re-frame/dispatch [:fetch-awesome])
+  (re-frame/dispatch [:fetch-releases])
+  (re-frame/dispatch [:fetch-platforms])
+  (re-frame/dispatch [:fetch-stats])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
     (re-frame/dispatch
      [:lang!
