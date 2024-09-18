@@ -504,16 +504,16 @@
                 ^{:key (str (:o repo) "/" (:n repo))}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
+                              id                 ; html_url
                               a                  ; codegouvfr "awesome" score
                               li                 ; license
                               n                  ; name
                               fn                 ; full-name
-                              o                  ; organization_name
+                              o                  ; owner
                               u                  ; last_update
                               p                  ; forge
                               ]} repo
-                      r          (str o "/" n)
-                      group      (subs r 0 (- (count r) (inc (count n))))]
+                      group      (subs id 0 (- (count id) (inc (count n))))]
                   [:tr
                    ;; Repo (orga)
                    [:td
@@ -521,9 +521,11 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title  (i/i lang [:go-to-data])
                        :target "new"
-                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/" p "/repositories/" fn)}]
+                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/"
+                                    (if (= p "github.com") "github" p)
+                                    "/repositories/" fn)}]
                      [:span " "]
-                     [:a {:href   r
+                     [:a {:href   id
                           :target "_blank"
                           :rel    "noreferrer noopener"
                           :title  (new-tab
@@ -543,7 +545,7 @@
                     [:span
                      (if-let [d (to-locale-date u lang)]
                        [:a
-                        {:href   (str (:swh-baseurl urls) r)
+                        {:href   (str (:swh-baseurl urls) id)
                          :target "new"
                          :title  (new-tab (i/i lang [:swh-link]) lang)
                          :rel    "noreferrer noopener"}
@@ -760,13 +762,12 @@
                 (let [{:keys [n        ; name
                               l        ; login
                               d        ; description
-                              o        ; organization_url
+                              id       ; organization_url
                               h        ; website
-                              f         ; floss_policy
-                              au        ; avatar_url
-                              r         ; repositories_count
-                              s         ; subscribers
-                              id        ; owner_url (json data)
+                              f        ; floss_policy
+                              au       ; avatar_url
+                              r        ; repositories_count
+                              s        ; subscribers
                               ]} orga]
                   [:tr
                    [:td (if au
@@ -786,18 +787,21 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title  (i/i lang [:go-to-data])
                        :target "new"
-                       :href   id}]
+                       :href   (str "https://data.code.gouv.fr/api/v1/hosts/"
+                                    (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
+                                      (if (re-matches #"^github.*" p) "GitHub" p))
+                                    "/owners/" l)}]
                      [:span " "]
                      [:a {:target "_blank"
                           :rel    "noreferrer noopener"
                           :title  (new-tab (i/i lang [:go-to-orga]) lang)
-                          :href   o}
+                          :href   id}
                       (or (not-empty n) l)]]]
                    [:td d]
                    [:td
                     {:style {:text-align "center"}}
                     [:a {:title (i/i lang [:go-to-repos])
-                         :href  (rfe/href :repos nil {:group o})}
+                         :href  (rfe/href :repos nil {:group id})}
                      r]]
                    [:td {:style {:text-align "center"}} s]
                    [:td {:style {:text-align "center"}}

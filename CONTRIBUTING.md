@@ -1,15 +1,15 @@
 # Contributing
 
-The development of this repository happens on [the SourceHut repository](https://git.sr.ht/~codegouvfr/code.gouv.fr).
+You can contribute by sending your patches to `~codegouvfr/dev@lists.sr.ht`.  Remember to configure your local copy of the repository as follows:
 
-For confidential feedback, use [contact@code.gouv.fr](mailto:contact@code.gouv.fr).
+    git config format.subjectPrefix ‘PATCH codegouvfr-sources’.
 
-For bug reports, patches, feature requests and general questions, send an email to the public mailing list [~codegouvfr/dev@lists.sr.ht](mailto:~codegouvfr/dev@lists.sr.ht).
+Commit messages should be written in English.
 
-To send a *patch* to the mailing list, please configure your local copy of the repository like this:
+You can also create an account on <https://sr.ht> and send us your username, we will give you write access and you can publish your contributions directly on the `main` branch.
 
-`git config format.subjectPrefix 'PATCH code.gouv.fr'`
-
-We only accept patches and commits that are signed off using the real name of the contributor.
+We only accept contributions if they are *signed off* with the contributor's real name.
 
 By signing off their contributions, contributors accept the [developer certificate of origin](https://developercertificate.org).
+
+If you wish, you can also send your suggestions directly to `contact@code.gouv.fr`.
