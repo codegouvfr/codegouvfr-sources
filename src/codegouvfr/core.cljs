@@ -241,7 +241,7 @@
  :fetch-repositories
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/repos.json"
+                 :uri             "/data/repos_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-repositories]
                  :on-failure      [:api-request-error :repositories]}}))
