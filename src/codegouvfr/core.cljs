@@ -55,16 +55,14 @@
            :li :license
            :n  :name
            :o  :organization_url
-           :id :repository_url
            :s  :subscribers_count
            :t? :is_template
            :u  :last_update
            }
    :orgas {
-           :a  :location
            :au :avatar_url
            :d  :description
-           :e  :email
+           :ps :public_sector_organization
            :id :organization_url
            :m  :ministry
            :n  :name
@@ -142,6 +140,9 @@
                 k0    (s/replace k #" \([^)]+\)" "")]
             [[:a {:href (rfe/href :orgas nil {param k0})} k] v])))
    data))
+
+(defn html-url-from-p-and-fn [p fn]
+  (str "https://" p "/" fn))
 
 (defn- table-header [lang what k]
   (let [glossary-url "https://code.gouv.fr/documentation/#glossaire"]
@@ -240,7 +241,7 @@
  :fetch-repositories
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/repositories.json"
+                 :uri             "/data/repos.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-repositories]
                  :on-failure      [:api-request-error :repositories]}}))
@@ -276,7 +277,7 @@
  :fetch-platforms
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/forges.csv"
+                 :uri             "/data/codegouvfr-forges.csv"
                  :response-format (ajax/raw-response-format)
                  :on-success      [:set-platforms]
                  :on-failure      [:api-request-error :platforms]}}))
@@ -623,7 +624,6 @@
                 ^{:key (str (:o repo) "/" (:n repo))}
                 (let [{:keys [d                  ; description
                               f                  ; forks_count
-                              id                 ; html_url
                               a                  ; codegouvfr "awesome" score
                               li                 ; license
                               n                  ; name
@@ -631,7 +631,8 @@
                               o                  ; owner
                               u                  ; last_update
                               p                  ; forge
-                              ]} repo]
+                              ]} repo
+                      html_url   (html-url-from-p-and-fn p fn)]
                   [:tr
                    [:td
                     [:span
@@ -643,7 +644,7 @@
                                         "/repositories/" fn)
                        :aria-label (str (i/i lang [:go-to-data]) " " n)}]
                      [:span " "]
-                     [:a {:href       id
+                     [:a {:href       html_url
                           :target     "_blank"
                           :rel        "noreferrer noopener"
                           :aria-label (str n " - " (i/i lang [:go-to-repo])
@@ -659,7 +660,7 @@
                     [:span
                      (if-let [d (to-locale-date u lang)]
                        [:a
-                        {:href       (str swh-baseurl id)
+                        {:href       (str swh-baseurl html_url)
                          :target     "new"
                          :title      (new-tab (i/i lang [:swh-link]) lang)
                          :rel        "noreferrer noopener"
@@ -690,11 +691,12 @@
       ;; Download link
       [:button.fr-link.fr-m-1w
        {:title    (i/i lang [:download])
-        :on-click #(download-as-csv!
-                    (map
-                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
-                     repos)
-                    (str "codegouvfr-repositories-" (todays-date lang) ".csv"))}
+        :on-click (fn []
+                    (download-as-csv!
+                     (->> repos
+                          (map #(set/rename-keys (select-keys % (keys mapping)) mapping))
+                          (map #(conj % {:html_url (html-url-from-p-and-fn (:p %) (:fn %))})))
+                     (str "codegouvfr-repositories-" (todays-date lang) ".csv")))}
        [:span.fr-icon-download-line {:aria-hidden true}]]
       ;; General information
       (table-header lang repos :repo)
