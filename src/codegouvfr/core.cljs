@@ -135,10 +135,9 @@
 
 (defn top-clean-up-orgas [data param]
   (sequence
-   (comp
-    (map #(let [[k v] %
-                k0    (s/replace k #" \([^)]+\)" "")]
-            [[:a {:href (rfe/href :orgas nil {param k0})} k] v])))
+   (map #(let [[k v] %
+               k0    (s/replace k #" \([^)]+\)" "")]
+           [[:a {:href (rfe/href :orgas nil {param k0})} k] v]))
    data))
 
 (defn html-url-from-p-and-fn [p fn]
