@@ -258,19 +258,10 @@
  :fetch-awesome
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/awesome-codegouvfr.json"
+                 :uri             "/data/awesome.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-awesome]
                  :on-failure      [:api-request-error :awesome]}}))
-
-(re-frame/reg-event-fx
- :fetch-releases
- (fn [_ _]
-   {:http-xhrio {:method          :get
-                 :uri             "/data/releases.json"
-                 :response-format (ajax/json-response-format {:keywords? true})
-                 :on-success      [:set-releases]
-                 :on-failure      [:api-request-error :releases]}}))
 
 (re-frame/reg-event-fx
  :fetch-platforms
@@ -305,11 +296,6 @@
  :set-awesome
  (fn [db [_ response]]
    (assoc db :awesome response)))
-
-(re-frame/reg-event-db
- :set-releases
- (fn [db [_ response]]
-   (assoc db :releases (map (comp bean clj->js) response))))
 
 (re-frame/reg-event-db
  :set-platforms
@@ -435,10 +421,6 @@
 (re-frame/reg-sub
  :platforms?
  (fn [db _] (:platforms db)))
-
-(re-frame/reg-sub
- :releases?
- (fn [db _] (:releases db)))
 
 (re-frame/reg-sub
  :repos?
@@ -979,7 +961,8 @@
 ;; Releases page
 
 (defn releases-page [lang]
-  (let [releases @(re-frame/subscribe [:releases?])]
+  (let [awes     @(re-frame/subscribe [:awes?])
+        releases (flatten (map :releases awes))]
     [:div
      [:div.fr-grid-row
       ;; RSS feed
@@ -1003,7 +986,9 @@
         [:tbody]
         (for [release (reverse (sort-by :published_at releases))]
           ^{:key (:html_url release)}
-          (let [{:keys [repo_name html_url body tag_name published_at]} release]
+          (let [{:keys [html_url body tag_name published_at]}
+                release
+                repo_name (last (re-matches #"https://[^/]+/([^/]+/[^/]+).*" html_url))]
             [:tr
              [:td
               [:a.fr-link
@@ -1412,7 +1397,6 @@
   (re-frame/dispatch [:fetch-repositories])
   (re-frame/dispatch [:fetch-owners])
   (re-frame/dispatch [:fetch-awesome])
-  (re-frame/dispatch [:fetch-releases])
   (re-frame/dispatch [:fetch-platforms])
   (re-frame/dispatch [:fetch-stats])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
