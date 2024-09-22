@@ -996,7 +996,7 @@
                 :target "_blank"
                 :title  (i/i lang [:Repo])
                 :rel    "noreferrer noopener"} repo_name]]
-             [:td (subs body 0 100)]
+             [:td body]
              [:td tag_name]
              [:td (to-locale-date published_at lang)]])))]]]))
 
