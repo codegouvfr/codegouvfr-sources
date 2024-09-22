@@ -986,9 +986,7 @@
         [:tbody]
         (for [release (reverse (sort-by :published_at releases))]
           ^{:key (:html_url release)}
-          (let [{:keys [html_url body tag_name published_at]}
-                release
-                repo_name (last (re-matches #"https://[^/]+/([^/]+/[^/]+).*" html_url))]
+          (let [{:keys [repo_name html_url body tag_name published_at]} release]
             [:tr
              [:td
               [:a.fr-link
