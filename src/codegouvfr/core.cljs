@@ -1019,7 +1019,7 @@
     [:> Tooltip]
     [:> Legend]]])
 
-(defn scatter-chart [lang stats]
+(defn scatter-chart [stats]
   [:> ResponsiveContainer {:width "100%" :height 400}
    [:> ScatterChart
     {:margin {:top 20 :right 20 :bottom 20 :left 20}}
@@ -1091,7 +1091,7 @@
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]
      [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
-      [scatter-chart lang stats]]]))
+      [scatter-chart stats]]]))
 
 ;; Main structure elements
 
