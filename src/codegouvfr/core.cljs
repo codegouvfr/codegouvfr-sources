@@ -201,13 +201,6 @@
             (s/join " " [(:id %) (:d %) (:ps %) (:os %)]) q))
          (if (= ministry "") true (= (:m %) ministry))))))))
 
-(defn close-filter-button [lang ff t reinit]
-  [:span
-   [:a.fr-link.fr-icon-close-circle-line.fr-link--icon-right
-    {:title (i/i lang [:remove-filter])
-     :href  (rfe/href t nil (filter #(not-empty (val %)) reinit))}
-    [:span ff]]])
-
 (defn not-empty-string-or-true [[_ v]]
   (or (and (boolean? v) (true? v))
       (and (string? v) (not-empty v))))
@@ -345,7 +338,8 @@
  (fn [db [_ view query-params]]
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:filter! (merge init-filter query-params)])
+   (re-frame/dispatch [:filter! query-params])
+   (println "filter now: " (:filter db))
    (assoc db :view view)))
 
 (re-frame/reg-event-db
@@ -372,7 +366,7 @@
 
 (re-frame/reg-sub
  :ministries?
- (fn [] (filter not-empty (distinct (map :m @(re-frame/subscribe [:orgas?]))))))
+ (fn [db _] (filter not-empty (distinct (map :m (:owners db))))))
 
 (re-frame/reg-sub
  :lang?
@@ -1133,7 +1127,7 @@
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i lang [:repos-of-source-code])
             :on-click
-            #(do (reset-queries) (rfe/push-state :repos  {:floss "true"}))}
+            #(do (reset-queries) (rfe/push-state :repos))}
            (i/i lang [:Repos])]]
          [:li.fr-nav__item
           [:button.fr-nav__link
@@ -1315,7 +1309,12 @@
                                :template :floss))]
       [:div.fr-col-8.fr-grid-row.fr-m-1w
        (when-let [ff (not-empty (:group flt))]
-         (close-filter-button lang ff :repos (merge flt {:group nil})))])]])
+         [:span
+          [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
+           {:title    (i/i lang [:remove-filter])
+            :on-click #(do (re-frame/dispatch [:filter! {:group nil}])
+                           (rfe/push-state :repos))}
+           [:span ff]]])])]])
 
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
