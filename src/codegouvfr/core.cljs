@@ -20,7 +20,9 @@
             [semantic-csv.core :as sc]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [cljsjs.recharts])
+            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter
+                                XAxis YAxis ZAxis Tooltip Legend CartesianGrid
+                                Pie PieChart Cell]])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Defaults
@@ -996,11 +998,11 @@
 
 (def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"])
 
-(defn x-chart [data {:keys [data-key name-key]}]
-  [:> (aget js/Recharts "ResponsiveContainer")
+(defn pie-chart [data {:keys [data-key name-key]}]
+  [:> ResponsiveContainer
    {:width "100%" :height 400}
-   [:> (aget js/Recharts "PieChart")
-    [:> (aget js/Recharts "Pie")
+   [:> PieChart
+    [:> Pie
      {:data        data
       :dataKey     data-key
       :nameKey     name-key
@@ -1010,26 +1012,50 @@
       :fill        "#8884d8"
       :label       true}
      (map-indexed  (fn [index _]
-                     [:> (aget js/Recharts "Cell")
+                     [:> Cell
                       {:key  (str "cell-" index)
                        :fill (nth color-palette index)}])
                    data)]
-    [:> (aget js/Recharts "Tooltip")]
-    [:> (aget js/Recharts "Legend")]]])
+    [:> Tooltip]
+    [:> Legend]]])
 
-(defn languages-chart [lang]
-  (let [data (for [[k v] (take 5 (:top_languages @(re-frame/subscribe [:stats?])))]
+(defn scatter-chart [lang stats]
+  [:> ResponsiveContainer {:width "100%" :height 400}
+   [:> ScatterChart
+    {:margin {:top 20 :right 20 :bottom 20 :left 20}}
+    [:> CartesianGrid {:strokeDasharray "3 3"}]
+    [:> XAxis {:type    "number"
+               :dataKey "total_stars"
+               :name    "Stars"
+               :unit    ""
+               :domain  ["dataMin - 5", "dataMax + 5"]}]
+    [:> YAxis {:type    "number"
+               :dataKey "repositories_count"
+               :name    "Repositories"
+               :unit    ""
+               :domain  ["dataMin - 5", "dataMax + 5"]}]
+    [:> ZAxis {:type    "category"
+               :dataKey "owner"
+               :name    "Organization"}]
+    [:> Tooltip {:cursor {:strokeDasharray "3 3"}}]
+    [:> Legend]
+    [:> Scatter {:name "Repositories vs Starts"
+                 :data (:top_orgs_repos_stars stats)
+                 :fill "#8884d8"}]]])
+
+(defn languages-chart [lang stats]
+  (let [data (for [[k v] (take 5 (:top_languages stats))]
                {:language k :percentage v})]
     [:div.fr-col-6
      [:span.fr-h4 (i/i lang [:most-used-languages])]
-     (x-chart data {:data-key "percentage" :name-key "language"})]))
+     (pie-chart data {:data-key "percentage" :name-key "language"})]))
 
-(defn licenses-chart [lang]
-  (let [data (for [[k v] (take 5 (:top_licenses @(re-frame/subscribe [:stats?])))]
+(defn licenses-chart [lang stats]
+  (let [data (for [[k v] (take 5 (:top_licenses stats))]
                {:license k :percentage v})]
     [:div.fr-col-6
      [:span.fr-h4 (i/i lang [:most-used-licenses])]
-     (x-chart data {:data-key "percentage" :name-key "license"})]))
+     (pie-chart data {:data-key "percentage" :name-key "license"})]))
 
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
@@ -1048,8 +1074,8 @@
         {:keys [top_orgs_by_repos top_orgs_by_stars]} stats]
     [:div.fr-grid
      [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
-      [languages-chart lang]
-      [licenses-chart lang]]
+      [languages-chart lang stats]
+      [licenses-chart lang stats]]
      [:div.fr-grid-row
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
@@ -1063,7 +1089,9 @@
        (stats-table [:span (i/i lang [:most-starred-orgas])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Stars])]]])]]]))
+                             [:th (i/i lang [:Stars])]]])]]
+     [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
+      [scatter-chart lang stats]]]))
 
 ;; Main structure elements
 
