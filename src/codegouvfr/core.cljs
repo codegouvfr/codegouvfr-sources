@@ -19,7 +19,8 @@
             [goog.labs.format.csv :as csv]
             [semantic-csv.core :as sc]
             [day8.re-frame.http-fx]
-            [ajax.core :as ajax])
+            [ajax.core :as ajax]
+            [cljsjs.recharts])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Defaults
@@ -339,7 +340,6 @@
    (re-frame/dispatch [:repos-page! 0])
    (re-frame/dispatch [:orgas-page! 0])
    (re-frame/dispatch [:filter! query-params])
-   (println "filter now: " (:filter db))
    (assoc db :view view)))
 
 (re-frame/reg-event-db
@@ -994,6 +994,43 @@
 
 ;; Stats page
 
+(def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"])
+
+(defn x-chart [data {:keys [data-key name-key]}]
+  [:> (aget js/Recharts "ResponsiveContainer")
+   {:width "100%" :height 400}
+   [:> (aget js/Recharts "PieChart")
+    [:> (aget js/Recharts "Pie")
+     {:data        data
+      :dataKey     data-key
+      :nameKey     name-key
+      :cx          "50%"
+      :cy          "50%"
+      :outerRadius 150
+      :fill        "#8884d8"
+      :label       true}
+     (map-indexed  (fn [index _]
+                     [:> (aget js/Recharts "Cell")
+                      {:key  (str "cell-" index)
+                       :fill (nth color-palette index)}])
+                   data)]
+    [:> (aget js/Recharts "Tooltip")]
+    [:> (aget js/Recharts "Legend")]]])
+
+(defn languages-chart [lang]
+  (let [data (for [[k v] (take 5 (:top_languages @(re-frame/subscribe [:stats?])))]
+               {:language k :percentage v})]
+    [:div.fr-col-6
+     [:span.fr-h4 (i/i lang [:most-used-languages])]
+     (x-chart data {:data-key "percentage" :name-key "language"})]))
+
+(defn licenses-chart [lang]
+  (let [data (for [[k v] (take 5 (:top_licenses @(re-frame/subscribe [:stats?])))]
+               {:license k :percentage v})]
+    [:div.fr-col-6
+     [:span.fr-h4 (i/i lang [:most-used-licenses])]
+     (x-chart data {:data-key "percentage" :name-key "license"})]))
+
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
    [:h4.fr-h4 heading]
@@ -1005,32 +1042,14 @@
         ^{:key k}
         [:tr [:td k] [:td v]])]]]])
 
-(defn stats-card [l i s]
-  [:div.fr-card.fr-col-4
-   [:div.fr-card__body
-    [:p.fr-card__title (i/i l [i])]
-    [:div.fr-card__desc [:p.fr-h4 s]]]])
-
-(defn stats-page [lang stats]
-  (let [{:keys [repos_cnt orgas_cnt ;; libs_cnt deps_cnt
-                avg_repos_cnt
-                top_orgs_by_repos top_orgs_by_stars
-                top_licenses top_languages]} stats]
+(defn stats-page [lang]
+  (let [stats
+        @(re-frame/subscribe [:stats?])
+        {:keys [top_orgs_by_repos top_orgs_by_stars]} stats]
     [:div.fr-grid
-     [:div.fr-grid-row.fr-grid-row--gutters
-      {:style {:height "180px"}}
-      (stats-card lang :Orgas orgas_cnt)
-      (stats-card lang :repos-of-source-code repos_cnt)
-      (stats-card lang :mean-repos-by-orga avg_repos_cnt)]
-     [:div.fr-grid-row
-      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
-       (stats-table [:span (i/i lang [:most-used-languages])]
-                    (top-clean-up-repos top_languages "language")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:language])] [:th "%"]]])]
-      [:div.fr-col-6.fr-grid-row.fr-grid-row--center
-       (stats-table [:span (i/i lang [:most-used-identified-licenses])]
-                    (top-clean-up-repos top_licenses "license")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:license])] [:th "%"]]])]]
+     [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
+      [languages-chart lang]
+      [licenses-chart lang]]
      [:div.fr-grid-row
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
@@ -1330,7 +1349,7 @@
         :repos    [repos-page lang license language]
         :releases [releases-page lang]
         :awes     [awes-page lang]
-        :stats    [stats-page lang @(re-frame/subscribe [:stats?])]
+        :stats    [stats-page lang]
         :legal    (condp = lang "fr" (inline-page "legal.fr.md")
                          (inline-page "legal.en.md"))
         :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
