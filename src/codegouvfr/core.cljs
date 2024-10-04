@@ -44,7 +44,7 @@
    :floss             false
    :with-publiccode   false
    :with-contributing false
-   :ministry          ""})
+   :ministry          nil})
 
 (defonce filter-chan (async/chan 100))
 
@@ -202,7 +202,7 @@
          (if-a-b-else-true q
            (s-includes?
             (s/join " " [(:id %) (:d %) (:ps %) (:os %)]) q))
-         (if (= ministry "") true (= (:m %) ministry))))))))
+         (if (empty? ministry) true (= (:m %) ministry))))))))
 
 (defn not-empty-string-or-true [[_ v]]
   (or (and (boolean? v) (true? v))
@@ -322,6 +322,11 @@
  :path!
  (fn [db [_ path]]
    (assoc db :path path)))
+
+(re-frame/reg-event-db
+ :reset-filter!
+ (fn [db [_ _]]
+   (update-in db [:filter] init-filter)))
 
 (re-frame/reg-event-db
  :filter!
@@ -1105,7 +1110,7 @@
   (reset! license nil)
   (reset! language nil)
   (reset! forge nil)
-  (re-frame/dispatch [:filter! {:q nil :license nil :language nil :forge nil}]))
+  (re-frame/dispatch [:reset-filter!]))
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
