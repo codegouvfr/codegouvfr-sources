@@ -39,7 +39,7 @@
    :group             nil
    :license           nil
    :language          nil
-   :forge             ""
+   :forge             nil
    :fork              false
    :floss             false
    :with-publiccode   false
@@ -188,7 +188,7 @@
            (some (into #{} (list (s/lower-case (or (:l %) ""))))
                  (s/split (s/lower-case language) #" +"))
            true)
-         (if (= forge "") true (= (:p %) forge))
+         (if (empty? forge) true (= (:p %) forge))
          (if-a-b-else-true group (= (:o %) group))
          (if-a-b-else-true q (s-includes? (s/join " " [(:id %) (:d %)]) q))))))))
 
@@ -1104,8 +1104,8 @@
   (reset! q nil)
   (reset! license nil)
   (reset! language nil)
-  (reset! forge "")
-  (re-frame/dispatch [:filter! {:q "" :license "" :language "" :forge ""}]))
+  (reset! forge nil)
+  (re-frame/dispatch [:filter! {:q nil :license nil :language nil :forge nil}]))
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
