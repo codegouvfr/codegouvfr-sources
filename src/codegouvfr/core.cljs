@@ -558,14 +558,11 @@
 
 ;; Main structure - repos
 
-(defn repos-table [lang repos-cnt]
-  (if (zero? repos-cnt)
-    (if (zero? (count @(re-frame/subscribe [:repos?])))
-      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:Loading])]]
-      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-repo-found])]])
+(defn repos-table [lang repos]
+  (if (zero? (count repos))
+    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-repo-found])]]
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
-          repos-page @(re-frame/subscribe [:repos-page?])
-          repos      @(re-frame/subscribe [:repos?])]
+          repos-page @(re-frame/subscribe [:repos-page?])]
       [:div.fr-table.fr-table--no-caption
        {:role "region" :aria-label (i/i lang [:repos-of-source-code])}
        [:table
@@ -604,15 +601,15 @@
                               (drop (* REPOS-PER-PAGE repos-page))
                               (take REPOS-PER-PAGE))]
                 ^{:key (str (:o repo) "/" (:n repo))}
-                (let [{:keys [d                  ; description
-                              f                  ; forks_count
-                              a                  ; codegouvfr "awesome" score
-                              li                 ; license
-                              n                  ; name
-                              fn                 ; full-name
-                              o                  ; owner
-                              u                  ; last_update
-                              p                  ; forge
+                (let [{:keys [d         ; description
+                              f         ; forks_count
+                              a         ; codegouvfr "awesome" score
+                              li        ; license
+                              n         ; name
+                              fn        ; full-name
+                              o         ; owner
+                              u         ; last_update
+                              p         ; forge
                               ]} repo
                       html_url   (html-url-from-p-and-fn p fn)]
                   [:tr
@@ -772,7 +769,7 @@
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
      ;; Main repos table display
-     [repos-table lang (count repos)]
+     [repos-table lang repos]
      ;; Bottom pagination block
      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
 
@@ -820,13 +817,10 @@
 
 ;; Main structure - orgas
 
-(defn orgas-table [lang orgas-cnt]
-  (if (zero? orgas-cnt)
-    (if (zero? (count @(re-frame/subscribe [:orgas?])))
-      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:Loading])]]
-      [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-orga-found])]])
-    (let [org-f @(re-frame/subscribe [:sort-orgas-by?])
-          orgas @(re-frame/subscribe [:orgas?])]
+(defn orgas-table [lang orgas]
+  (if (zero? (count orgas))
+    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-orga-found])]]
+    (let [org-f @(re-frame/subscribe [:sort-orgas-by?])]
       [:div.fr-table.fr-table--no-caption
        {:role "region" :aria-label (i/i lang [:Orgas])}
        [:table
@@ -917,7 +911,6 @@
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
-        orgas-cnt      (count orgas)
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
         count-pages    (count (partition-all ORGAS-PER-PAGE orgas))
         first-disabled (zero? orgas-pages)
@@ -956,7 +949,7 @@
        (for [x @(re-frame/subscribe [:ministries?])]
          ^{:key x}
          [:option {:value x} x])]]
-     [orgas-table lang orgas-cnt]
+     [orgas-table lang orgas]
      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
 ;; Releases page
