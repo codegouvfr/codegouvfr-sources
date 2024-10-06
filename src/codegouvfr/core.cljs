@@ -710,7 +710,7 @@
             (async/go
               (async/>! filter-chan {:forge ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
-       (for [x @(re-frame/subscribe [:platforms?])]
+       (for [x (sort @(re-frame/subscribe [:platforms?]))]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
@@ -996,26 +996,28 @@
 
 (def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"])
 
-(defn pie-chart [data {:keys [data-key name-key]}]
-  [:> ResponsiveContainer
-   {:width "100%" :height 400}
-   [:> PieChart
-    [:> Pie
-     {:data        data
-      :dataKey     data-key
-      :nameKey     name-key
-      :cx          "50%"
-      :cy          "50%"
-      :outerRadius 150
-      :fill        "#8884d8"
-      :label       true}
-     (map-indexed  (fn [index _]
-                     [:> Cell
-                      {:key  (str "cell-" index)
-                       :fill (nth color-palette index)}])
-                   data)]
-    [:> Tooltip]
-    [:> Legend]]])
+(defn pie-chart [{:keys [lang data data-key name-key title-i18n-keyword]}]
+  [:div.fr-col-6
+   [:span.fr-h4 (i/i lang [title-i18n-keyword])]
+   [:> ResponsiveContainer
+    {:width "100%" :height 400}
+    [:> PieChart
+     [:> Pie
+      {:data        data
+       :dataKey     data-key
+       :nameKey     name-key
+       :cx          "50%"
+       :cy          "50%"
+       :outerRadius 150
+       :fill        "#8884d8"
+       :label       true}
+      (map-indexed  (fn [index _]
+                      [:> Cell
+                       {:key  (str "cell-" index)
+                        :fill (nth color-palette index)}])
+                    data)]
+     [:> Tooltip]
+     [:> Legend]]]])
 
 (defn scatter-chart [stats]
   [:> ResponsiveContainer {:width "100%" :height 400}
@@ -1042,18 +1044,22 @@
                  :fill "#8884d8"}]]])
 
 (defn languages-chart [lang stats]
-  (let [data (for [[k v] (take 5 (:top_languages stats))]
-               {:language k :percentage v})]
-    [:div.fr-col-6
-     [:span.fr-h4 (i/i lang [:most-used-languages])]
-     (pie-chart data {:data-key "percentage" :name-key "language"})]))
+  (pie-chart
+   {:data               (for [[k v] (take 5 (:top_languages stats))]
+                          {:language k :percentage v})
+    :lang               lang
+    :data-key           "percentage"
+    :name-key           "language"
+    :title-i18n-keyword :most-used-languages}))
 
 (defn licenses-chart [lang stats]
-  (let [data (for [[k v] (take 5 (:top_licenses stats))]
-               {:license k :percentage v})]
-    [:div.fr-col-6
-     [:span.fr-h4 (i/i lang [:most-used-licenses])]
-     (pie-chart data {:data-key "percentage" :name-key "license"})]))
+  (pie-chart
+   {:data               (for [[k v] (take 5 (:top_licenses stats))]
+                          {:license k :percentage v})
+    :lang               lang
+    :data-key           "percentage"
+    :name-key           "license"
+    :title-i18n-keyword :most-used-licenses}))
 
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
