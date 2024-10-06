@@ -710,7 +710,7 @@
             (async/go
               (async/>! filter-chan {:forge ev}))))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
-       (for [x @(re-frame/subscribe [:platforms?])]
+       (for [x (sort @(re-frame/subscribe [:platforms?]))]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
