@@ -20,9 +20,7 @@
             [semantic-csv.core :as sc]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            ["recharts" :refer [ResponsiveContainer ScatterChart Scatter
-                                XAxis YAxis ZAxis Tooltip Legend CartesianGrid
-                                Pie PieChart Cell]])
+            [cljsjs.highcharts])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Set defaults
@@ -997,81 +995,89 @@
 
 ;; Stats page
 
-(def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"
-                    "#50C878" "#FF7F50" "#9370DB" "#20B2AA" "#FFD700"])
-
 (defn pie-chart [{:keys [lang data data-key name-key title-i18n-keyword]}]
-  [:div.fr-col-6
-   [:span.fr-h4 (i/i lang [title-i18n-keyword])]
-   [:> ResponsiveContainer
-    {:width "100%" :height 400}
-    [:> PieChart
-     [:> Pie
-      {:data        data
-       :dataKey     data-key
-       :nameKey     name-key
-       :cx          "50%"
-       :cy          "50%"
-       :outerRadius 150
-       :fill        "#8884d8"
-       :label       #(str (js/parseFloat (.toFixed (.-value %) 2)) "%")}
-      (map-indexed  (fn [index _]
-                      [:> Cell
-                       {:key  (str "cell-" index)
-                        :fill (nth color-palette index)}])
-                    data)]
-     [:> Tooltip {:formatter (fn [value] (str (js/parseFloat (.toFixed value 2)) "%"))}]
-     [:> Legend]]]])
+  (let [formatted-data
+        (map (fn [item]
+               {:name (get item name-key)
+                :y    (get item data-key)})
+             data)
+        chart-options
+        {:chart       {:type "pie"}
+         :title       {:text (i/i lang [title-i18n-keyword])}
+         :tooltip     {:pointFormat "{series.name}: <b>{point.percentage:.1f}%</b>"}
+         :plotOptions {:pie {:allowPointSelect true
+                             :cursor           "pointer"
+                             :dataLabels       {:enabled true
+                                                :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
+         :series      [{:name         (i/i lang [title-i18n-keyword])
+                        :colorByPoint true
+                        :data         formatted-data}]
+         :credits     {:enabled false}}]
+    (when (seq formatted-data)  ; Only render if we have data
+      [:div.fr-col-6
+       [:div {:style {:width "100%" :height "400px"}
+              :ref   (fn [el]
+                       (when el
+                         (js/console.log "Rendering chart with data:" (clj->js formatted-data))
+                         (js/Highcharts.chart el (clj->js chart-options))))}]])))
 
 (defn scatter-chart [stats]
-  [:> ResponsiveContainer {:width "100%" :height 400}
-   [:> ScatterChart
-    {:margin {:top 20 :right 20 :bottom 20 :left 20}}
-    [:> CartesianGrid {:strokeDasharray "3 3"}]
-    [:> XAxis {:type    "number"
-               :dataKey "total_stars"
-               :name    "Stars"
-               :unit    ""
-               :domain  ["dataMin - 5", "dataMax + 5"]}]
-    [:> YAxis {:type    "number"
-               :dataKey "repositories_count"
-               :name    "Repositories"
-               :unit    ""
-               :domain  ["dataMin - 5", "dataMax + 5"]}]
-    [:> ZAxis {:type    "category"
-               :dataKey "owner"
-               :name    "Organization"}]
-    [:> Tooltip {:cursor {:strokeDasharray "3 3"}}]
-    [:> Legend]
-    [:> Scatter {:name "Repositories vs Starts"
-                 :data (:top_orgs_repos_stars stats)
-                 :fill "#8884d8"}]]])
+  (let [chart-options
+        {:chart       {:type     "scatter"
+                       :zoomType "xy"}
+         :title       {:text "Repositories vs Stars"}
+         :xAxis       {:title         {:enabled true
+                                       :text    "Total Stars"}
+                       :startOnTick   true
+                       :endOnTick     true
+                       :showLastLabel true}
+         :yAxis       {:title {:text "Repositories Count"}}
+         :legend      {:enabled false}
+         :plotOptions {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
+                                           :pointFormat  "Stars: {point.x}<br>Repositories: {point.y}"}}}
+         :series      [{:name  "Organizations"
+                        :color "rgba(223, 83, 83, .5)"
+                        :data  (map (fn [item]
+                                      (let [owner (get item :owner)
+                                            stars (get item :total_stars)
+                                            repos (get item :repositories_count)]
+                                        {:x    stars
+                                         :y    repos
+                                         :name owner}))
+                                    (:top_orgs_repos_stars stats))}]
+         :credits     {:enabled false}}]
+    [:div {:style {:width "100%" :height "400px"}
+           :ref   (fn [el]
+                    (when el
+                      (js/Highcharts.chart el (clj->js chart-options))))}]))
 
 (defn to-percent [num total]
   (js/parseFloat (gstring/format "%.2f" (* 100 (/ (* num 1.0) total)))))
 
 (defn languages-chart [lang stats]
-  (let [top_languages (into {} (take 10 (:top_languages stats)))
-        repos_total   (reduce + (vals top_languages))
-        data          (for [[k v] top_languages]
-                        {:language k :percentage (to-percent v repos_total)})]
+  (let [top_languages (take 10 (:top_languages stats))
+        repos_total   (reduce + (map second top_languages))
+        data          (for [[language count] top_languages]
+                        {:language   language
+                         :percentage (to-percent count repos_total)})]
     (pie-chart
      {:data               data
       :lang               lang
-      :data-key           "percentage"
-      :name-key           "language"
+      :data-key           :percentage
+      :name-key           :language
       :title-i18n-keyword :most-used-languages})))
 
 (defn licenses-chart [lang stats]
-  (let [top_licenses (into {} (take 10 (:top_licenses stats)))
-        repos_total  (reduce + (vals top_licenses))
-        data         (for [[k v] top_licenses]
-                       {:license k :percentage (to-percent v repos_total)})]
+  (let [top_licenses (take 10 (:top_licenses stats))
+        repos_total  (reduce + (map second top_licenses))
+        data         (for [[license count] top_licenses]
+                       {:license    license
+                        :percentage (to-percent count repos_total)})]
     (pie-chart
      {:data               data
       :lang               lang
-      :data-key           "percentage"
-      :name-key           "license"
+      :data-key           :percentage
+      :name-key           :license
       :title-i18n-keyword :most-used-licenses})))
 
 (defn stats-table [heading data thead]
