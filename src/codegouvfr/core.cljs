@@ -25,14 +25,17 @@
                                 Pie PieChart Cell]])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
-;; Defaults
+;; Set defaults
 
 (def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
-(def ^:const TIMEOUT 200)
 (def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
 (def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
+
+(def q (reagent/atom nil))
+(def license (reagent/atom nil))
+(def language (reagent/atom nil))
 
 (defonce init-filter
   {:q                 nil
@@ -42,6 +45,7 @@
    :forge             nil
    :fork              false
    :floss             false
+   :template          false
    :with-publiccode   false
    :with-contributing false
    :ministry          nil})
@@ -49,6 +53,7 @@
 (defonce filter-chan (async/chan 100))
 
 ;; Mappings used when exporting displayed data to csv files
+
 (defonce mappings
   {:repos {
            :d  :description
@@ -210,11 +215,8 @@
 
 (defn start-filter-loop []
   (async/go
-    (loop [f (async/<! filter-chan)]
-      (let [v  @(re-frame/subscribe [:view?])
-            fs @(re-frame/subscribe [:filter?])]
-        (rfe/push-state v nil (filter not-empty-string-or-true (merge fs f))))
-      (re-frame/dispatch [:filter! f])
+    (loop [{:keys [view f update-filter]} (async/<! filter-chan)]
+      (rfe/push-state view nil (filter not-empty-string-or-true (merge update-filter f)))
       (recur (async/<! filter-chan)))))
 
 ;; Events
@@ -232,6 +234,7 @@
     :path          ""}))
 
 ;; Define events for each API call
+
 (re-frame/reg-event-fx
  :fetch-repositories
  (fn [_ _]
@@ -278,6 +281,7 @@
                  :on-failure      [:api-request-error :stats]}}))
 
 ;; Define events to handle successful responses
+
 (re-frame/reg-event-db
  :set-repositories
  (fn [db [_ response]]
@@ -304,12 +308,14 @@
    (assoc db :stats response)))
 
 ;; Define an event to handle API request errors
+
 (re-frame/reg-event-db
  :api-request-error
  (fn [db [_ request-type response]]
    (assoc-in db [:errors request-type] response)))
 
 ;; Define other reframe events
+
 (re-frame/reg-event-db
  :lang!
  (fn [db [_ lang]]
@@ -341,33 +347,53 @@
  :orgas-page!
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :view!
- (fn [db [_ view query-params]]
-   (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:filter! query-params])
-   (assoc db :view view)))
+ (fn [{:keys [db]} [_ view query-params]]
+   {:db         (assoc db :view view)
+    :dispatch-n [[:repos-page! 0]
+                 [:orgas-page! 0]
+                 [:filter! query-params]]}))
 
 (re-frame/reg-event-db
  :reverse-sort!
  (fn [db _] (update-in db [:reverse-sort] not)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :sort-repos-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:repos-page! 0])
-   (when (= k (:sort-repos-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-repos-by k)))
+ (fn [{:keys [db]} [_ k]]
+   (let [effects {:db       (assoc db :sort-repos-by k)
+                  :dispatch [:repos-page! 0]}]
+     (if (= k (:sort-repos-by db))
+       (update effects :dispatch-n (fnil conj []) [:reverse-sort!])
+       effects))))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :sort-orgas-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:orgas-page! 0])
-   (when (= k (:sort-orgas-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-orgas-by k)))
+ (fn [{:keys [db]} [_ k]]
+   (let [effects {:db       (assoc db :sort-orgas-by k)
+                  :dispatch [:orgas-page! 0]}]
+     (if (= k (:sort-orgas-by db))
+       (update effects :dispatch-n (fnil conj []) [:reverse-sort!])
+       effects))))
+
+(re-frame/reg-event-fx
+ :update-filter
+ (fn [{:keys [db]} [_ value filter-key]]
+   {:db       (assoc-in db [:filter filter-key] value)
+    :dispatch [:update-filter-chan {filter-key value}]}))
+
+(re-frame/reg-event-fx
+ :update-filter-chan
+ (fn [{:keys [db]} [_ filter-update]]
+   {:async-flow
+    {:async-flow-fn
+     #(async/go
+        (async/>! filter-chan {:view (:view db) :f (:filter db) :update-filter filter-update}))}}))
+
+(re-frame/reg-fx
+ :async-flow
+ (fn [{:keys [async-flow-fn]}] (async-flow-fn)))
 
 ;; Subscriptions
 
@@ -446,11 +472,6 @@
                  :repos       (sort-by :r orgs)
                  :floss       (sort-by :f orgs)
                  :subscribers (sort-by :s orgs)
-                 ;; :date  (sort
-                 ;;         #(compare
-                 ;;           (js/Date. (.parse js/Date (or (:c %2) UNIX-EPOCH)))
-                 ;;           (js/Date. (.parse js/Date (or (:c %1) UNIX-EPOCH))))
-                 ;;         orgs)
                  orgs)]
      (apply-orgas-filters
       (if @(re-frame/subscribe [:reverse-sort?])
@@ -481,31 +502,43 @@
       (and (pos? page) (not next))
       (re-frame/dispatch [evt (dec page)]))))
 
-(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
+(defn navigate-pagination [lang type first-disabled last-disabled current-page total-pages]
   [:div.fr-grid-row.fr-grid-row--center
-   [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
+   [:nav.fr-pagination
+    {:role       "navigation"
+     :aria-label (i/i lang [:pagination])}
     [:ul.fr-pagination__list
      [:li
       [:button.fr-pagination__link.fr-pagination__link--first
-       {:on-click #(change-page type "first")
-        :disabled first-disabled}]]
+       {:on-click      #(change-page type "first")
+        :disabled      first-disabled
+        :aria-label    (i/i lang [:first-page])
+        :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--prev
-       {:on-click #(change-page type nil)
-        :disabled first-disabled}]]
+       {:on-click      #(change-page type nil)
+        :disabled      first-disabled
+        :aria-label    (i/i lang [:previous-page])
+        :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr
-       {:disabled true}
+       {:disabled     true
+        :aria-current "page"
+        :aria-label   (i/i lang [:current-page-of-total])}
        (str (inc current-page) "/"
             (if (> total-pages 0) total-pages 1))]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
-       {:on-click #(change-page type true)
-        :disabled last-disabled}]]
+       {:on-click      #(change-page type true)
+        :disabled      last-disabled
+        :aria-label    (i/i lang [:next-page])
+        :aria-disabled last-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--last
-       {:on-click #(change-page type "last")
-        :disabled last-disabled}]]]]])
+       {:on-click      #(change-page type "last")
+        :disabled      last-disabled
+        :aria-label    (i/i lang [:last-page])
+        :aria-disabled last-disabled}]]]]])
 
 ;; Home page
 
@@ -651,7 +684,7 @@
                    [:td {:style      {:text-align "center"}
                          :aria-label (str (i/i lang [:Score]) ": " a)} a]])))]])))
 
-(defn repos-page [lang license language]
+(defn repos-page [lang]
   (let [repos          @(re-frame/subscribe [:repos?])
         repos-pages    @(re-frame/subscribe [:repos-page?])
         count-pages    (count (partition-all REPOS-PER-PAGE repos))
@@ -680,98 +713,63 @@
       ;; General information
       (table-header lang repos :repo)
       ;; Top pagination block
-      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
+      [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
-        :value       (or @license (:license @(re-frame/subscribe [:filter?])))
-        :on-change   (fn [e]
-                       (let [ev (.-value (.-target e))]
-                         (reset! license ev)
-                         (async/go
-                           (async/<! (async/timeout TIMEOUT))
-                           (async/>! filter-chan {:license ev}))))}]
+        :aria-label  (i/i lang [:license])
+        :value       (or @license (:license f))
+        :on-change   #(let [v (.. % -target -value)]
+                        (reset! license v)
+                        (re-frame/dispatch [:update-filter v :license]))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:value       (or @language (:language @(re-frame/subscribe [:filter?])))
+       {:value       (or @language (:language f))
         :placeholder (i/i lang [:language])
-        :on-change   (fn [e]
-                       (let [ev (.-value (.-target e))]
-                         (reset! language ev)
-                         (async/go
-                           (async/<! (async/timeout TIMEOUT))
-                           (async/>! filter-chan {:language ev}))))}]
+        :aria-label  (i/i lang [:language])
+        :on-change   #(let [v (.. % -target -value)]
+                        (reset! language v)
+                        (re-frame/dispatch [:update-filter v :language]))}]
       [:select.fr-select.fr-col-3
-       {:value (or forge "")
-        :on-change
-        (fn [e]
-          (let [ev (.-value (.-target e))]
-            (re-frame/dispatch [:filter! {:forge ev}])
-            (async/go
-              (async/>! filter-chan {:forge ev}))))}
+       {:value     (or forge "")
+        :on-change #(let [v (.. % -target -value)]
+                      (re-frame/dispatch [:update-filter (.. % -target -value) :forge]))}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x (sort @(re-frame/subscribe [:platforms?]))]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#1 {:type "checkbox" :name "1"
-                  :on-change
-                  (fn [e]
-                    (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:fork ev}])
-                      (async/go
-                        (async/>! filter-chan {:fork ev}))))}]
-       [:label.fr-label
-        {:for   "1"
-         :title (i/i lang [:only-fork-title])}
+       [:input#1 {:type      "checkbox" :name "1"
+                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :fork])}]
+       [:label.fr-label {:for "1" :title (i/i lang [:only-fork-title])}
         (i/i lang [:only-fork])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#2 {:type "checkbox" :name "2"
-                  :on-change
-                  (fn [e]
-                    (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:floss ev}])
-                      (async/go
-                        (async/>! filter-chan {:floss ev}))))}]
+       [:input#2 {:type      "checkbox" :name "2"
+                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :floss])}]
        [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
         (i/i lang [:only-with-license])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#4 {:type "checkbox" :name "4"
-                  :on-change
-                  (fn [e]
-                    (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:template ev}])
-                      (async/go
-                        (async/>! filter-chan {:template ev}))))}]
+       [:input#4 {:type      "checkbox" :name "4"
+                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :template])}]
        [:label.fr-label
         {:for "4" :title (i/i lang [:only-template-title])}
         (i/i lang [:only-template])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#5 {:type "checkbox" :name "5"
-                  :on-change
-                  (fn [e]
-                    (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:with-contributing ev}])
-                      (async/go
-                        (async/>! filter-chan {:with-contributing ev}))))}]
+       [:input#5 {:type      "checkbox" :name "5"
+                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-contributing])}]
        [:label.fr-label
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#6 {:type "checkbox" :name "6"
-                  :on-change
-                  (fn [e]
-                    (let [ev (.-checked (.-target e))]
-                      (re-frame/dispatch [:filter! {:with-publiccode ev}])
-                      (async/go
-                        (async/>! filter-chan {:with-publiccode ev}))))}]
+       [:input#6 {:type      "checkbox" :name "6"
+                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
      ;; Main repos table display
      [repos-table lang repos]
      ;; Bottom pagination block
-     [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
+     [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]))
 
 ;; Main structure - awesome
 
@@ -912,6 +910,7 @@
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
         orgas-pages    @(re-frame/subscribe [:orgas-page?])
+        f              @(re-frame/subscribe [:filter?])
         count-pages    (count (partition-all ORGAS-PER-PAGE orgas))
         first-disabled (zero? orgas-pages)
         last-disabled  (= orgas-pages (dec count-pages))
@@ -935,22 +934,17 @@
       ;; General information
       (table-header lang orgas :orga)
       ;; Top pagination block
-      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
+      [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
-       {:value (or (:ministry @(re-frame/subscribe [:filter?])) "")
-        :on-change
-        (fn [e]
-          (let [ev (.-value (.-target e))]
-            (re-frame/dispatch [:filter! {:ministry ev}])
-            (async/go
-              (async/>! filter-chan {:ministry ev}))))}
+       {:value     (or (:ministry f) "")
+        :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :ministry])}
        [:option#default {:value ""} (i/i lang [:all-ministries])]
        (for [x @(re-frame/subscribe [:ministries?])]
          ^{:key x}
          [:option {:value x} x])]]
      [orgas-table lang orgas]
-     [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
+     [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
 ;; Releases page
 
@@ -1099,16 +1093,10 @@
 
 ;; Main structure elements
 
-(def q (reagent/atom nil))
-(def license (reagent/atom nil))
-(def language (reagent/atom nil))
-(def forge (reagent/atom nil))
-
 (defn reset-queries []
   (reset! q nil)
   (reset! license nil)
   (reset! language nil)
-  (reset! forge nil)
   (re-frame/dispatch [:reset-filter!]))
 
 (defn banner [lang]
@@ -1341,31 +1329,29 @@
 ;; Main pages functions
 
 (defn main-menu [lang view]
-  [:div
-   [:div.fr-grid-row.fr-mt-2w
-    [:div.fr-col-12
-     (when (some #{:repos :orgas} [view])
-       [:input.fr-input
-        {:placeholder (i/i lang [:free-search])
-         :aria-label  (i/i lang [:free-search])
-         :value       (or @q (:q @(re-frame/subscribe [:filter?])))
-         :on-change   (fn [e]
-                        (let [ev (.-value (.-target e))]
-                          (reset! q ev)
-                          (async/go
-                            (async/<! (async/timeout TIMEOUT))
-                            (async/>! filter-chan {:q ev}))))}])]
-    (when-let [flt (-> @(re-frame/subscribe [:filter?])
-                       (dissoc :fork :with-publiccode :with-contributing
-                               :template :floss))]
-      [:div.fr-col-8.fr-grid-row.fr-m-1w
-       (when-let [ff (not-empty (:group flt))]
-         [:span
-          [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
-           {:title    (i/i lang [:remove-filter])
-            :on-click #(do (re-frame/dispatch [:filter! {:group nil}])
-                           (rfe/push-state :repos))}
-           [:span ff]]])])]])
+  (let [f           @(re-frame/subscribe [:filter?])
+        free-search (i/i lang [:free-search])]
+    [:div
+     [:div.fr-grid-row.fr-mt-2w
+      [:div.fr-col-12
+       (when (some #{:repos :orgas} [view])
+         [:input.fr-input
+          {:placeholder free-search
+           :aria-label  free-search
+           :value       (or @q (:q f))
+           :on-change   #(do
+                           (reset! q (.. % -target -value))
+                           (re-frame/dispatch [:update-filter (.. % -target -value) :q]))}])]
+      (when-let [flt (-> f (dissoc :fork :with-publiccode :with-contributing
+                                   :template :floss))]
+        [:div.fr-col-8.fr-grid-row.fr-m-1w
+         (when-let [ff (not-empty (:group flt))]
+           [:span
+            [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
+             {:title    (i/i lang [:remove-filter])
+              :on-click #(do (re-frame/dispatch [:filter! {:group nil}])
+                             (rfe/push-state :repos))}
+             [:span ff]]])])]]))
 
 (defn main-page []
   (let [lang @(re-frame/subscribe [:lang?])
@@ -1378,7 +1364,7 @@
       (condp = view
         :home     [home-page lang]
         :orgas    [orgas-page lang]
-        :repos    [repos-page lang license language]
+        :repos    [repos-page lang]
         :releases [releases-page lang]
         :awes     [awes-page lang]
         :stats    [stats-page lang]
