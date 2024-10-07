@@ -12,6 +12,7 @@
             [goog.string :as gstring]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
+            [clojure.edn :as edn]
             [clojure.set :as set]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
@@ -988,7 +989,8 @@
 
 ;; Stats page
 
-(def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"])
+(def color-palette ["#FF6384" "#36A2EB" "#FFCE56" "#4BC0C0" "#9966FF"
+                    "#50C878" "#FF7F50" "#9370DB" "#20B2AA" "#FFD700"])
 
 (defn pie-chart [{:keys [lang data data-key name-key title-i18n-keyword]}]
   [:div.fr-col-6
@@ -1004,13 +1006,13 @@
        :cy          "50%"
        :outerRadius 150
        :fill        "#8884d8"
-       :label       true}
+       :label       #(str (js/parseFloat (.toFixed (.-value %) 2)) "%")}
       (map-indexed  (fn [index _]
                       [:> Cell
                        {:key  (str "cell-" index)
                         :fill (nth color-palette index)}])
                     data)]
-     [:> Tooltip]
+     [:> Tooltip {:formatter (fn [value] (str (js/parseFloat (.toFixed value 2)) "%"))}]
      [:> Legend]]]])
 
 (defn scatter-chart [stats]
@@ -1037,23 +1039,32 @@
                  :data (:top_orgs_repos_stars stats)
                  :fill "#8884d8"}]]])
 
+(defn to-percent [num total]
+  (edn/read-string (gstring/format "%.2f" (* 100 (/ (* num 1.0) total)))))
+
 (defn languages-chart [lang stats]
-  (pie-chart
-   {:data               (for [[k v] (take 5 (:top_languages stats))]
-                          {:language k :percentage v})
-    :lang               lang
-    :data-key           "percentage"
-    :name-key           "language"
-    :title-i18n-keyword :most-used-languages}))
+  (let [top_languages (into {} (take 10 (:top_languages stats)))
+        repos_total   (reduce + (vals top_languages))
+        data          (for [[k v] top_languages]
+                        {:language k :percentage (to-percent v repos_total)})]
+    (pie-chart
+     {:data               data
+      :lang               lang
+      :data-key           "percentage"
+      :name-key           "language"
+      :title-i18n-keyword :most-used-languages})))
 
 (defn licenses-chart [lang stats]
-  (pie-chart
-   {:data               (for [[k v] (take 5 (:top_licenses stats))]
-                          {:license k :percentage v})
-    :lang               lang
-    :data-key           "percentage"
-    :name-key           "license"
-    :title-i18n-keyword :most-used-licenses}))
+  (let [top_licenses (into {} (take 10 (:top_licenses stats)))
+        repos_total  (reduce + (vals top_licenses))
+        data         (for [[k v] top_licenses]
+                       {:license k :percentage (to-percent v repos_total)})]
+    (pie-chart
+     {:data               data
+      :lang               lang
+      :data-key           "percentage"
+      :name-key           "license"
+      :title-i18n-keyword :most-used-licenses})))
 
 (defn stats-table [heading data thead]
   [:div.fr-m-3w
