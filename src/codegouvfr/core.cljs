@@ -341,33 +341,35 @@
  :orgas-page!
  (fn [db [_ n]] (assoc db :orgas-page n)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :view!
- (fn [db [_ view query-params]]
-   (re-frame/dispatch [:repos-page! 0])
-   (re-frame/dispatch [:orgas-page! 0])
-   (re-frame/dispatch [:filter! query-params])
-   (assoc db :view view)))
+ (fn [{:keys [db]} [_ view query-params]]
+   {:db         (assoc db :view view)
+    :dispatch-n [[:repos-page! 0]
+                 [:orgas-page! 0]
+                 [:filter! query-params]]}))
 
 (re-frame/reg-event-db
  :reverse-sort!
  (fn [db _] (update-in db [:reverse-sort] not)))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :sort-repos-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:repos-page! 0])
-   (when (= k (:sort-repos-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-repos-by k)))
+ (fn [{:keys [db]} [_ k]]
+   (let [effects {:db       (assoc db :sort-repos-by k)
+                  :dispatch [:repos-page! 0]}]
+     (if (= k (:sort-repos-by db))
+       (update effects :dispatch-n (fnil conj []) [:reverse-sort!])
+       effects))))
 
-(re-frame/reg-event-db
+(re-frame/reg-event-fx
  :sort-orgas-by!
- (fn [db [_ k]]
-   (re-frame/dispatch [:orgas-page! 0])
-   (when (= k (:sort-orgas-by db))
-     (re-frame/dispatch [:reverse-sort!]))
-   (assoc db :sort-orgas-by k)))
+ (fn [{:keys [db]} [_ k]]
+   (let [effects {:db       (assoc db :sort-orgas-by k)
+                  :dispatch [:orgas-page! 0]}]
+     (if (= k (:sort-orgas-by db))
+       (update effects :dispatch-n (fnil conj []) [:reverse-sort!])
+       effects))))
 
 ;; Subscriptions
 
