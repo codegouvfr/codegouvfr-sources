@@ -12,7 +12,6 @@
             [goog.string :as gstring]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
-            [clojure.edn :as edn]
             [clojure.set :as set]
             [clojure.walk :as walk]
             [reitit.frontend :as rf]
@@ -29,6 +28,7 @@
 ;; Set defaults
 
 (def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
+(def ^:const TIMEOUT 300)
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
@@ -80,6 +80,13 @@
            }})
 
 ;; Utility functions
+
+(defn debounce [f]
+  (let [timeout (atom nil)]
+    (fn [& args]
+      (when @timeout
+        (js/clearTimeout @timeout))
+      (reset! timeout (js/setTimeout #(apply f args) TIMEOUT)))))
 
 (defn new-tab [s lang]
   (str s " - " (i/i lang [:new-tab])))
@@ -686,14 +693,16 @@
                          :aria-label (str (i/i lang [:Score]) ": " a)} a]])))]])))
 
 (defn repos-page [lang]
-  (let [repos          @(re-frame/subscribe [:repos?])
-        repos-pages    @(re-frame/subscribe [:repos-page?])
-        count-pages    (count (partition-all REPOS-PER-PAGE repos))
-        f              @(re-frame/subscribe [:filter?])
-        forge          (:forge f)
-        first-disabled (zero? repos-pages)
-        last-disabled  (= repos-pages (dec count-pages))
-        mapping        (:repos mappings)]
+  (let [repos              @(re-frame/subscribe [:repos?])
+        repos-pages        @(re-frame/subscribe [:repos-page?])
+        count-pages        (count (partition-all REPOS-PER-PAGE repos))
+        f                  @(re-frame/subscribe [:filter?])
+        forge              (:forge f)
+        first-disabled     (zero? repos-pages)
+        last-disabled      (= repos-pages (dec count-pages))
+        mapping            (:repos mappings)
+        debounced-license  (debounce #(re-frame/dispatch [:update-filter % :license]))
+        debounced-language (debounce #(re-frame/dispatch [:update-filter % :language]))]
     [:div
      [:div.fr-grid-row
       ;; RSS feed
@@ -720,21 +729,20 @@
       [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
         :aria-label  (i/i lang [:license])
-        :value       (or @license (:license f))
+        :value       @license
         :on-change   #(let [v (.. % -target -value)]
                         (reset! license v)
-                        (re-frame/dispatch [:update-filter v :license]))}]
+                        (debounced-license v))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:value       (or @language (:language f))
+       {:value       @language
         :placeholder (i/i lang [:language])
         :aria-label  (i/i lang [:language])
         :on-change   #(let [v (.. % -target -value)]
                         (reset! language v)
-                        (re-frame/dispatch [:update-filter v :language]))}]
+                        (debounced-language v))}]
       [:select.fr-select.fr-col-3
        {:value     (or forge "")
-        :on-change #(let [v (.. % -target -value)]
-                      (re-frame/dispatch [:update-filter (.. % -target -value) :forge]))}
+        :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :forge])}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x (sort @(re-frame/subscribe [:platforms?]))]
          ^{:key x}
@@ -1040,7 +1048,7 @@
                  :fill "#8884d8"}]]])
 
 (defn to-percent [num total]
-  (edn/read-string (gstring/format "%.2f" (* 100 (/ (* num 1.0) total)))))
+  (js/parseFloat (gstring/format "%.2f" (* 100 (/ (* num 1.0) total)))))
 
 (defn languages-chart [lang stats]
   (let [top_languages (into {} (take 10 (:top_languages stats)))
@@ -1341,7 +1349,8 @@
 
 (defn main-menu [lang view]
   (let [f           @(re-frame/subscribe [:filter?])
-        free-search (i/i lang [:free-search])]
+        free-search (i/i lang [:free-search])
+        debounced-q (debounce #(re-frame/dispatch [:update-filter % :q]))]
     [:div
      [:div.fr-grid-row.fr-mt-2w
       [:div.fr-col-12
@@ -1349,10 +1358,10 @@
          [:input.fr-input
           {:placeholder free-search
            :aria-label  free-search
-           :value       (or @q (:q f))
-           :on-change   #(do
-                           (reset! q (.. % -target -value))
-                           (re-frame/dispatch [:update-filter (.. % -target -value) :q]))}])]
+           :value       @q
+           :on-change   #(let [v (.. % -target -value)]
+                           (reset! q v)
+                           (debounced-q v))}])]
       (when-let [flt (-> f (dissoc :fork :with-publiccode :with-contributing
                                    :template :floss))]
         [:div.fr-col-8.fr-grid-row.fr-m-1w
