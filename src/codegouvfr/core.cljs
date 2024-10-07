@@ -481,31 +481,43 @@
       (and (pos? page) (not next))
       (re-frame/dispatch [evt (dec page)]))))
 
-(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
+(defn navigate-pagination [lang type first-disabled last-disabled current-page total-pages]
   [:div.fr-grid-row.fr-grid-row--center
-   [:nav.fr-pagination {:role "navigation" :aria-label "Pagination"}
+   [:nav.fr-pagination
+    {:role       "navigation"
+     :aria-label (i/i lang [:pagination])}
     [:ul.fr-pagination__list
      [:li
       [:button.fr-pagination__link.fr-pagination__link--first
-       {:on-click #(change-page type "first")
-        :disabled first-disabled}]]
+       {:on-click      #(change-page type "first")
+        :disabled      first-disabled
+        :aria-label    (i/i lang [:first-page])
+        :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--prev
-       {:on-click #(change-page type nil)
-        :disabled first-disabled}]]
+       {:on-click      #(change-page type nil)
+        :disabled      first-disabled
+        :aria-label    (i/i lang [:previous-page])
+        :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr
-       {:disabled true}
+       {:disabled     true
+        :aria-current "page"
+        :aria-label   (i/i lang [:current-page-of-total])}
        (str (inc current-page) "/"
             (if (> total-pages 0) total-pages 1))]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
-       {:on-click #(change-page type true)
-        :disabled last-disabled}]]
+       {:on-click      #(change-page type true)
+        :disabled      last-disabled
+        :aria-label    (i/i lang [:next-page])
+        :aria-disabled last-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--last
-       {:on-click #(change-page type "last")
-        :disabled last-disabled}]]]]])
+       {:on-click      #(change-page type "last")
+        :disabled      last-disabled
+        :aria-label    (i/i lang [:last-page])
+        :aria-disabled last-disabled}]]]]])
 
 ;; Home page
 
@@ -680,11 +692,12 @@
       ;; General information
       (table-header lang repos :repo)
       ;; Top pagination block
-      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
+      [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]
      ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
+        :aria-label  (i/i lang [:license])
         :value       (or @license (:license @(re-frame/subscribe [:filter?])))
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
@@ -695,6 +708,7 @@
       [:input.fr-input.fr-col.fr-m-2w
        {:value       (or @language (:language @(re-frame/subscribe [:filter?])))
         :placeholder (i/i lang [:language])
+        :aria-label  (i/i lang [:language])
         :on-change   (fn [e]
                        (let [ev (.-value (.-target e))]
                          (reset! language ev)
@@ -771,7 +785,7 @@
      ;; Main repos table display
      [repos-table lang repos]
      ;; Bottom pagination block
-     [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
+     [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]))
 
 ;; Main structure - awesome
 
@@ -935,7 +949,7 @@
       ;; General information
       (table-header lang orgas :orga)
       ;; Top pagination block
-      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
+      [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]
      [:div.fr-grid-row
       [:select.fr-select.fr-col.fr-m-1w
        {:value (or (:ministry @(re-frame/subscribe [:filter?])) "")
@@ -950,7 +964,7 @@
          ^{:key x}
          [:option {:value x} x])]]
      [orgas-table lang orgas]
-     [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
+     [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
 ;; Releases page
 
