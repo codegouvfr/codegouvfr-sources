@@ -643,6 +643,7 @@
                 (let [{:keys [d         ; description
                               f         ; forks_count
                               a         ; codegouvfr "awesome" score
+                              a?        ; archived
                               li        ; license
                               n         ; name
                               fn        ; full-name
@@ -672,7 +673,8 @@
                          {:href       (rfe/href :repos nil {:group o})
                           :aria-label (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
-                   [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)} d]]
+                   [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)}
+                         (if a? [:em {:title (i/i lang [:repo-archived])} d] d)]]
                    [:td
                     {:style {:text-align "center"}}
                     [:span
