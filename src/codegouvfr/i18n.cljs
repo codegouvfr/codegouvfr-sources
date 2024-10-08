@@ -205,7 +205,7 @@
     :modal-title             "Display parameters"
     :more-info               "More information"
     :most-starred-orgas      "Most starred organizations"
-    :most-used-languages     "Most used languages"
+    :most-used-languages     "Most used programming languages"
     :most-used-licenses      "Most used licenses"
     :name                    "Name"
     :new-modal               "Open as a modal window"
