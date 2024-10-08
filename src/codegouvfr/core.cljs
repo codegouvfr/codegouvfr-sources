@@ -1003,7 +1003,7 @@
         chart-options
         {:chart       {:type "pie"}
          :title       {:text (i/i lang [title-i18n-keyword])}
-         :tooltip     {:pointFormat "{series.name}: <b>{point.percentage:.1f}%</b>"}
+         :tooltip     {:pointFormat "<b>{point.percentage:.1f}%</b>"}
          :plotOptions {:pie {:allowPointSelect true
                              :cursor           "pointer"
                              :dataLabels       {:enabled true
@@ -1017,23 +1017,26 @@
        [:div {:style {:width "100%" :height "400px"}
               :ref   (fn [el]
                        (when el
-                         (js/console.log "Rendering chart with data:" (clj->js formatted-data))
                          (js/Highcharts.chart el (clj->js chart-options))))}]])))
 
-(defn scatter-chart [stats]
+(defn scatter-chart [stats lang]
   (let [chart-options
         {:chart       {:type     "scatter"
                        :zoomType "xy"}
-         :title       {:text "Repositories vs Stars"}
+         :title       {:text (i/i lang [:repos-vs-stars])}
          :xAxis       {:title         {:enabled true
-                                       :text    "Total Stars"}
+                                       :text    (i/i lang [:Stars-total])}
                        :startOnTick   true
                        :endOnTick     true
                        :showLastLabel true}
-         :yAxis       {:title {:text "Repositories Count"}}
+         :yAxis       {:title {:text (i/i lang [:number-of-repos])}}
          :legend      {:enabled false}
          :plotOptions {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
-                                           :pointFormat  "Stars: {point.x}<br>Repositories: {point.y}"}}}
+                                           :pointFormat  (str
+                                                          (i/i lang [:Stars])
+                                                          ": {point.x}<br>"
+                                                          (i/i lang [:Repos])
+                                                          ": {point.y}")}}}
          :series      [{:name  "Organizations"
                         :color "rgba(223, 83, 83, .5)"
                         :data  (map (fn [item]
@@ -1113,7 +1116,7 @@
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]
      [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
-      [scatter-chart stats]]]))
+      [scatter-chart stats lang]]]))
 
 ;; Main structure elements
 
