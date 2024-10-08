@@ -695,7 +695,6 @@
         repos-pages        @(re-frame/subscribe [:repos-page?])
         count-pages        (count (partition-all REPOS-PER-PAGE repos))
         f                  @(re-frame/subscribe [:filter?])
-        forge              (:forge f)
         first-disabled     (zero? repos-pages)
         last-disabled      (= repos-pages (dec count-pages))
         mapping            (:repos mappings)
@@ -727,19 +726,19 @@
       [:input.fr-input.fr-col.fr-m-2w
        {:placeholder (i/i lang [:license])
         :aria-label  (i/i lang [:license])
-        :value       @license
+        :value       (or @license (:license f))
         :on-change   #(let [v (.. % -target -value)]
                         (reset! license v)
                         (debounced-license v))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:value       @language
+       {:value       (or @language (:language f))
         :placeholder (i/i lang [:language])
         :aria-label  (i/i lang [:language])
         :on-change   #(let [v (.. % -target -value)]
                         (reset! language v)
                         (debounced-language v))}]
       [:select.fr-select.fr-col-3
-       {:value     (or forge "")
+       {:value     (or (:forge f) "")
         :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :forge])}
        [:option#default {:value ""} (i/i lang [:all-forges])]
        (for [x (sort @(re-frame/subscribe [:platforms?]))]
@@ -1364,7 +1363,7 @@
          [:input.fr-input
           {:placeholder free-search
            :aria-label  free-search
-           :value       @q
+           :value       (or @q (:q f))
            :on-change   #(let [v (.. % -target -value)]
                            (reset! q v)
                            (debounced-q v))}])]
