@@ -281,7 +281,7 @@
  :fetch-stats
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/stats.json"
+                 :uri             "/data/stats_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-stats]
                  :on-failure      [:api-request-error :stats]}}))
