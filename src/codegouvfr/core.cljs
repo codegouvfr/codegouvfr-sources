@@ -998,62 +998,73 @@
 
 (defn pie-chart [{:keys [lang data data-key name-key title-i18n-keyword]}]
   (let [formatted-data
-        (map (fn [item]
-               {:name (get item name-key)
-                :y    (get item data-key)})
-             data)
+        (map (fn [i] {:name (get i name-key) :y (get i data-key)}) data)
         chart-options
         {:chart       {:type "pie"}
          :title       {:text (i/i lang [title-i18n-keyword])}
          :tooltip     {:pointFormat "<b>{point.percentage:.1f}%</b>"}
          :plotOptions {:pie {:allowPointSelect true
                              :cursor           "pointer"
-                             :dataLabels       {:enabled true
-                                                :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
+                             :dataLabels
+                             {:enabled true
+                              :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
          :series      [{:name         (i/i lang [title-i18n-keyword])
                         :colorByPoint true
                         :data         formatted-data}]
          :credits     {:enabled false}}]
     (when (seq formatted-data)  ; Only render if we have data
       [:div.fr-col-6
-       [:div {:style {:width "100%" :height "400px"}
-              :ref   (fn [el]
-                       (when el
-                         (js/Highcharts.chart el (clj->js chart-options))))}]])))
+       {:style {:width "100%" :height "400px"}
+        :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}])))
 
-(defn scatter-chart [stats lang]
-  (let [chart-options
-        {:chart       {:type     "scatter"
-                       :zoomType "xy"}
-         :title       {:text (i/i lang [:repos-vs-stars])}
-         :xAxis       {:title         {:enabled true
-                                       :text    (i/i lang [:Stars-total])}
+(defn scatter-chart [stats lang chart-options]
+  (let [{:keys [title x-axis tooltip-x data-key]}
+        chart-options
+        chart-data (get stats data-key)
+        chart-options
+        {:chart       {:type "scatter" :zoomType "xy"}
+         :title       {:text (i/i lang [title])}
+         :xAxis       {:title         {:enabled true :text (i/i lang [tooltip-x])}
                        :startOnTick   true
                        :endOnTick     true
                        :showLastLabel true}
-         :yAxis       {:title {:text (i/i lang [:number-of-repos])}}
+         :yAxis       {:title {:enabled true :text (i/i lang [:number-of-repos])}}
          :legend      {:enabled false}
          :plotOptions {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
                                            :pointFormat  (str
-                                                          (i/i lang [:Stars])
+                                                          (i/i lang [tooltip-x])
                                                           ": {point.x}<br>"
                                                           (i/i lang [:Repos])
                                                           ": {point.y}")}}}
          :series      [{:name  "Organizations"
                         :color "rgba(223, 83, 83, .5)"
-                        :data  (map (fn [item]
-                                      (let [owner (get item :owner)
-                                            stars (get item :total_stars)
-                                            repos (get item :repositories_count)]
-                                        {:x    stars
-                                         :y    repos
-                                         :name owner}))
-                                    (:top_orgs_repos_stars stats))}]
+                        :data  (map (fn [{:keys [owner repositories_count] :as item}]
+                                      {:x    (get item x-axis)
+                                       :y    repositories_count
+                                       :name owner})
+                                    chart-data)}]
          :credits     {:enabled false}}]
-    [:div {:style {:width "100%" :height "400px"}
-           :ref   (fn [el]
-                    (when el
-                      (js/Highcharts.chart el (clj->js chart-options))))}]))
+    [:div.fr-col-6
+     {:style {:width "100%" :height "400px"}
+      :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}]))
+
+(defn scatter-chart-repos-vs-stars [stats lang]
+  (scatter-chart 
+   stats 
+   lang 
+   {:title     :repos-vs-stars
+    :x-axis    :total_stars
+    :tooltip-x :Stars-total
+    :data-key  :top_orgs_repos_stars}))
+
+(defn scatter-chart-repos-vs-followers [stats lang]
+  (scatter-chart 
+   stats 
+   lang 
+   {:title     :repos-vs-followers
+    :x-axis    :followers
+    :tooltip-x :Followers-total
+    :data-key  :top_orgs_repos_followers}))
 
 (defn to-percent [num total]
   (js/parseFloat (gstring/format "%.2f" (* 100 (/ (* num 1.0) total)))))
@@ -1103,6 +1114,9 @@
      [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
       [languages-chart lang stats]
       [licenses-chart lang stats]]
+     [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
+      [scatter-chart-repos-vs-stars stats lang]
+      [scatter-chart-repos-vs-followers stats lang]]
      [:div.fr-grid-row
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
@@ -1116,9 +1130,7 @@
        (stats-table [:span (i/i lang [:most-starred-orgas])]
                     (top-clean-up-orgas top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Stars])]]])]]
-     [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
-      [scatter-chart stats lang]]]))
+                             [:th (i/i lang [:Stars])]]])]]]))
 
 ;; Main structure elements
 
