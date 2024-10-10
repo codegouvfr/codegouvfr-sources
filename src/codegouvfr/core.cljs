@@ -54,8 +54,7 @@
 ;; Mappings used when exporting displayed data to csv files
 
 (defonce mappings
-  {:repos {
-           :d  :description
+  {:repos {:d  :description
            :f  :forks_count
            :f? :is_fork
            :l  :language
@@ -64,18 +63,15 @@
            :o  :organization_url
            :s  :subscribers_count
            :t? :is_template
-           :u  :last_update
-           }
-   :orgas {
-           :au :avatar_url
+           :u  :last_update}
+   :orgas {:au :avatar_url
            :d  :description
            :ps :public_sector_organization
            :id :organization_url
            :m  :ministry
            :n  :name
            :r  :repositories_count
-           :s  :subscribers_count
-           }})
+           :s  :subscribers_count}})
 
 ;; Utility functions
 
@@ -135,22 +131,18 @@
 
 (defn top-clean-up-repos [data param]
   (let [total (reduce + (map last data))]
-    (->>
-     data
-     (sequence
-      (comp
-       (map (fn [[k v]]
-              [k (if (some #{"license" "language"} (list param))
-                   (js/parseFloat
-                    (gstring/format "%.2f" (* (/ v total) 100)))
-                   v)]))
-       (map #(let [[k v] %]
-               [[:a {:href (rfe/href :repos nil {param k})} k] v])))))))
+    (->> data
+         (sequence
+          (comp (map (fn [[k v]]
+                       [k (if (some #{"license" "language"} (list param))
+                            (js/parseFloat (gstring/format "%.2f" (* (/ v total) 100)))
+                            v)]))
+                (map #(let [[k v] %]
+                        [[:a {:href (rfe/href :repos nil {param k})} k] v])))))))
 
 (defn top-clean-up-orgas [data param]
   (sequence
-   (map #(let [[k v] %
-               k0    (s/replace k #" \([^)]+\)" "")]
+   (map #(let [[k v] % k0 (s/replace k #" \([^)]+\)" "")]
            [[:a {:href (rfe/href :orgas nil {param k0})} k] v]))
    data))
 
@@ -313,8 +305,6 @@
  (fn [db [_ response]]
    (assoc db :stats response)))
 
-;; Define an event to handle API request errors
-
 (re-frame/reg-event-db
  :api-request-error
  (fn [db [_ request-type response]]
@@ -472,27 +462,25 @@
 
 (re-frame/reg-sub
  :orgas?
- (fn [db]
-   (let [orgs  (:owners db)
-         orgas (case @(re-frame/subscribe [:sort-orgas-by?])
-                 :repos       (sort-by :r orgs)
-                 :floss       (sort-by :f orgs)
-                 :subscribers (sort-by :s orgs)
-                 orgs)]
-     (apply-orgas-filters
-      (if @(re-frame/subscribe [:reverse-sort?])
-        orgas
-        (reverse orgas))))))
+ #(let [orgs  (:owners %)
+        orgas (case @(re-frame/subscribe [:sort-orgas-by?])
+                :repos       (sort-by :r orgs)
+                :floss       (sort-by :f orgs)
+                :subscribers (sort-by :s orgs)
+                orgs)]
+    (apply-orgas-filters
+     (if @(re-frame/subscribe [:reverse-sort?])
+       orgas
+       (reverse orgas)))))
 
 ;; Pagination
 
 (defn change-page [type next]
-  (let [conf
-        (condp = type
-          :repos {:sub :repos-page? :evt      :repos-page!
-                  :cnt :repos?      :per-page REPOS-PER-PAGE}
-          :orgas {:sub :orgas-page? :evt      :orgas-page!
-                  :cnt :orgas?      :per-page ORGAS-PER-PAGE})
+  (let [conf        (condp = type
+                      :repos {:sub :repos-page? :evt      :repos-page!
+                              :cnt :repos?      :per-page REPOS-PER-PAGE}
+                      :orgas {:sub :orgas-page? :evt      :orgas-page!
+                              :cnt :orgas?      :per-page ORGAS-PER-PAGE})
         evt         (:evt conf)
         per-page    (:per-page conf)
         cnt         @(re-frame/subscribe [(:cnt conf)])
@@ -769,8 +757,9 @@
         {:for "5" :title (i/i lang [:only-contrib-title])}
         (i/i lang [:only-contrib])]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#6 {:type      "checkbox" :name "6"
-                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
+       [:input#6
+        {:type      "checkbox" :name "6"
+         :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
        [:label.fr-label
         {:for "6" :title (i/i lang [:only-publiccode-title])}
         (i/i lang [:only-publiccode])]]]
@@ -898,15 +887,12 @@
                           :aria-label (str (i/i lang [:go-to-orga]) " " (or (not-empty n) l))}
                       (or (not-empty n) l)]]]
                    [:td {:aria-label (str (i/i lang [:description]) ": " d)} d]
-                   [:td
-                    {:style {:text-align "center"}}
+                   [:td {:style {:text-align "center"}}
                     [:a {:title      (i/i lang [:go-to-repos])
                          :href       (rfe/href :repos nil {:group id})
-                         :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))}
-                     r]]
+                         :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))} r]]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str s " " (i/i lang [:Subscribers]))}
-                    s]
+                         :aria-label (str s " " (i/i lang [:Subscribers]))} s]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
                       [:a {:target     "new"
@@ -983,13 +969,12 @@
         (for [release (reverse (sort-by :published_at releases))]
           ^{:key (:html_url release)}
           (let [{:keys [repo_name html_url body tag_name published_at]} release]
-            [:tr
-             [:td
-              [:a.fr-link
-               {:href   html_url
-                :target "_blank"
-                :title  (i/i lang [:Repo])
-                :rel    "noreferrer noopener"} repo_name]]
+            [:tr [:td
+                  [:a.fr-link
+                   {:href   html_url
+                    :target "_blank"
+                    :title  (i/i lang [:Repo])
+                    :rel    "noreferrer noopener"} repo_name]]
              [:td body]
              [:td tag_name]
              [:td (to-locale-date published_at lang)]])))]]]))
@@ -1016,6 +1001,26 @@
       [:div.fr-col-6
        {:style {:width "100%" :height "400px"}
         :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}])))
+
+(defn repos-by-score-bar-chart [lang stats]
+  (let [data      (:top_repos_by_score_range stats)
+        max-value (apply max (map second data))
+        chart-options
+        {:chart   {:type "column"}
+         :title   {:text (i/i lang [:repos-vs-score])}
+         :xAxis   {:type       "category"
+                   :title      {:text (i/i lang [:Score])}
+                   :categories (map (comp str first) data)
+                   :labels     {:rotation -45 :style {:fontSize "13px"}}}
+         :yAxis   {:type  "logarithmic" :min 1 :max 10000
+                   :title {:text (i/i lang [:number-of-repos])}}
+         :series  [{:data (map second data)}]
+         :tooltip {:pointFormat (str (i/i lang [:number-of-repos]) ": <b>{point.y}</b>")}
+         :legend  {:enabled false}
+         :credits {:enabled false}}]
+    [:div.fr-col-12
+     {:style {:width "100%" :height "400px"}
+      :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}]))
 
 (defn scatter-chart [stats lang chart-options]
   (let [{:keys [title x-axis tooltip-x data-key]}
@@ -1049,18 +1054,18 @@
       :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}]))
 
 (defn scatter-chart-repos-vs-stars [stats lang]
-  (scatter-chart 
-   stats 
-   lang 
+  (scatter-chart
+   stats
+   lang
    {:title     :repos-vs-stars
     :x-axis    :total_stars
     :tooltip-x :Stars-total
     :data-key  :top_orgs_repos_stars}))
 
 (defn scatter-chart-repos-vs-followers [stats lang]
-  (scatter-chart 
-   stats 
-   lang 
+  (scatter-chart
+   stats
+   lang
    {:title     :repos-vs-followers
     :x-axis    :followers
     :tooltip-x :Followers-total
@@ -1116,7 +1121,8 @@
       [licenses-chart lang stats]]
      [:div.fr-grid-row.fr-grid-row--center.fr-m-3w
       [scatter-chart-repos-vs-stars stats lang]
-      [scatter-chart-repos-vs-followers stats lang]]
+      [scatter-chart-repos-vs-followers stats lang]
+      [repos-by-score-bar-chart lang stats]]
      [:div.fr-grid-row
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
