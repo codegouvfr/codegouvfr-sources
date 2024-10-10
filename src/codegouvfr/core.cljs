@@ -1003,8 +1003,7 @@
         :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}])))
 
 (defn repos-by-score-bar-chart [lang stats]
-  (let [data      (:top_repos_by_score_range stats)
-        max-value (apply max (map second data))
+  (let [data (:top_repos_by_score_range stats)
         chart-options
         {:chart   {:type "column"}
          :title   {:text (i/i lang [:repos-vs-score])}
