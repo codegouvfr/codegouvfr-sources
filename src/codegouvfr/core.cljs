@@ -129,21 +129,19 @@
     (.click link)
     (-> js/document .-body (.removeChild link))))
 
-(defn top-clean-up-repos [data param]
-  (let [total (reduce + (map last data))]
-    (->> data
-         (sequence
-          (comp (map (fn [[k v]]
-                       [k (if (some #{"license" "language"} (list param))
-                            (js/parseFloat (gstring/format "%.2f" (* (/ v total) 100)))
-                            v)]))
-                (map #(let [[k v] %]
-                        [[:a {:href (rfe/href :repos nil {param k})} k] v])))))))
+(defn reset-queries []
+  (reset! q nil)
+  (reset! license nil)
+  (reset! language nil)
+  (re-frame/dispatch [:reset-filter!]))
 
-(defn top-clean-up-orgas [data param]
+(defn top-clean-up-orgas [lang data param]
   (sequence
    (map #(let [[k v] % k0 (s/replace k #" \([^)]+\)" "")]
-           [[:a {:href (rfe/href :orgas nil {param k0})} k] v]))
+           [[:a.fr-raw-link.fr-link
+             {:title      (i/i lang [:go-to-orga]) ;; FIXME: better message?
+              :aria-label (i/i lang [:go-to-orga])
+              :href       (rfe/href :orgas nil {param k0})} k] v]))
    data))
 
 (defn html-url-from-p-and-fn [p fn]
@@ -204,7 +202,7 @@
        #(and
          (if-a-b-else-true q
            (s-includes?
-            (s/join " " [(:id %) (:d %) (:ps %) (:os %)]) q))
+            (s/join " " [(:id %) (:n %) (:d %) (:ps %) (:os %)]) q))
          (if (empty? ministry) true (= (:m %) ministry))))))))
 
 (defn not-empty-string-or-true [[_ v]]
@@ -657,8 +655,8 @@
                           :aria-label (str n " - " (i/i lang [:go-to-repo])
                                            (when li (str " " (i/i lang [:under-license]) " " li)))}
                       n]]]
-                   [:td [:a.fr-raw-link.fr-link
-                         {:href       (rfe/href :repos nil {:group o})
+                   [:td [:button.fr-raw-link.fr-link
+                         {:on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group o}))
                           :aria-label (i/i lang [:browse-repos-orga])}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)}
@@ -888,9 +886,10 @@
                       (or (not-empty n) l)]]]
                    [:td {:aria-label (str (i/i lang [:description]) ": " d)} d]
                    [:td {:style {:text-align "center"}}
-                    [:a {:title      (i/i lang [:go-to-repos])
-                         :href       (rfe/href :repos nil {:group id})
-                         :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))} r]]
+                    [:button..fr-raw-link.fr-link
+                     {:title      (i/i lang [:go-to-repos])
+                      :on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group id}))
+                      :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))} r]]
                    [:td {:style      {:text-align "center"}
                          :aria-label (str s " " (i/i lang [:Subscribers]))} s]
                    [:td {:style {:text-align "center"}}
@@ -1128,22 +1127,16 @@
                      (i/i lang [:Orgas])
                      (i/i lang [:with-more-of])
                      (i/i lang [:repos])]
-                    (top-clean-up-orgas top_orgs_by_repos "q")
+                    (top-clean-up-orgas lang top_orgs_by_repos "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span (i/i lang [:most-starred-orgas])]
-                    (top-clean-up-orgas top_orgs_by_stars "q")
+                    (top-clean-up-orgas lang top_orgs_by_stars "q")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]]))
 
 ;; Main structure elements
-
-(defn reset-queries []
-  (reset! q nil)
-  (reset! license nil)
-  (reset! language nil)
-  (re-frame/dispatch [:reset-filter!]))
 
 (defn banner [lang]
   (let [path @(re-frame/subscribe [:path?])]
