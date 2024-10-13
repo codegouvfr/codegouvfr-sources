@@ -57,7 +57,7 @@
     :go-to-data              "Voir les données détaillées"
     :go-to-orga              "Visiter le compte d'organisation"
     :go-to-repo              "Voir ce dépôt"
-    :go-to-repos             "Voir les dépôts"
+    :go-to-repos             "Voir les dépôts de cette organisation"
     :go-to-website           "Visiter le site web"
     :home                    "Accueil"
     :home-orgas-desc         "Quelles sont les organisations qui publient des codes sources ?"

@@ -137,11 +137,11 @@
 
 (defn top-clean-up-orgas [lang data param]
   (sequence
-   (map #(let [[k v] % k0 (s/replace k #" \([^)]+\)" "")]
+   (map #(let [[[n l] v] %]
            [[:a.fr-raw-link.fr-link
-             {:title      (i/i lang [:go-to-orga]) ;; FIXME: better message?
-              :aria-label (i/i lang [:go-to-orga])
-              :href       (rfe/href :orgas nil {param k0})} k] v]))
+             {:title      (i/i lang [:go-to-repos])
+              :aria-label (i/i lang [:go-to-repos])
+              :href       (rfe/href :repos nil {param l})} n] v]))
    data))
 
 (defn html-url-from-p-and-fn [p fn]
@@ -1127,12 +1127,12 @@
                      (i/i lang [:Orgas])
                      (i/i lang [:with-more-of])
                      (i/i lang [:repos])]
-                    (top-clean-up-orgas lang top_orgs_by_repos "q")
+                    (top-clean-up-orgas lang top_orgs_by_repos "group")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Repos])]]])]
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span (i/i lang [:most-starred-orgas])]
-                    (top-clean-up-orgas lang top_orgs_by_stars "q")
+                    (top-clean-up-orgas lang top_orgs_by_stars "group")
                     [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
                              [:th (i/i lang [:Stars])]]])]]]))
 
