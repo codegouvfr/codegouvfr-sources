@@ -148,12 +148,11 @@
   (str "https://" p "/" fn))
 
 (defn- table-header [lang what k]
-  (let [glossary-url "https://code.gouv.fr/documentation/#glossaire"]
-    [:strong.fr-m-auto
-     (let [rps (count what)]
-       (if (< rps 2)
-         (str rps (i/i lang [k]))
-         (str rps (i/i lang [(keyword (str (name k) "s"))]))))]))
+  [:strong.fr-m-auto
+   (let [rps (count what)]
+     (if (< rps 2)
+       (str rps (i/i lang [k]))
+       (str rps (i/i lang [(keyword (str (name k) "s"))]))))])
 
 ;; Filters
 
