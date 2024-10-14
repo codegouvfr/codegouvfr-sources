@@ -153,14 +153,7 @@
      (let [rps (count what)]
        (if (< rps 2)
          (str rps (i/i lang [k]))
-         (str rps (i/i lang [(keyword (str (name k) "s"))]))))
-     " "
-     [:a.fr-raw-link.fr-link
-      {:href   glossary-url
-       :target "new"
-       :rel    "noreferrer noopener"
-       :title  (i/i lang [:glossary])}
-      [:span.fr-icon-info-line]]]))
+         (str rps (i/i lang [(keyword (str (name k) "s"))]))))]))
 
 ;; Filters
 
@@ -594,8 +587,8 @@
         [:caption {:id "repos-table-caption"} (i/i lang [:repos-of-source-code])]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col {:scope "col"} (i/i lang [:Repos])]
-          [:th.fr-col {:scope "col"} (i/i lang [:Orgas])]
+          [:th.fr-col {:scope "col"} (i/i lang [:Repo])]
+          [:th.fr-col {:scope "col"} (i/i lang [:Orga])]
           [:th.fr-col {:scope "col"} (i/i lang [:description])]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
