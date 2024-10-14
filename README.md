@@ -3,26 +3,29 @@
 
 # code.gouv.fr/sources
 
-This repository contains the Web application for exploring source code from the french public sector.  Its official instance is available on [code.gouv.fr/sources](https://code.gouv.fr/sources/).
+This repository contains a web static frontend for exploring source
+code published by french public sector organizations. This frontend is
+available on [code.gouv.fr/sources](https://code.gouv.fr/sources/).
 
-*If you are looking for the source code of the main `code.gouv.fr` website, check [codegouvfr-website](https://github.com/codegouvfr/codegouvfr-website.)*
+*If you are looking for the source code of the main `code.gouv.fr`
+website, check
+[codegouvfr-website](https://github.com/codegouvfr/codegouvfr-website.)*
 
 ![img](codegouvfr.png)
 
 # Get the data
 
-The list of organizations accounts is maintained on [codegouvfr-sources](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
+Data used for [code.gouv.fr/sources](https://code.gouv.fr/sources) are maintained on [codegouvfr-data](https://git.sr.ht/~codegouvfr/codegouvfr-data) and consolidated by [this script](https://git.sr.ht/~codegouvfr/codegouvfr-cli/tree/main/item/src/codegouvfr-output-data.clj).
 
-From these sources, data are then fetched by [codegouvfr-fetch-data](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data) and consolidated with [codegouvfr-consolidate-data](https://git.sr.ht/~codegouvfr/codegouvfr-consolidate-data).
+You can download them:
 
-- Organizations: as [csv](https://code.gouv.fr/data/organizations/csv/all.csv) or [json](https://code.gouv.fr/data/organizations/json/all.json)
-- Repositories: as [csv](https://code.gouv.fr/data/repositories/csv/all.csv) or [json](https://code.gouv.fr/data/repositories/json/all.json)
-- Dependencies: [json](https://code.gouv.fr/data/deps.json)
+- Organizations: as [csv](https://code.gouv.fr/data/codegouvfr-organizations.csv) or [json](https://code.gouv.fr/data/codegouvfr-organizations.json)
+- Repositories: as [csv](https://code.gouv.fr/data/codegouvfr-repositories.csv) or [json](https://code.gouv.fr/data/codegouvfr-repositories.json)
 
 # Develop
 
-    ~$ git clone https://git.sr.ht/~codegouvfr/code.gouv.fr
-    ~$ cd code.gouv.fr/
+    ~$ git clone https://git.sr.ht/~codegouvfr/codegouvfr-sources
+    ~$ cd codegouvfr-sources/
     ~$ clj -M:fig
 
 This will open you browser at `http://localhost:9500` where you can see your changes as you hack.
