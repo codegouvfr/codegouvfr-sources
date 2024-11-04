@@ -161,41 +161,46 @@
   [a b]
   (if a b true))
 
-(defn apply-repos-filters [repos]
-  (let [{:keys [q group language forge license template
-                with-contributing with-publiccode fork floss]}
-        @(re-frame/subscribe [:filter?])]
-    (->>
-     repos
-     (sequence
-      (filter
-       #(and
-         (if-a-b-else-true fork (:f? %))
-         (if-a-b-else-true with-contributing (:c? %))
-         (if-a-b-else-true with-publiccode (:p? %))
-         (if-a-b-else-true template (:t? %))
-         (if-a-b-else-true floss
-           (let [l (:li %)] (and (not-empty l) (not= l "Other"))))
-         (if-a-b-else-true license (s-includes? (:li %) license))
-         (if language
-           (some (into #{} (list (s/lower-case (or (:l %) ""))))
-                 (s/split (s/lower-case language) #" +"))
-           true)
-         (if (empty? forge) true (= (:p %) forge))
-         (if-a-b-else-true group (= (:o %) group))
-         (if-a-b-else-true q (s-includes? (s/join " " [(:id %) (:d %)]) q))))))))
+(def memoized-apply-repos-filters
+  (memoize
+   (fn [repos {:keys [fork with-contributing with-publiccode
+                      template floss license language forge group q]}]
+     (->> repos
+          (sequence
+           (filter
+            #(and
+              (if-a-b-else-true fork (:f? %))
+              (if-a-b-else-true with-contributing (:c? %))
+              (if-a-b-else-true with-publiccode (:p? %))
+              (if-a-b-else-true template (:t? %))
+              (if-a-b-else-true floss
+                (let [l (:li %)] (and (not-empty l) (not= l "Other"))))
+              (if-a-b-else-true license (s-includes? (:li %) license))
+              (if (not-empty language)
+                (some (into #{} (list (s/lower-case (or (:l %) ""))))
+                      (s/split (s/lower-case language) #" +"))
+                true)
+              (if (empty? forge) true (= (:p %) forge))
+              (if-a-b-else-true group (= (:o %) group))
+              (if-a-b-else-true q (s-includes? (s/join " " [(:id %) (:d %)]) q)))))))))
+
+(def memoized-apply-orgas-filters
+  (memoize
+   (fn [orgas q ministry]
+     (->>
+      orgas
+      (sequence
+       (filter
+        #(and
+          (if-a-b-else-true q
+            (s-includes?
+             (s/join " " [(:id %) (:n %) (:d %) (:ps %) (:os %)])
+             q))
+          (if (empty? ministry) true (= (:m %) ministry)))))))))
 
 (defn apply-orgas-filters [orgas]
   (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
-    (->>
-     orgas
-     (sequence
-      (filter
-       #(and
-         (if-a-b-else-true q
-           (s-includes?
-            (s/join " " [(:id %) (:n %) (:d %) (:ps %) (:os %)]) q))
-         (if (empty? ministry) true (= (:m %) ministry))))))))
+    (memoized-apply-orgas-filters orgas q ministry)))
 
 (defn not-empty-string-or-true [[_ v]]
   (or (and (boolean? v) (true? v))
@@ -447,17 +452,20 @@
 (re-frame/reg-sub
  :repos?
  (fn [db]
-   (let [repos0 (:repositories db)
-         repos  (case @(re-frame/subscribe [:sort-repos-by?])
-                  :forks (sort-by :f repos0)
-                  :score (sort-by :a repos0)
-                  :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
-                                         (js/Date. (.parse js/Date (:u %2))))
-                               repos0)
-                  repos0)]
-     (apply-repos-filters (if @(re-frame/subscribe [:reverse-sort?])
-                            repos
-                            (reverse repos))))))
+   (let [repos0     (:repositories db)
+         filter-map @(re-frame/subscribe [:filter?])
+         repos      (case @(re-frame/subscribe [:sort-repos-by?])
+                      :forks (sort-by :f repos0)
+                      :score (sort-by :a repos0)
+                      :date  (sort #(compare (js/Date. (.parse js/Date (:u %1)))
+                                             (js/Date. (.parse js/Date (:u %2))))
+                                   repos0)
+                      repos0)]
+     (memoized-apply-repos-filters
+      (if @(re-frame/subscribe [:reverse-sort?])
+        repos
+        (reverse repos))
+      filter-map))))
 
 (re-frame/reg-sub
  :orgas?
