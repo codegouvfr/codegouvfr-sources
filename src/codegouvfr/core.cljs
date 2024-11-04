@@ -235,7 +235,10 @@
                  :uri             "/data/repos_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-repositories]
-                 :on-failure      [:api-request-error :repositories]}}))
+                 :on-failure      [:api-request-error :repositories]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-owners
@@ -244,7 +247,10 @@
                  :uri             "/data/owners.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-owners]
-                 :on-failure      [:api-request-error :owners]}}))
+                 :on-failure      [:api-request-error :owners]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-awesome
@@ -253,7 +259,10 @@
                  :uri             "/data/awesome-codegouvfr.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-awesome]
-                 :on-failure      [:api-request-error :awesome]}}))
+                 :on-failure      [:api-request-error :awesome]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-platforms
@@ -262,7 +271,10 @@
                  :uri             "/data/codegouvfr-forges.csv"
                  :response-format (ajax/raw-response-format)
                  :on-success      [:set-platforms]
-                 :on-failure      [:api-request-error :platforms]}}))
+                 :on-failure      [:api-request-error :platforms]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-stats
@@ -271,7 +283,10 @@
                  :uri             "/data/stats_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-stats]
-                 :on-failure      [:api-request-error :stats]}}))
+                 :on-failure      [:api-request-error :stats]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 ;; Define events to handle successful responses
 
