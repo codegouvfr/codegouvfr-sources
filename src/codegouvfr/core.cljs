@@ -844,7 +844,6 @@
             [:ul (for [u used] [:li u])]])
          (when-let [funded (not-empty fundedBy)]
            [:div
-            [:div {:dangerouslySetInnerHTML {:__html "<b>Bonjour</b>"}}]
             [:br]
             [:h4.fr-icon-government-line " " (i/i lang [:Funders])]
             [:ul (for [{:keys [name url]} funded]
