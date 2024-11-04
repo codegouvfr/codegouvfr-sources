@@ -316,6 +316,11 @@
    (assoc db :path path)))
 
 (re-frame/reg-event-db
+ :path-params!
+ (fn [db [_ path-params]]
+   (assoc db :path-params path-params)))
+
+(re-frame/reg-event-db
  :reset-filter!
  (fn [db [_ _]]
    (update-in db [:filter] init-filter)))
@@ -394,6 +399,10 @@
 (re-frame/reg-sub
  :path?
  (fn [db _] (:path db)))
+
+(re-frame/reg-sub
+ :path-params?
+ (fn [db _] (:path-params db)))
 
 (re-frame/reg-sub
  :sort-repos-by?
@@ -765,9 +774,9 @@
    [:div.fr-grid-row.fr-grid-row--gutters]
    (for [awesome (shuffle @(re-frame/subscribe [:awes?]))]
      ^{:key (:name awesome)}
-     (let [{:keys [name url logo legal description fundedBy]}
+     (let [{:keys [name logo legal description]}
            awesome
-           desc (:shortDescription (get description (keyword lang)))]
+           desc (not-empty (:shortDescription (get description (keyword lang))))]
        [:div.fr-col-12.fr-col-md-3
         [:div.fr-card.fr-enlarge-link
          [:div.fr-card__header
@@ -779,13 +788,8 @@
             [:ul.fr-tags-group
              [:li [:p.fr-tag (str (i/i lang [:license]) ": " (:license legal))]]]]
            [:h3.fr-card__title
-            [:a {:href url} name]]
-           [:p.fr-card__desc desc]
-           [:div.fr-card__end
-            (when (not-empty fundedBy)
-              [:p.fr-card__detail.fr-icon-warning-fill
-               (str (i/i lang [:Funded-by]) ": "
-                    (s/join ", " (map :name fundedBy)))])]]]]]))))
+            [:a {:href (rfe/href :awesome-project {:n name})} name]]
+           [:p.fr-card__desc desc]]]]]))))
 
 (defn awes-page [lang]
   [:div.fr-container.fr-mt-6w
@@ -795,10 +799,55 @@
       [:p.fr-callout__text
        [:span
         (i/i lang [:Awesome-callout])
-        " (" [:a {:href (rfe/href :releases)}
-              (i/i lang [:release-check-latest])] ")"]]]
+        ": " [:a.fr-link {:href (rfe/href :releases)}
+              (i/i lang [:release-check-latest])]]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
+
+(defn awes-project [lang]
+  (let [project-name (:n @(re-frame/subscribe [:path-params?]))
+        awesome      @(re-frame/subscribe [:awes?])
+        {:keys [name logo description legal landingURL
+                url usedBy fundedBy]}
+        (first (filter #(= (:name %) project-name) awesome))
+        desc         (or (get description (keyword lang))
+                         (get description :en))]
+    [:div.fr-container.fr-py-6w
+     [:div.fr-grid-row.fr-grid-row--gutters
+      [:div.fr-col-12
+       [:div.fr-grid-row.fr-grid-row--gutters
+        [:div.fr-col-9
+         [:h2.fr-h2 name]
+         (if-let [longDesc (:longDescription desc)]
+           [:p longDesc]
+           [:p (:shortDescription desc)])
+         [:p [:a.fr-raw-link.fr-icon-global-line
+              {:href       landingURL
+               :target     "new"
+               :rel        "noreferrer noopener"
+               :aria-label (i/i lang [:go-to-website])}
+              " " (i/i lang [:go-to-website])]]
+         [:p [:a.fr-raw-link.fr-icon-code-box-line
+              {:href       url
+               :target     "new"
+               :rel        "noreferrer noopener"
+               :aria-label (i/i lang [:go-to-source])}
+              " " (i/i lang [:go-to-source])]]]
+        [:img.fr-responsive-img.fr-col-3 {:src logo :data-fr-js-ratio true}]]
+       [:div.fr-grid-row.fr-grid-row--gutters
+        [:div.fr-col-12
+         (when-let [license (not-empty (:license legal))]
+           [:h4.fr-icon-scales-3-line " " (i/i lang [:license]) ": " license])
+         (when-let [used (not-empty usedBy)]
+           [:div
+            [:h4.fr-icon-user-line " " (i/i lang [:Users])]
+            [:ul (for [u used] [:li u])]])
+         (when-let [funded (not-empty fundedBy)]
+           [:div
+            [:br]
+            [:h4.fr-icon-government-line " " (i/i lang [:Funders])]
+            [:ul (for [{:keys [name url]} funded]
+                   [:li [:a {:href url} name]])]])]]]]]))
 
 ;; Main structure - orgas
 
@@ -1394,22 +1443,23 @@
       {:role "main"}
       [main-menu lang view]
       (condp = view
-        :home     [home-page lang]
-        :orgas    [orgas-page lang]
-        :repos    [repos-page lang]
-        :releases [releases-page lang]
-        :awes     [awes-page lang]
-        :stats    [stats-page lang]
-        :legal    (condp = lang "fr" (inline-page "legal.fr.md")
-                         (inline-page "legal.en.md"))
-        :a11y     (condp = lang "fr" (inline-page "a11y.fr.md")
-                         (inline-page "a11y.en.md"))
-        :sitemap  (condp = lang "fr" (inline-page "sitemap.fr.md")
-                         (inline-page "sitemap.en.md"))
-        :feeds    (condp = lang "fr" (inline-page "feeds.fr.md")
-                         (inline-page "feeds.en.md"))
-        :about    (condp = lang "fr" (inline-page "about.fr.md")
-                         (inline-page "about.en.md"))
+        :home            [home-page lang]
+        :orgas           [orgas-page lang]
+        :repos           [repos-page lang]
+        :releases        [releases-page lang]
+        :awes            [awes-page lang]
+        :awesome-project [awes-project lang]
+        :stats           [stats-page lang]
+        :legal           (condp = lang "fr" (inline-page "legal.fr.md")
+                                (inline-page "legal.en.md"))
+        :a11y            (condp = lang "fr" (inline-page "a11y.fr.md")
+                                (inline-page "a11y.en.md"))
+        :sitemap         (condp = lang "fr" (inline-page "sitemap.fr.md")
+                                (inline-page "sitemap.en.md"))
+        :feeds           (condp = lang "fr" (inline-page "feeds.fr.md")
+                                (inline-page "feeds.en.md"))
+        :about           (condp = lang "fr" (inline-page "about.fr.md")
+                                (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1419,7 +1469,7 @@
 
 (defn on-navigate [match]
   (let [title-prefix  "code.gouv.fr ─ "
-        title-default "Codes sources du secteur public ─ Source code from the French public sector"
+        title-default "Codes sources du secteur public ─ French Public Sector Source Code"
         page          (keyword (:name (:data match)))]
     ;; Rely on the server to handle /not-found as a 404
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
@@ -1438,6 +1488,7 @@
                  :sitemap  "Pages du site ─ Sitemap"
                  :about    "À propos ─ About"
                  nil)))
+    (re-frame/dispatch [:path-params! (:path (:parameters match))])
     (re-frame/dispatch [:path! (:path match)])
     (re-frame/dispatch [:view! page (:query-params match)])))
 
@@ -1447,6 +1498,7 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["awesome" :awes]
+   ["awesome/:n" :awesome-project]
    ["releases" :releases]
    ["stats" :stats]
    ["legal" :legal]
