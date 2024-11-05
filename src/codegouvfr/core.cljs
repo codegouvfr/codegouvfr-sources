@@ -366,6 +366,11 @@
    (assoc db :path-params path-params)))
 
 (re-frame/reg-event-db
+ :query-params!
+ (fn [db [_ query-params]]
+   (assoc db :query-params query-params)))
+
+(re-frame/reg-event-db
  :reset-filter!
  (fn [db [_ _]]
    (update-in db [:filter] init-filter)))
@@ -448,6 +453,10 @@
 (re-frame/reg-sub
  :path-params?
  (fn [db _] (:path-params db)))
+
+(re-frame/reg-sub
+ :query-params?
+ (fn [db _] (:query-params db)))
 
 (re-frame/reg-sub
  :sort-repos-by?
@@ -778,22 +787,26 @@
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#1 {:type      "checkbox" :name "1"
+                  :checked   (= "true" (:fork @(re-frame/subscribe [:query-params?])))
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :fork])}]
        [:label.fr-label {:for "1" :title (i/i lang :only-fork-title)}
         (i/i lang :only-fork)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#2 {:type      "checkbox" :name "2"
+                  :checked   (= "true" (:floss @(re-frame/subscribe [:query-params?])))
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :floss])}]
        [:label.fr-label {:for "2" :title (i/i lang :only-with-license-title)}
         (i/i lang :only-with-license)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#4 {:type      "checkbox" :name "4"
+                  :checked   (= "true" (:template @(re-frame/subscribe [:query-params?])))
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :template])}]
        [:label.fr-label
         {:for "4" :title (i/i lang :only-template-title)}
         (i/i lang :only-template)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#5 {:type      "checkbox" :name "5"
+                  :checked   (= "true" (:with-contributing @(re-frame/subscribe [:query-params?])))
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-contributing])}]
        [:label.fr-label
         {:for "5" :title (i/i lang :only-contrib-title)}
@@ -801,6 +814,7 @@
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#6
         {:type      "checkbox" :name "6"
+         :checked   (= "true" (:with-publiccode @(re-frame/subscribe [:query-params?])))
          :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
        [:label.fr-label
         {:for "6" :title (i/i lang :only-publiccode-title)}
@@ -1565,7 +1579,10 @@
                  nil)))
     (re-frame/dispatch [:path-params! (:path (:parameters match))])
     (re-frame/dispatch [:path! (:path match)])
-    (re-frame/dispatch [:view! page (:query-params match)])))
+    (let [query-params (:query-params match)]
+      (re-frame/dispatch [:query-params! query-params])
+      (re-frame/dispatch [:filter! (merge init-filter query-params)])
+      (re-frame/dispatch [:view! page query-params]))))
 
 (defonce routes
   ["/"
@@ -1596,13 +1613,8 @@
   (re-frame/dispatch [:fetch-stats])
   (let [browser-lang (subs (or js/navigator.language "en") 0 2)]
     (re-frame/dispatch
-     [:lang!
-      (if (contains? i/supported-languages browser-lang)
-        browser-lang
-        "en")]))
-  (rfe/start! (rf/router routes {:conflicts nil})
-              on-navigate
-              {:use-fragment true})
+     [:lang! (if (contains? i/supported-languages browser-lang) browser-lang "en")]))
+  (rfe/start! (rf/router routes {:conflicts nil}) on-navigate {:use-fragment true})
   (start-filter-loop)
   (when (nil? @root)
     (reset! root (rdc/create-root (js/document.getElementById "app"))))
