@@ -272,4 +272,4 @@
 (defn i
   "Main i18n fonction."
   [lang input]
-  (tr opts [lang] input))
+  (tr opts [lang] [input]))

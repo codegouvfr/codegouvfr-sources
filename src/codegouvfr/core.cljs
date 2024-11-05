@@ -83,7 +83,7 @@
       (reset! timeout (js/setTimeout #(apply f args) TIMEOUT)))))
 
 (defn new-tab [s lang]
-  (str s " - " (i/i lang [:new-tab])))
+  (str s " - " (i/i lang :new-tab)))
 
 (defn to-locale-date [^String s lang]
   (when (string? s)
@@ -139,8 +139,8 @@
   (sequence
    (map #(let [[[n l] v] %]
            [[:a.fr-raw-link.fr-link
-             {:title      (i/i lang [:go-to-repos])
-              :aria-label (i/i lang [:go-to-repos])
+             {:title      (i/i lang :go-to-repos)
+              :aria-label (i/i lang :go-to-repos)
               :href       (rfe/href :repos nil {param l})} n] v]))
    data))
 
@@ -151,8 +151,8 @@
   [:strong.fr-m-auto
    (let [rps (count what)]
      (if (< rps 2)
-       (str rps (i/i lang [k]))
-       (str rps (i/i lang [(keyword (str (name k) "s"))]))))])
+       (str rps (i/i lang k))
+       (str rps (i/i lang (keyword (str (name k) "s"))))))])
 
 ;; Filters
 
@@ -235,7 +235,10 @@
                  :uri             "/data/repos_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-repositories]
-                 :on-failure      [:api-request-error :repositories]}}))
+                 :on-failure      [:api-request-error :repositories]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-owners
@@ -244,7 +247,10 @@
                  :uri             "/data/owners.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-owners]
-                 :on-failure      [:api-request-error :owners]}}))
+                 :on-failure      [:api-request-error :owners]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-awesome
@@ -253,7 +259,10 @@
                  :uri             "/data/awesome-codegouvfr.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-awesome]
-                 :on-failure      [:api-request-error :awesome]}}))
+                 :on-failure      [:api-request-error :awesome]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-platforms
@@ -262,7 +271,10 @@
                  :uri             "/data/codegouvfr-forges.csv"
                  :response-format (ajax/raw-response-format)
                  :on-success      [:set-platforms]
-                 :on-failure      [:api-request-error :platforms]}}))
+                 :on-failure      [:api-request-error :platforms]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
  :fetch-stats
@@ -271,7 +283,10 @@
                  :uri             "/data/stats_preprod.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-stats]
-                 :on-failure      [:api-request-error :stats]}}))
+                 :on-failure      [:api-request-error :stats]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
 
 ;; Define events to handle successful responses
 
@@ -507,38 +522,38 @@
   [:div.fr-grid-row.fr-grid-row--center
    [:nav.fr-pagination
     {:role       "navigation"
-     :aria-label (i/i lang [:pagination])}
+     :aria-label (i/i lang :pagination)}
     [:ul.fr-pagination__list
      [:li
       [:button.fr-pagination__link.fr-pagination__link--first
        {:on-click      #(change-page type "first")
         :disabled      first-disabled
-        :aria-label    (i/i lang [:first-page])
+        :aria-label    (i/i lang :first-page)
         :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--prev
        {:on-click      #(change-page type nil)
         :disabled      first-disabled
-        :aria-label    (i/i lang [:previous-page])
+        :aria-label    (i/i lang :previous-page)
         :aria-disabled first-disabled}]]
      [:li
       [:button.fr-pagination__link.fr
        {:disabled     true
         :aria-current "page"
-        :aria-label   (i/i lang [:current-page-of-total])}
+        :aria-label   (i/i lang :current-page-of-total)}
        (str (inc current-page) "/"
             (if (> total-pages 0) total-pages 1))]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--next
        {:on-click      #(change-page type true)
         :disabled      last-disabled
-        :aria-label    (i/i lang [:next-page])
+        :aria-label    (i/i lang :next-page)
         :aria-disabled last-disabled}]]
      [:li
       [:button.fr-pagination__link.fr-pagination__link--last
        {:on-click      #(change-page type "last")
         :disabled      last-disabled
-        :aria-label    (i/i lang [:last-page])
+        :aria-label    (i/i lang :last-page)
         :aria-disabled last-disabled}]]]]])
 
 ;; Home page
@@ -551,9 +566,9 @@
       [:div.fr-card__title
        [:a.fr-card__link
         {:href  (rfe/href :awes)
-         :title (i/i lang [:Awesome-title])}
-        (i/i lang [:Awesome])]]
-      [:div.fr-card__desc (i/i lang [:Awesome-callout])]]
+         :title (i/i lang :Awesome-title)}
+        (i/i lang :Awesome)]]
+      [:div.fr-card__desc (i/i lang :Awesome-callout)]]
      [:div.fr-card__img.fr-col-3
       [:img.fr-responsive-img {:src "./img/awesome.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
@@ -562,9 +577,9 @@
       [:div.fr-card__title
        [:a.fr-card__link
         {:href  (rfe/href :repos)
-         :title (i/i lang [:repos-of-source-code])}
-        (i/i lang [:Repos])]]
-      [:div.fr-card__desc (i/i lang [:home-repos-desc])]]
+         :title (i/i lang :repos-of-source-code)}
+        (i/i lang :Repos)]]
+      [:div.fr-card__desc (i/i lang :home-repos-desc)]]
      [:div.fr-card__img.fr-col-3
       [:img.fr-responsive-img {:src "./img/repositories.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
@@ -573,9 +588,9 @@
       [:div.fr-card__title
        [:a.fr-card__link
         {:href  (rfe/href :orgas)
-         :title (i/i lang [:Orgas])}
-        (i/i lang [:Orgas])]]
-      [:div.fr-card__desc (i/i lang [:home-orgas-desc])]]
+         :title (i/i lang :Orgas)}
+        (i/i lang :Orgas)]]
+      [:div.fr-card__desc (i/i lang :home-orgas-desc)]]
      [:div.fr-card__img.fr-col-3
       [:img.fr-responsive-img {:src "./img/organizations.webp" :alt ""}]]]]
    [:div.fr-col-6.fr-p-2w
@@ -584,9 +599,9 @@
       [:div.fr-card__title
        [:a.fr-card__link
         {:href  (rfe/href :stats)
-         :title (i/i lang [:stats-expand])}
-        (i/i lang [:Stats])]]
-      [:div.fr-card__desc (i/i lang [:home-stats-desc])]]
+         :title (i/i lang :stats-expand)}
+        (i/i lang :Stats)]]
+      [:div.fr-card__desc (i/i lang :home-stats-desc)]]
      [:div.fr-card__img.fr-col-3
       [:img.fr-responsive-img {:src "./img/stats.webp" :alt ""}]]]]])
 
@@ -594,42 +609,42 @@
 
 (defn repos-table [lang repos]
   (if (zero? (count repos))
-    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-repo-found])]]
+    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang :no-repo-found)]]
     (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
           repos-page @(re-frame/subscribe [:repos-page?])]
       [:div.fr-table.fr-table--no-caption
-       {:role "region" :aria-label (i/i lang [:repos-of-source-code])}
+       {:role "region" :aria-label (i/i lang :repos-of-source-code)}
        [:table
-        [:caption {:id "repos-table-caption"} (i/i lang [:repos-of-source-code])]
+        [:caption {:id "repos-table-caption"} (i/i lang :repos-of-source-code)]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col {:scope "col"} (i/i lang [:Repo])]
-          [:th.fr-col {:scope "col"} (i/i lang [:Orga])]
-          [:th.fr-col {:scope "col"} (i/i lang [:description])]
+          [:th.fr-col {:scope "col"} (i/i lang :Repo)]
+          [:th.fr-col {:scope "col"} (i/i lang :Orga)]
+          [:th.fr-col {:scope "col"} (i/i lang :description)]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= rep-f :date) "fr-btn--secondary")
-             :title        (i/i lang [:sort-update-date])
+             :title        (i/i lang :sort-update-date)
              :on-click     #(re-frame/dispatch [:sort-repos-by! :date])
              :aria-pressed (if (= rep-f :date) "true" "false")
-             :aria-label   (i/i lang [:sort-update-date])}
-            (i/i lang [:update-short])]]
+             :aria-label   (i/i lang :sort-update-date)}
+            (i/i lang :update-short)]]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= rep-f :forks) "fr-btn--secondary")
-             :title        (i/i lang [:sort-forks])
+             :title        (i/i lang :sort-forks)
              :on-click     #(re-frame/dispatch [:sort-repos-by! :forks])
              :aria-pressed (if (= rep-f :forks) "true" "false")
-             :aria-label   (i/i lang [:sort-forks])}
-            (i/i lang [:forks])]]
+             :aria-label   (i/i lang :sort-forks)}
+            (i/i lang :forks)]]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= rep-f :score) "fr-btn--secondary")
-             :title        (i/i lang [:sort-score])
+             :title        (i/i lang :sort-score)
              :on-click     #(re-frame/dispatch [:sort-repos-by! :score])
              :aria-pressed (if (= rep-f :score) "true" "false")
-             :aria-label   (i/i lang [:sort-score])}
-            (i/i lang [:Score])]]]]
+             :aria-label   (i/i lang :sort-score)}
+            (i/i lang :Score)]]]]
         (into [:tbody]
               (for [repo (->> repos
                               (drop (* REPOS-PER-PAGE repos-page))
@@ -651,25 +666,25 @@
                    [:td
                     [:span
                      [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang [:go-to-data])
+                      {:title      (i/i lang :go-to-data)
                        :target     "new"
                        :href       (str ecosystem-prefix-url
                                         (if (= p "github.com") "github" p)
                                         "/repositories/" fn)
-                       :aria-label (str (i/i lang [:go-to-data]) " " n)}]
+                       :aria-label (str (i/i lang :go-to-data) " " n)}]
                      [:span " "]
                      [:a {:href       html_url
                           :target     "_blank"
                           :rel        "noreferrer noopener"
-                          :aria-label (str n " - " (i/i lang [:go-to-repo])
-                                           (when li (str " " (i/i lang [:under-license]) " " li)))}
+                          :aria-label (str n " - " (i/i lang :go-to-repo)
+                                           (when li (str " " (i/i lang :under-license) " " li)))}
                       n]]]
                    [:td [:button.fr-raw-link.fr-link
                          {:on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group o}))
-                          :aria-label (i/i lang [:browse-repos-orga])}
+                          :aria-label (i/i lang :browse-repos-orga)}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
-                   [:td [:span {:aria-label (str (i/i lang [:description]) ": " d)}
-                         (if a? [:em {:title (i/i lang [:repo-archived])} d] d)]]
+                   [:td [:span {:aria-label (str (i/i lang :description) ": " d)}
+                         (if a? [:em {:title (i/i lang :repo-archived)} d] d)]]
                    [:td
                     {:style {:text-align "center"}}
                     [:span
@@ -677,15 +692,15 @@
                        [:a
                         {:href       (str swh-baseurl html_url)
                          :target     "new"
-                         :title      (new-tab (i/i lang [:swh-link]) lang)
+                         :title      (new-tab (i/i lang :swh-link) lang)
                          :rel        "noreferrer noopener"
-                         :aria-label (i/i lang [:swh-link])}
+                         :aria-label (i/i lang :swh-link)}
                         d]
                        "N/A")]]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str (i/i lang [:forks]) ": " f)} f]
+                         :aria-label (str (i/i lang :forks) ": " f)} f]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str (i/i lang [:Score]) ": " a)} a]])))]])))
+                         :aria-label (str (i/i lang :Score) ": " a)} a]])))]])))
 
 (defn repos-page [lang]
   (let [repos              @(re-frame/subscribe [:repos?])
@@ -701,12 +716,12 @@
      [:div.fr-grid-row
       ;; RSS feed
       [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i lang [:rss-feed])
+       {:title (i/i lang :rss-feed)
         :href  "/data/latest.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
       [:button.fr-link.fr-m-1w
-       {:title    (i/i lang [:download])
+       {:title    (i/i lang :download)
         :on-click (fn []
                     (download-as-csv!
                      (->> repos
@@ -721,55 +736,55 @@
      ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (i/i lang [:license])
-        :aria-label  (i/i lang [:license])
+       {:placeholder (i/i lang :license)
+        :aria-label  (i/i lang :license)
         :value       (or @license (:license f))
         :on-change   #(let [v (.. % -target -value)]
                         (reset! license v)
                         (debounced-license v))}]
       [:input.fr-input.fr-col.fr-m-2w
        {:value       (or @language (:language f))
-        :placeholder (i/i lang [:language])
-        :aria-label  (i/i lang [:language])
+        :placeholder (i/i lang :language)
+        :aria-label  (i/i lang :language)
         :on-change   #(let [v (.. % -target -value)]
                         (reset! language v)
                         (debounced-language v))}]
       [:select.fr-select.fr-col-3
        {:value     (or (:forge f) "")
         :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :forge])}
-       [:option#default {:value ""} (i/i lang [:all-forges])]
+       [:option#default {:value ""} (i/i lang :all-forges)]
        (for [x (sort @(re-frame/subscribe [:platforms?]))]
          ^{:key x}
          [:option {:value x} x])]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#1 {:type      "checkbox" :name "1"
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :fork])}]
-       [:label.fr-label {:for "1" :title (i/i lang [:only-fork-title])}
-        (i/i lang [:only-fork])]]
+       [:label.fr-label {:for "1" :title (i/i lang :only-fork-title)}
+        (i/i lang :only-fork)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#2 {:type      "checkbox" :name "2"
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :floss])}]
-       [:label.fr-label {:for "2" :title (i/i lang [:only-with-license-title])}
-        (i/i lang [:only-with-license])]]
+       [:label.fr-label {:for "2" :title (i/i lang :only-with-license-title)}
+        (i/i lang :only-with-license)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#4 {:type      "checkbox" :name "4"
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :template])}]
        [:label.fr-label
-        {:for "4" :title (i/i lang [:only-template-title])}
-        (i/i lang [:only-template])]]
+        {:for "4" :title (i/i lang :only-template-title)}
+        (i/i lang :only-template)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#5 {:type      "checkbox" :name "5"
                   :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-contributing])}]
        [:label.fr-label
-        {:for "5" :title (i/i lang [:only-contrib-title])}
-        (i/i lang [:only-contrib])]]
+        {:for "5" :title (i/i lang :only-contrib-title)}
+        (i/i lang :only-contrib)]]
       [:div.fr-checkbox-group.fr-col.fr-m-2w
        [:input#6
         {:type      "checkbox" :name "6"
          :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
        [:label.fr-label
-        {:for "6" :title (i/i lang [:only-publiccode-title])}
-        (i/i lang [:only-publiccode])]]]
+        {:for "6" :title (i/i lang :only-publiccode-title)}
+        (i/i lang :only-publiccode)]]]
      ;; Main repos table display
      [repos-table lang repos]
      ;; Bottom pagination block
@@ -794,7 +809,7 @@
           [:div.fr-card__content
            [:div.fr-card__start
             [:ul.fr-tags-group
-             [:li [:p.fr-tag (str (i/i lang [:license]) ": " (:license legal))]]]]
+             [:li [:p.fr-tag (str (i/i lang :license) ": " (:license legal))]]]]
            [:h3.fr-card__title
             [:a {:href (rfe/href :awesome-project {:n name})} name]]
            [:p.fr-card__desc desc]]]]]))))
@@ -806,9 +821,9 @@
      [:div.fr-callout
       [:p.fr-callout__text
        [:span
-        (i/i lang [:Awesome-callout])
+        (i/i lang :Awesome-callout)
         ": " [:a.fr-link {:href (rfe/href :releases)}
-              (i/i lang [:release-check-latest])]]]]
+              (i/i lang :release-check-latest)]]]]
      [:div.fr-my-6w
       [awes-table lang]]]]])
 
@@ -833,27 +848,27 @@
               {:href       landingURL
                :target     "new"
                :rel        "noreferrer noopener"
-               :aria-label (i/i lang [:go-to-website])}
-              " " (i/i lang [:go-to-website])]]
+               :aria-label (i/i lang :go-to-website)}
+              " " (i/i lang :go-to-website)]]
          [:p [:a.fr-raw-link.fr-icon-code-box-line
               {:href       url
                :target     "new"
                :rel        "noreferrer noopener"
-               :aria-label (i/i lang [:go-to-source])}
-              " " (i/i lang [:go-to-source])]]]
+               :aria-label (i/i lang :go-to-source)}
+              " " (i/i lang :go-to-source)]]]
         [:img.fr-responsive-img.fr-col-3 {:src logo :data-fr-js-ratio true}]]
        [:div.fr-grid-row.fr-grid-row--gutters
         [:div.fr-col-12
          (when-let [license (not-empty (:license legal))]
-           [:h4.fr-icon-scales-3-line " " (i/i lang [:license]) ": " license])
+           [:h4.fr-icon-scales-3-line " " (i/i lang :license) ": " license])
          (when-let [used (not-empty usedBy)]
            [:div
-            [:h4.fr-icon-user-line " " (i/i lang [:Users])]
+            [:h4.fr-icon-user-line " " (i/i lang :Users)]
             [:ul (for [u used] [:li u])]])
          (when-let [funded (not-empty fundedBy)]
            [:div
             [:br]
-            [:h4.fr-icon-government-line " " (i/i lang [:Funders])]
+            [:h4.fr-icon-government-line " " (i/i lang :Funders)]
             [:ul (for [{:keys [name url]} funded]
                    [:li [:a {:href url} name]])]])]]]]]))
 
@@ -861,41 +876,41 @@
 
 (defn orgas-table [lang orgas]
   (if (zero? (count orgas))
-    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang [:no-orga-found])]]
+    [:div.fr-m-3w [:p {:aria-live "polite"} (i/i lang :no-orga-found)]]
     (let [org-f @(re-frame/subscribe [:sort-orgas-by?])]
       [:div.fr-table.fr-table--no-caption
-       {:role "region" :aria-label (i/i lang [:Orgas])}
+       {:role "region" :aria-label (i/i lang :Orgas)}
        [:table
-        [:caption {:id "orgas-table-caption"} (i/i lang [:Orgas])]
+        [:caption {:id "orgas-table-caption"} (i/i lang :Orgas)]
         [:thead.fr-grid.fr-col-12
          [:tr
           [:th.fr-col-1 {:scope "col"} "Image"]
-          [:th.fr-col-2 {:scope "col"} (i/i lang [:Orgas])]
-          [:th.fr-col-6 {:scope "col"} (i/i lang [:description])]
+          [:th.fr-col-2 {:scope "col"} (i/i lang :Orgas)]
+          [:th.fr-col-6 {:scope "col"} (i/i lang :description)]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= org-f :repos) "fr-btn--secondary")
-             :title        (i/i lang [:sort-repos])
+             :title        (i/i lang :sort-repos)
              :on-click     #(re-frame/dispatch [:sort-orgas-by! :repos])
              :aria-pressed (if (= org-f :repos) "true" "false")
-             :aria-label   (i/i lang [:sort-repos])}
-            (i/i lang [:Repos])]]
+             :aria-label   (i/i lang :sort-repos)}
+            (i/i lang :Repos)]]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= org-f :subscribers) "fr-btn--secondary")
-             :title        (i/i lang [:sort-subscribers])
+             :title        (i/i lang :sort-subscribers)
              :on-click     #(re-frame/dispatch [:sort-orgas-by! :subscribers])
              :aria-pressed (if (= org-f :subscribers) "true" "false")
-             :aria-label   (i/i lang [:sort-subscribers])}
-            (i/i lang [:Subscribers])]]
+             :aria-label   (i/i lang :sort-subscribers)}
+            (i/i lang :Subscribers)]]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
             {:class        (when (= org-f :floss) "fr-btn--secondary")
-             :title        (i/i lang [:sort-orgas-floss-policy])
+             :title        (i/i lang :sort-orgas-floss-policy)
              :on-click     #(re-frame/dispatch [:sort-orgas-by! :floss])
              :aria-pressed (if (= org-f :floss) "true" "false")
-             :aria-label   (i/i lang [:sort-orgas-floss-policy])}
-            (i/i lang [:floss])]]]]
+             :aria-label   (i/i lang :sort-orgas-floss-policy)}
+            (i/i lang :floss)]]]]
         (into [:tbody]
               (for [orga (take ORGAS-PER-PAGE
                                (drop (* ORGAS-PER-PAGE @(re-frame/subscribe [:orgas-page?]))
@@ -906,48 +921,48 @@
                    [:td (if au
                           (if (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title      (i/i lang [:orga-homepage])
+                             {:title      (i/i lang :orga-homepage)
                               :href       h
-                              :aria-label (str (i/i lang [:orga-homepage]) " " n)}
-                             [:img {:src au :width "100%" :alt (str n " " (i/i lang [:logo]))}]]
-                            [:img {:src au :width "100%" :alt (str n " " (i/i lang [:logo]))}])
+                              :aria-label (str (i/i lang :orga-homepage) " " n)}
+                             [:img {:src au :width "100%" :alt (str n " " (i/i lang :logo))}]]
+                            [:img {:src au :width "100%" :alt (str n " " (i/i lang :logo))}])
                           (when (not-empty h)
                             [:a.fr-raw-link.fr-link
-                             {:title      (i/i lang [:orga-homepage])
+                             {:title      (i/i lang :orga-homepage)
                               :href       h
-                              :aria-label (str (i/i lang [:orga-homepage]) " " n)}
-                             (i/i lang [:website])]))]
+                              :aria-label (str (i/i lang :orga-homepage) " " n)}
+                             (i/i lang :website)]))]
                    [:td
                     [:span
                      [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang [:go-to-data])
+                      {:title      (i/i lang :go-to-data)
                        :target     "new"
                        :href       (str ecosystem-prefix-url
                                         (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
                                           (if (re-matches #"^github.*" p) "GitHub" p))
                                         "/owners/" l)
-                       :aria-label (str (i/i lang [:go-to-data]) " " (or (not-empty n) l))}]
+                       :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}]
                      [:span " "]
                      [:a {:target     "_blank"
                           :rel        "noreferrer noopener"
                           :href       id
-                          :aria-label (str (i/i lang [:go-to-orga]) " " (or (not-empty n) l))}
+                          :aria-label (str (i/i lang :go-to-orga) " " (or (not-empty n) l))}
                       (or (not-empty n) l)]]]
-                   [:td {:aria-label (str (i/i lang [:description]) ": " d)} d]
+                   [:td {:aria-label (str (i/i lang :description) ": " d)} d]
                    [:td {:style {:text-align "center"}}
                     [:button..fr-raw-link.fr-link
-                     {:title      (i/i lang [:go-to-repos])
+                     {:title      (i/i lang :go-to-repos)
                       :on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group id}))
-                      :aria-label (str r " " (i/i lang [:repos-of]) " " (or (not-empty n) l))} r]]
+                      :aria-label (str r " " (i/i lang :repos-of) " " (or (not-empty n) l))} r]]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str s " " (i/i lang [:Subscribers]))} s]
+                         :aria-label (str s " " (i/i lang :Subscribers))} s]
                    [:td {:style {:text-align "center"}}
                     (when (not-empty f)
                       [:a {:target     "new"
                            :rel        "noreferrer noopener"
                            :href       f
-                           :aria-label (str (i/i lang [:floss-policy]) " " (i/i lang [:for]) " " (or (not-empty n) l))}
-                       (i/i lang [:floss])])]])))]])))
+                           :aria-label (str (i/i lang :floss-policy) " " (i/i lang :for) " " (or (not-empty n) l))}
+                       (i/i lang :floss)])]])))]])))
 
 (defn orgas-page [lang]
   (let [orgas          @(re-frame/subscribe [:orgas?])
@@ -961,12 +976,12 @@
      [:div.fr-grid-row
       ;; RSS feed
       [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i lang [:rss-feed])
+       {:title (i/i lang :rss-feed)
         :href  "/data/latest-organizations.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; Download link
       [:button.fr-link.fr-m-1w
-       {:title    (i/i lang [:download])
+       {:title    (i/i lang :download)
         :on-click #(download-as-csv!
                     (map
                      (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
@@ -981,7 +996,7 @@
       [:select.fr-select.fr-col.fr-m-1w
        {:value     (or (:ministry f) "")
         :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :ministry])}
-       [:option#default {:value ""} (i/i lang [:all-ministries])]
+       [:option#default {:value ""} (i/i lang :all-ministries)]
        (for [x @(re-frame/subscribe [:ministries?])]
          ^{:key x}
          [:option {:value x} x])]]
@@ -997,7 +1012,7 @@
      [:div.fr-grid-row
       ;; RSS feed
       [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i lang [:rss-feed])
+       {:title (i/i lang :rss-feed)
         :href  "/data/latest-releases.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; General informations
@@ -1005,13 +1020,13 @@
      ;; Main releases display
      [:div.fr-table.fr-table--no-caption
       [:table
-       [:caption (i/i lang [:Releases])]
+       [:caption (i/i lang :Releases)]
        [:thead.fr-grid.fr-col-12
         [:tr
-         [:th.fr-col-1 (i/i lang [:Repo])]
-         [:th.fr-col-2 (i/i lang [:description])]
-         [:th.fr-col-1 (i/i lang [:Releasename])]
-         [:th.fr-col-1 (i/i lang [:update-short])]]]
+         [:th.fr-col-1 (i/i lang :Repo)]
+         [:th.fr-col-2 (i/i lang :description)]
+         [:th.fr-col-1 (i/i lang :Releasename)]
+         [:th.fr-col-1 (i/i lang :update-short)]]]
        (into
         [:tbody]
         (for [release (reverse (sort-by :published_at releases))]
@@ -1021,7 +1036,7 @@
                   [:a.fr-link
                    {:href   html_url
                     :target "_blank"
-                    :title  (i/i lang [:Repo])
+                    :title  (i/i lang :Repo)
                     :rel    "noreferrer noopener"} repo_name]]
              [:td body]
              [:td tag_name]
@@ -1034,14 +1049,14 @@
         (map (fn [i] {:name (get i name-key) :y (get i data-key)}) data)
         chart-options
         {:chart       {:type "pie"}
-         :title       {:text (i/i lang [title-i18n-keyword])}
+         :title       {:text (i/i lang title-i18n-keyword)}
          :tooltip     {:pointFormat "<b>{point.percentage:.1f}%</b>"}
          :plotOptions {:pie {:allowPointSelect true
                              :cursor           "pointer"
                              :dataLabels
                              {:enabled true
                               :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
-         :series      [{:name         (i/i lang [title-i18n-keyword])
+         :series      [{:name         (i/i lang title-i18n-keyword)
                         :colorByPoint true
                         :data         formatted-data}]
          :credits     {:enabled false}}]
@@ -1054,15 +1069,15 @@
   (let [data (:top_repos_by_score_range stats)
         chart-options
         {:chart   {:type "column"}
-         :title   {:text (i/i lang [:repos-vs-score])}
+         :title   {:text (i/i lang :repos-vs-score)}
          :xAxis   {:type       "category"
-                   :title      {:text (i/i lang [:Score])}
+                   :title      {:text (i/i lang :Score)}
                    :categories (map (comp str first) data)
                    :labels     {:rotation -45 :style {:fontSize "13px"}}}
          :yAxis   {:type  "logarithmic" :min 1 :max 10000
-                   :title {:text (i/i lang [:number-of-repos])}}
+                   :title {:text (i/i lang :number-of-repos)}}
          :series  [{:data (map second data)}]
-         :tooltip {:pointFormat (str (i/i lang [:number-of-repos]) ": <b>{point.y}</b>")}
+         :tooltip {:pointFormat (str (i/i lang :number-of-repos) ": <b>{point.y}</b>")}
          :legend  {:enabled false}
          :credits {:enabled false}}]
     [:div.fr-col-12
@@ -1075,18 +1090,18 @@
         chart-data (get stats data-key)
         chart-options
         {:chart       {:type "scatter" :zoomType "xy"}
-         :title       {:text (i/i lang [title])}
-         :xAxis       {:title         {:enabled true :text (i/i lang [tooltip-x])}
+         :title       {:text (i/i lang title)}
+         :xAxis       {:title         {:enabled true :text (i/i lang tooltip-x)}
                        :startOnTick   true
                        :endOnTick     true
                        :showLastLabel true}
-         :yAxis       {:title {:enabled true :text (i/i lang [:number-of-repos])}}
+         :yAxis       {:title {:enabled true :text (i/i lang :number-of-repos)}}
          :legend      {:enabled false}
          :plotOptions {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
                                            :pointFormat  (str
-                                                          (i/i lang [tooltip-x])
+                                                          (i/i lang tooltip-x)
                                                           ": {point.x}<br>"
-                                                          (i/i lang [:Repos])
+                                                          (i/i lang :Repos)
                                                           ": {point.y}")}}}
          :series      [{:name  "Organizations"
                         :color "rgba(223, 83, 83, .5)"
@@ -1173,17 +1188,17 @@
      [:div.fr-grid-row
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
        (stats-table [:span
-                     (i/i lang [:Orgas])
-                     (i/i lang [:with-more-of])
-                     (i/i lang [:repos])]
+                     (i/i lang :Orgas)
+                     (i/i lang :with-more-of)
+                     (i/i lang :repos)]
                     (top-clean-up-orgas lang top_orgs_by_repos "group")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Repos])]]])]
+                    [:thead [:tr [:th.fr-col-10 (i/i lang :Orgas)]
+                             [:th (i/i lang :Repos)]]])]
       [:div.fr-col-6.fr-grid-row.fr-grid-row--center
-       (stats-table [:span (i/i lang [:most-starred-orgas])]
+       (stats-table [:span (i/i lang :most-starred-orgas)]
                     (top-clean-up-orgas lang top_orgs_by_stars "group")
-                    [:thead [:tr [:th.fr-col-10 (i/i lang [:Orgas])]
-                             [:th (i/i lang [:Stars])]]])]]]))
+                    [:thead [:tr [:th.fr-col-10 (i/i lang :Orgas)]
+                             [:th (i/i lang :Stars)]]])]]]))
 
 ;; Main structure elements
 
@@ -1209,31 +1224,31 @@
            [:div.fr-header__service-title
             [:svg {:width "240px" :viewBox "0 0 299.179 49.204"}
              [:path {:fill "#808080" :d "M5.553 2.957v2.956h4.829V0H5.553Zm5.554 0v2.956h4.829V0h-4.829Zm5.553 0v2.956h4.587V0H16.66zm5.553 0v2.956h4.829V0h-4.829zm76.057 0v2.956h4.829V0H98.27zm5.553 0v2.956h4.829V0h-4.829zm53.843 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.587zm5.313 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.588zM0 10.27v3.112h4.854l-.073-3.05-.073-3.018-2.342-.094L0 7.127zm5.553 0v3.143l2.367-.093 2.342-.093V7.314L7.92 7.22l-2.367-.093zm16.66 0v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.554 0v3.112h4.587V7.158h-4.587zm70.672-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm48.362 2.925v3.112h4.588V7.158h-4.588zm5.481-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm16.732 2.894v3.112h4.588V7.158h-4.588zm5.553 0v3.112h4.588V7.158h-4.587zM0 17.428v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019H0Zm5.553 0v3.143l2.367-.093 2.342-.093v-5.913l-2.342-.094-2.367-.093zm38.197-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.554 0 .072 3.05h4.588l.072-3.05.073-3.019H49.23zm5.505.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm21.248 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.505.093v3.143l2.366-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.602-.093.072 3.05 2.367.093 2.342.093v-6.255h-4.854zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm15.936 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.747.093v3.112h4.587v-6.224h-4.587zm15.694 0v3.112h4.588v-6.224h-4.588zm5.36-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm38.342.093v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm15.936 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm16.66 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.505.093v3.143l2.367-.093 2.342-.093.072-3.05.073-3.019h-4.854zm10.142 0v3.143l2.365-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.6-.093.073 3.05h4.588l.072-3.05.073-3.019h-4.878zm16.66 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.506.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zM0 24.742v2.956h4.829v-5.913H0Zm5.553 0v2.956h4.829v-5.913H5.553Zm32.596 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.141 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.829v-5.913H81.61zm16.66 0v2.956h4.829v-5.913H98.27zm5.553 0v2.956h4.829v-5.913h-4.829zm10.382 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.828v-5.913h-4.828zm16.901 0v2.956h4.587v-5.913h-4.587zm5.312 0v2.956h4.828v-5.913h-4.828zm10.382 0v2.956h4.588v-5.913h-4.588zm5.312 0v2.956h4.829v-5.913h-4.829zm11.107 0v2.956h4.829v-5.913h-4.829zm5.794 0v2.956h4.588v-5.913h-4.588zm5.553 0v2.956h4.588v-5.913h-4.587zm10.383 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.588v-5.913h-4.588zm16.66 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.587v-5.913h-4.587zm10.382 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.142 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zM0 31.744v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094L0 28.601zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm32.596 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.141 0v3.112h4.829v-6.224h-4.829zm5.554 0v3.112h4.829v-6.224H81.61zm16.756-2.707c-.072.249-.096 1.618-.048 3.05l.072 2.614 2.367.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm10.479-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.438.405zm5.457 2.707v3.112h4.828v-6.224h-4.828zm5.649-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm5.795 0v3.112h4.587v-6.224h-4.587zm5.408-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm10.286 2.707v3.112h4.588v-6.224h-4.588zm5.409-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256H160.2c-1.714 0-2.342.125-2.438.405zm16.804 2.707v3.112h4.588v-6.224h-4.588zm5.553 0v3.112h4.588v-6.224h-4.587zm10.383 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.112h4.588v-6.224h-4.588zm16.66 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.554 0v3.112h4.587v-6.224h-4.587zm10.382 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.142 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.112h4.829v-6.224h-4.829zM0 38.747v2.956h4.829V35.79H0Zm5.553 0v2.956h4.829V35.79H5.553Zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm10.141 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.829V35.79H81.61zm16.66 0v2.956h4.829V35.79H98.27zm5.553 0v2.956h4.829V35.79h-4.829zm10.382 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm32.595 0v2.956h4.588V35.79h-4.588zm5.312 0v2.956h4.829V35.79h-4.829zm16.901 0v2.956h4.588V35.79h-4.588zm5.553 0v2.956h4.588V35.79h-4.587zm10.383 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.588V35.79h-4.588zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm15.695 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.828V35.79h-4.828zM5.553 46.06v3.144l2.367-.094 2.342-.093v-5.913L7.92 43.01l-2.367-.093zm5.554 0v3.112h4.853l-.073-3.05-.072-3.018-2.342-.094-2.366-.093zm5.553 0v3.112h4.587v-6.224H16.66zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.072-3.018-2.174-.094c-1.207-.03-2.27 0-2.366.125zm21.489 0c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.554 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm21.248 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.553.031c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.384 2.894v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.723-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm15.936 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.552.031c-.096.093-.168 1.494-.168 3.112v2.894h4.828v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.554-.031c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.626 2.925v3.112h4.587v-6.224h-4.587zm21.175-2.925c-.097.124-.17 1.525-.17 3.143v2.894h4.855l-.073-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.625 2.925v3.112h4.588v-6.224h-4.587zm5.482-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.625 2.894v3.112h4.588v-6.224h-4.588zm21.489 0v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm21.658-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.854l-.073-3.05-.072-3.018-2.342-.094-2.367-.093zm5.554 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm26.801 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.385 2.925v3.112h4.852l-.072-3.05-.073-3.018-2.342-.094-2.366-.093z"}]]]]
-          [:p.fr-header__service-tagline (i/i lang [:index-title])]]]
+          [:p.fr-header__service-tagline (i/i lang :index-title)]]]
         [:div.fr-header__tools
          [:div.fr-header__tools-links
           [:ul.fr-links-group
            [:li [:a.fr-link.fr-icon-mastodon-line
                  {:rel   "me"
                   :href  "https://social.numerique.gouv.fr/@codegouvfr"
-                  :title (i/i lang [:mastodon-follow])} "@codegouvfr"]]
+                  :title (i/i lang :mastodon-follow)} "@codegouvfr"]]
            [:li [:a.fr-link.fr-icon-twitter-x-line
                  {:rel   "me"
                   :href  "https://x.com/codegouvfr"
-                  :title (i/i lang [:twitter-follow])} "@codegouvfr"]]
-           [:li [:a.fr-link {:href (rfe/href :feeds)} (i/i lang [:rss-feed])]]
+                  :title (i/i lang :twitter-follow)} "@codegouvfr"]]
+           [:li [:a.fr-link {:href (rfe/href :feeds)} (i/i lang :rss-feed)]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
-                  :title          (str (i/i lang [:modal-title]) " - "
-                                       (i/i lang [:new-modal]))
+                  :title          (str (i/i lang :modal-title) " - "
+                                       (i/i lang :new-modal))
                   :data-fr-opened false}
-                 (i/i lang [:modal-title])]]]]]]]]
+                 (i/i lang :modal-title)]]]]]]]]
      ;; Header menu
      [:div#modal-833.fr-header__menu.fr-modal
       {:aria-labelledby "fr-btn-menu-mobile"}
       [:div.fr-container
        [:button.fr-link--close.fr-link
-        {:aria-controls "modal-833"} (i/i lang [:close])]
+        {:aria-controls "modal-833"} (i/i lang :close)]
        [:div.fr-header__menu-links]
        [:nav#navigation-832.fr-nav {:role "navigation" :aria-label "Principal"}
         [:ul.fr-nav__list
@@ -1241,7 +1256,7 @@
           [:button.fr-nav__link
            {:aria-current (when (= path "/") "page")
             :on-click     #(rfe/push-state :home)}
-           (i/i lang [:home])]]
+           (i/i lang :home)]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/awesome") "page")
@@ -1252,27 +1267,27 @@
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
-            :title        (i/i lang [:repos-of-source-code])
+            :title        (i/i lang :repos-of-source-code)
             :on-click
             #(do (reset-queries) (rfe/push-state :repos))}
-           (i/i lang [:Repos])]]
+           (i/i lang :Repos)]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
             :on-click
             #(do (reset-queries) (rfe/push-state :orgas))}
-           (i/i lang [:Orgas])]]
+           (i/i lang :Orgas)]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/stats") "page")
-            :title        (i/i lang [:stats-expand])
+            :title        (i/i lang :stats-expand)
             :href         (rfe/href :stats)}
-           (i/i lang [:Stats])]]
+           (i/i lang :Stats)]]
          [:li.fr-nav__item
           [:a.fr-nav__link
            {:aria-current (when (= path "/about") "page")
             :href         (rfe/href :about)}
-           (i/i lang [:About])]]]]]]]))
+           (i/i lang :rien/tout)]]]]]]]))
 
 (defn subscribe [lang]
   [:div.fr-follow
@@ -1281,34 +1296,34 @@
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__special
        [:div
-        [:h1.fr-h5.fr-follow__title (i/i lang [:contact])]
+        [:h1.fr-h5.fr-follow__title (i/i lang :contact)]
         [:div.fr-text--sm.fr-follow__desc
-         (i/i lang [:contact-title])]]]]
+         (i/i lang :contact-title)]]]]
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-follow__newsletter
        [:div
-        [:h1.fr-h5.fr-follow__title (i/i lang [:bluehats])]
+        [:h1.fr-h5.fr-follow__title (i/i lang :bluehats)]
         [:p.fr-text--sm.fr-follow__desc
-         (i/i lang [:bluehats-desc])]
+         (i/i lang :bluehats-desc)]
         [:a.fr-btn
          {:type "button"
           :href "https://code.gouv.fr/newsletters"}
-         (i/i lang [:subscribe])]]]]
+         (i/i lang :subscribe)]]]]
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-share
-       [:p.fr-h5.fr-mb-3v (i/i lang [:find-us])]
+       [:p.fr-h5.fr-mb-3v (i/i lang :find-us)]
        [:div.fr-share__group
         [:a.fr-share__link
          {:href       "https://social.numerique.gouv.fr/@codegouvfr"
-          :aria-label (i/i lang [:mastodon-follow])
-          :title      (new-tab (i/i lang [:mastodon-follow]) lang)
+          :aria-label (i/i lang :mastodon-follow)
+          :title      (new-tab (i/i lang :mastodon-follow) lang)
           :rel        "noreferrer noopener me"
           :target     "_blank"}
          "Mastodon"]
         [:a.fr-share__link
          {:href       "https://x.com/codegouvfr"
-          :aria-label (i/i lang [:twitter-follow])
-          :title      (new-tab (i/i lang [:twitter-follow]) lang)
+          :aria-label (i/i lang :twitter-follow)
+          :title      (new-tab (i/i lang :twitter-follow) lang)
           :rel        "noreferrer noopener me"
           :target     "_blank"}
          "Twitter"]]]]]]])
@@ -1319,12 +1334,12 @@
     [:div.fr-footer__body
      [:div.fr-footer__brand.fr-enlarge-link
       [:a {:on-click #(rfe/push-state :home)
-           :title    (i/i lang [:home])}
+           :title    (i/i lang :home)}
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
-      [:p.fr-footer__content-desc (i/i lang [:footer-desc])
+      [:p.fr-footer__content-desc (i/i lang :footer-desc)
        [:a {:href "https://code.gouv.fr"}
-        (i/i lang [:footer-desc-link])]]
+        (i/i lang :footer-desc-link)]]
       [:ul.fr-footer__content-list
        [:li.fr-footer__content-item
         [:a.fr-footer__content-link
@@ -1344,35 +1359,35 @@
        [:button.fr-footer__bottom-link
         {:lang     (if (= lang "fr") "en" "fr")
          :on-click #(re-frame/dispatch [:lang! (if (= lang "fr") "en" "fr")])}
-        (i/i lang [:switch-lang])]]
+        (i/i lang :switch-lang)]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
         {:href (rfe/href :a11y)}
-        (i/i lang [:accessibility])]]
+        (i/i lang :accessibility)]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
         {:href (rfe/href :legal)}
-        (i/i lang [:legal])]]
+        (i/i lang :legal)]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
         {:href (rfe/href :legal)}
-        (i/i lang [:personal-data])]]
+        (i/i lang :personal-data)]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
         {:href (rfe/href :sitemap)}
-        (i/i lang [:sitemap])]]
+        (i/i lang :sitemap)]]
       [:li.fr-footer__bottom-item
        [:a.fr-footer__bottom-link
         {:href  (rfe/href :feeds)
-         :title (i/i lang [:subscribe-rss-flux])}
-        (i/i lang [:rss-feed])]]
+         :title (i/i lang :subscribe-rss-flux)}
+        (i/i lang :rss-feed)]]
       [:li.fr-footer__bottom-item
        [:button.fr-footer__bottom-link.fr-icon-theme-fill.fr-link--icon-left
         {:aria-controls  "fr-theme-modal"
-         :title          (str (i/i lang [:modal-title]) " - "
-                              (i/i lang [:new-modal]))
+         :title          (str (i/i lang :modal-title) " - "
+                              (i/i lang :new-modal))
          :data-fr-opened false}
-        (i/i lang [:modal-title])]]]]]])
+        (i/i lang :modal-title)]]]]]])
 
 (defn display-parameters-modal [lang]
   [:dialog#fr-theme-modal.fr-modal
@@ -1383,34 +1398,34 @@
       [:div.fr-modal__body
        [:div.fr-modal__header
         [:button.fr-link--close.fr-link {:aria-controls "fr-theme-modal"}
-         (i/i lang [:modal-close])]]
+         (i/i lang :modal-close)]]
        [:div.fr-modal__content
         [:h1#fr-theme-modal-title.fr-modal__title
-         (i/i lang [:modal-title])]
+         (i/i lang :modal-title)]
         [:div#fr-display.fr-form-group.fr-display
          [:fieldset.fr-fieldset
           [:legend#-legend.fr-fieldset__legend.fr-text--regular
-           (i/i lang [:modal-select-theme])]
+           (i/i lang :modal-select-theme)]
           [:div.fr-fieldset__content
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-light
              {:type "radio" :name "fr-radios-theme" :value "light"}]
             [:label.fr-label {:for "fr-radios-theme-light"}
-             (i/i lang [:modal-theme-light])]
+             (i/i lang :modal-theme-light)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
              [:img {:src "./img/artwork/light.svg"}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-dark
              {:type "radio" :name "fr-radios-theme" :value "dark"}]
             [:label.fr-label {:for "fr-radios-theme-dark"}
-             (i/i lang [:modal-theme-dark])]
+             (i/i lang :modal-theme-dark)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
              [:img {:src "./img/artwork/dark.svg"}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-system
              {:type "radio" :name "fr-radios-theme" :value "system"}]
             [:label.fr-label {:for "fr-radios-theme-system"}
-             (i/i lang [:modal-theme-system])]
+             (i/i lang :modal-theme-system)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
              [:img {:src "./img/artwork/system.svg"}]]]]]]]]]]]])
 
@@ -1418,7 +1433,7 @@
 
 (defn main-menu [lang view]
   (let [f           @(re-frame/subscribe [:filter?])
-        free-search (i/i lang [:free-search])
+        free-search (i/i lang :free-search)
         debounced-q (debounce #(re-frame/dispatch [:update-filter % :q]))]
     [:div
      [:div.fr-grid-row.fr-mt-2w
@@ -1437,7 +1452,7 @@
          (when-let [ff (not-empty (:group flt))]
            [:span
             [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
-             {:title    (i/i lang [:remove-filter])
+             {:title    (i/i lang :remove-filter)
               :on-click #(do (re-frame/dispatch [:filter! {:group nil}])
                              (rfe/push-state :repos))}
              [:span ff]]])])]]))
