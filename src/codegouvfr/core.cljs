@@ -811,7 +811,7 @@
             [:ul.fr-tags-group
              [:li [:p.fr-tag (str (i/i lang :license) ": " (:license legal))]]]]
            [:h3.fr-card__title
-            [:a {:href (rfe/href :awesome-project {:n name})} name]]
+            [:a {:href (rfe/href :awesome-page {:n name})} name]]
            [:p.fr-card__desc desc]]]]]))))
 
 (defn awes-page [lang]
@@ -844,12 +844,13 @@
          (if-let [longDesc (:longDescription desc)]
            [:p longDesc]
            [:p (:shortDescription desc)])
-         [:p [:a.fr-raw-link.fr-icon-global-line
-              {:href       landingURL
-               :target     "new"
-               :rel        "noreferrer noopener"
-               :aria-label (i/i lang :go-to-website)}
-              " " (i/i lang :go-to-website)]]
+         (when (not-empty landingURL)
+           [:p [:a.fr-raw-link.fr-icon-global-line
+                {:href       landingURL
+                 :target     "new"
+                 :rel        "noreferrer noopener"
+                 :aria-label (i/i lang :go-to-website)}
+                " " (i/i lang :go-to-website)]])
          [:p [:a.fr-raw-link.fr-icon-code-box-line
               {:href       url
                :target     "new"
@@ -1466,23 +1467,23 @@
       {:role "main"}
       [main-menu lang view]
       (condp = view
-        :home            [home-page lang]
-        :orgas           [orgas-page lang]
-        :repos           [repos-page lang]
-        :releases        [releases-page lang]
-        :awes            [awes-page lang]
-        :awesome-project [awes-project lang]
-        :stats           [stats-page lang]
-        :legal           (condp = lang "fr" (inline-page "legal.fr.md")
-                                (inline-page "legal.en.md"))
-        :a11y            (condp = lang "fr" (inline-page "a11y.fr.md")
-                                (inline-page "a11y.en.md"))
-        :sitemap         (condp = lang "fr" (inline-page "sitemap.fr.md")
-                                (inline-page "sitemap.en.md"))
-        :feeds           (condp = lang "fr" (inline-page "feeds.fr.md")
-                                (inline-page "feeds.en.md"))
-        :about           (condp = lang "fr" (inline-page "about.fr.md")
-                                (inline-page "about.en.md"))
+        :home         [home-page lang]
+        :orgas        [orgas-page lang]
+        :repos        [repos-page lang]
+        :releases     [releases-page lang]
+        :awes         [awes-page lang]
+        :awesome-page [awes-project lang]
+        :stats        [stats-page lang]
+        :legal        (condp = lang "fr" (inline-page "legal.fr.md")
+                             (inline-page "legal.en.md"))
+        :a11y         (condp = lang "fr" (inline-page "a11y.fr.md")
+                             (inline-page "a11y.en.md"))
+        :sitemap      (condp = lang "fr" (inline-page "sitemap.fr.md")
+                             (inline-page "sitemap.en.md"))
+        :feeds        (condp = lang "fr" (inline-page "feeds.fr.md")
+                             (inline-page "feeds.en.md"))
+        :about        (condp = lang "fr" (inline-page "about.fr.md")
+                             (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1521,7 +1522,7 @@
    ["groups" :orgas]
    ["repos" :repos]
    ["awesome" :awes]
-   ["awesome/:n" :awesome-project]
+   ["awesome/:n" :awesome-page]
    ["releases" :releases]
    ["stats" :stats]
    ["legal" :legal]
