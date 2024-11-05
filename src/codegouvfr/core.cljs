@@ -154,11 +154,10 @@
        (str rps (i/i lang k))
        (str rps (i/i lang (keyword (str (name k) "s"))))))])
 
-(defn repo-fn-to-data-url [p n t]
-  (println p n t)
+(defn repo-orga-data-url [p n t]
   (let [fmt-string
         (str ecosystem-prefix-url "%s/" (if (= t :repos) "repositories" "owners") "/%s")
-        platform (if (= p "github.com") "github" (or p ""))]
+        platform (if (re-matches #"(?i)github\.com" p) "github" (or p ""))]
     (gstring/format fmt-string platform n)))
 
 ;; Filters
@@ -296,13 +295,13 @@
                  :retry-delay     1000}}))
 
 (re-frame/reg-event-fx
- :fetch-repository-data
- (fn [_ [_ platform full-name]]
+ :fetch-repo-or-orga-data
+ (fn [_ [_ platform name-or-login repo-or-orga]]
    {:http-xhrio {:method          :get
-                 :uri             (repo-fn-to-data-url platform full-name :repos)
+                 :uri             (repo-orga-data-url platform name-or-login repo-or-orga)
                  :response-format (ajax/json-response-format {:keywords? true})
-                 :on-success      [:set-repository-data]
-                 :on-failure      [:api-request-error :current-repository]
+                 :on-success      [:set-repo-or-orga-data]
+                 :on-failure      [:api-request-error :current-repo-or-orga-data]
                  :timeout         30000
                  :retry-count     3
                  :retry-delay     1000}}))
@@ -315,9 +314,9 @@
    (assoc db :repositories (map (comp bean clj->js) response))))
 
 (re-frame/reg-event-db
- :set-repository-data
+ :set-repo-or-orga-data
  (fn [db [_ response]]
-   (assoc db :current-repository response)))
+   (assoc db :current-repo-or-orga-data response)))
 
 (re-frame/reg-event-db
  :set-owners
@@ -341,8 +340,10 @@
 
 (re-frame/reg-event-db
  :api-request-error
- (fn [db [_ request-type response]]
-   (assoc-in db [:errors request-type] response)))
+ (fn [db _]
+   ;; [db [_ request-type response]]
+   ;; (assoc-in db [:errors request-type] response)
+   (assoc db :current-repo-or-orga-data nil)))
 
 ;; Define other reframe events
 
@@ -520,8 +521,8 @@
        (reverse orgas)))))
 
 (re-frame/reg-sub
- :current-repository?
- (fn [db _] (:current-repository db)))
+ :current-repo-or-orga-data?
+ (fn [db _] (:current-repo-or-orga-data db)))
 
 ;; Pagination
 
@@ -682,7 +683,8 @@
                               f         ; forks_count
                               a         ; codegouvfr "awesome" score
                               a?        ; archived
-                              li        ; license
+                              ;; FIXME: useless?
+                              ;; li        ; license
                               n         ; name
                               fn        ; full-name
                               o         ; owner
@@ -692,19 +694,11 @@
                       html_url   (html-url-from-p-and-fn p fn)]
                   [:tr
                    [:td
-                    [:span
-                     [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang :go-to-data)
-                       :target     "new"
-                       :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
-                       :aria-label (str (i/i lang :go-to-data) " " n)}]
-                     [:span " "]
-                     [:a {:href       html_url
-                          :target     "_blank"
-                          :rel        "noreferrer noopener"
-                          :aria-label (str n " - " (i/i lang :go-to-repo)
-                                           (when li (str " " (i/i lang :under-license) " " li)))}
-                      n]]]
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i lang :go-to-data)
+                      :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
+                      :aria-label (str (i/i lang :go-to-data) " " n)}
+                     n]]
                    [:td [:button.fr-raw-link.fr-link
                          {:on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group o}))
                           :aria-label (i/i lang :browse-repos-orga)}
@@ -818,19 +812,22 @@
 
 (defn repo-page []
   (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
-    (re-frame/dispatch [:fetch-repository-data platform orga-repo-name])
-    (let [{:keys [full_name description icon_url]} @(re-frame/subscribe [:current-repository?])]
-      [:div.fr-container.fr-py-6w
-       [:div.fr-grid-row.fr-grid-row--gutters
-        [:div.fr-col-12
+    (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-repo-name :repos])
+    (let [{:keys [full_name description icon_url]}
+          @(re-frame/subscribe [:current-repo-or-orga-data?])]
+      (if-not (not-empty full_name)
+        [:div "Sorry no data"]
+        [:div.fr-container.fr-py-6w
          [:div.fr-grid-row.fr-grid-row--gutters
-          [:div.fr-col-9
-           [:h2.fr-h2 full_name]
-           [:p description]]
-          [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
-         ;; [:div.fr-grid-row.fr-grid-row--gutters
-         ;;  [:div.fr-col-12]]
-         ]]])))
+          [:div.fr-col-12
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-9
+             [:h2.fr-h2 full_name]
+             [:p description]]
+            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
+           ;; [:div.fr-grid-row.fr-grid-row--gutters
+           ;;  [:div.fr-col-12]]
+           ]]]))))
 
 ;; Main structure - awesome
 
@@ -976,19 +973,12 @@
                               :aria-label (str (i/i lang :orga-homepage) " " n)}
                              (i/i lang :website)]))]
                    [:td
-                    [:span
-                     [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang :go-to-data)
-                       :target     "new"
-                       :href       (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
-                                     (repo-fn-to-data-url p l :owners))
-                       :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}]
-                     [:span " "]
-                     [:a {:target     "_blank"
-                          :rel        "noreferrer noopener"
-                          :href       id
-                          :aria-label (str (i/i lang :go-to-orga) " " (or (not-empty n) l))}
-                      (or (not-empty n) l)]]]
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i lang :go-to-data)
+                      :href       (let [p (last (re-matches #"^https://([^/]+).*$" id))]
+                                    (rfe/href :orga-page {:platform p :orga-login l}))
+                      :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}
+                     (or (not-empty n) l)]]
                    [:td {:aria-label (str (i/i lang :description) ": " d)} d]
                    [:td {:style {:text-align "center"}}
                     [:button..fr-raw-link.fr-link
@@ -1043,6 +1033,25 @@
          [:option {:value x} x])]]
      [orgas-table lang orgas]
      [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]))
+
+(defn orga-page []
+  (let [{:keys [orga-login platform]} @(re-frame/subscribe [:path-params?])]
+    (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-login :orgas])
+    (let [{:keys [name description icon_url]}
+          @(re-frame/subscribe [:current-repo-or-orga-data?])]
+      (if-not (not-empty name)
+        [:div "Sorry no data"]
+        [:div.fr-container.fr-py-6w
+         [:div.fr-grid-row.fr-grid-row--gutters
+          [:div.fr-col-12
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-9
+             [:h2.fr-h2 name]
+             [:p description]]
+            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
+           ;; [:div.fr-grid-row.fr-grid-row--gutters
+           ;;  [:div.fr-col-12]]
+           ]]]))))
 
 ;; Releases page
 
@@ -1509,8 +1518,9 @@
       (condp = view
         :home                 [home-page lang]
         :orgas                [orgas-page lang]
+        :orga-page            [orga-page]
         :repos                [repos-page lang]
-        :repo-page            [repo-page lang]
+        :repo-page            [repo-page]
         :releases             [releases-page lang]
         :awesome              [awesome-page lang]
         :awesome-project-page [awesome-project-page lang]
@@ -1561,6 +1571,7 @@
   ["/"
    ["" :home]
    ["groups" :orgas]
+   ["groups/:platform/:orga-login" :orga-page]
    ["repos" :repos]
    ["repos/:platform/:orga-repo-name" :repo-page]
    ["awesome" :awesome]
