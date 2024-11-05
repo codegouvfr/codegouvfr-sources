@@ -154,6 +154,12 @@
        (str rps (i/i lang k))
        (str rps (i/i lang (keyword (str (name k) "s"))))))])
 
+(defn repo-orga-data-url [p n t]
+  (let [fmt-string
+        (str ecosystem-prefix-url "%s/" (if (= t :repos) "repositories" "owners") "/%s")
+        platform (if (re-matches #"(?i)github\.com" p) "github" (or p ""))]
+    (gstring/format fmt-string platform n)))
+
 ;; Filters
 
 (defn if-a-b-else-true
@@ -288,12 +294,29 @@
                  :retry-count     3
                  :retry-delay     1000}}))
 
+(re-frame/reg-event-fx
+ :fetch-repo-or-orga-data
+ (fn [_ [_ platform name-or-login repo-or-orga]]
+   {:http-xhrio {:method          :get
+                 :uri             (repo-orga-data-url platform name-or-login repo-or-orga)
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-repo-or-orga-data]
+                 :on-failure      [:api-request-error :current-repo-or-orga-data]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
+
 ;; Define events to handle successful responses
 
 (re-frame/reg-event-db
  :set-repositories
  (fn [db [_ response]]
    (assoc db :repositories (map (comp bean clj->js) response))))
+
+(re-frame/reg-event-db
+ :set-repo-or-orga-data
+ (fn [db [_ response]]
+   (assoc db :current-repo-or-orga-data response)))
 
 (re-frame/reg-event-db
  :set-owners
@@ -317,8 +340,10 @@
 
 (re-frame/reg-event-db
  :api-request-error
- (fn [db [_ request-type response]]
-   (assoc-in db [:errors request-type] response)))
+ (fn [db _]
+   ;; [db [_ request-type response]]
+   ;; (assoc-in db [:errors request-type] response)
+   (assoc db :current-repo-or-orga-data nil)))
 
 ;; Define other reframe events
 
@@ -457,7 +482,7 @@
  (fn [db _] (:stats db)))
 
 (re-frame/reg-sub
- :awes?
+ :awesome?
  (fn [db _] (:awesome db)))
 
 (re-frame/reg-sub
@@ -494,6 +519,10 @@
      (if @(re-frame/subscribe [:reverse-sort?])
        orgas
        (reverse orgas)))))
+
+(re-frame/reg-sub
+ :current-repo-or-orga-data?
+ (fn [db _] (:current-repo-or-orga-data db)))
 
 ;; Pagination
 
@@ -565,7 +594,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :awes)
+        {:href  (rfe/href :awesome)
          :title (i/i lang :Awesome-title)}
         (i/i lang :Awesome)]]
       [:div.fr-card__desc (i/i lang :Awesome-callout)]]
@@ -654,7 +683,8 @@
                               f         ; forks_count
                               a         ; codegouvfr "awesome" score
                               a?        ; archived
-                              li        ; license
+                              ;; FIXME: useless?
+                              ;; li        ; license
                               n         ; name
                               fn        ; full-name
                               o         ; owner
@@ -664,21 +694,11 @@
                       html_url   (html-url-from-p-and-fn p fn)]
                   [:tr
                    [:td
-                    [:span
-                     [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang :go-to-data)
-                       :target     "new"
-                       :href       (str ecosystem-prefix-url
-                                        (if (= p "github.com") "github" p)
-                                        "/repositories/" fn)
-                       :aria-label (str (i/i lang :go-to-data) " " n)}]
-                     [:span " "]
-                     [:a {:href       html_url
-                          :target     "_blank"
-                          :rel        "noreferrer noopener"
-                          :aria-label (str n " - " (i/i lang :go-to-repo)
-                                           (when li (str " " (i/i lang :under-license) " " li)))}
-                      n]]]
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i lang :go-to-data)
+                      :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
+                      :aria-label (str (i/i lang :go-to-data) " " n)}
+                     n]]
                    [:td [:button.fr-raw-link.fr-link
                          {:on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group o}))
                           :aria-label (i/i lang :browse-repos-orga)}
@@ -790,12 +810,31 @@
      ;; Bottom pagination block
      [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]))
 
+(defn repo-page []
+  (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
+    (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-repo-name :repos])
+    (let [{:keys [full_name description icon_url]}
+          @(re-frame/subscribe [:current-repo-or-orga-data?])]
+      (if-not (not-empty full_name)
+        [:div "Sorry no data"]
+        [:div.fr-container.fr-py-6w
+         [:div.fr-grid-row.fr-grid-row--gutters
+          [:div.fr-col-12
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-9
+             [:h2.fr-h2 full_name]
+             [:p description]]
+            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
+           ;; [:div.fr-grid-row.fr-grid-row--gutters
+           ;;  [:div.fr-col-12]]
+           ]]]))))
+
 ;; Main structure - awesome
 
-(defn awes-table [lang]
+(defn awesome-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [awesome (shuffle @(re-frame/subscribe [:awes?]))]
+   (for [awesome (shuffle @(re-frame/subscribe [:awesome?]))]
      ^{:key (:name awesome)}
      (let [{:keys [name logo legal description]}
            awesome
@@ -811,10 +850,10 @@
             [:ul.fr-tags-group
              [:li [:p.fr-tag (str (i/i lang :license) ": " (:license legal))]]]]
            [:h3.fr-card__title
-            [:a {:href (rfe/href :awesome-project {:n name})} name]]
+            [:a {:href (rfe/href :awesome-project-page {:awesome-project-name name})} name]]
            [:p.fr-card__desc desc]]]]]))))
 
-(defn awes-page [lang]
+(defn awesome-page [lang]
   [:div.fr-container.fr-mt-6w
    [:div.fr-grid-row
     [:div.fr-col-12
@@ -825,11 +864,11 @@
         ": " [:a.fr-link {:href (rfe/href :releases)}
               (i/i lang :release-check-latest)]]]]
      [:div.fr-my-6w
-      [awes-table lang]]]]])
+      [awesome-table lang]]]]])
 
-(defn awes-project [lang]
-  (let [project-name (:n @(re-frame/subscribe [:path-params?]))
-        awesome      @(re-frame/subscribe [:awes?])
+(defn awesome-project-page [lang]
+  (let [project-name (:awesome-project-name @(re-frame/subscribe [:path-params?]))
+        awesome      @(re-frame/subscribe [:awesome?])
         {:keys [name logo description legal landingURL
                 url usedBy fundedBy]}
         (first (filter #(= (:name %) project-name) awesome))
@@ -844,12 +883,13 @@
          (if-let [longDesc (:longDescription desc)]
            [:p longDesc]
            [:p (:shortDescription desc)])
-         [:p [:a.fr-raw-link.fr-icon-global-line
-              {:href       landingURL
-               :target     "new"
-               :rel        "noreferrer noopener"
-               :aria-label (i/i lang :go-to-website)}
-              " " (i/i lang :go-to-website)]]
+         (when (not-empty landingURL)
+           [:p [:a.fr-raw-link.fr-icon-global-line
+                {:href       landingURL
+                 :target     "new"
+                 :rel        "noreferrer noopener"
+                 :aria-label (i/i lang :go-to-website)}
+                " " (i/i lang :go-to-website)]])
          [:p [:a.fr-raw-link.fr-icon-code-box-line
               {:href       url
                :target     "new"
@@ -864,12 +904,12 @@
          (when-let [used (not-empty usedBy)]
            [:div
             [:h4.fr-icon-user-line " " (i/i lang :Users)]
-            [:ul (for [u used] [:li u])]])
+            [:ul (for [u used] ^{:key u} [:li u])]])
          (when-let [funded (not-empty fundedBy)]
            [:div
             [:br]
             [:h4.fr-icon-government-line " " (i/i lang :Funders)]
-            [:ul (for [{:keys [name url]} funded]
+            [:ul (for [{:keys [name url]} funded] ^{:key url}
                    [:li [:a {:href url} name]])]])]]]]]))
 
 ;; Main structure - orgas
@@ -933,21 +973,12 @@
                               :aria-label (str (i/i lang :orga-homepage) " " n)}
                              (i/i lang :website)]))]
                    [:td
-                    [:span
-                     [:a.fr-raw-link.fr-icon-terminal-box-line
-                      {:title      (i/i lang :go-to-data)
-                       :target     "new"
-                       :href       (str ecosystem-prefix-url
-                                        (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
-                                          (if (re-matches #"^github.*" p) "GitHub" p))
-                                        "/owners/" l)
-                       :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}]
-                     [:span " "]
-                     [:a {:target     "_blank"
-                          :rel        "noreferrer noopener"
-                          :href       id
-                          :aria-label (str (i/i lang :go-to-orga) " " (or (not-empty n) l))}
-                      (or (not-empty n) l)]]]
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i lang :go-to-data)
+                      :href       (let [p (last (re-matches #"^https://([^/]+).*$" id))]
+                                    (rfe/href :orga-page {:platform p :orga-login l}))
+                      :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}
+                     (or (not-empty n) l)]]
                    [:td {:aria-label (str (i/i lang :description) ": " d)} d]
                    [:td {:style {:text-align "center"}}
                     [:button..fr-raw-link.fr-link
@@ -1003,10 +1034,29 @@
      [orgas-table lang orgas]
      [navigate-pagination lang :orgas first-disabled last-disabled orgas-pages count-pages]]))
 
+(defn orga-page []
+  (let [{:keys [orga-login platform]} @(re-frame/subscribe [:path-params?])]
+    (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-login :orgas])
+    (let [{:keys [name description icon_url]}
+          @(re-frame/subscribe [:current-repo-or-orga-data?])]
+      (if-not (not-empty name)
+        [:div "Sorry no data"]
+        [:div.fr-container.fr-py-6w
+         [:div.fr-grid-row.fr-grid-row--gutters
+          [:div.fr-col-12
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-9
+             [:h2.fr-h2 name]
+             [:p description]]
+            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
+           ;; [:div.fr-grid-row.fr-grid-row--gutters
+           ;;  [:div.fr-col-12]]
+           ]]]))))
+
 ;; Releases page
 
 (defn releases-page [lang]
-  (let [awes     @(re-frame/subscribe [:awes?])
+  (let [awes     @(re-frame/subscribe [:awesome?])
         releases (flatten (map :releases awes))]
     [:div
      [:div.fr-grid-row
@@ -1262,7 +1312,7 @@
            {:aria-current (when (= path "/awesome") "page")
             :title        "Awesome"
             :on-click
-            #(do (reset-queries) (rfe/push-state :awes))}
+            #(do (reset-queries) (rfe/push-state :awesome))}
            "Awesome"]]
          [:li.fr-nav__item
           [:button.fr-nav__link
@@ -1466,23 +1516,25 @@
       {:role "main"}
       [main-menu lang view]
       (condp = view
-        :home            [home-page lang]
-        :orgas           [orgas-page lang]
-        :repos           [repos-page lang]
-        :releases        [releases-page lang]
-        :awes            [awes-page lang]
-        :awesome-project [awes-project lang]
-        :stats           [stats-page lang]
-        :legal           (condp = lang "fr" (inline-page "legal.fr.md")
-                                (inline-page "legal.en.md"))
-        :a11y            (condp = lang "fr" (inline-page "a11y.fr.md")
-                                (inline-page "a11y.en.md"))
-        :sitemap         (condp = lang "fr" (inline-page "sitemap.fr.md")
-                                (inline-page "sitemap.en.md"))
-        :feeds           (condp = lang "fr" (inline-page "feeds.fr.md")
-                                (inline-page "feeds.en.md"))
-        :about           (condp = lang "fr" (inline-page "about.fr.md")
-                                (inline-page "about.en.md"))
+        :home                 [home-page lang]
+        :orgas                [orgas-page lang]
+        :orga-page            [orga-page]
+        :repos                [repos-page lang]
+        :repo-page            [repo-page]
+        :releases             [releases-page lang]
+        :awesome              [awesome-page lang]
+        :awesome-project-page [awesome-project-page lang]
+        :stats                [stats-page lang]
+        :legal                (condp = lang "fr" (inline-page "legal.fr.md")
+                                     (inline-page "legal.en.md"))
+        :a11y                 (condp = lang "fr" (inline-page "a11y.fr.md")
+                                     (inline-page "a11y.en.md"))
+        :sitemap              (condp = lang "fr" (inline-page "sitemap.fr.md")
+                                     (inline-page "sitemap.en.md"))
+        :feeds                (condp = lang "fr" (inline-page "feeds.fr.md")
+                                     (inline-page "feeds.en.md"))
+        :about                (condp = lang "fr" (inline-page "about.fr.md")
+                                     (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1495,11 +1547,12 @@
         title-default "Codes sources du secteur public ─ French Public Sector Source Code"
         page          (keyword (:name (:data match)))]
     ;; Rely on the server to handle /not-found as a 404
+    (reset-queries)
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (set! (. js/document -title)
           (str title-prefix
                (case page
-                 :awes     "Awesome"
+                 :awesome  "Awesome"
                  :orgas    "Organisations ─ Organizations"
                  :repos    "Dépôts de code source ─ Source code repositories"
                  :home     title-default
@@ -1519,9 +1572,11 @@
   ["/"
    ["" :home]
    ["groups" :orgas]
+   ["groups/:platform/:orga-login" :orga-page]
    ["repos" :repos]
-   ["awesome" :awes]
-   ["awesome/:n" :awesome-project]
+   ["repos/:platform/:orga-repo-name" :repo-page]
+   ["awesome" :awesome]
+   ["awesome/:awesome-project-name" :awesome-project-page]
    ["releases" :releases]
    ["stats" :stats]
    ["legal" :legal]
