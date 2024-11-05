@@ -154,6 +154,13 @@
        (str rps (i/i lang k))
        (str rps (i/i lang (keyword (str (name k) "s"))))))])
 
+(defn repo-fn-to-data-url [p n t]
+  (println p n t)
+  (let [fmt-string
+        (str ecosystem-prefix-url "%s/" (if (= t :repos) "repositories" "owners") "/%s")
+        platform (if (= p "github.com") "github" (or p ""))]
+    (gstring/format fmt-string platform n)))
+
 ;; Filters
 
 (defn if-a-b-else-true
@@ -288,12 +295,29 @@
                  :retry-count     3
                  :retry-delay     1000}}))
 
+(re-frame/reg-event-fx
+ :fetch-repository-data
+ (fn [_ [_ platform full-name]]
+   {:http-xhrio {:method          :get
+                 :uri             (repo-fn-to-data-url platform full-name :repos)
+                 :response-format (ajax/json-response-format {:keywords? true})
+                 :on-success      [:set-repository-data]
+                 :on-failure      [:api-request-error :current-repository]
+                 :timeout         30000
+                 :retry-count     3
+                 :retry-delay     1000}}))
+
 ;; Define events to handle successful responses
 
 (re-frame/reg-event-db
  :set-repositories
  (fn [db [_ response]]
    (assoc db :repositories (map (comp bean clj->js) response))))
+
+(re-frame/reg-event-db
+ :set-repository-data
+ (fn [db [_ response]]
+   (assoc db :current-repository response)))
 
 (re-frame/reg-event-db
  :set-owners
@@ -457,7 +481,7 @@
  (fn [db _] (:stats db)))
 
 (re-frame/reg-sub
- :awes?
+ :awesome?
  (fn [db _] (:awesome db)))
 
 (re-frame/reg-sub
@@ -494,6 +518,10 @@
      (if @(re-frame/subscribe [:reverse-sort?])
        orgas
        (reverse orgas)))))
+
+(re-frame/reg-sub
+ :current-repository?
+ (fn [db _] (:current-repository db)))
 
 ;; Pagination
 
@@ -565,7 +593,7 @@
      [:div.fr-card__body
       [:div.fr-card__title
        [:a.fr-card__link
-        {:href  (rfe/href :awes)
+        {:href  (rfe/href :awesome)
          :title (i/i lang :Awesome-title)}
         (i/i lang :Awesome)]]
       [:div.fr-card__desc (i/i lang :Awesome-callout)]]
@@ -668,9 +696,7 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title      (i/i lang :go-to-data)
                        :target     "new"
-                       :href       (str ecosystem-prefix-url
-                                        (if (= p "github.com") "github" p)
-                                        "/repositories/" fn)
+                       :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
                        :aria-label (str (i/i lang :go-to-data) " " n)}]
                      [:span " "]
                      [:a {:href       html_url
@@ -790,12 +816,28 @@
      ;; Bottom pagination block
      [navigate-pagination lang :repos first-disabled last-disabled repos-pages count-pages]]))
 
+(defn repo-page []
+  (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
+    (re-frame/dispatch [:fetch-repository-data platform orga-repo-name])
+    (let [{:keys [full_name description icon_url]} @(re-frame/subscribe [:current-repository?])]
+      [:div.fr-container.fr-py-6w
+       [:div.fr-grid-row.fr-grid-row--gutters
+        [:div.fr-col-12
+         [:div.fr-grid-row.fr-grid-row--gutters
+          [:div.fr-col-9
+           [:h2.fr-h2 full_name]
+           [:p description]]
+          [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
+         ;; [:div.fr-grid-row.fr-grid-row--gutters
+         ;;  [:div.fr-col-12]]
+         ]]])))
+
 ;; Main structure - awesome
 
-(defn awes-table [lang]
+(defn awesome-table [lang]
   (into
    [:div.fr-grid-row.fr-grid-row--gutters]
-   (for [awesome (shuffle @(re-frame/subscribe [:awes?]))]
+   (for [awesome (shuffle @(re-frame/subscribe [:awesome?]))]
      ^{:key (:name awesome)}
      (let [{:keys [name logo legal description]}
            awesome
@@ -811,10 +853,10 @@
             [:ul.fr-tags-group
              [:li [:p.fr-tag (str (i/i lang :license) ": " (:license legal))]]]]
            [:h3.fr-card__title
-            [:a {:href (rfe/href :awesome-page {:n name})} name]]
+            [:a {:href (rfe/href :awesome-project-page {:awesome-project-name name})} name]]
            [:p.fr-card__desc desc]]]]]))))
 
-(defn awes-page [lang]
+(defn awesome-page [lang]
   [:div.fr-container.fr-mt-6w
    [:div.fr-grid-row
     [:div.fr-col-12
@@ -825,11 +867,11 @@
         ": " [:a.fr-link {:href (rfe/href :releases)}
               (i/i lang :release-check-latest)]]]]
      [:div.fr-my-6w
-      [awes-table lang]]]]])
+      [awesome-table lang]]]]])
 
-(defn awes-project [lang]
-  (let [project-name (:n @(re-frame/subscribe [:path-params?]))
-        awesome      @(re-frame/subscribe [:awes?])
+(defn awesome-project-page [lang]
+  (let [project-name (:awesome-project-name @(re-frame/subscribe [:path-params?]))
+        awesome      @(re-frame/subscribe [:awesome?])
         {:keys [name logo description legal landingURL
                 url usedBy fundedBy]}
         (first (filter #(= (:name %) project-name) awesome))
@@ -865,12 +907,12 @@
          (when-let [used (not-empty usedBy)]
            [:div
             [:h4.fr-icon-user-line " " (i/i lang :Users)]
-            [:ul (for [u used] [:li u])]])
+            [:ul (for [u used] ^{:key u} [:li u])]])
          (when-let [funded (not-empty fundedBy)]
            [:div
             [:br]
             [:h4.fr-icon-government-line " " (i/i lang :Funders)]
-            [:ul (for [{:keys [name url]} funded]
+            [:ul (for [{:keys [name url]} funded] ^{:key url}
                    [:li [:a {:href url} name]])]])]]]]]))
 
 ;; Main structure - orgas
@@ -938,10 +980,8 @@
                      [:a.fr-raw-link.fr-icon-terminal-box-line
                       {:title      (i/i lang :go-to-data)
                        :target     "new"
-                       :href       (str ecosystem-prefix-url
-                                        (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
-                                          (if (re-matches #"^github.*" p) "GitHub" p))
-                                        "/owners/" l)
+                       :href       (when-let [p (last (re-matches #"^https://([^/]+).*$" id))]
+                                     (repo-fn-to-data-url p l :owners))
                        :aria-label (str (i/i lang :go-to-data) " " (or (not-empty n) l))}]
                      [:span " "]
                      [:a {:target     "_blank"
@@ -1007,7 +1047,7 @@
 ;; Releases page
 
 (defn releases-page [lang]
-  (let [awes     @(re-frame/subscribe [:awes?])
+  (let [awes     @(re-frame/subscribe [:awesome?])
         releases (flatten (map :releases awes))]
     [:div
      [:div.fr-grid-row
@@ -1263,7 +1303,7 @@
            {:aria-current (when (= path "/awesome") "page")
             :title        "Awesome"
             :on-click
-            #(do (reset-queries) (rfe/push-state :awes))}
+            #(do (reset-queries) (rfe/push-state :awesome))}
            "Awesome"]]
          [:li.fr-nav__item
           [:button.fr-nav__link
@@ -1467,23 +1507,24 @@
       {:role "main"}
       [main-menu lang view]
       (condp = view
-        :home         [home-page lang]
-        :orgas        [orgas-page lang]
-        :repos        [repos-page lang]
-        :releases     [releases-page lang]
-        :awes         [awes-page lang]
-        :awesome-page [awes-project lang]
-        :stats        [stats-page lang]
-        :legal        (condp = lang "fr" (inline-page "legal.fr.md")
-                             (inline-page "legal.en.md"))
-        :a11y         (condp = lang "fr" (inline-page "a11y.fr.md")
-                             (inline-page "a11y.en.md"))
-        :sitemap      (condp = lang "fr" (inline-page "sitemap.fr.md")
-                             (inline-page "sitemap.en.md"))
-        :feeds        (condp = lang "fr" (inline-page "feeds.fr.md")
-                             (inline-page "feeds.en.md"))
-        :about        (condp = lang "fr" (inline-page "about.fr.md")
-                             (inline-page "about.en.md"))
+        :home                 [home-page lang]
+        :orgas                [orgas-page lang]
+        :repos                [repos-page lang]
+        :repo-page            [repo-page lang]
+        :releases             [releases-page lang]
+        :awesome              [awesome-page lang]
+        :awesome-project-page [awesome-project-page lang]
+        :stats                [stats-page lang]
+        :legal                (condp = lang "fr" (inline-page "legal.fr.md")
+                                     (inline-page "legal.en.md"))
+        :a11y                 (condp = lang "fr" (inline-page "a11y.fr.md")
+                                     (inline-page "a11y.en.md"))
+        :sitemap              (condp = lang "fr" (inline-page "sitemap.fr.md")
+                                     (inline-page "sitemap.en.md"))
+        :feeds                (condp = lang "fr" (inline-page "feeds.fr.md")
+                                     (inline-page "feeds.en.md"))
+        :about                (condp = lang "fr" (inline-page "about.fr.md")
+                                     (inline-page "about.en.md"))
         nil)]
      (subscribe lang)
      (footer lang)
@@ -1500,7 +1541,7 @@
     (set! (. js/document -title)
           (str title-prefix
                (case page
-                 :awes     "Awesome"
+                 :awesome  "Awesome"
                  :orgas    "Organisations ─ Organizations"
                  :repos    "Dépôts de code source ─ Source code repositories"
                  :home     title-default
@@ -1521,8 +1562,9 @@
    ["" :home]
    ["groups" :orgas]
    ["repos" :repos]
-   ["awesome" :awes]
-   ["awesome/:n" :awesome-page]
+   ["repos/:platform/:orga-repo-name" :repo-page]
+   ["awesome" :awesome]
+   ["awesome/:awesome-project-name" :awesome-project-page]
    ["releases" :releases]
    ["stats" :stats]
    ["legal" :legal]
