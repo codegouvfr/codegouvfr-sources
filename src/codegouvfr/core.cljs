@@ -262,7 +262,7 @@
  :fetch-awesome
  (fn [_ _]
    {:http-xhrio {:method          :get
-                 :uri             "/data/awesome-codegouvfr.json"
+                 :uri             "/data/awesome.json"
                  :response-format (ajax/json-response-format {:keywords? true})
                  :on-success      [:set-awesome]
                  :on-failure      [:api-request-error :awesome]
