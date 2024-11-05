@@ -149,10 +149,10 @@
 
 (defn- table-header [lang what k]
   [:strong.fr-m-auto
-   (let [rps (count what)]
-     (if (< rps 2)
-       (str rps (i/i lang k))
-       (str rps (i/i lang (keyword (str (name k) "s"))))))])
+   (let [cnt (count what)]
+     (if (< cnt 2)
+       (str cnt (i/i lang k))
+       (str cnt (i/i lang (keyword (str (name k) "s"))))))])
 
 (defn repo-orga-data-url [p n t]
   (let [fmt-string
