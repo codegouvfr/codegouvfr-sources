@@ -5,7 +5,7 @@
 (ns codegouvfr.i18n
   (:require [taoensso.tempura :refer [tr]]))
 
-(def supported-languages
+(def languages
   "A set of supported languages."
   #{"en" "fr"})
 
