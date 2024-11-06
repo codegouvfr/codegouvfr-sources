@@ -25,7 +25,7 @@
 ;; Set defaults
 
 (def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
-(def ^:const TIMEOUT 400)
+(def ^:const TIMEOUT 200)
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
