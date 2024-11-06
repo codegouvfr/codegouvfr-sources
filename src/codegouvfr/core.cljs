@@ -78,9 +78,8 @@
 (defn debounce [f]
   (let [timeout (atom nil)]
     (fn [& args]
-      (when @timeout
-        (js/clearTimeout @timeout))
-      (reset! timeout (js/setTimeout #(apply (.bind f (.-this js/window)) args) 300)))))
+      (when @timeout (js/clearTimeout @timeout))
+      (reset! timeout (js/setTimeout #(apply f args) TIMEOUT)))))
 
 (defn new-tab [s]
   (str s " - " (i/i @lang :new-tab)))
@@ -765,15 +764,13 @@
      ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (i/i @lang :license)
+       {:placeholder (or @license (:license f) (i/i @lang :license))
         :aria-label  (i/i @lang :license)
-        :value       (or @license (:license f))
         :on-change   #(let [v (.. % -target -value)]
                         (reset! license v)
                         (debounced-license v))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:value       (or @language (:language f))
-        :placeholder (i/i @lang :language)
+       {:placeholder (or @language (:language f) (i/i @lang :language))
         :aria-label  (i/i @lang :language)
         :on-change   #(let [v (.. % -target -value)]
                         (reset! language v)
@@ -1493,15 +1490,14 @@
 (defn main-menu [view]
   (let [f           @(re-frame/subscribe [:filter?])
         free-search (i/i @lang :free-search)
-        debounced-q #(re-frame/dispatch [:update-filter % :q])]
+        debounced-q (debounce #(re-frame/dispatch [:update-filter % :q]))]
     [:div
      [:div.fr-grid-row.fr-mt-2w
       [:div.fr-col-12
        (when (some #{:repos :orgas} [view])
          [:input.fr-input
-          {:placeholder free-search
+          {:placeholder (or (:q f) free-search)
            :aria-label  free-search
-           :value       (or @q (:q f))
            :on-change   #(let [v (.. % -target -value)]
                            (reset! q v)
                            (debounced-q v))}])]
