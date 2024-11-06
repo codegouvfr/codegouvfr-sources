@@ -3,8 +3,7 @@
 ;; License-Filename: LICENSES/EPL-2.0.txt
 
 (ns codegouvfr.core
-  (:require [cljs.core.async :as async]
-            [re-frame.core :as re-frame]
+  (:require [re-frame.core :as re-frame]
             [reagent.core :as reagent]
             [reagent.dom.client :as rdc]
             [cljs-bean.core :refer [bean]]
@@ -48,8 +47,6 @@
    :with-publiccode   false
    :with-contributing false
    :ministry          nil})
-
-(defonce filter-chan (async/chan 100))
 
 ;; Mappings used when exporting displayed data to csv files
 
@@ -210,12 +207,6 @@
 (defn not-empty-string-or-true [[_ v]]
   (or (and (boolean? v) (true? v))
       (and (string? v) (not-empty v))))
-
-(defn start-filter-loop []
-  (async/go
-    (loop [{:keys [view query-params]} (async/<! filter-chan)]
-      (rfe/push-state view nil query-params)
-      (recur (async/<! filter-chan)))))
 
 ;; Events
 
@@ -426,28 +417,16 @@
 (re-frame/reg-event-fx
  :update-filter-chan
  (fn [{:keys [db]} [_ filter-update]]
-   {:async-flow
-    {:async-flow-fn
-     #(async/go
-        (async/>! filter-chan
-                  {:view         (:view db)
-                   :query-params (->> db :filter
-                                      (merge filter-update)
-                                      (filter not-empty-string-or-true))}))}}))
-
-(re-frame/reg-fx
- :async-flow
- (fn [{:keys [async-flow-fn]}] (async-flow-fn)))
+   (rfe/push-state (:view db) nil
+                   (->> db :filter
+                        (merge filter-update)
+                        (filter not-empty-string-or-true)))))
 
 ;; Subscriptions
 
 (re-frame/reg-sub
  :ministries?
  (fn [db _] (filter not-empty (distinct (map :m (:owners db))))))
-
-;; (re-frame/reg-sub
-;;  :lang?
-;;  (fn [db _] (:lang db)))
 
 (re-frame/reg-sub
  :path?
@@ -1556,23 +1535,24 @@
 ;; Setup router and init
 
 (defn on-navigate [match]
-  (let [title-prefix  "code.gouv.fr ─ "
-        title-default "Codes sources du secteur public ─ French Public Sector Source Code"
-        page          (keyword (:name (:data match)))]
+  (let [page (keyword (:name (:data match)))]
     ;; Rely on the server to handle /not-found as a 404
     (reset-queries)
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (let [path-params (:path (:parameters match))]
       (set! (. js/document -title)
-            (str title-prefix
+            (str (i/i @lang :title-prefix)
                  (case page
                    :awesome              (i/i @lang :Awesome)
                    :orgas                (i/i @lang :Orgas)
-                   :orga-page            (str (i/i @lang :Orga) " ─ " (:orga-login path-params))
-                   :repo-page            (str (i/i @lang :Repo) " ─ " (:orga-repo-name path-params))
-                   :awesome-project-page (str (i/i @lang :Awesome) " ─ " (:awesome-project-page path-params))
+                   :orga-page            (str (i/i @lang :Orga) " - "
+                                              (:orga-login path-params))
+                   :repo-page            (str (i/i @lang :Repo) " - "
+                                              (:orga-repo-name path-params))
+                   :awesome-project-page (str (i/i @lang :Awesome) " - "
+                                              (:awesome-project-page path-params))
                    :repos                (i/i @lang :Repos)
-                   :home                 title-default
+                   :home                 (i/i @lang :title-default)
                    :legal                (i/i @lang :legal)
                    :releases             (i/i @lang :Releases)
                    :stats                (i/i @lang :Stats)
@@ -1619,7 +1599,6 @@
         language     (if (contains? i/languages browser-lang) browser-lang "en")]
     (reset! lang language))
   (rfe/start! (rf/router routes {:conflicts nil}) on-navigate {:use-fragment true})
-  (start-filter-loop)
   (when (nil? @root)
     (reset! root (rdc/create-root (js/document.getElementById "app"))))
   (rdc/render @root [main-page]))
