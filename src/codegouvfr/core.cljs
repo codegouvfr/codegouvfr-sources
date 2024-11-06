@@ -80,7 +80,7 @@
     (fn [& args]
       (when @timeout
         (js/clearTimeout @timeout))
-      (reset! timeout (js/setTimeout #(apply f args) TIMEOUT)))))
+      (reset! timeout (js/setTimeout #(apply (.bind f (.-this js/window)) args) 300)))))
 
 (defn new-tab [s]
   (str s " - " (i/i @lang :new-tab)))
@@ -1493,7 +1493,7 @@
 (defn main-menu [view]
   (let [f           @(re-frame/subscribe [:filter?])
         free-search (i/i @lang :free-search)
-        debounced-q (debounce #(re-frame/dispatch [:update-filter % :q]))]
+        debounced-q #(re-frame/dispatch [:update-filter % :q])]
     [:div
      [:div.fr-grid-row.fr-mt-2w
       [:div.fr-col-12
