@@ -213,8 +213,8 @@
 
 (defn start-filter-loop []
   (async/go
-    (loop [{:keys [view f update-filter]} (async/<! filter-chan)]
-      (rfe/push-state view nil (filter not-empty-string-or-true (merge update-filter f)))
+    (loop [{:keys [view query-params]} (async/<! filter-chan)]
+      (rfe/push-state view nil query-params)
       (recur (async/<! filter-chan)))))
 
 ;; Events
@@ -429,7 +429,11 @@
    {:async-flow
     {:async-flow-fn
      #(async/go
-        (async/>! filter-chan {:view (:view db) :f (:filter db) :update-filter filter-update}))}}))
+        (async/>! filter-chan
+                  {:view         (:view db)
+                   :query-params (->> db :filter
+                                      (merge filter-update)
+                                      (filter not-empty-string-or-true))}))}}))
 
 (re-frame/reg-fx
  :async-flow
@@ -733,6 +737,7 @@
 (defn repos-page []
   (let [repos              @(re-frame/subscribe [:repos?])
         repos-pages        @(re-frame/subscribe [:repos-page?])
+        query-params       @(re-frame/subscribe [:query-params?])
         count-pages        (count (partition-all REPOS-PER-PAGE repos))
         f                  @(re-frame/subscribe [:filter?])
         first-disabled     (zero? repos-pages)
@@ -764,13 +769,15 @@
      ;; Specific repos search filters and options
      [:div.fr-grid-row
       [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (or @license (:license f) (i/i @lang :license))
+       {:placeholder (i/i @lang :license)
+        :value       (or @license (:license query-params))
         :aria-label  (i/i @lang :license)
         :on-change   #(let [v (.. % -target -value)]
                         (reset! license v)
                         (debounced-license v))}]
       [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (or @language (:language f) (i/i @lang :language))
+       {:placeholder (i/i @lang :language)
+        :value       (or @language (:language query-params))
         :aria-label  (i/i @lang :language)
         :on-change   #(let [v (.. % -target -value)]
                         (reset! language v)
@@ -1488,15 +1495,17 @@
 ;; Main pages functions
 
 (defn main-menu [view]
-  (let [f           @(re-frame/subscribe [:filter?])
-        free-search (i/i @lang :free-search)
-        debounced-q (debounce #(re-frame/dispatch [:update-filter % :q]))]
+  (let [f            @(re-frame/subscribe [:filter?])
+        query-params @(re-frame/subscribe [:query-params?])
+        free-search  (i/i @lang :free-search)
+        debounced-q  (debounce #(re-frame/dispatch [:update-filter % :q]))]
     [:div
      [:div.fr-grid-row.fr-mt-2w
       [:div.fr-col-12
        (when (some #{:repos :orgas} [view])
          [:input.fr-input
-          {:placeholder (or (:q f) free-search)
+          {:placeholder free-search
+           :value       (or @q (:q query-params))
            :aria-label  free-search
            :on-change   #(let [v (.. % -target -value)]
                            (reset! q v)
