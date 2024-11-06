@@ -1559,30 +1559,35 @@
 (defn on-navigate [match]
   (let [title-prefix  "code.gouv.fr ─ "
         title-default "Codes sources du secteur public ─ French Public Sector Source Code"
-        page          (keyword (:name (:data match)))]
+        page          (keyword (:name (:data match)))
+        lang          @(re-frame/subscribe [:lang?])]
     ;; Rely on the server to handle /not-found as a 404
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
-    (set! (. js/document -title)
-          (str title-prefix
-               (case page
-                 :awesome  "Awesome"
-                 :orgas    "Organisations ─ Organizations"
-                 :repos    "Dépôts de code source ─ Source code repositories"
-                 :home     title-default
-                 :legal    "Mentions légales ─ Legal mentions"
-                 :releases "Versions"
-                 :stats    "Chiffres ─ Stats"
-                 :a11y     "Accessibilité ─ Accessibility"
-                 :feeds    "Flux RSS ─ RSS Feeds"
-                 :sitemap  "Pages du site ─ Sitemap"
-                 :about    "À propos ─ About"
-                 nil)))
-    (re-frame/dispatch [:path-params! (:path (:parameters match))])
-    (re-frame/dispatch [:path! (:path match)])
-    (let [query-params (:query-params match)]
-      (re-frame/dispatch [:query-params! query-params])
-      (re-frame/dispatch [:filter! (merge init-filter query-params)])
-      (re-frame/dispatch [:view! page query-params]))))
+    (let [path-params (:path (:parameters match))]
+      (set! (. js/document -title)
+            (str title-prefix
+                 (case page
+                   :awesome              (i/i lang :Awesome)
+                   :orgas                (i/i lang :Orgas)
+                   :orga-page            (str (i/i lang :Orga) " ─ " (:orga-login path-params))
+                   :repo-page            (str (i/i lang :Repo) " ─ " (:orga-repo-name path-params))
+                   :awesome-project-page (str (i/i lang :Awesome) " ─ " (:awesome-project-page path-params))
+                   :repos                (i/i lang :Repos)
+                   :home                 title-default
+                   :legal                (i/i lang :legal)
+                   :releases             (i/i lang :Releases)
+                   :stats                (i/i lang :Stats)
+                   :a11y                 (i/i lang :accessibility)
+                   :feeds                (i/i lang :rss-feed)
+                   :sitemap              (i/i lang :sitemap)
+                   :about                (i/i lang :About)
+                   nil)))
+      (re-frame/dispatch [:path-params! path-params])
+      (re-frame/dispatch [:path! (:path match)])
+      (let [query-params (:query-params match)]
+        (re-frame/dispatch [:query-params! query-params])
+        (re-frame/dispatch [:filter! (merge init-filter query-params)])
+        (re-frame/dispatch [:view! page query-params])))))
 
 (defonce routes
   ["/"
