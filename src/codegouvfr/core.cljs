@@ -8,6 +8,7 @@
             [reagent.dom.client :as rdc]
             [cljs-bean.core :refer [bean]]
             [goog.string :as gstring]
+            [goog.functions :as gfun]
             [codegouvfr.i18n :as i]
             [clojure.string :as s]
             [clojure.set :as set]
@@ -29,24 +30,8 @@
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
 (def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
-
-(def q (reagent/atom nil))
-(def license (reagent/atom nil))
+(defonce root (atom nil))
 (def lang (reagent/atom nil))
-(def language (reagent/atom nil))
-
-(defonce init-filter
-  {:q                 nil
-   :group             nil
-   :license           nil
-   :language          nil
-   :forge             nil
-   :fork              false
-   :floss             false
-   :template          false
-   :with-publiccode   false
-   :with-contributing false
-   :ministry          nil})
 
 ;; Mappings used when exporting displayed data to csv files
 
@@ -72,11 +57,21 @@
 
 ;; Utility functions
 
-(defn debounce [f]
-  (let [timeout (atom nil)]
-    (fn [& args]
-      (when @timeout (js/clearTimeout @timeout))
-      (reset! timeout (js/setTimeout #(apply f args) TIMEOUT)))))
+(defn clean-params [& m]
+  (let [mm (apply merge m)]
+    (filter (fn [[_ v]] (or (true? v) (and (string? v) (not-empty v)))) mm)))
+
+(defn create-debounced-push [view param-key]
+  (gfun/debounce
+   #(rfe/push-state view nil (clean-params @(re-frame/subscribe [:query-params?]) {param-key %}))
+   TIMEOUT))
+
+;; Define all push functions using the helper
+(def push-repos-q (create-debounced-push :repos :q))
+(def push-orgas-q (create-debounced-push :orgas :q))
+(def push-repos-language (create-debounced-push :repos :language))
+(def push-repos-license (create-debounced-push :repos :license))
+(def push-orgas-ministry (create-debounced-push :orgas :ministry))
 
 (defn new-tab [s]
   (str s " - " (i/i @lang :new-tab)))
@@ -87,9 +82,6 @@
 
 (defn todays-date []
   (s/replace (.toLocaleDateString (js/Date.) @lang) "/" "-"))
-
-(defn or-kwds [m ks]
-  (first (remove nil? (map #(apply % [m]) ks))))
 
 (defn s-includes? [^String s ^String sub]
   (when (and (string? s) (string? sub))
@@ -125,12 +117,6 @@
     (.click link)
     (-> js/document .-body (.removeChild link))))
 
-(defn reset-queries []
-  (reset! q nil)
-  (reset! license nil)
-  (reset! language nil)
-  (re-frame/dispatch [:reset-filter!]))
-
 (defn top-clean-up-orgas [data param]
   (sequence
    (map #(let [[[n l] v] %]
@@ -143,12 +129,11 @@
 (defn html-url-from-p-and-fn [p fn]
   (str "https://" p "/" fn))
 
-(defn- table-header [what k]
+(defn- table-header [cnt k]
   [:strong.fr-m-auto
-   (let [cnt (count what)]
-     (if (< cnt 2)
-       (str cnt (i/i @lang k))
-       (str cnt (i/i @lang (keyword (str (name k) "s"))))))])
+   (if (< cnt 2)
+     (str cnt (i/i @lang k))
+     (str cnt (i/i @lang (keyword (str (name k) "s")))))])
 
 (defn repo-orga-data-url [p n t]
   (let [fmt-string
@@ -201,12 +186,8 @@
           (if (empty? ministry) true (= (:m %) ministry)))))))))
 
 (defn apply-orgas-filters [orgas]
-  (let [{:keys [q ministry]} @(re-frame/subscribe [:filter?])]
+  (let [{:keys [q ministry]} @(re-frame/subscribe [:query-params?])]
     (memoized-apply-orgas-filters orgas q ministry)))
-
-(defn not-empty-string-or-true [[_ v]]
-  (or (and (boolean? v) (true? v))
-      (and (string? v) (not-empty v))))
 
 ;; Events
 
@@ -217,10 +198,7 @@
     :orgas-page    0
     :sort-repos-by :score
     :sort-orgas-by :subscribers
-    :reverse-sort  false
-    :filter        init-filter
-    ;; :lang          "en"
-    :path          ""}))
+    :reverse-sort  false}))
 
 ;; Define events for each API call
 
@@ -361,16 +339,6 @@
    (assoc db :query-params query-params)))
 
 (re-frame/reg-event-db
- :reset-filter!
- (fn [db [_ _]]
-   (update-in db [:filter] init-filter)))
-
-(re-frame/reg-event-db
- :filter!
- (fn [db [_ s]]
-   (update-in db [:filter] merge s)))
-
-(re-frame/reg-event-db
  :repos-page!
  (fn [db [_ n]] (assoc db :repos-page n)))
 
@@ -380,11 +348,10 @@
 
 (re-frame/reg-event-fx
  :view!
- (fn [{:keys [db]} [_ view query-params]]
+ (fn [{:keys [db]} [_ view]]
    {:db         (assoc db :view view)
     :dispatch-n [[:repos-page! 0]
-                 [:orgas-page! 0]
-                 [:filter! query-params]]}))
+                 [:orgas-page! 0]]}))
 
 (re-frame/reg-event-db
  :reverse-sort!
@@ -407,20 +374,6 @@
      (if (= k (:sort-orgas-by db))
        (update effects :dispatch-n (fnil conj []) [:reverse-sort!])
        effects))))
-
-(re-frame/reg-event-fx
- :update-filter
- (fn [{:keys [db]} [_ value filter-key]]
-   {:db       (assoc-in db [:filter filter-key] value)
-    :dispatch [:update-filter-chan {filter-key value}]}))
-
-(re-frame/reg-event-fx
- :update-filter-chan
- (fn [{:keys [db]} [_ filter-update]]
-   (rfe/push-state (:view db) nil
-                   (->> db :filter
-                        (merge filter-update)
-                        (filter not-empty-string-or-true)))))
 
 ;; Subscriptions
 
@@ -457,10 +410,6 @@
  (fn [db _] (:orgas-page db)))
 
 (re-frame/reg-sub
- :filter?
- (fn [db _] (:filter db)))
-
-(re-frame/reg-sub
  :view?
  (fn [db _] (:view db)))
 
@@ -484,7 +433,7 @@
  :repos?
  (fn [db]
    (let [repos0     (:repositories db)
-         filter-map @(re-frame/subscribe [:filter?])
+         filter-map @(re-frame/subscribe [:query-params?])
          repos      (case @(re-frame/subscribe [:sort-repos-by?])
                       :forks (sort-by :f repos0)
                       :score (sort-by :a repos0)
@@ -493,9 +442,7 @@
                                    repos0)
                       repos0)]
      (memoized-apply-repos-filters
-      (if @(re-frame/subscribe [:reverse-sort?])
-        repos
-        (reverse repos))
+      (if @(re-frame/subscribe [:reverse-sort?]) repos (reverse repos))
       filter-map))))
 
 (re-frame/reg-sub
@@ -507,9 +454,7 @@
                 :subscribers (sort-by :s orgs)
                 orgs)]
     (apply-orgas-filters
-     (if @(re-frame/subscribe [:reverse-sort?])
-       orgas
-       (reverse orgas)))))
+     (if @(re-frame/subscribe [:reverse-sort?]) orgas (reverse orgas)))))
 
 (re-frame/reg-sub
  :current-repo-or-orga-data?
@@ -538,43 +483,44 @@
       (and (pos? page) (not next))
       (re-frame/dispatch [evt (dec page)]))))
 
-(defn navigate-pagination [type first-disabled last-disabled current-page total-pages]
-  [:div.fr-grid-row.fr-grid-row--center
-   [:nav.fr-pagination
-    {:role       "navigation"
-     :aria-label (i/i @lang :pagination)}
-    [:ul.fr-pagination__list
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--first
-       {:on-click      #(change-page type "first")
-        :disabled      first-disabled
-        :aria-label    (i/i @lang :first-page)
-        :aria-disabled first-disabled}]]
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--prev
-       {:on-click      #(change-page type nil)
-        :disabled      first-disabled
-        :aria-label    (i/i @lang :previous-page)
-        :aria-disabled first-disabled}]]
-     [:li
-      [:button.fr-pagination__link.fr
-       {:disabled     true
-        :aria-current "page"
-        :aria-label   (i/i @lang :current-page-of-total)}
-       (str (inc current-page) "/"
-            (if (> total-pages 0) total-pages 1))]]
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--next
-       {:on-click      #(change-page type true)
-        :disabled      last-disabled
-        :aria-label    (i/i @lang :next-page)
-        :aria-disabled last-disabled}]]
-     [:li
-      [:button.fr-pagination__link.fr-pagination__link--last
-       {:on-click      #(change-page type "last")
-        :disabled      last-disabled
-        :aria-label    (i/i @lang :last-page)
-        :aria-disabled last-disabled}]]]]])
+(defn navigate-pagination [type current-page total-pages]
+  (let [first-disabled (= @current-page 0)
+        last-disabled  (= @current-page (dec total-pages))]
+    [:div.fr-grid-row.fr-grid-row--center
+     [:nav.fr-pagination
+      {:role       "navigation"
+       :aria-label (i/i @lang :pagination)}
+      [:ul.fr-pagination__list
+       [:li
+        [:button.fr-pagination__link.fr-pagination__link--first
+         {:on-click      #(change-page type "first")
+          :disabled      first-disabled
+          :aria-label    (i/i @lang :first-page)
+          :aria-disabled first-disabled}]]
+       [:li
+        [:button.fr-pagination__link.fr-pagination__link--prev
+         {:on-click      #(change-page type nil)
+          :disabled      first-disabled
+          :aria-label    (i/i @lang :previous-page)
+          :aria-disabled first-disabled}]]
+       [:li
+        [:button.fr-pagination__link.fr
+         {:disabled     true
+          :aria-current "page"
+          :aria-label   (i/i @lang :current-page-of-total)}
+         (str (inc @current-page) "/" (if (> total-pages 0) total-pages 1))]]
+       [:li
+        [:button.fr-pagination__link.fr-pagination__link--next
+         {:on-click      #(change-page type true)
+          :disabled      last-disabled
+          :aria-label    (i/i @lang :next-page)
+          :aria-disabled last-disabled}]]
+       [:li
+        [:button.fr-pagination__link.fr-pagination__link--last
+         {:on-click      #(change-page type "last")
+          :disabled      last-disabled
+          :aria-label    (i/i @lang :last-page)
+          :aria-disabled last-disabled}]]]]]))
 
 ;; Home page
 
@@ -630,8 +576,7 @@
 (defn repos-table [repos]
   (if (zero? (count repos))
     [:div.fr-m-3w [:p {:aria-live "polite"} (i/i @lang :no-repo-found)]]
-    (let [rep-f      @(re-frame/subscribe [:sort-repos-by?])
-          repos-page @(re-frame/subscribe [:repos-page?])]
+    (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
       [:div.fr-table.fr-table--no-caption
        {:role "region" :aria-label (i/i @lang :repos-of-source-code)}
        [:table
@@ -667,7 +612,7 @@
             (i/i @lang :Score)]]]]
         (into [:tbody]
               (for [repo (->> repos
-                              (drop (* REPOS-PER-PAGE repos-page))
+                              (drop (* REPOS-PER-PAGE @(re-frame/subscribe [:repos-page?])))
                               (take REPOS-PER-PAGE))]
                 ^{:key (str (:o repo) "/" (:n repo))}
                 (let [{:keys [d         ; description
@@ -691,7 +636,8 @@
                       :aria-label (str (i/i @lang :go-to-data) " " n)}
                      n]]
                    [:td [:button.fr-raw-link.fr-link
-                         {:on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group o}))
+                         {:on-click   #(rfe/push-state
+                                        :repos nil (merge @(re-frame/subscribe [:query-params?] {:group o})))
                           :aria-label (i/i @lang :browse-repos-orga)}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    [:td [:span {:aria-label (str (i/i @lang :description) ": " d)}
@@ -714,98 +660,108 @@
                          :aria-label (str (i/i @lang :Score) ": " a)} a]])))]])))
 
 (defn repos-page []
-  (let [repos              @(re-frame/subscribe [:repos?])
-        repos-pages        @(re-frame/subscribe [:repos-page?])
-        query-params       @(re-frame/subscribe [:query-params?])
-        count-pages        (count (partition-all REPOS-PER-PAGE repos))
-        f                  @(re-frame/subscribe [:filter?])
-        first-disabled     (zero? repos-pages)
-        last-disabled      (= repos-pages (dec count-pages))
-        mapping            (:repos mappings)
-        debounced-license  (debounce #(re-frame/dispatch [:update-filter % :license]))
-        debounced-language (debounce #(re-frame/dispatch [:update-filter % :language]))]
-    [:div
-     [:div.fr-grid-row
-      ;; RSS feed
-      [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i @lang :rss-feed)
-        :href  "/data/latest.xml"}
-       [:span.fr-icon-rss-line {:aria-hidden true}]]
-      ;; Download link
-      [:button.fr-link.fr-m-1w
-       {:title    (i/i @lang :download)
-        :on-click (fn []
-                    (download-as-csv!
-                     (->> repos
-                          (map #(set/rename-keys (select-keys % (keys mapping)) mapping))
-                          (map #(conj % {:html_url (html-url-from-p-and-fn (:p %) (:fn %))})))
-                     (str "codegouvfr-repositories-" (todays-date) ".csv")))}
-       [:span.fr-icon-download-line {:aria-hidden true}]]
-      ;; General information
-      (table-header repos :repo)
-      ;; Top pagination block
-      [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]
-     ;; Specific repos search filters and options
-     [:div.fr-grid-row
-      [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (i/i @lang :license)
-        :value       (or @license (:license query-params))
-        :aria-label  (i/i @lang :license)
-        :on-change   #(let [v (.. % -target -value)]
-                        (reset! license v)
-                        (debounced-license v))}]
-      [:input.fr-input.fr-col.fr-m-2w
-       {:placeholder (i/i @lang :language)
-        :value       (or @language (:language query-params))
-        :aria-label  (i/i @lang :language)
-        :on-change   #(let [v (.. % -target -value)]
-                        (reset! language v)
-                        (debounced-language v))}]
-      [:select.fr-select.fr-col-3
-       {:value     (or (:forge f) "")
-        :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :forge])}
-       [:option#default {:value ""} (i/i @lang :all-forges)]
-       (for [x (sort @(re-frame/subscribe [:platforms?]))]
-         ^{:key x}
-         [:option {:value x} x])]
-      [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#1 {:type      "checkbox" :name "1"
-                  :checked   (= "true" (:fork @(re-frame/subscribe [:query-params?])))
-                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :fork])}]
-       [:label.fr-label {:for "1" :title (i/i @lang :only-fork-title)}
-        (i/i @lang :only-fork)]]
-      [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#2 {:type      "checkbox" :name "2"
-                  :checked   (= "true" (:floss @(re-frame/subscribe [:query-params?])))
-                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :floss])}]
-       [:label.fr-label {:for "2" :title (i/i @lang :only-with-license-title)}
-        (i/i @lang :only-with-license)]]
-      [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#4 {:type      "checkbox" :name "4"
-                  :checked   (= "true" (:template @(re-frame/subscribe [:query-params?])))
-                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :template])}]
-       [:label.fr-label
-        {:for "4" :title (i/i @lang :only-template-title)}
-        (i/i @lang :only-template)]]
-      [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#5 {:type      "checkbox" :name "5"
-                  :checked   (= "true" (:with-contributing @(re-frame/subscribe [:query-params?])))
-                  :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-contributing])}]
-       [:label.fr-label
-        {:for "5" :title (i/i @lang :only-contrib-title)}
-        (i/i @lang :only-contrib)]]
-      [:div.fr-checkbox-group.fr-col.fr-m-2w
-       [:input#6
-        {:type      "checkbox" :name "6"
-         :checked   (= "true" (:with-publiccode @(re-frame/subscribe [:query-params?])))
-         :on-change #(re-frame/dispatch [:update-filter (.. % -target -checked) :with-publiccode])}]
-       [:label.fr-label
-        {:for "6" :title (i/i @lang :only-publiccode-title)}
-        (i/i @lang :only-publiccode)]]]
-     ;; Main repos table display
-     [repos-table repos]
-     ;; Bottom pagination block
-     [navigate-pagination :repos first-disabled last-disabled repos-pages count-pages]]))
+  (let [repos        (re-frame/subscribe [:repos?])
+        query-params (re-frame/subscribe [:query-params?])
+        mapping      (:repos mappings)
+        license      (reagent/atom nil)
+        language     (reagent/atom nil)]
+    (fn []
+      [:div
+       [:div.fr-grid-row
+        ;; RSS feed
+        [:a.fr-raw-link.fr-link.fr-m-1w
+         {:title (i/i @lang :rss-feed)
+          :href  "/data/latest.xml"}
+         [:span.fr-icon-rss-line {:aria-hidden true}]]
+        ;; Download link
+        [:button.fr-link.fr-m-1w
+         {:title    (i/i @lang :download)
+          :on-click (fn []
+                      (download-as-csv!
+                       (->> @repos
+                            (map #(set/rename-keys (select-keys % (keys mapping)) mapping))
+                            (map #(conj % {:html_url (html-url-from-p-and-fn (:p %) (:fn %))})))
+                       (str "codegouvfr-repositories-" (todays-date) ".csv")))}
+         [:span.fr-icon-download-line {:aria-hidden true}]]
+        ;; General information
+        (table-header (count @repos) :repo)
+        ;; Top pagination block
+        [navigate-pagination
+         :repos
+         (re-frame/subscribe [:repos-page?])
+         (count (partition-all REPOS-PER-PAGE @repos))]]
+       ;; Specific repos search filters and options
+       [:div.fr-grid-row
+        [:input.fr-input.fr-col.fr-m-2w
+         {:placeholder (i/i @lang :license)
+          :value       (or @license (:license @query-params))
+          :aria-label  (i/i @lang :license)
+          :on-change   #(let [v (.. % -target -value)]
+                          (reset! license v)
+                          (push-repos-license v))}]
+        [:input.fr-input.fr-col.fr-m-2w
+         {:placeholder (i/i @lang :language)
+          :value       (or @language (:language @query-params))
+          :aria-label  (i/i @lang :language)
+          :on-change   #(let [v (.. % -target -value)]
+                          (reset! language v)
+                          (push-repos-language v))}]
+        [:select.fr-select.fr-col-3
+         {:value     (or (:forge @query-params) "")
+          :on-change #(rfe/push-state
+                       :repos nil (clean-params @query-params {:forge (.. % -target -value)}))}
+         [:option#default {:value ""} (i/i @lang :all-forges)]
+         (for [x (sort @(re-frame/subscribe [:platforms?]))]
+           ^{:key x}
+           [:option {:value x} x])]
+        [:div.fr-checkbox-group.fr-col.fr-m-2w
+         [:input#1 {:type      "checkbox" :name "1"
+                    :checked   (= "true" (:fork @query-params))
+                    :on-change #(rfe/push-state
+                                 :repos nil (clean-params @query-params {:fork (.. % -target -checked)}))}]
+         [:label.fr-label {:for "1" :title (i/i @lang :only-fork-title)}
+          (i/i @lang :only-fork)]]
+        [:div.fr-checkbox-group.fr-col.fr-m-2w
+         [:input#2 {:type      "checkbox" :name "2"
+                    :checked   (= "true" (:floss @query-params))
+                    :on-change #(rfe/push-state
+                                 :repos nil (clean-params @query-params {:floss (.. % -target -checked)}))}]
+         [:label.fr-label {:for "2" :title (i/i @lang :only-with-license-title)}
+          (i/i @lang :only-with-license)]]
+        [:div.fr-checkbox-group.fr-col.fr-m-2w
+         [:input#4 {:type      "checkbox" :name "4"
+                    :checked   (= "true" (:template @query-params))
+                    :on-change #(rfe/push-state
+                                 :repos nil (clean-params @query-params {:template (.. % -target -checked)}))}]
+         [:label.fr-label
+          {:for "4" :title (i/i @lang :only-template-title)}
+          (i/i @lang :only-template)]]
+        [:div.fr-checkbox-group.fr-col.fr-m-2w
+         [:input#5 {:type      "checkbox" :name "5"
+                    :checked   (= "true" (:with-contributing @query-params))
+                    :on-change #(rfe/push-state
+                                 :repos nil (clean-params
+                                             @query-params {:with-contributing (.. % -target -checked)}))}]
+         [:label.fr-label
+          {:for "5" :title (i/i @lang :only-contrib-title)}
+          (i/i @lang :only-contrib)]]
+        [:div.fr-checkbox-group.fr-col.fr-m-2w
+         [:input#6
+          {:type      "checkbox" :name "6"
+           :checked   (= "true" (:with-publiccode @query-params))
+           :on-change #(rfe/push-state
+                        :repos nil (clean-params
+                                    @query-params {:with-publiccode (.. % -target -checked)}))}]
+         [:label.fr-label
+          {:for "6" :title (i/i @lang :only-publiccode-title)}
+          (i/i @lang :only-publiccode)]]]
+       ;; Main repos table display
+       [repos-table @repos]
+       ;; Bottom pagination block
+       [navigate-pagination
+        :repos
+        (re-frame/subscribe [:repos-page?])
+        (count (partition-all REPOS-PER-PAGE @repos))]])))
 
 (defn repo-page []
   (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
@@ -980,7 +936,8 @@
                    [:td {:style {:text-align "center"}}
                     [:button..fr-raw-link.fr-link
                      {:title      (i/i @lang :go-to-repos)
-                      :on-click   #(do (reset-queries) (rfe/push-state :repos nil {:group id}))
+                      :on-click   #(rfe/push-state
+                                    :repos nil (merge @(re-frame/subscribe [:query-params?]) {:group id}))
                       :aria-label (str r " " (i/i @lang :repos-of) " " (or (not-empty n) l))} r]]
                    [:td {:style      {:text-align "center"}
                          :aria-label (str s " " (i/i @lang :Subscribers))} s]
@@ -993,43 +950,49 @@
                        (i/i @lang :floss)])]])))]])))
 
 (defn orgas-page []
-  (let [orgas          @(re-frame/subscribe [:orgas?])
-        orgas-pages    @(re-frame/subscribe [:orgas-page?])
-        f              @(re-frame/subscribe [:filter?])
-        count-pages    (count (partition-all ORGAS-PER-PAGE orgas))
-        first-disabled (zero? orgas-pages)
-        last-disabled  (= orgas-pages (dec count-pages))
-        mapping        (:orgas mappings)]
-    [:div
-     [:div.fr-grid-row
-      ;; RSS feed
-      [:a.fr-raw-link.fr-link.fr-m-1w
-       {:title (i/i @lang :rss-feed)
-        :href  "/data/latest-organizations.xml"}
-       [:span.fr-icon-rss-line {:aria-hidden true}]]
-      ;; Download link
-      [:button.fr-link.fr-m-1w
-       {:title    (i/i @lang :download)
-        :on-click #(download-as-csv!
-                    (map
-                     (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
-                     orgas)
-                    (str "codegouvfr-organizations-" (todays-date) ".csv"))}
-       [:span.fr-icon-download-line {:aria-hidden true}]]
-      ;; General information
-      (table-header orgas :orga)
-      ;; Top pagination block
-      [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]
-     [:div.fr-grid-row
-      [:select.fr-select.fr-col.fr-m-1w
-       {:value     (or (:ministry f) "")
-        :on-change #(re-frame/dispatch [:update-filter (.. % -target -value) :ministry])}
-       [:option#default {:value ""} (i/i @lang :all-ministries)]
-       (for [x @(re-frame/subscribe [:ministries?])]
-         ^{:key x}
-         [:option {:value x} x])]]
-     [orgas-table orgas]
-     [navigate-pagination :orgas first-disabled last-disabled orgas-pages count-pages]]))
+  (let [orgas        (re-frame/subscribe [:orgas?])
+        query-params (re-frame/subscribe [:query-params?])
+        mapping      (:orgas mappings)
+        ministry     (reagent/atom nil)]
+    (fn []
+      [:div
+       [:div.fr-grid-row
+        ;; RSS feed
+        [:a.fr-raw-link.fr-link.fr-m-1w
+         {:title (i/i @lang :rss-feed)
+          :href  "/data/latest-organizations.xml"}
+         [:span.fr-icon-rss-line {:aria-hidden true}]]
+        ;; Download link
+        [:button.fr-link.fr-m-1w
+         {:title    (i/i @lang :download)
+          :on-click #(download-as-csv!
+                      (map
+                       (fn [r] (set/rename-keys (select-keys r (keys mapping)) mapping))
+                       @orgas)
+                      (str "codegouvfr-organizations-" (todays-date) ".csv"))}
+         [:span.fr-icon-download-line {:aria-hidden true}]]
+        ;; General information
+        (table-header (count @orgas) :orga)
+        ;; Top pagination block
+        [navigate-pagination
+         :orgas
+         (re-frame/subscribe [:orgas-page?])
+         (count (partition-all ORGAS-PER-PAGE @orgas))]]
+       [:div.fr-grid-row
+        [:select.fr-select.fr-col.fr-m-1w
+         {:value     (or @ministry (:ministry @query-params))
+          :on-change #(let [v (.. % -target -value)]
+                        (reset! ministry v)
+                        (push-orgas-ministry v))}
+         [:option#default {:value ""} (i/i @lang :all-ministries)]
+         (for [x @(re-frame/subscribe [:ministries?])]
+           ^{:key x}
+           [:option {:value x} x])]]
+       [orgas-table @orgas]
+       [navigate-pagination
+        :orgas
+        (re-frame/subscribe [:orgas-page?])
+        (count (partition-all ORGAS-PER-PAGE @orgas))]])))
 
 (defn orga-page []
   (let [{:keys [orga-login platform]} @(re-frame/subscribe [:path-params?])]
@@ -1063,7 +1026,7 @@
         :href  "/data/latest-releases.xml"}
        [:span.fr-icon-rss-line {:aria-hidden true}]]
       ;; General informations
-      (table-header releases :release)]
+      (table-header (count releases) :release)]
      ;; Main releases display
      [:div.fr-table.fr-table--no-caption
       [:table
@@ -1304,21 +1267,18 @@
           [:button.fr-nav__link
            {:aria-current (when (= path "/awesome") "page")
             :title        "Awesome"
-            :on-click
-            #(do (reset-queries) (rfe/push-state :awesome))}
+            :on-click     #(rfe/push-state :awesome)}
            "Awesome"]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/repos") "page")
             :title        (i/i @lang :repos-of-source-code)
-            :on-click
-            #(do (reset-queries) (rfe/push-state :repos))}
+            :on-click     #(rfe/push-state :repos)}
            (i/i @lang :Repos)]]
          [:li.fr-nav__item
           [:button.fr-nav__link
            {:aria-current (when (= path "/groups") "page")
-            :on-click
-            #(do (reset-queries) (rfe/push-state :orgas))}
+            :on-click     #(rfe/push-state :orgas)}
            (i/i @lang :Orgas)]]
          [:li.fr-nav__item
           [:a.fr-nav__link
@@ -1330,7 +1290,7 @@
           [:a.fr-nav__link
            {:aria-current (when (= path "/about") "page")
             :href         (rfe/href :about)}
-           (i/i @lang :rien/tout)]]]]]]]))
+           (i/i @lang :About)]]]]]]]))
 
 (defn subscribe []
   [:div.fr-follow
@@ -1473,32 +1433,35 @@
 
 ;; Main pages functions
 
-(defn main-menu [view]
-  (let [f            @(re-frame/subscribe [:filter?])
-        query-params @(re-frame/subscribe [:query-params?])
+(defn main-menu []
+  (let [query-params (re-frame/subscribe [:query-params?])
+        path         (re-frame/subscribe [:path?])
         free-search  (i/i @lang :free-search)
-        debounced-q  (debounce #(re-frame/dispatch [:update-filter % :q]))]
-    [:div
-     [:div.fr-grid-row.fr-mt-2w
-      [:div.fr-col-12
-       (when (some #{:repos :orgas} [view])
-         [:input.fr-input
-          {:placeholder free-search
-           :value       (or @q (:q query-params))
-           :aria-label  free-search
-           :on-change   #(let [v (.. % -target -value)]
-                           (reset! q v)
-                           (debounced-q v))}])]
-      (when-let [flt (-> f (dissoc :fork :with-publiccode :with-contributing
+        q            (reagent/atom nil)]
+    (fn []
+      [:div
+       [:div.fr-grid-row.fr-mt-2w
+        [:div.fr-col-12
+         (when (or (= @path "/repos") (= @path "/groups"))
+           [:input.fr-input
+            {:placeholder free-search
+             :value       (or @q (:q @query-params))
+             :aria-label  free-search
+             :on-change   #(let [v (.. % -target -value)]
+                             (reset! q v)
+                             (if (= @path "/repos")
+                               (push-repos-q v)
+                               (push-orgas-q v)))}])]
+        (when-let [flt (-> @query-params
+                           (dissoc :fork :with-publiccode :with-contributing
                                    :template :floss))]
-        [:div.fr-col-8.fr-grid-row.fr-m-1w
-         (when-let [ff (not-empty (:group flt))]
-           [:span
-            [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
-             {:title    (i/i @lang :remove-filter)
-              :on-click #(do (re-frame/dispatch [:filter! {:group nil}])
-                             (rfe/push-state :repos))}
-             [:span ff]]])])]]))
+          [:div.fr-col-8.fr-grid-row.fr-m-1w
+           (when-let [ff (not-empty (:group flt))]
+             [:span
+              [:button.fr-link.fr-icon-close-circle-line.fr-link--icon-right
+               {:title    (i/i @lang :remove-filter)
+                :on-click #(rfe/push-state :repos nil {})}
+               [:span ff]]])])]])))
 
 (defn main-page []
   (let [view @(re-frame/subscribe [:view?])]
@@ -1506,7 +1469,7 @@
      (banner)
      [:main#main.fr-container.fr-container--fluid.fr-mb-3w
       {:role "main"}
-      [main-menu view]
+      [main-menu]
       (condp = view
         :home                 [home-page]
         :orgas                [orgas-page]
@@ -1564,8 +1527,7 @@
       (re-frame/dispatch [:path! (:path match)])
       (let [query-params (:query-params match)]
         (re-frame/dispatch [:query-params! query-params])
-        (re-frame/dispatch [:filter! (merge init-filter query-params)])
-        (re-frame/dispatch [:view! page query-params])))))
+        (re-frame/dispatch [:view! page])))))
 
 (defonce routes
   ["/"
@@ -1583,8 +1545,6 @@
    ["about" :about]
    ["sitemap" :sitemap]
    ["feeds" :feeds]])
-
-(defonce root (atom nil))
 
 (defn ^:export init []
   (re-frame/clear-subscription-cache!)
