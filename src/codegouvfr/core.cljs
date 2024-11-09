@@ -308,20 +308,12 @@
 
 (re-frame/reg-event-db
  :api-request-error
- (fn [db _]
+ (fn [db _] ;; FIXME: Use this?
    ;; [db [_ request-type response]]
    ;; (assoc-in db [:errors request-type] response)
    (assoc db :current-repo-or-orga-data nil)))
 
 ;; Define other reframe events
-
-;; (re-frame/reg-event-db
-;;  :lang!
-;;  (fn [db [_ lang]]
-;;    (dom/set-properties
-;;     (dom/get-element "html")
-;;     {"lang" lang})
-;;    (assoc db :lang lang)))
 
 (re-frame/reg-event-db
  :path!
