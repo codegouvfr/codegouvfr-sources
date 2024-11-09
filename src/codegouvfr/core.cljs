@@ -767,7 +767,7 @@
     (let [{:keys [full_name description icon_url]}
           @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty full_name)
-        [:div "Sorry no data"]
+        [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
         [:div.fr-container.fr-py-6w
          [:div.fr-grid-row.fr-grid-row--gutters
           [:div.fr-col-12
@@ -998,7 +998,7 @@
     (let [{:keys [name description icon_url]}
           @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty name)
-        [:div "Sorry no data"]
+        [:divs.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
         [:div.fr-container.fr-py-6w
          [:div.fr-grid-row.fr-grid-row--gutters
           [:div.fr-col-12
