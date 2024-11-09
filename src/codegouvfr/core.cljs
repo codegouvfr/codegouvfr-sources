@@ -633,8 +633,9 @@
                       :aria-label (str (i/i @lang :go-to-data) " " n)}
                      n]]
                    [:td [:button.fr-raw-link.fr-link
-                         {:on-click   #(rfe/push-state
-                                        :repos nil (merge @(re-frame/subscribe [:query-params?] {:group o})))
+                         {:on-click
+                          #(rfe/push-state
+                            :repos nil (clean-params @(re-frame/subscribe [:query-params?]) {:group o}))
                           :aria-label (i/i @lang :browse-repos-orga)}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    [:td [:span {:aria-label (str (i/i @lang :description) ": " d)}
@@ -912,6 +913,7 @@
                           (if (not-empty h)
                             [:a.fr-raw-link.fr-link
                              {:title      (i/i @lang :orga-homepage)
+                              :target     "new"
                               :href       h
                               :aria-label (str (i/i @lang :orga-homepage) " " n)}
                              [:img {:src au :width "100%" :alt (str n " " (i/i @lang :logo))}]]
@@ -933,8 +935,7 @@
                    [:td {:style {:text-align "center"}}
                     [:button..fr-raw-link.fr-link
                      {:title      (i/i @lang :go-to-repos)
-                      :on-click   #(rfe/push-state
-                                    :repos nil (merge @(re-frame/subscribe [:query-params?]) {:group id}))
+                      :on-click   #(rfe/push-state :repos nil {:group id})
                       :aria-label (str r " " (i/i @lang :repos-of) " " (or (not-empty n) l))} r]]
                    [:td {:style      {:text-align "center"}
                          :aria-label (str s " " (i/i @lang :Subscribers))} s]
