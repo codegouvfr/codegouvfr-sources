@@ -1500,7 +1500,6 @@
 (defn on-navigate [match]
   (let [page (keyword (:name (:data match)))]
     ;; Rely on the server to handle /not-found as a 404
-    (reset-queries)
     (when (not (seq match)) (set! (.-location js/window) "/not-found"))
     (let [path-params (:path (:parameters match))]
       (set! (. js/document -title)
