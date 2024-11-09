@@ -61,17 +61,22 @@
   (let [mm (apply merge m)]
     (filter (fn [[_ v]] (or (true? v) (and (string? v) (not-empty v)))) mm)))
 
-(defn create-debounced-push [view param-key]
+(re-frame/reg-event-fx
+ :push-state
+ (fn [{:keys [db]} [_ view param-key value]]
+   (rfe/push-state view nil (clean-params (:query-params db) {param-key value}))))
+
+(defn create-push-fn [view param-key]
   (gfun/debounce
-   #(rfe/push-state view nil (clean-params @(re-frame/subscribe [:query-params?]) {param-key %}))
+   (fn [params value]
+     (rfe/push-state view nil (clean-params params {param-key value})))
    TIMEOUT))
 
-;; Define all push functions using the helper
-(def push-repos-q (create-debounced-push :repos :q))
-(def push-orgas-q (create-debounced-push :orgas :q))
-(def push-repos-language (create-debounced-push :repos :language))
-(def push-repos-license (create-debounced-push :repos :license))
-(def push-orgas-ministry (create-debounced-push :orgas :ministry))
+(def push-repos-q (create-push-fn :repos :q))
+(def push-orgas-q (create-push-fn :orgas :q))
+(def push-repos-language (create-push-fn :repos :language))
+(def push-repos-license (create-push-fn :repos :license))
+(def push-orgas-ministry (create-push-fn :orgas :ministry))
 
 (defn new-tab [s]
   (str s " - " (i/i @lang :new-tab)))
@@ -690,14 +695,14 @@
           :aria-label  (i/i @lang :license)
           :on-change   #(let [v (.. % -target -value)]
                           (reset! license v)
-                          (push-repos-license v))}]
+                          (push-repos-license @query-params v))}]
         [:input.fr-input.fr-col.fr-m-2w
          {:placeholder (i/i @lang :language)
           :value       (or @language (:language @query-params))
           :aria-label  (i/i @lang :language)
           :on-change   #(let [v (.. % -target -value)]
                           (reset! language v)
-                          (push-repos-language v))}]
+                          (push-repos-language @query-params v))}]
         [:select.fr-select.fr-col-3
          {:value     (or (:forge @query-params) "")
           :on-change #(rfe/push-state
@@ -972,10 +977,10 @@
          (count (partition-all ORGAS-PER-PAGE @orgas))]]
        [:div.fr-grid-row
         [:select.fr-select.fr-col.fr-m-1w
-         {:value     (or @ministry (:ministry @query-params))
+         {:value     (or @ministry (:ministry @query-params) "")
           :on-change #(let [v (.. % -target -value)]
                         (reset! ministry v)
-                        (push-orgas-ministry v))}
+                        (push-orgas-ministry @query-params v))}
          [:option#default {:value ""} (i/i @lang :all-ministries)]
          (for [x @(re-frame/subscribe [:ministries?])]
            ^{:key x}
@@ -1050,18 +1055,20 @@
   (let [formatted-data
         (map (fn [i] {:name (get i name-key) :y (get i data-key)}) data)
         chart-options
-        {:chart       {:type "pie"}
-         :title       {:text (i/i @lang title-i18n-keyword)}
-         :tooltip     {:pointFormat "<b>{point.percentage:.1f}%</b>"}
-         :plotOptions {:pie {:allowPointSelect true
-                             :cursor           "pointer"
-                             :dataLabels
-                             {:enabled true
-                              :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
-         :series      [{:name         (i/i @lang title-i18n-keyword)
-                        :colorByPoint true
-                        :data         formatted-data}]
-         :credits     {:enabled false}}]
+        {:chart         {:type "pie"}
+         ;; FIXME: Please do enable accessibility
+         :accessibility {:enabled false}
+         :title         {:text (i/i @lang title-i18n-keyword)}
+         :tooltip       {:pointFormat "<b>{point.percentage:.1f}%</b>"}
+         :plotOptions   {:pie {:allowPointSelect true
+                               :cursor           "pointer"
+                               :dataLabels
+                               {:enabled true
+                                :format  "<b>{point.name}</b>: {point.percentage:.1f} %"}}}
+         :series        [{:name         (i/i @lang title-i18n-keyword)
+                          :colorByPoint true
+                          :data         formatted-data}]
+         :credits       {:enabled false}}]
     (when (seq formatted-data)  ; Only render if we have data
       [:div.fr-col-6
        {:style {:width "100%" :height "400px"}
@@ -1070,18 +1077,20 @@
 (defn repos-by-score-bar-chart [stats]
   (let [data (:top_repos_by_score_range stats)
         chart-options
-        {:chart   {:type "column"}
-         :title   {:text (i/i @lang :repos-vs-score)}
-         :xAxis   {:type       "category"
-                   :title      {:text (i/i @lang :Score)}
-                   :categories (map (comp str first) data)
-                   :labels     {:rotation -45 :style {:fontSize "13px"}}}
-         :yAxis   {:type  "logarithmic" :min 1 :max 10000
-                   :title {:text (i/i @lang :number-of-repos)}}
-         :series  [{:data (map second data)}]
-         :tooltip {:pointFormat (str (i/i @lang :number-of-repos) ": <b>{point.y}</b>")}
-         :legend  {:enabled false}
-         :credits {:enabled false}}]
+        {:chart         {:type "column"}
+         ;; FIXME: Please do enable accessibility
+         :accessibility {:enabled false}
+         :title         {:text (i/i @lang :repos-vs-score)}
+         :xAxis         {:type       "category"
+                         :title      {:text (i/i @lang :Score)}
+                         :categories (map (comp str first) data)
+                         :labels     {:rotation -45 :style {:fontSize "13px"}}}
+         :yAxis         {:type  "logarithmic" :min 1 :max 10000
+                         :title {:text (i/i @lang :number-of-repos)}}
+         :series        [{:data (map second data)}]
+         :tooltip       {:pointFormat (str (i/i @lang :number-of-repos) ": <b>{point.y}</b>")}
+         :legend        {:enabled false}
+         :credits       {:enabled false}}]
     [:div.fr-col-12
      {:style {:width "100%" :height "400px"}
       :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}]))
@@ -1091,28 +1100,30 @@
         chart-options
         chart-data (get stats data-key)
         chart-options
-        {:chart       {:type "scatter" :zoomType "xy"}
-         :title       {:text (i/i @lang title)}
-         :xAxis       {:title         {:enabled true :text (i/i @lang tooltip-x)}
-                       :startOnTick   true
-                       :endOnTick     true
-                       :showLastLabel true}
-         :yAxis       {:title {:enabled true :text (i/i @lang :number-of-repos)}}
-         :legend      {:enabled false}
-         :plotOptions {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
-                                           :pointFormat  (str
-                                                          (i/i @lang tooltip-x)
-                                                          ": {point.x}<br>"
-                                                          (i/i @lang :Repos)
-                                                          ": {point.y}")}}}
-         :series      [{:name  "Organizations"
-                        :color "rgba(223, 83, 83, .5)"
-                        :data  (map (fn [{:keys [owner repositories_count] :as item}]
-                                      {:x    (get item x-axis)
-                                       :y    repositories_count
-                                       :name owner})
-                                    chart-data)}]
-         :credits     {:enabled false}}]
+        {:chart         {:type "scatter" :zoomType "xy"}
+         ;; FIXME: Please do enable accessibility
+         :accessibility {:enabled false}
+         :title         {:text (i/i @lang title)}
+         :xAxis         {:title         {:enabled true :text (i/i @lang tooltip-x)}
+                         :startOnTick   true
+                         :endOnTick     true
+                         :showLastLabel true}
+         :yAxis         {:title {:enabled true :text (i/i @lang :number-of-repos)}}
+         :legend        {:enabled false}
+         :plotOptions   {:scatter {:tooltip {:headerFormat "<b>{point.key}</b><br>"
+                                             :pointFormat  (str
+                                                            (i/i @lang tooltip-x)
+                                                            ": {point.x}<br>"
+                                                            (i/i @lang :Repos)
+                                                            ": {point.y}")}}}
+         :series        [{:name  "Organizations"
+                          :color "rgba(223, 83, 83, .5)"
+                          :data  (map (fn [{:keys [owner repositories_count] :as item}]
+                                        {:x    (get item x-axis)
+                                         :y    repositories_count
+                                         :name owner})
+                                      chart-data)}]
+         :credits       {:enabled false}}]
     [:div.fr-col-6
      {:style {:width "100%" :height "400px"}
       :ref   #(when % (js/Highcharts.chart % (clj->js chart-options)))}]))
@@ -1442,8 +1453,8 @@
              :on-change   #(let [v (.. % -target -value)]
                              (reset! q v)
                              (if (= @path "/repos")
-                               (push-repos-q v)
-                               (push-orgas-q v)))}])]
+                               (push-repos-q @query-params v)
+                               (push-orgas-q @query-params v)))}])]
         (when-let [flt (-> @query-params
                            (dissoc :fork :with-publiccode :with-contributing
                                    :template :floss))]
