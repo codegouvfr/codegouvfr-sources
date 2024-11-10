@@ -573,7 +573,8 @@
 (defn repos-table [repos]
   (if (zero? (count repos))
     [:div.fr-m-3w [:p {:aria-live "polite"} (i/i @lang :no-repo-found)]]
-    (let [rep-f @(re-frame/subscribe [:sort-repos-by?])]
+    (let [rep-f        @(re-frame/subscribe [:sort-repos-by?])
+          query-params @(re-frame/subscribe [:query-params?])]
       [:div.fr-table.fr-table--no-caption
        {:role "region" :aria-label (i/i @lang :repos-of-source-code)}
        [:table
@@ -634,8 +635,7 @@
                      n]]
                    [:td [:button.fr-raw-link.fr-link
                          {:on-click
-                          #(rfe/push-state
-                            :repos nil (clean-params @(re-frame/subscribe [:query-params?]) {:group o}))
+                          #(rfe/push-state :repos nil (clean-params query-params {:group o}))
                           :aria-label (i/i @lang :browse-repos-orga)}
                          (or (last (re-matches #".+/([^/]+)/?" o)) "")]]
                    [:td [:span {:aria-label (str (i/i @lang :description) ": " d)}
@@ -998,7 +998,7 @@
     (let [{:keys [name description icon_url]}
           @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty name)
-        [:divs.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
+        [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
         [:div.fr-container.fr-py-6w
          [:div.fr-grid-row.fr-grid-row--gutters
           [:div.fr-col-12
