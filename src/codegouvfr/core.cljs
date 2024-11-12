@@ -88,6 +88,10 @@
 (defn todays-date []
   (s/replace (.toLocaleDateString (js/Date.) @lang) "/" "-"))
 
+(defn format-date [date-string]
+  (when date-string
+    (.toLocaleDateString (js/Date. date-string))))
+
 (defn s-includes? [^String s ^String sub]
   (when (and (string? s) (string? sub))
     (let [sub (-> sub
@@ -761,24 +765,98 @@
         (re-frame/subscribe [:repos-page?])
         (count (partition-all REPOS-PER-PAGE @repos))]])))
 
+(defn stats-card [{:keys [icon label value]}]
+  [:div.fr-card.fr-card--no-border
+   [:div.fr-card__body
+    [:div.fr-card__content
+     [:div.fr-grid-row.fr-grid-row--middle
+      [:div.fr-col-2 [:i.fr-icon-lg {:class icon}]]
+      [:div.fr-col
+       [:p.fr-text--lg.fr-mb-0 value]
+       [:p.fr-text--sm.fr-mb-0 label]]]]]])
+
 (defn repo-page []
   (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
     (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-repo-name :repos])
-    (let [{:keys [full_name description icon_url]}
-          @(re-frame/subscribe [:current-repo-or-orga-data?])]
+    (let [{:keys [full_name
+                  description
+                  icon_url
+                  stargazers_count
+                  forks_count
+                  open_issues_count
+                  subscribers_count
+                  homepage
+                  language
+                  license
+                  topics
+                  created_at
+                  updated_at
+                  commit_stats]} @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty full_name)
         [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
         [:div.fr-container.fr-py-6w
          [:div.fr-grid-row.fr-grid-row--gutters
-          [:div.fr-col-12
+          ;; Header section with basic info
+          [:div.fr-col-12.fr-mt-4w
            [:div.fr-grid-row.fr-grid-row--gutters
             [:div.fr-col-9
              [:h2.fr-h2 full_name]
-             [:p description]]
-            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
-           ;; [:div.fr-grid-row.fr-grid-row--gutters
-           ;;  [:div.fr-col-12]]
-           ]]]))))
+             [:p.fr-text description]
+             (when (seq topics)
+               [:div.fr-tags-group.fr-mt-2w
+                (for [topic topics]
+                  [:p.fr-tag {:key topic} topic])])]
+            (when icon_url
+              [:img.fr-responsive-img.fr-col-3
+               {:src icon_url :alt "Repository icon" :data-fr-js-ratio true}])]]
+          ;; Quick stats section
+          [:div.fr-col-12.fr-mt-4w
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-3
+             [stats-card
+              {:icon  "fr-icon-star-fill"
+               :label (i/i @lang :Stars)
+               :value stargazers_count}]]
+            [:div.fr-col-3
+             [stats-card
+              {:icon  "fr-icon-git-branch-fill"
+               :label (i/i @lang :forks)
+               :value forks_count}]]
+            [:div.fr-col-3
+             [stats-card
+              {:icon  "fr-icon-warning-fill"
+               :label (i/i @lang :Open-issues)
+               :value open_issues_count}]]
+            [:div.fr-col-3
+             [stats-card
+              {:icon  "fr-icon-eye-fill"
+               :label (i/i @lang :Followers)
+               :value subscribers_count}]]]]
+          ;; Technical details section
+          [:div.fr-col-12.fr-mt-4w
+           [:h3.fr-h3 (i/i @lang :technical-details)]
+           [:div.fr-grid-row.fr-grid-row--gutters
+            [:div.fr-col-6
+             [:ul.fr-list
+              [:li [:strong (i/i @lang :primary-language)] ": " language]
+              [:li [:strong (i/i @lang :license)] ": " (:license license)]
+              [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
+              [:li [:strong (i/i @lang :updated)] ": " (format-date updated_at)]]]
+            [:div.fr-col-6
+             (when commit_stats
+               [:ul.fr-list
+                [:li [:strong (i/i @lang :total-commits)] ": " (:total_commits commit_stats)]
+                [:li [:strong (i/i @lang :total-contributors)] ": " (:total_committers commit_stats)]])]]]
+          ;; Call to action buttons
+          [:div.fr-col-12.fr-mt-4w
+           [:div.fr-btns-group.fr-btns-group--right
+            (when homepage
+              [:a.fr-btn.fr-btn--secondary
+               {:href homepage :target "_blank"}
+               "Visit Website"])
+            [:a.fr-btn
+             {:href (str "https://" platform "/" full_name)}
+             "View on " platform]]]]]))))
 
 ;; Main structure - awesome
 
