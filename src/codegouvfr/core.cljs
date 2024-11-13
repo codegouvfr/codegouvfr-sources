@@ -992,8 +992,8 @@
                               :target     "new"
                               :href       h
                               :aria-label (str (i/i @lang :orga-homepage) " " n)}
-                             [:img {:src au :width "100%" :alt (str n " " (i/i @lang :logo))}]]
-                            [:img {:src au :width "100%" :alt (str n " " (i/i @lang :logo))}])
+                             [:img {:src au :width "100%" :alt (str n " logo")}]]
+                            [:img {:src au :width "100%" :alt (str n " logo")}])
                           (when (not-empty h)
                             [:a.fr-raw-link.fr-link
                              {:title      (i/i @lang :orga-homepage)
