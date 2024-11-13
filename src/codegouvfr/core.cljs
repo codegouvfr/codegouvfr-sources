@@ -90,7 +90,7 @@
 
 (defn format-date [date-string]
   (when date-string
-    (.toLocaleDateString (js/Date. date-string))))
+    (.toLocaleDateString (js/Date. date-string) @lang)))
 
 (defn s-includes? [^String s ^String substring]
   (when (and (string? s) (string? substring))
@@ -1068,24 +1068,89 @@
         (re-frame/subscribe [:orgas-page?])
         (count (partition-all ORGAS-PER-PAGE @orgas))]])))
 
+(defn social-media-links [{:keys [twitter website]}]
+  [:div.fr-col-12
+   [:div.fr-links-group.fr-links-group--icons]
+   (when twitter
+     [:a.fr-link.fr-icon-twitter-x-line.fr-link--icon-left
+      {:href   (str "https://twitter.com/" twitter)
+       :target "_blank"
+       :rel    "noreferrer noopener"
+       :title  (str (i/i @lang :twitter-follow) " @" twitter)}
+      (str "@" twitter)])
+   (when website
+     [:a.fr-link.fr-icon-earth-line.fr-link--icon-left.fr-ml-2w
+      {:href   website
+       :target "_blank"
+       :rel    "noreferrer noopener"
+       :title  (i/i @lang :website)}
+      (i/i @lang :website)])])
+
 (defn orga-page []
   (let [{:keys [orga-login platform]} @(re-frame/subscribe [:path-params?])]
+    ;; Fetch organization data
     (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-login :orgas])
-    (let [{:keys [name description icon_url]}
-          @(re-frame/subscribe [:current-repo-or-orga-data?])]
-      (if-not (not-empty name)
-        [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
-        [:div.fr-container.fr-py-6w
-         [:div.fr-grid-row.fr-grid-row--gutters
-          [:div.fr-col-12
-           [:div.fr-grid-row.fr-grid-row--gutters
-            [:div.fr-col-9
-             [:h2.fr-h2 name]
-             [:p description]]
-            [:img.fr-responsive-img.fr-col-3 {:src icon_url :data-fr-js-ratio true}]]
-           ;; [:div.fr-grid-row.fr-grid-row--gutters
-           ;;  [:div.fr-col-12]]
-           ]]]))))
+    (fn []
+      (let [org-data @(re-frame/subscribe [:current-repo-or-orga-data?])]
+        (if-not (not-empty (:name org-data))
+          [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
+          (let [{:keys [name description icon_url html_url email location
+                        followers following repositories_count]} org-data]
+            [:div.fr-container
+             ;; Header section
+             [:div.fr-grid-row.fr-grid-row--gutters.fr-mb-4w
+              [:div.fr-col-12
+               [:div.fr-grid-row.fr-grid-row--gutters
+                [:div.fr-col-9
+                 [:h1.fr-h2 name]
+                 [:p.fr-text--lead description]
+                 [:div.fr-grid-row.fr-grid-row--gutters
+                  [social-media-links org-data]]]
+                (when icon_url
+                  [:div.fr-col-3
+                   [:img.fr-responsive-img
+                    {:src              icon_url
+                     :alt              (str name " logo")
+                     :data-fr-js-ratio true}]])]
+               ;; Info sections
+               [:div.fr-grid-row.fr-grid-row--gutters.fr-mb-4w
+                [:div.fr-col-3
+                 [:h3.fr-h5 (i/i @lang :contact)]
+                 [:ul.fr-list
+                  (when (not-empty email)
+                    [:li
+                     [:i.fr-icon--sm.fr-icon-mail-line.fr-mr-1w]
+                     [:a.fr-link {:href (str "mailto:" email)} email]])
+                  (when (not-empty location)
+                    [:li [:i.fr-icon--sm.fr-icon-map-pin-2-line.fr-mr-1w] location])]]
+                [:div.fr-col-3
+                 [stats-card
+                  {:icon  "fr-icon-user-line"
+                   :label (i/i @lang :Followers)
+                   :value followers}]]
+                [:div.fr-col-3
+                 [stats-card
+                  {:icon  "fr-icon-git-repository-line"
+                   :label (i/i @lang :Repos)
+                   :value repositories_count}]]
+                [:div.fr-col-3
+                 [stats-card
+                  {:icon  "fr-icon-user-star-line"
+                   :label (i/i @lang :Following)
+                   :value following}]]]
+               [:div.fr-col-12.fr-mt-4w
+                [:div.fr-btns-group.fr-btns-group--right
+                 (when html_url
+                   [:a.fr-btn.fr-btn--secondary
+                    {:href   html_url
+                     :target "_blank"
+                     :rel    "noopener noreferrer"}
+                    (i/i @lang :go-to-orga)])
+                 (when (pos? repositories_count)
+                   [:div.fr-col
+                    [:a.fr-btn
+                     {:href (rfe/href :repos nil {:group html_url})}
+                     (i/i @lang :go-to-repos)]])]]]]]))))))
 
 ;; Releases page
 
