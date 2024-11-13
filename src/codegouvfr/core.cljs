@@ -92,13 +92,11 @@
   (when date-string
     (.toLocaleDateString (js/Date. date-string))))
 
-(defn s-includes? [^String s ^String sub]
-  (when (and (string? s) (string? sub))
-    (let [sub (-> sub
+(defn s-includes? [^String s ^String substring]
+  (when (and (string? s) (string? substring))
+    (let [sub (-> substring
                   s/trim
-                  (s/replace #"[\(\)\*\!\+\?\[\]\\]" #(str "\\" %1))
-                  (s/replace #"\s+" " ")
-                  (s/replace #"\s+" " ")
+                  (s/replace #"\s+" ".*")
                   (s/replace #"(?i)[éèëêe]" "[éèëêe]")
                   (s/replace #"(?i)[æàâa]" "[æàâa]")
                   (s/replace #"(?i)[œöôo]" "[œöôo]")
