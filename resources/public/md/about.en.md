@@ -10,13 +10,13 @@ Source code bought or developed by public agencies are considered administrative
 
 The *source code* is the human-readable version of a computer program.  A *source code repository* is the set of files for a computer program.  All source code repositories listed on this website use Git as their versioning system.
 
-This website only references repositories from organizational accounts (GitHub) or public groups (gitlab.com or GitLab instances) : repositories on personal accounts are not listed.
+This website only references repositories from organizational accounts : repositories on personal accounts are not listed.
 
-For more details on other technical terms, [please check this glossary](https://code.gouv.fr/documentation/#glossaire).
+For more details on other technical terms, [please check this (French) glossary](https://code.gouv.fr/documentation/#glossaire).
 
 ## How to contribute?
 
-To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-outils/).
+To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-data/).
 
 **Warning**: We don't reference personal accounts.
 
@@ -28,16 +28,15 @@ More generally, you can find more information on how to contribute to free and o
 
 These data are published under the [Open License 2.0](https://spdx.org/licenses/etalab-2.0.html):
 
-- The list of organizations as [json](/data/owners.json).
-- The list of repositories as [json](/data/repositories.json).
+- The list of repositories as [json](/data/codegouvfr-repositories.json) or [csv](/data/codegouvfr-repositories.csv).
+- The list of organizations as [json](/data/codegouvfr-organizations.json) or [csv](/data/codegouvfr-organizations.csv).
 * The list of Awesome project as [json](/data/awesome.json).
-* The list of Awesome projects releases as [json](/data/releases.json).
 
 ## How to get updates?
 
 Check our [list of RSS feeds](#/feeds).
 
-You can also follow us on [Twitter](https://twitter.com/codegouvfr) and [Mastodon](https://social.numerique.gouv.fr/@codegouvfr).
+You can also follow us on [Mastodon](https://social.numerique.gouv.fr/@codegouvfr) and [Twitter](https://twitter.com/codegouvfr).
 
 ## Who are we ?
 
