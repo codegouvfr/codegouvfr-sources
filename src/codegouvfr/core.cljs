@@ -535,7 +535,11 @@
         (i/i @lang :Awesome)]]
       [:div.fr-card__desc (i/i @lang :Awesome-callout)]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/awesome.webp" :alt ""}]]]]
+      [:img.fr-responsive-img
+       {:src              "./img/awesome.webp"
+        :loading          "lazy"
+        :data-fr-js-ratio true
+        :alt              "Beautiful semi-random image"}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -546,7 +550,11 @@
         (i/i @lang :Repos)]]
       [:div.fr-card__desc (i/i @lang :home-repos-desc)]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/repositories.webp" :alt ""}]]]]
+      [:img.fr-responsive-img
+       {:src              "./img/repositories.webp"
+        :loading          "lazy"
+        :data-fr-js-ratio true
+        :alt              "Beautiful semi-random image"}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -557,7 +565,11 @@
         (i/i @lang :Orgas)]]
       [:div.fr-card__desc (i/i @lang :home-orgas-desc)]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/organizations.webp" :alt ""}]]]]
+      [:img.fr-responsive-img
+       {:src              "./img/organizations.webp"
+        :loading          "lazy"
+        :data-fr-js-ratio true
+        :alt              "Beautiful semi-random image"}]]]]
    [:div.fr-col-6.fr-p-2w
     [:div.fr-card.fr-card--horizontal.fr-enlarge-link.fr-card--neutral
      [:div.fr-card__body
@@ -568,7 +580,11 @@
         (i/i @lang :Stats)]]
       [:div.fr-card__desc (i/i @lang :home-stats-desc)]]
      [:div.fr-card__img.fr-col-3
-      [:img.fr-responsive-img {:src "./img/stats.webp" :alt ""}]]]]])
+      [:img.fr-responsive-img
+       {:src              "./img/stats.webp"
+        :loading          "lazy"
+        :data-fr-js-ratio true
+        :alt              "Beautiful semi-random image"}]]]]])
 
 ;; Main structure - repos
 
@@ -806,7 +822,10 @@
                   [:p.fr-tag {:key topic} topic])])]
             (when icon_url
               [:img.fr-responsive-img.fr-col-3
-               {:src icon_url :alt "Repository icon" :data-fr-js-ratio true}])]]
+               {:src              icon_url
+                :loading          "lazy"
+                :alt              "Repository icon"
+                :data-fr-js-ratio true}])]]
           ;; Quick stats section
           [:div.fr-col-12.fr-mt-4w
            [:div.fr-grid-row.fr-grid-row--gutters
@@ -870,7 +889,11 @@
         [:div.fr-card.fr-enlarge-link
          [:div.fr-card__header
           [:div.fr-card__img
-           [:img.fr-responsive-img {:src logo :alt "" :data-fr-js-ratio true}]]]
+           [:img.fr-responsive-img
+            {:src              logo
+             :alt              "Logo"
+             :loading          "lazy"
+             :data-fr-js-ratio true}]]]
          [:div.fr-card__body
           [:div.fr-card__content
            [:div.fr-card__start
@@ -923,7 +946,11 @@
                :rel        "noreferrer noopener"
                :aria-label (i/i @lang :go-to-source)}
               " " (i/i @lang :go-to-source)]]]
-        [:img.fr-responsive-img.fr-col-3 {:src logo :data-fr-js-ratio true}]]
+        [:img.fr-responsive-img.fr-col-3
+         {:src              logo
+          :alt              "Logo"
+          :loading          "lazy"
+          :data-fr-js-ratio true}]]
        [:div.fr-grid-row.fr-grid-row--gutters
         [:div.fr-col-12
          (when-let [license (not-empty (:license legal))]
@@ -992,14 +1019,21 @@
                               :target     "new"
                               :href       h
                               :aria-label (str (i/i @lang :orga-homepage) " " n)}
-                             [:img {:src au :width "100%" :alt (str n " " (i/i @lang :logo))}]]
-                            [:img {:src au :width "100%" :alt (str n " " (i/i @lang :logo))}])
-                          (when (not-empty h)
-                            [:a.fr-raw-link.fr-link
-                             {:title      (i/i @lang :orga-homepage)
-                              :href       h
-                              :aria-label (str (i/i @lang :orga-homepage) " " n)}
-                             (i/i @lang :website)]))]
+                             [:img.fr-responsive-img
+                              {:src              au
+                               :data-fr-js-ratio true
+                               :loading          "lazy"
+                               :alt              (str n " logo")}]]
+                            [:img.fr-responsive-img
+                             {:src     au
+                              :data-fr-js-ratio true
+                              :loading "lazy"
+                              :alt     (str n " logo")}])
+                          [:img.fr-responsive-img
+                           {:src              au
+                            :data-fr-js-ratio true
+                            :loading          "lazy"
+                            :alt              (str n " logo")}])]
                    [:td
                     [:a.fr-raw-link.fr-link
                      {:title      (i/i @lang :go-to-data)
@@ -1111,6 +1145,7 @@
                    [:img.fr-responsive-img
                     {:src              icon_url
                      :alt              (str name " logo")
+                     :loading          "lazy"
                      :data-fr-js-ratio true}]])]
                ;; Info sections
                [:div.fr-grid-row.fr-grid-row--gutters.fr-mb-4w
@@ -1373,7 +1408,8 @@
          [:div.fr-header__service
           [:a {:href "https://code.gouv.fr"}
            [:div.fr-header__service-title
-            [:svg {:width "240px" :viewBox "0 0 299.179 49.204"}
+            [:svg {:width "240px" :viewBox "0 0 299.179 49.204"
+                   :role "img" :aria-label "Code.gouv.fr logo"}
              [:path {:fill "#808080" :d "M5.553 2.957v2.956h4.829V0H5.553Zm5.554 0v2.956h4.829V0h-4.829Zm5.553 0v2.956h4.587V0H16.66zm5.553 0v2.956h4.829V0h-4.829zm76.057 0v2.956h4.829V0H98.27zm5.553 0v2.956h4.829V0h-4.829zm53.843 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.587zm5.313 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.588zM0 10.27v3.112h4.854l-.073-3.05-.073-3.018-2.342-.094L0 7.127zm5.553 0v3.143l2.367-.093 2.342-.093V7.314L7.92 7.22l-2.367-.093zm16.66 0v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.554 0v3.112h4.587V7.158h-4.587zm70.672-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm48.362 2.925v3.112h4.588V7.158h-4.588zm5.481-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm16.732 2.894v3.112h4.588V7.158h-4.588zm5.553 0v3.112h4.588V7.158h-4.587zM0 17.428v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019H0Zm5.553 0v3.143l2.367-.093 2.342-.093v-5.913l-2.342-.094-2.367-.093zm38.197-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.554 0 .072 3.05h4.588l.072-3.05.073-3.019H49.23zm5.505.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm21.248 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.505.093v3.143l2.366-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.602-.093.072 3.05 2.367.093 2.342.093v-6.255h-4.854zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm15.936 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.747.093v3.112h4.587v-6.224h-4.587zm15.694 0v3.112h4.588v-6.224h-4.588zm5.36-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm38.342.093v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm15.936 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm16.66 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.505.093v3.143l2.367-.093 2.342-.093.072-3.05.073-3.019h-4.854zm10.142 0v3.143l2.365-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.6-.093.073 3.05h4.588l.072-3.05.073-3.019h-4.878zm16.66 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.506.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zM0 24.742v2.956h4.829v-5.913H0Zm5.553 0v2.956h4.829v-5.913H5.553Zm32.596 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.141 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.829v-5.913H81.61zm16.66 0v2.956h4.829v-5.913H98.27zm5.553 0v2.956h4.829v-5.913h-4.829zm10.382 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.828v-5.913h-4.828zm16.901 0v2.956h4.587v-5.913h-4.587zm5.312 0v2.956h4.828v-5.913h-4.828zm10.382 0v2.956h4.588v-5.913h-4.588zm5.312 0v2.956h4.829v-5.913h-4.829zm11.107 0v2.956h4.829v-5.913h-4.829zm5.794 0v2.956h4.588v-5.913h-4.588zm5.553 0v2.956h4.588v-5.913h-4.587zm10.383 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.588v-5.913h-4.588zm16.66 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.587v-5.913h-4.587zm10.382 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.142 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zM0 31.744v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094L0 28.601zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm32.596 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.141 0v3.112h4.829v-6.224h-4.829zm5.554 0v3.112h4.829v-6.224H81.61zm16.756-2.707c-.072.249-.096 1.618-.048 3.05l.072 2.614 2.367.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm10.479-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.438.405zm5.457 2.707v3.112h4.828v-6.224h-4.828zm5.649-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm5.795 0v3.112h4.587v-6.224h-4.587zm5.408-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm10.286 2.707v3.112h4.588v-6.224h-4.588zm5.409-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256H160.2c-1.714 0-2.342.125-2.438.405zm16.804 2.707v3.112h4.588v-6.224h-4.588zm5.553 0v3.112h4.588v-6.224h-4.587zm10.383 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.112h4.588v-6.224h-4.588zm16.66 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.554 0v3.112h4.587v-6.224h-4.587zm10.382 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.142 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.112h4.829v-6.224h-4.829zM0 38.747v2.956h4.829V35.79H0Zm5.553 0v2.956h4.829V35.79H5.553Zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm10.141 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.829V35.79H81.61zm16.66 0v2.956h4.829V35.79H98.27zm5.553 0v2.956h4.829V35.79h-4.829zm10.382 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm32.595 0v2.956h4.588V35.79h-4.588zm5.312 0v2.956h4.829V35.79h-4.829zm16.901 0v2.956h4.588V35.79h-4.588zm5.553 0v2.956h4.588V35.79h-4.587zm10.383 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.588V35.79h-4.588zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm15.695 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.828V35.79h-4.828zM5.553 46.06v3.144l2.367-.094 2.342-.093v-5.913L7.92 43.01l-2.367-.093zm5.554 0v3.112h4.853l-.073-3.05-.072-3.018-2.342-.094-2.366-.093zm5.553 0v3.112h4.587v-6.224H16.66zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.072-3.018-2.174-.094c-1.207-.03-2.27 0-2.366.125zm21.489 0c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.554 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm21.248 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.553.031c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.384 2.894v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.723-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm15.936 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.552.031c-.096.093-.168 1.494-.168 3.112v2.894h4.828v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.554-.031c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.626 2.925v3.112h4.587v-6.224h-4.587zm21.175-2.925c-.097.124-.17 1.525-.17 3.143v2.894h4.855l-.073-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.625 2.925v3.112h4.588v-6.224h-4.587zm5.482-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.625 2.894v3.112h4.588v-6.224h-4.588zm21.489 0v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm21.658-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.854l-.073-3.05-.072-3.018-2.342-.094-2.367-.093zm5.554 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm26.801 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.385 2.925v3.112h4.852l-.072-3.05-.073-3.018-2.342-.094-2.366-.093z"}]]]]
           [:p.fr-header__service-tagline (i/i @lang :index-title)]]]
         [:div.fr-header__tools
@@ -1560,21 +1596,33 @@
             [:label.fr-label {:for "fr-radios-theme-light"}
              (i/i @lang :modal-theme-light)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/light.svg"}]]]
+             [:img.fr-responsive-img
+              {:src              "./img/artwork/light.svg"
+               :loading          "lazy"
+               :alt              "Light theme"
+               :data-fr-js-ratio true}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-dark
              {:type "radio" :name "fr-radios-theme" :value "dark"}]
             [:label.fr-label {:for "fr-radios-theme-dark"}
              (i/i @lang :modal-theme-dark)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/dark.svg"}]]]
+             [:img.fr-responsive-img
+              {:src              "./img/artwork/dark.svg"
+               :alt              "Dark theme"
+               :loading          "lazy"
+               :data-fr-js-ratio true}]]]
            [:div.fr-radio-group.fr-radio-rich
             [:input#fr-radios-theme-system
              {:type "radio" :name "fr-radios-theme" :value "system"}]
             [:label.fr-label {:for "fr-radios-theme-system"}
              (i/i @lang :modal-theme-system)]
             [:div.fr-radio-rich__img {:data-fr-inject true}
-             [:img {:src "./img/artwork/system.svg"}]]]]]]]]]]]])
+             [:img.fr-responsive-img
+              {:src              "./img/artwork/system.svg"
+               :loading          "lazy"
+               :alt              "Use theme of the system"
+               :data-fr-js-ratio true}]]]]]]]]]]]])
 
 ;; Main pages functions
 
