@@ -939,10 +939,12 @@
            [:div.fr-grid-row.fr-grid-row--gutters
             [:div.fr-col-6
              [:ul.fr-list
-              [:li [:strong (i/i @lang :primary-language)] ": " language]
-              [:li [:strong (i/i @lang :license)] ": " (:license license)]
-              [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
+              (when-let [l (not-empty language)] [:li [:strong (i/i @lang :primary-language)] ": " l])
+              (when-let [l (:license license)] [:li [:strong (i/i @lang :license)] ": " l])
+              ;; FIXME: This is not reliable enough yet
+              ;; [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
               [:li [:strong (i/i @lang :updated)] ": " (format-date updated_at)]]]
+            ;; FIXME: We don't collect this steadily yet
             ;; [:div.fr-col-6
             ;;  (when commit_stats
             ;;    [:ul.fr-list
