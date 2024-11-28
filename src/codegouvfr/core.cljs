@@ -176,7 +176,8 @@
                 true)
               (if (empty? forge) true (= (:p %) forge))
               (if-a-b-else-true group (= (:o %) group))
-              (if-a-b-else-true q (s-includes? (s/join " " [(:id %) (:d %)]) q)))))))))
+              (if-a-b-else-true q
+                (s-includes? (s/join " " [(:fn %) (:o %) (:d %)]) q)))))))))
 
 (def memoized-apply-orgas-filters
   (memoize
