@@ -1606,8 +1606,9 @@
    [:div.fr-container
     [:div.fr-footer__body
      [:div.fr-footer__brand.fr-enlarge-link
-      [:a {:on-click #(rfe/push-state :home)
-           :title    (i/i @lang :home)}
+      [:button
+       {:on-click #(rfe/push-state :home)
+        :title    (i/i @lang :home)}
        [:p.fr-logo "République" [:br] "Française"]]]
      [:div.fr-footer__content
       [:p.fr-footer__content-desc (i/i @lang :footer-desc)
