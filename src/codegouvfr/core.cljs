@@ -673,7 +673,12 @@
                    [:td {:style      {:text-align "center"}
                          :aria-label (str (i/i @lang :forks) ": " f)} f]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str (i/i @lang :Score) ": " a)} a]])))]])))
+                         :aria-label (str (i/i @lang :Score) ": " a)}
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i @lang :go-to-data)
+                      :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
+                      :aria-label (str (i/i @lang :go-to-data) " " n)}
+                     a]]])))]])))
 
 (defn repos-page []
   (let [repos        (re-frame/subscribe [:repos?])
