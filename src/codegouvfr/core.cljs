@@ -793,7 +793,6 @@
                           forks_count
                           fork
                           archived
-                          stargazers_count
                           subscribers_count
                           license
                           template
@@ -880,7 +879,8 @@
                   topics
                   created_at
                   updated_at
-                  commit_stats]
+                  ;; commit_stats
+                  ]
            :as   repo-data}
           @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty full_name)
@@ -938,11 +938,12 @@
               [:li [:strong (i/i @lang :license)] ": " (:license license)]
               [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
               [:li [:strong (i/i @lang :updated)] ": " (format-date updated_at)]]]
-            [:div.fr-col-6
-             (when commit_stats
-               [:ul.fr-list
-                [:li [:strong (i/i @lang :total-commits)] ": " (:total_commits commit_stats)]
-                [:li [:strong (i/i @lang :total-contributors)] ": " (:total_committers commit_stats)]])]]]
+            ;; [:div.fr-col-6
+            ;;  (when commit_stats
+            ;;    [:ul.fr-list
+            ;;     [:li [:strong (i/i @lang :total-commits)] ": " (:total_commits commit_stats)]
+            ;;     [:li [:strong (i/i @lang :total-contributors)] ": " (:total_committers commit_stats)]])]
+            ]]
           ;; Call to action buttons
           [:div.fr-col-12.fr-mt-4w
            [:div.fr-btns-group.fr-btns-group--right
