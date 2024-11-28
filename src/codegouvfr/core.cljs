@@ -673,7 +673,12 @@
                    [:td {:style      {:text-align "center"}
                          :aria-label (str (i/i @lang :forks) ": " f)} f]
                    [:td {:style      {:text-align "center"}
-                         :aria-label (str (i/i @lang :Score) ": " a)} a]])))]])))
+                         :aria-label (str (i/i @lang :Score) ": " a)}
+                    [:a.fr-raw-link.fr-link
+                     {:title      (i/i @lang :go-to-data)
+                      :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
+                      :aria-label (str (i/i @lang :go-to-data) " " n)}
+                     a]]])))]])))
 
 (defn repos-page []
   (let [repos        (re-frame/subscribe [:repos?])
@@ -789,6 +794,80 @@
        [:p.fr-text--lg.fr-mb-0 value]
        [:p.fr-text--sm.fr-mb-0 label]]]]]])
 
+(defn repo-score [{:keys [description
+                          forks_count
+                          fork
+                          archived
+                          subscribers_count
+                          license
+                          template
+                          metadata]}]
+  (let [high         1000
+        medium       100
+        low          10
+        license      (if (and (string? license) (not (= license "other"))) license "N/A")
+        files        (:files metadata)
+        readme       (:readme files)
+        publiccode   (:publiccode files)
+        changelog    (:changelog files)
+        contributing (:contributing files)]
+    [:div
+     [:h2.fr-h2 {:id "Score"} (i/i @lang :Score)]
+     [:div.fr-table.fr-table--no-caption
+      [:table
+       [:thead.fr-grid.fr-col-9
+        [:tr
+         [:th {:scope "col"} (i/i @lang :Criterium)]
+         [:th {:scope "col"} (i/i @lang :Value)]
+         [:th {:scope "col"} (i/i @lang :Score)]]]
+       [:tbody
+        [:tr
+         [:td {:scope "col"} (i/i @lang :license)]
+         [:td {:scope "col"} license]
+         [:td {:scope "col"} (if-not (= license "N/A") high 0)]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :Template)]
+         [:td {:scope "col"} (if template (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if template high 0)]]
+        [:tr
+         [:td {:scope "col"} "publiccode.yml"]
+         [:td {:scope "col"} (if (not-empty publiccode) (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if (not-empty publiccode) high 0)]]
+        [:tr
+         [:td {:scope "col"} "README"]
+         [:td {:scope "col"} (if (not-empty readme) (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if (not-empty readme) medium 0)]]
+        [:tr
+         [:td {:scope "col"} "CONTRIBUTING.md"]
+         [:td {:scope "col"} (if (not-empty contributing) (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if (not-empty contributing) medium 0)]]
+        [:tr
+         [:td {:scope "col"} "CHANGELOG.md"]
+         [:td {:scope "col"} (if (not-empty changelog) (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if (not-empty changelog) low 0)]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :description)]
+         [:td {:scope "col"} (if (not-empty description) (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if (not-empty description) 0 (- medium))]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :Archived)]
+         [:td {:scope "col"} (if archived (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if archived (- high) 0)]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :fork)]
+         [:td {:scope "col"} (if fork (i/i @lang :Yes) (i/i @lang :No))]
+         [:td {:scope "col"} (if fork (- high) 0)]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :forks)]
+         [:td {:scope "col"} forks_count]
+         [:td {:scope "col"}
+          (if-let [f forks_count] (condp < f 100 high 10 medium 1 low 0) 0)]]
+        [:tr
+         [:td {:scope "col"} (i/i @lang :Subscribers)]
+         [:td {:scope "col"} subscribers_count]
+         [:td {:scope "col"}
+          (if-let [f subscribers_count] (condp < f 100 high 10 medium 1 low 0) 0)]]]]]]))
+
 (defn repo-page []
   (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
     (re-frame/dispatch [:fetch-repo-or-orga-data platform orga-repo-name :repos])
@@ -805,7 +884,10 @@
                   topics
                   created_at
                   updated_at
-                  commit_stats]} @(re-frame/subscribe [:current-repo-or-orga-data?])]
+                  ;; commit_stats
+                  ]
+           :as   repo-data}
+          @(re-frame/subscribe [:current-repo-or-orga-data?])]
       (if-not (not-empty full_name)
         [:div.fr-alert.fr-alert--warning (i/i @lang :sorry-no-data-available)]
         [:div.fr-container.fr-py-6w
@@ -825,7 +907,9 @@
                {:src              icon_url
                 :loading          "lazy"
                 :alt              "Repository icon"
-                :data-fr-js-ratio true}])]]
+                :data-fr-js-ratio true}])]
+           ;; Display score explanations
+           [repo-score repo-data]]
           ;; Quick stats section
           [:div.fr-col-12.fr-mt-4w
            [:div.fr-grid-row.fr-grid-row--gutters
@@ -859,11 +943,12 @@
               [:li [:strong (i/i @lang :license)] ": " (:license license)]
               [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
               [:li [:strong (i/i @lang :updated)] ": " (format-date updated_at)]]]
-            [:div.fr-col-6
-             (when commit_stats
-               [:ul.fr-list
-                [:li [:strong (i/i @lang :total-commits)] ": " (:total_commits commit_stats)]
-                [:li [:strong (i/i @lang :total-contributors)] ": " (:total_committers commit_stats)]])]]]
+            ;; [:div.fr-col-6
+            ;;  (when commit_stats
+            ;;    [:ul.fr-list
+            ;;     [:li [:strong (i/i @lang :total-commits)] ": " (:total_commits commit_stats)]
+            ;;     [:li [:strong (i/i @lang :total-contributors)] ": " (:total_committers commit_stats)]])]
+            ]]
           ;; Call to action buttons
           [:div.fr-col-12.fr-mt-4w
            [:div.fr-btns-group.fr-btns-group--right
@@ -1025,10 +1110,10 @@
                                :loading          "lazy"
                                :alt              (str n " logo")}]]
                             [:img.fr-responsive-img
-                             {:src     au
+                             {:src              au
                               :data-fr-js-ratio true
-                              :loading "lazy"
-                              :alt     (str n " logo")}])
+                              :loading          "lazy"
+                              :alt              (str n " logo")}])
                           [:img.fr-responsive-img
                            {:src              au
                             :data-fr-js-ratio true
@@ -1408,8 +1493,8 @@
          [:div.fr-header__service
           [:a {:href "https://code.gouv.fr"}
            [:div.fr-header__service-title
-            [:svg {:width "240px" :viewBox "0 0 299.179 49.204"
-                   :role "img" :aria-label "Code.gouv.fr logo"}
+            [:svg {:width "240px" :viewBox    "0 0 299.179 49.204"
+                   :role  "img"   :aria-label "Code.gouv.fr logo"}
              [:path {:fill "#808080" :d "M5.553 2.957v2.956h4.829V0H5.553Zm5.554 0v2.956h4.829V0h-4.829Zm5.553 0v2.956h4.587V0H16.66zm5.553 0v2.956h4.829V0h-4.829zm76.057 0v2.956h4.829V0H98.27zm5.553 0v2.956h4.829V0h-4.829zm53.843 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.587zm5.313 0v2.956h4.829V0h-4.829zm5.794 0v2.956h4.588V0h-4.588zM0 10.27v3.112h4.854l-.073-3.05-.073-3.018-2.342-.094L0 7.127zm5.553 0v3.143l2.367-.093 2.342-.093V7.314L7.92 7.22l-2.367-.093zm16.66 0v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.554 0v3.112h4.587V7.158h-4.587zm70.672-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm48.362 2.925v3.112h4.588V7.158h-4.588zm5.481-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83V7.158h-2.246c-1.255 0-2.342.093-2.414.218zm16.732 2.894v3.112h4.588V7.158h-4.588zm5.553 0v3.112h4.588V7.158h-4.587zM0 17.428v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019H0Zm5.553 0v3.143l2.367-.093 2.342-.093v-5.913l-2.342-.094-2.367-.093zm38.197-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.554 0 .072 3.05h4.588l.072-3.05.073-3.019H49.23zm5.505.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm21.248 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.505.093v3.143l2.366-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.602-.093.072 3.05 2.367.093 2.342.093v-6.255h-4.854zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm15.936 0 .072 3.05h4.588l.072-3.05.073-3.019h-4.878zm5.553 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.553 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.747.093v3.112h4.587v-6.224h-4.587zm15.694 0v3.112h4.588v-6.224h-4.588zm5.36-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm38.342.093v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm15.936 0v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zm5.601-.093.073 3.05h4.587l.073-3.05.072-3.019h-4.877zm16.66 0 .073 3.05h4.587l.073-3.05.072-3.019h-4.877zm5.505.093v3.143l2.367-.093 2.342-.093.072-3.05.073-3.019h-4.854zm10.142 0v3.143l2.365-.093 2.343-.093.072-3.05.072-3.019h-4.853zm5.6-.093.073 3.05h4.588l.072-3.05.073-3.019h-4.878zm16.66 0 .073 3.05 2.366.093 2.342.093v-6.255h-4.853zm5.506.093v3.143l2.366-.093 2.342-.093.073-3.05.072-3.019h-4.853zM0 24.742v2.956h4.829v-5.913H0Zm5.553 0v2.956h4.829v-5.913H5.553Zm32.596 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.141 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.829v-5.913H81.61zm16.66 0v2.956h4.829v-5.913H98.27zm5.553 0v2.956h4.829v-5.913h-4.829zm10.382 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.828v-5.913h-4.828zm16.901 0v2.956h4.587v-5.913h-4.587zm5.312 0v2.956h4.828v-5.913h-4.828zm10.382 0v2.956h4.588v-5.913h-4.588zm5.312 0v2.956h4.829v-5.913h-4.829zm11.107 0v2.956h4.829v-5.913h-4.829zm5.794 0v2.956h4.588v-5.913h-4.588zm5.553 0v2.956h4.588v-5.913h-4.587zm10.383 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.588v-5.913h-4.588zm16.66 0v2.956h4.829v-5.913h-4.829zm5.554 0v2.956h4.587v-5.913h-4.587zm10.382 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.829v-5.913h-4.829zm5.553 0v2.956h4.829v-5.913h-4.829zm10.142 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zm16.66 0v2.956h4.828v-5.913h-4.828zm5.553 0v2.956h4.829v-5.913h-4.829zM0 31.744v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094L0 28.601zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm32.596 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.141 0v3.112h4.829v-6.224h-4.829zm5.554 0v3.112h4.829v-6.224H81.61zm16.756-2.707c-.072.249-.096 1.618-.048 3.05l.072 2.614 2.367.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm10.479-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.438.405zm5.457 2.707v3.112h4.828v-6.224h-4.828zm5.649-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm5.457 2.707v3.112h4.829v-6.224h-4.829zm5.795 0v3.112h4.587v-6.224h-4.587zm5.408-2.707c-.072.249-.096 1.618-.048 3.05l.073 2.614 2.366.093 2.342.094v-6.256h-2.294c-1.714 0-2.342.125-2.439.405zm10.286 2.707v3.112h4.588v-6.224h-4.588zm5.409-2.707c-.073.249-.097 1.618-.049 3.05l.073 2.614 2.366.093 2.342.094v-6.256H160.2c-1.714 0-2.342.125-2.438.405zm16.804 2.707v3.112h4.588v-6.224h-4.588zm5.553 0v3.112h4.588v-6.224h-4.587zm10.383 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.112h4.588v-6.224h-4.588zm16.66 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.554 0v3.112h4.587v-6.224h-4.587zm10.382 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.829v-6.224h-4.829zm5.553 0v3.144l2.367-.094 2.342-.093v-5.913l-2.342-.094-2.367-.093zm10.142 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm16.66 0v3.112h4.828v-6.224h-4.828zm5.553 0v3.112h4.829v-6.224h-4.829zM0 38.747v2.956h4.829V35.79H0Zm5.553 0v2.956h4.829V35.79H5.553Zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm10.141 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.829V35.79H81.61zm16.66 0v2.956h4.829V35.79H98.27zm5.553 0v2.956h4.829V35.79h-4.829zm10.382 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm32.595 0v2.956h4.588V35.79h-4.588zm5.312 0v2.956h4.829V35.79h-4.829zm16.901 0v2.956h4.588V35.79h-4.588zm5.553 0v2.956h4.588V35.79h-4.587zm10.383 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.588V35.79h-4.588zm16.66 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.587V35.79h-4.587zm10.382 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.829V35.79h-4.829zm16.66 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm15.695 0v2.956h4.829V35.79h-4.829zm5.553 0v2.956h4.829V35.79h-4.829zm5.554 0v2.956h4.828V35.79h-4.828zm5.553 0v2.956h4.828V35.79h-4.828zM5.553 46.06v3.144l2.367-.094 2.342-.093v-5.913L7.92 43.01l-2.367-.093zm5.554 0v3.112h4.853l-.073-3.05-.072-3.018-2.342-.094-2.366-.093zm5.553 0v3.112h4.587v-6.224H16.66zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.072-3.018-2.174-.094c-1.207-.03-2.27 0-2.366.125zm21.489 0c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.554 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm21.248 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.553.031c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.384 2.894v3.112h4.853l-.072-3.05-.072-3.018-2.343-.094-2.366-.093zm5.723-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.553-.031c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm15.936 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.073-3.05-.072-3.018-2.173-.094c-1.208-.03-2.27 0-2.366.125zm5.552.031c-.096.093-.168 1.494-.168 3.112v2.894h4.828v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.554-.031c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.626 2.925v3.112h4.587v-6.224h-4.587zm21.175-2.925c-.097.124-.17 1.525-.17 3.143v2.894h4.855l-.073-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.625 2.925v3.112h4.588v-6.224h-4.587zm5.482-2.894c-.097.093-.17 1.494-.17 3.112v2.894h4.83v-6.224h-2.246c-1.255 0-2.342.093-2.414.218zm5.625 2.894v3.112h4.588v-6.224h-4.588zm21.489 0v3.112h4.588v-6.224h-4.588zm5.554 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.587v-6.224h-4.587zm5.553 0v3.112h4.853l-.072-3.05-.073-3.018-2.342-.094-2.366-.093zm21.658-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.384 2.925v3.112h4.854l-.073-3.05-.072-3.018-2.342-.094-2.367-.093zm5.554 0v3.144l2.366-.094 2.342-.093v-5.913l-2.342-.094-2.366-.093zm5.722-2.925c-.096.124-.169 1.525-.169 3.143v2.894h4.853l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm26.801 0c-.097.124-.17 1.525-.17 3.143v2.894h4.854l-.072-3.05-.073-3.018-2.173-.094c-1.207-.03-2.27 0-2.366.125zm5.385 2.925v3.112h4.852l-.072-3.05-.073-3.018-2.342-.094-2.366-.093z"}]]]]
           [:p.fr-header__service-tagline (i/i @lang :index-title)]]]
         [:div.fr-header__tools
