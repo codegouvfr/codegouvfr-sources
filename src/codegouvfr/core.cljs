@@ -882,8 +882,9 @@
                   language
                   license
                   topics
-                  created_at
                   updated_at
+                  ;; FIXME: reuse later?
+                  ;; created_at
                   ;; commit_stats
                   ]
            :as   repo-data}
