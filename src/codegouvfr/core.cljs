@@ -24,11 +24,10 @@
 
 ;; Set defaults
 
-(def ^:const UNIX-EPOCH "1970-01-01T00:00:00Z")
 (def ^:const TIMEOUT 200)
 (def ^:const REPOS-PER-PAGE 100)
 (def ^:const ORGAS-PER-PAGE 20)
-(def ^:const ecosystem-prefix-url "https://data.code.gouv.fr/api/v1/hosts/")
+(def ^:const ecosystem-prefix-url "https://ecosystem.code.gouv.fr/api/v1/hosts/")
 (def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
 (defonce root (atom nil))
 (def lang (reagent/atom nil))
@@ -61,11 +60,6 @@
   (let [mm (apply merge m)]
     (filter (fn [[_ v]] (or (true? v) (and (string? v) (not-empty v)))) mm)))
 
-(re-frame/reg-event-fx
- :push-state
- (fn [{:keys [db]} [_ view param-key value]]
-   (rfe/push-state view nil (clean-params (:query-params db) {param-key value}))))
-
 (defn create-push-fn [view param-key]
   (gfun/debounce
    (fn [params value]
@@ -81,16 +75,12 @@
 (defn new-tab [s]
   (str s " - " (i/i @lang :new-tab)))
 
-(defn to-locale-date [^String s]
-  (when (string? s)
-    (.toLocaleDateString (js/Date. (.parse js/Date s)) @lang)))
+(defn to-locale-date [^String date-string]
+  (when (string? date-string)
+    (.toLocaleDateString (js/Date. (.parse js/Date date-string)) @lang)))
 
 (defn todays-date []
   (s/replace (.toLocaleDateString (js/Date.) @lang) "/" "-"))
-
-(defn format-date [date-string]
-  (when date-string
-    (.toLocaleDateString (js/Date. date-string) @lang)))
 
 (defn s-includes? [^String s ^String substring]
   (when (and (string? s) (string? substring))
@@ -112,6 +102,15 @@
        (map #(map (fn [s] (gstring/format "\"%s\"" s)) %))
        (map #(s/join ", " %))
        (s/join "\n")))
+
+(defn score-value [value scores]
+  (if-let [v value]
+    (condp < v
+      100 (:high scores)
+      10  (:medium scores)
+      1   (:low scores)
+      0)
+    0))
 
 (defn download-as-csv!
   [data file-name]
@@ -150,11 +149,6 @@
 
 ;; Filters
 
-(defn if-a-b-else-true
-  "Not a true and b false."
-  [a b]
-  (if a b true))
-
 (def memoized-apply-repos-filters
   (memoize
    (fn [repos {:keys [fork with-contributing with-publiccode
@@ -163,21 +157,19 @@
           (sequence
            (filter
             #(and
-              (if-a-b-else-true fork (:f? %))
-              (if-a-b-else-true with-contributing (:c? %))
-              (if-a-b-else-true with-publiccode (:p? %))
-              (if-a-b-else-true template (:t? %))
-              (if-a-b-else-true floss
-                (let [l (:li %)] (and (not-empty l) (not= l "Other"))))
-              (if-a-b-else-true license (s-includes? (:li %) license))
+              (if fork (:f? %) true)
+              (if with-contributing (:c? %) true)
+              (if with-publiccode (:p? %) true)
+              (if template (:t? %) true)
+              (if floss (let [l (:li %)] (and (not-empty l) (not= l "Other"))) true)
+              (if license (s-includes? (:li %) license) true)
               (if (not-empty language)
                 (some (into #{} (list (s/lower-case (or (:l %) ""))))
                       (s/split (s/lower-case language) #" +"))
                 true)
               (if (empty? forge) true (= (:p %) forge))
-              (if-a-b-else-true group (= (:o %) group))
-              (if-a-b-else-true q
-                (s-includes? (s/join " " [(:fn %) (:o %) (:d %)]) q)))))))))
+              (if group (= (:o %) group) true)
+              (if q (s-includes? (s/join " " [(:fn %) (:o %) (:d %)]) q) true))))))))
 
 (def memoized-apply-orgas-filters
   (memoize
@@ -187,10 +179,7 @@
       (sequence
        (filter
         #(and
-          (if-a-b-else-true q
-            (s-includes?
-             (s/join " " [(:id %) (:n %) (:d %) (:ps %) (:os %)])
-             q))
+          (if q (s-includes? (s/join " " [(:id %) (:n %) (:d %) (:ps %) (:os %)]) q) true)
           (if (empty? ministry) true (= (:m %) ministry)))))))))
 
 (defn apply-orgas-filters [orgas]
@@ -795,23 +784,51 @@
        [:p.fr-text--lg.fr-mb-0 value]
        [:p.fr-text--sm.fr-mb-0 label]]]]]])
 
-(defn repo-score [{:keys [description
-                          forks_count
-                          fork
-                          archived
-                          subscribers_count
-                          license
-                          template
-                          metadata]}]
-  (let [high         1000
-        medium       100
-        low          10
-        license      (if (and (string? license) (not (= license "other"))) license "N/A")
-        files        (:files metadata)
-        readme       (:readme files)
-        publiccode   (:publiccode files)
-        changelog    (:changelog files)
-        contributing (:contributing files)]
+(defn repo-score [{:keys [description forks_count fork archived
+                          subscribers_count license template metadata]}]
+  (let [scores   {:high 1000 :medium 100 :low 10}
+        files    (:files metadata)
+        criteria [{:label    :license
+                   :value    (if (and (string? license) (not= license "other")) license "N/A")
+                   :score-fn #(if (not= % "N/A") (:high scores) 0)}
+                  {:label    :Template
+                   :value    template
+                   :yes-no?  true
+                   :score-fn #(if % (:high scores) 0)}
+                  {:label    "publiccode.yml"
+                   :value    (not-empty (:publiccode files))
+                   :yes-no?  true
+                   :score-fn #(if % (:high scores) 0)}
+                  {:label    "README"
+                   :value    (not-empty (:readme files))
+                   :yes-no?  true
+                   :score-fn #(if % (:medium scores) 0)}
+                  {:label    "CONTRIBUTING.md"
+                   :value    (not-empty (:contributing files))
+                   :yes-no?  true
+                   :score-fn #(if % (:medium scores) 0)}
+                  {:label    "CHANGELOG.md"
+                   :value    (not-empty (:changelog files))
+                   :yes-no?  true
+                   :score-fn #(if % (:low scores) 0)}
+                  {:label    :description
+                   :value    (not-empty description)
+                   :yes-no?  true
+                   :score-fn #(if % 0 (- (:medium scores)))}
+                  {:label    :Archived
+                   :value    archived
+                   :yes-no?  true
+                   :score-fn #(if % (- (:high scores)) 0)}
+                  {:label    :fork
+                   :value    fork
+                   :yes-no?  true
+                   :score-fn #(if % (- (:high scores)) 0)}
+                  {:label    :forks
+                   :value    forks_count
+                   :score-fn #(score-value % scores)}
+                  {:label    :Subscribers
+                   :value    subscribers_count
+                   :score-fn #(score-value % scores)}]]
     [:div
      [:h2.fr-h2 {:id "Score"} (i/i @lang :Score)]
      [:div.fr-table.fr-table--no-caption
@@ -822,52 +839,15 @@
          [:th {:scope "col"} (i/i @lang :Value)]
          [:th {:scope "col"} (i/i @lang :Score)]]]
        [:tbody
-        [:tr
-         [:td {:scope "col"} (i/i @lang :license)]
-         [:td {:scope "col"} license]
-         [:td {:scope "col"} (if-not (= license "N/A") high 0)]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :Template)]
-         [:td {:scope "col"} (if template (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if template high 0)]]
-        [:tr
-         [:td {:scope "col"} "publiccode.yml"]
-         [:td {:scope "col"} (if (not-empty publiccode) (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if (not-empty publiccode) high 0)]]
-        [:tr
-         [:td {:scope "col"} "README"]
-         [:td {:scope "col"} (if (not-empty readme) (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if (not-empty readme) medium 0)]]
-        [:tr
-         [:td {:scope "col"} "CONTRIBUTING.md"]
-         [:td {:scope "col"} (if (not-empty contributing) (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if (not-empty contributing) medium 0)]]
-        [:tr
-         [:td {:scope "col"} "CHANGELOG.md"]
-         [:td {:scope "col"} (if (not-empty changelog) (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if (not-empty changelog) low 0)]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :description)]
-         [:td {:scope "col"} (if (not-empty description) (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if (not-empty description) 0 (- medium))]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :Archived)]
-         [:td {:scope "col"} (if archived (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if archived (- high) 0)]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :fork)]
-         [:td {:scope "col"} (if fork (i/i @lang :Yes) (i/i @lang :No))]
-         [:td {:scope "col"} (if fork (- high) 0)]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :forks)]
-         [:td {:scope "col"} forks_count]
-         [:td {:scope "col"}
-          (if-let [f forks_count] (condp < f 100 high 10 medium 1 low 0) 0)]]
-        [:tr
-         [:td {:scope "col"} (i/i @lang :Subscribers)]
-         [:td {:scope "col"} subscribers_count]
-         [:td {:scope "col"}
-          (if-let [f subscribers_count] (condp < f 100 high 10 medium 1 low 0) 0)]]]]]]))
+        (doall
+         (for [{:keys [label value yes-no? score-fn]} criteria]
+           ^{:key label}
+           [:tr
+            [:td {:scope "col"} (i/i @lang label)]
+            [:td {:scope "col"} (cond
+                                  yes-no? (if value (i/i @lang :Yes) (i/i @lang :No))
+                                  :else   value)]
+            [:td {:scope "col"} (score-fn value)]]))]]]]))
 
 (defn repo-page []
   (let [{:keys [orga-repo-name platform]} @(re-frame/subscribe [:path-params?])]
@@ -945,7 +925,7 @@
               (when-let [l (:license license)] [:li [:strong (i/i @lang :license)] ": " l])
               ;; FIXME: This is not reliable enough yet
               ;; [:li [:strong (i/i @lang :created-at)] ": " (format-date created_at)]
-              [:li [:strong (i/i @lang :updated)] ": " (format-date updated_at)]]]
+              [:li [:strong (i/i @lang :updated)] ": " (to-locale-date updated_at)]]]
             ;; FIXME: We don't collect this steadily yet
             ;; [:div.fr-col-6
             ;;  (when commit_stats
