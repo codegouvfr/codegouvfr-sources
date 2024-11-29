@@ -23,15 +23,12 @@ Ce site est hébergé par OVH France, 2 rue Kellermann, 59100 Roubaix, France.  
 - *Mechanical Keyboard with dsa keycaps* © Jay Zhang , licence [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
 - *Free Turkey Image* © Igor Savelev, licence [Unsplash](https://unsplash.com/photos/6yQ-iSQdpcQ)
 - *Colorful glass windows photo* © Max Williams, licence [Unsplash](https://unsplash.com/photos/dtYGcdagOm0)
-- *Pebble tower* © Jeremy Thomas, licence [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
-- *Person holding green and gold compass* © Mariah Hewines, licence [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
-- *White and black street sign* © Shawn Sim, licence [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
+- *Graph on blue background* © Алекс Арцибашев, licence [Unsplash](https://unsplash.com/photos/vVHXeu0YNbk)
 </ul>
-<br>
 
 ## Code source
 
-Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~codegouvfr/code.gouv.fr).
+Le [code source du site est disponible sur SourceHut](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
 
 ## Données personnelles et cookies
 

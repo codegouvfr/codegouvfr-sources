@@ -22,15 +22,11 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 - *Mechanical Keyboard with dsa keycaps* © Jay Zhang , license [Unsplash](https://unsplash.com/photos/ycZjz2Uw6VY)
 - *Free Turkey Image* © Igor Savelev, license [Unsplash](https://unsplash.com/photos/6yQ-iSQdpcQ)
 - *Colorful glass windows photo* © Max Williams, license [Unsplash](https://unsplash.com/photos/dtYGcdagOm0)
-- *Pebble tower* © Jeremy Thomas, license [Unsplash](https://unsplash.com/photos/FO7bKvgETgQ)
-- *Person holding green and gold compass* © Mariah Hewines, license [Unsplash](https://unsplash.com/photos/TQ3JV9ECgLM)
-- *White and black street sign* © Shawn Sim, license [Unsplash](https://unsplash.com/photos/waLDfHMTD6w)
-</ul>
-<br>
+- *Graph on blue background* © Алекс Арцибашев, licence [Unsplash](https://unsplash.com/photos/vVHXeu0YNbk) </ul>
 
 ## Source code
 
-The [source code of this website is published on SourceHut](https://git.sr.ht/~codegouvfr/code.gouv.fr).
+The [source code of this website is published on SourceHut](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
 
 ## Personal data and cookies
 

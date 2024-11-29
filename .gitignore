@@ -11,3 +11,4 @@ resources/public/data/
 .cpcache/
 *org
 .clj-kondo/
+todo.org
