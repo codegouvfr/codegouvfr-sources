@@ -296,7 +296,7 @@
 (re-frame/reg-event-db
  :set-platforms
  (fn [db [_ response]]
-   (assoc db :platforms (map first (next (js->clj (csv/parse response)))))))
+   (assoc db :platforms (map first (js->clj (csv/parse response))))))
 
 (re-frame/reg-event-db
  :set-stats
