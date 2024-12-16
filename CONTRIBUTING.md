@@ -1,12 +1,6 @@
 # Contributing
 
-You can contribute by sending your patches to `~codegouvfr/dev@lists.sr.ht`.  Remember to configure your local copy of the repository as follows:
-
-    git config format.subjectPrefix ‘PATCH codegouvfr-sources’.
-
 Commit messages should be written in English.
-
-You can also create an account on <https://sr.ht> and send us your username, we will give you write access and you can publish your contributions directly on the `main` branch.
 
 We only accept contributions if they are *signed off* with the contributor's real name.
 
