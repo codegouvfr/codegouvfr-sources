@@ -38,7 +38,7 @@ Ces données sont publiées sous [licence Ouverte 2.0](https://spdx.org/licenses
 
 Voir notre [page avec tous les flux RSS](#/feeds).
 
-Vous pouvez aussi suivre les annonces de la mission logiciels libres en vous abonnant à la [gazette BlueHats](https://code.gouv.fr/fr/bluehats/tags/gazette//) ou en nous suivant sur [Mastodon](https://social.numerique.gouv.fr/@codegouvfr) ou [X (Twitter)](https://x.com/codegouvfr).
+Vous pouvez aussi suivre les annonces de la mission logiciels libres en vous abonnant à la [gazette BlueHats](https://code.gouv.fr/fr/bluehats/tags/gazette//) ou en nous suivant sur [Mastodon](https://social.numerique.gouv.fr/@codegouvfr).
 
 ## Qui sommes-nous ?
 

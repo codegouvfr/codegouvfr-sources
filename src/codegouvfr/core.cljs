@@ -1171,16 +1171,9 @@
         (re-frame/subscribe [:orgas-page?])
         (count (partition-all ORGAS-PER-PAGE @orgas))]])))
 
-(defn social-media-links [{:keys [twitter website]}]
+(defn social-media-links [{:keys [website]}]
   [:div.fr-col-12
    [:div.fr-links-group.fr-links-group--icons]
-   (when twitter
-     [:a.fr-link.fr-icon-twitter-x-line.fr-link--icon-left
-      {:href   (str "https://twitter.com/" twitter)
-       :target "_blank"
-       :rel    "noreferrer noopener"
-       :title  (str (i/i @lang :twitter-follow) " @" twitter)}
-      (str "@" twitter)])
    (when website
      [:a.fr-link.fr-icon-earth-line.fr-link--icon-left.fr-ml-2w
       {:href   website
@@ -1488,10 +1481,6 @@
                  {:rel   "me"
                   :href  "https://social.numerique.gouv.fr/@codegouvfr"
                   :title (i/i @lang :mastodon-follow)} "@codegouvfr"]]
-           [:li [:a.fr-link.fr-icon-twitter-x-line
-                 {:rel   "me"
-                  :href  "https://x.com/codegouvfr"
-                  :title (i/i @lang :twitter-follow)} "@codegouvfr"]]
            [:li [:a.fr-link {:href (rfe/href :feeds)} (i/i @lang :rss-feed)]]
            [:li [:button.fr-link.fr-icon-theme-fill.fr-link--icon-left
                  {:aria-controls  "fr-theme-modal"
@@ -1572,14 +1561,7 @@
           :title      (new-tab (i/i @lang :mastodon-follow))
           :rel        "noreferrer noopener me"
           :target     "_blank"}
-         "Mastodon"]
-        [:a.fr-share__link
-         {:href       "https://x.com/codegouvfr"
-          :aria-label (i/i @lang :twitter-follow)
-          :title      (new-tab (i/i @lang :twitter-follow))
-          :rel        "noreferrer noopener me"
-          :target     "_blank"}
-         "Twitter"]]]]]]])
+         "Mastodon"]]]]]]])
 
 (defn footer []
   [:footer.fr-footer {:role "contentinfo"}
