@@ -36,7 +36,7 @@ These data are published under the [Open License 2.0](https://spdx.org/licenses/
 
 Check our [list of RSS feeds](#/feeds).
 
-You can also follow us on [Mastodon](https://social.numerique.gouv.fr/@codegouvfr) and [Twitter](https://twitter.com/codegouvfr).
+You can also follow us on [Mastodon](https://social.numerique.gouv.fr/@codegouvfr).
 
 ## Who are we ?
 
