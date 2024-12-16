@@ -18,11 +18,11 @@ Pour d'autres précisions sur les termes techniques de ce site, [consultez ce gl
 
 ## Comment contribuer ?
 
-Pour ajouter une forge, un compte d'organisation, un groupe ou même une forge, écrivez à [contact@code.gouv.fr](mailto:contact@code.gouv.fr) ou envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-data/).
+Pour ajouter une forge, un compte d'organisation, un groupe ou même une forge, écrivez à [contact@code.gouv.fr](mailto:contact@code.gouv.fr) ou envoyez un correctif sur [ce dépôt](https://github.com/codegouvfr/codegouvfr-data/).
 
 **Attention**: Nous ne référençons pas les comptes personnels.
 
-Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
+Pour contribuer à ce site web, envoyez un correctif sur [ce dépôt](https://github.com/codegouvfr/codegouvfr-sources).
 
 Plus généralement, vous trouverez plus d'informations sur comment contribuer aux logiciels libres dans cette [documentation](https://code.gouv.fr/documentation/#/publier).
 

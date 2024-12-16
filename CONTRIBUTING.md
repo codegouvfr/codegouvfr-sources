@@ -1,14 +1,20 @@
 # Contributing
 
+<<<<<<< HEAD
 You can contribute by sending your patches to `~codegouvfr/dev@lists.sr.ht`.  Remember to configure your local copy of the repository as follows:
 
     git config format.subjectPrefix ‘PATCH codegouvfr-sources’.
 
 For confidential feedback, use [contact@code.gouv.fr](mailto:contact@code.gouv.fr).
 
-Commit messages should be written in English.
+||||||| 7b9bc10
+You can contribute by sending your patches to `~codegouvfr/dev@lists.sr.ht`.  Remember to configure your local copy of the repository as follows:
 
-You can also create an account on <https://sr.ht> and send us your username, we will give you write access and you can publish your contributions directly on the `main` branch.
+    git config format.subjectPrefix ‘PATCH codegouvfr-sources’.
+
+=======
+>>>>>>> preproduction
+Commit messages should be written in English.
 
 We only accept contributions if they are *signed off* with the contributor's real name.
 
