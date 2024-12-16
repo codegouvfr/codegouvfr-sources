@@ -16,11 +16,11 @@ For more details on other technical terms, [please check this (French) glossary]
 
 ## How to contribute?
 
-To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-data/).
+To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://github.com/codegouvfr/codegouvfr-data/).
 
 **Warning**: We don't reference personal accounts.
 
-To contribute to this website, you can submit a patch against [this repository](https://git.sr.ht/~codegouvfr/codegouvfr-sources)
+To contribute to this website, you can submit a patch against [this repository](https://github.com/codegouvfr/codegouvfr-sources).
 
 More generally, you can find more information on how to contribute to free and open source software in this living [documentation](https://code.gouv.fr/documentation/#/publier).
 

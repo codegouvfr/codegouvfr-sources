@@ -1,5 +1,5 @@
 [![img](https://img.shields.io/badge/code.gouv.fr-contributif-blue.svg)](https://code.gouv.fr/documentation/#/publier)
-[![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg)](https://git.sr.ht/~codegouvfr/code.gouv.fr/tree/main/item/LICENSES)
+[![Software License](https://img.shields.io/badge/Licence-EPL%2C%20Licence%20Ouverte-orange.svg)](https://github.com/codegouvfr/codegouvfr-sources/tree/main/LICENSES)
 
 # code.gouv.fr/sources
 
@@ -11,7 +11,7 @@ This repository contains the Web application for exploring source code from the 
 
 # Get the data
 
-The list of organizations accounts is maintained on [codegouvfr-sources](https://git.sr.ht/~codegouvfr/codegouvfr-sources).
+Data used for [code.gouv.fr/sources](https://code.gouv.fr/sources) are maintained on [codegouvfr-data](https://github.com/codegouvfr/codegouvfr-data) and consolidated by [this script](https://github.com/codegouvfr/codegouvfr-cli/tree/main/item/src/codegouvfr-output-data.clj).
 
 From these sources, data are then fetched by [codegouvfr-fetch-data](https://git.sr.ht/~codegouvfr/codegouvfr-fetch-data) and consolidated with [codegouvfr-consolidate-data](https://git.sr.ht/~codegouvfr/codegouvfr-consolidate-data).
 
@@ -21,8 +21,8 @@ From these sources, data are then fetched by [codegouvfr-fetch-data](https://git
 
 # Develop
 
-    ~$ git clone https://git.sr.ht/~codegouvfr/code.gouv.fr
-    ~$ cd code.gouv.fr/
+    ~$ git clone https://github.com/codegouvfr/codegouvfr-sources
+    ~$ cd codegouvfr-sources/
     ~$ clj -M:fig
 
 This will open you browser at `http://localhost:9500` where you can see your changes as you hack.
