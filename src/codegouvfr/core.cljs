@@ -589,8 +589,8 @@
         [:caption {:id "repos-table-caption"} (i/i @lang :repos-of-source-code)]
         [:thead.fr-grid.fr-col-12
          [:tr
-          [:th.fr-col {:scope "col"} (i/i @lang :Repo)]
-          [:th.fr-col {:scope "col"} (i/i @lang :Orga)]
+          [:th.fr-col-1 {:scope "col"} (i/i @lang :Repo)]
+          [:th.fr-col-1 {:scope "col"} (i/i @lang :Orga)]
           [:th.fr-col {:scope "col"} (i/i @lang :description)]
           [:th.fr-col-1 {:scope "col"}
            [:button.fr-btn.fr-btn--tertiary-no-outline
