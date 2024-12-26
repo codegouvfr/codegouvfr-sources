@@ -1,3 +1,7 @@
+;; Copyright (c) 2019-2025 DINUM, Bastien Guerry <bastien.guerry@code.gouv.fr>
+;; SPDX-License-Identifier: EPL-2.0
+;; License-Filename: LICENSES/EPL-2.0.txt
+
 (ns codegouvfr.macros
   (:require [clojure.java.io :as io]
             [clojure.walk :as walk]
