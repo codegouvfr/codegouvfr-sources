@@ -29,6 +29,7 @@
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const ecosystem-prefix-url "https://ecosystem.code.gouv.fr/api/v1/hosts/")
 (def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
+(def ^:const short_str_size 60)
 (defonce root (atom nil))
 (def lang (reagent/atom nil))
 
@@ -55,6 +56,11 @@
            :s  :subscribers_count}})
 
 ;; Utility functions
+
+(defn- shorten-string [^String s]
+  (if (> (count s) short_str_size)
+    (str (subs s 0 short_str_size) "…")
+    s))
 
 (defn clean-params [& m]
   (let [mm (apply merge m)]
@@ -640,7 +646,7 @@
                      {:title      (i/i @lang :go-to-data)
                       :href       (rfe/href :repo-page {:platform p :orga-repo-name fn})
                       :aria-label (str (i/i @lang :go-to-data) " " n)}
-                     n]]
+                     (shorten-string n)]]
                    [:td [:button.fr-raw-link.fr-link
                          {:on-click
                           #(rfe/push-state :repos nil (clean-params query-params {:group o}))
