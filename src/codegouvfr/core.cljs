@@ -29,7 +29,7 @@
 (def ^:const ORGAS-PER-PAGE 20)
 (def ^:const ecosystem-prefix-url "https://ecosystem.code.gouv.fr/api/v1/hosts/")
 (def ^:const swh-baseurl "https://archive.softwareheritage.org/browse/origin/")
-(def ^:const short_str_size 60)
+(def ^:const short_str_size 50)
 (defonce root (atom nil))
 (def lang (reagent/atom nil))
 
