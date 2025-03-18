@@ -1555,7 +1555,7 @@
          (i/i @lang :bluehats-desc)]
         [:a.fr-btn
          {:type "button"
-          :href "https://code.gouv.fr/newsletters"}
+          :href "https://code.gouv.fr/infolettre"}
          (i/i @lang :subscribe)]]]]
      [:div.fr-col-12.fr-col-md-4
       [:div.fr-share
