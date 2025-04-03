@@ -2,7 +2,7 @@
 
 Many agencies already publish source code repositories : we are listing them on this website to make it easier to find them and to encourage administrations to reuse them or to contribute to them.
 
-<div class="fr-highlight"> <p>If you are a French public agency and want to add new source code repositories, please read our <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> and <a href="mailto:contact@code.gouv.fr">do send us an email</a>. </p> </div>
+<div class="fr-highlight"> <p>If you are a French public agency and want to add new source code repositories, please read our <a target="new" href="https://code.gouv.fr/documentation/">documentation</a> and <a href="mailto:floss@numerique.gouv.fr">do send us an email</a>. </p> </div>
 
 Source code bought or developed by public agencies are considered administrative documents, due to be opened as open data.
 
@@ -16,7 +16,7 @@ For more details on other technical terms, [please check this (French) glossary]
 
 ## How to contribute?
 
-To submit a new organization account, send us an email at [contact@code.gouv.fr](mailto:contact@code.gouv.fr) or send a patch against [this repository](https://github.com/codegouvfr/codegouvfr-data/).
+To submit a new organization account, send us an email at [floss@numerique.gouv.fr](mailto:floss@numerique.gouv.fr) or send a patch against [this repository](https://github.com/codegouvfr/codegouvfr-data/).
 
 **Warning**: We don't reference personal accounts.
 
