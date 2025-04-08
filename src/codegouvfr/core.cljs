@@ -19,7 +19,8 @@
             [semantic-csv.core :as sc]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [cljsjs.highcharts])
+            [cljsjs.highcharts]
+            [markdown-to-hiccup.core :as md])
   (:require-macros [codegouvfr.macros :refer [inline-page]]))
 
 ;; Set defaults
@@ -1006,8 +1007,8 @@
         [:div.fr-col-9
          [:h2.fr-h2 name]
          (if-let [longDesc (:longDescription desc)]
-           [:p longDesc]
-           [:p (:shortDescription desc)])
+           [:p (md/md->hiccup longDesc)]
+           [:p (md/md->hiccup (:shortDescription desc))])
          (when (not-empty landingURL)
            [:p [:a.fr-raw-link.fr-icon-global-line
                 {:href       landingURL
@@ -1021,11 +1022,12 @@
                :rel        "noreferrer noopener"
                :aria-label (i/i @lang :go-to-source)}
               " " (i/i @lang :go-to-source)]]]
-        [:img.fr-responsive-img.fr-col-3
-         {:src              logo
-          :alt              "Logo"
-          :loading          "lazy"
-          :data-fr-js-ratio true}]]
+        [:div.fr-col-3
+         [:img.fr-responsive-img
+          {:src              logo
+           :alt              "Logo"
+           :loading          "lazy"
+           :data-fr-js-ratio true}]]]
        [:div.fr-grid-row.fr-grid-row--gutters
         [:div.fr-col-12
          (when-let [license (not-empty (:license legal))]

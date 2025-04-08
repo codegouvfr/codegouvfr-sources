@@ -26,7 +26,7 @@ The website is hosted by OVH France, 2 rue Kellermann 59100 Roubaix, France.  Ph
 
 ## Source code
 
-The [source code of this website is published on SourceHut](https://github.com/codegouvfr/codegouvfr-sources).
+Here is the [source code of this web application](https://github.com/codegouvfr/codegouvfr-sources).
 
 ## Personal data and cookies
 
