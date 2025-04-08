@@ -1021,11 +1021,12 @@
                :rel        "noreferrer noopener"
                :aria-label (i/i @lang :go-to-source)}
               " " (i/i @lang :go-to-source)]]]
-        [:img.fr-responsive-img.fr-col-3
-         {:src              logo
-          :alt              "Logo"
-          :loading          "lazy"
-          :data-fr-js-ratio true}]]
+        [:div.fr-col-3
+         [:img.fr-responsive-img
+          {:src              logo
+           :alt              "Logo"
+           :loading          "lazy"
+           :data-fr-js-ratio true}]]]
        [:div.fr-grid-row.fr-grid-row--gutters
         [:div.fr-col-12
          (when-let [license (not-empty (:license legal))]
