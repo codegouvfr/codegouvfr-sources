@@ -29,6 +29,14 @@ This will open you browser at `http://localhost:9500` where you can see your cha
 
 **Note**: if you don't have the `clj` executable, try `apt install clojure` or [follow the instructions](https://clojure.org/guides/getting_started) on clojure.org.
 
+# Build
+
+    ~$ git clone https://github.com/codegouvfr/codegouvfr-sources
+    ~$ cd codegouvfr-sources/
+    ~$ clj -M:js
+
+This will produce files in the `resources/public` directory that can be uploaded on a server.
+
 # [Contributing](CONTRIBUTING.md)
 
 # Support the Clojure(script) ecosystem
